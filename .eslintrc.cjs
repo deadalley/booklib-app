@@ -8,6 +8,7 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
+    'vue/multi-word-component-names': 0,
     'prettier/prettier': ['error', { singleQuote: true, semi: false }],
   },
 }
