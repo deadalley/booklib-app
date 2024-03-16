@@ -7,6 +7,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 15px;
+  }
+
   body {
     @apply font-RadioCanada bg-background text-black;
   }
