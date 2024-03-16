@@ -1,11 +1,6 @@
 <template>
   <div class="w-screen h-screen flex items-center justify-center">
-    <button
-      class="bg-main py-3 px-5 text-white text-base rounded-3xl font-medium hover:bg-main-light"
-      @click="handleLogout"
-    >
-      Sign Out
-    </button>
+    <bl-button @click="handleLogout">Sign Out</bl-button>
   </div>
 </template>
 
@@ -17,6 +12,7 @@ useHead({
 definePageMeta({
   middleware: 'auth',
 })
+
 const supabase = useSupabaseClient()
 
 const handleLogout = async () => {

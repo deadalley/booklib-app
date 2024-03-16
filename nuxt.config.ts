@@ -3,6 +3,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['@/assets/css/main.css'],
   modules: ['@nuxtjs/supabase', '@nuxtjs/tailwindcss', '@nuxtjs/storybook'],
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        prefix: 'bl',
+      },
+    ],
+  },
   supabase: {
     redirect: false,
     redirectOptions: {

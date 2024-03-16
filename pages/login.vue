@@ -1,11 +1,8 @@
 <template>
   <div class="w-screen h-screen flex items-center justify-center">
-    <button
-      class="bg-main py-3 px-5 text-white text-base rounded-3xl font-medium hover:bg-main-light"
-      @click="handleLogin"
-    >
+    <bl-button @click="handleLogin">
       {{ loading ? 'Loading' : 'Google Sign-In' }}
-    </button>
+    </bl-button>
   </div>
 </template>
 
