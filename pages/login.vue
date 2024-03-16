@@ -6,7 +6,6 @@
     >
       {{ loading ? 'Loading' : 'Google Sign-In' }}
     </button>
-    <NuxtLink to="/dashboard">Dashboard</NuxtLink>
   </div>
 </template>
 
