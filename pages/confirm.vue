@@ -5,23 +5,23 @@
 </template>
 
 <script setup lang="ts">
-const user = useSupabaseUser();
+const user = useSupabaseUser()
 
-const cookieName = useRuntimeConfig().public.supabase.cookieName;
-const redirectPath = useCookie(`${cookieName}-redirect-path`).value;
+const cookieName = useRuntimeConfig().public.supabase.cookieName
+const redirectPath = useCookie(`${cookieName}-redirect-path`).value
 
 watch(
   user,
   () => {
     if (user.value) {
       if (redirectPath) {
-        useCookie(`${cookieName}-redirect-path`).value = null;
-        return navigateTo(redirectPath || "/");
+        useCookie(`${cookieName}-redirect-path`).value = null
+        return navigateTo(redirectPath || '/')
       } else {
-        return navigateTo("/dashboard");
+        return navigateTo('/dashboard')
       }
     }
   },
   { immediate: true },
-);
+)
 </script>

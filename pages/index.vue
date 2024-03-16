@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const user = useSupabaseUser();
+const user = useSupabaseUser()
 
 if (user.value) {
-  navigateTo("/dashboard");
+  navigateTo('/dashboard')
 } else {
-  navigateTo("/login");
+  navigateTo('/login')
 }
 </script>

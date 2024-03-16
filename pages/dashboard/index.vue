@@ -11,17 +11,17 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: "auth",
-});
-const supabase = useSupabaseClient();
+  middleware: 'auth',
+})
+const supabase = useSupabaseClient()
 
 const handleLogout = async () => {
   try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    navigateTo("/login");
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+    navigateTo('/login')
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 </script>
