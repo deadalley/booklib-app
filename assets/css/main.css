@@ -8,10 +8,30 @@
 
 @layer base {
   html {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   body {
     @apply font-RadioCanada bg-background text-black;
+  }
+
+  h1 {
+    @apply text-black font-bold text-[2.986rem];
+  }
+
+  h2 {
+    @apply text-black font-semibold text-[2.488rem];
+  }
+
+  h3 {
+    @apply text-black font-semibold text-[2.074rem];
+  }
+
+  h4 {
+    @apply text-black font-medium text-[1.728rem];
+  }
+
+  p {
+    @apply text-black;
   }
 }
