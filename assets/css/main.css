@@ -1,0 +1,13 @@
+/* @/assets/css/main.css */
+
+@import url("https://fonts.googleapis.com/css2?family=Radio+Canada:ital,wght@0,300..700;1,300..700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-RadioCanada bg-background text-black;
+  }
+}
