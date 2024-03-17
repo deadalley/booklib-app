@@ -49,7 +49,7 @@ const classes = computed(() => {
   if (props.compact) {
     baseStyles.wrapper.push('py-2 px-5')
   } else {
-    baseStyles.wrapper.push('py-3 px-5 ')
+    baseStyles.wrapper.push('py-3 px-5')
   }
 
   return {
