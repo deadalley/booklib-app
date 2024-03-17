@@ -2,7 +2,12 @@
   <nav
     class="bg-main px-6 pt-16 pb-8 h-full text-accent-light gap-6 flex flex-col"
   >
-    <h2 class="text-accent-light font-normal tracking-wider mb-6">BOOKLIB</h2>
+    <h2
+      class="text-accent-light font-normal tracking-wider mb-6 cursor-pointer"
+      @click="onTitleClick"
+    >
+      BOOKLIB
+    </h2>
     <div class="flex flex-col justify-between flex-1">
       <div class="flex flex-col gap-3 flex-1">
         <bl-nav-sidebar-button
@@ -10,11 +15,19 @@
           :key="button.label"
           :active="activeItem === button.label"
           @click="setActiveItem(button.label)"
-          >{{ button.label }}</bl-nav-sidebar-button
+        >
+          <template #icon="iconProps">
+            <component v-bind="iconProps" :is="button.icon"></component>
+          </template>
+          {{ button.label }}</bl-nav-sidebar-button
         >
       </div>
-      <div class="flex flex-col gap-3">
-        <bl-nav-sidebar-button>Logout</bl-nav-sidebar-button>
+      <div class="flex flex-col gap-3" @click="onLogout">
+        <bl-nav-sidebar-button
+          ><template #icon="iconProps"
+            ><IconLogout v-bind="iconProps" /></template
+          >Logout</bl-nav-sidebar-button
+        >
       </div>
     </div>
   </nav>
@@ -22,12 +35,31 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { IconLogout, IconHome, IconBooks } from '@tabler/icons-vue'
 
-const buttons = [{ label: 'Home ' }, { label: 'Library' }]
+const supabase = useSupabaseClient()
+
+const buttons = [
+  { label: 'Home', icon: IconHome },
+  { label: 'Library', icon: IconBooks },
+]
 const activeItem = ref()
 
 function setActiveItem(item: string) {
-  console.log(item)
   activeItem.value = item
+}
+
+function onTitleClick() {
+  navigateTo('/')
+}
+
+async function onLogout() {
+  try {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+    navigateTo('/login')
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>

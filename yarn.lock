@@ -3679,6 +3679,18 @@
     "@supabase/realtime-js" "2.9.3"
     "@supabase/storage-js" "2.5.5"
 
+"@tabler/icons-vue@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons-vue/-/icons-vue-3.1.0.tgz#011d308e0c95ee619f41212287107a55ac718c19"
+  integrity sha512-o4+uKniOgF52v5+BSdcmSmHMMFQ9KGqrv4/sihBBcrUoZHXqjLq9fPTp4ThnJOQchrI5jUIu2ht0BMZZd4Wbog==
+  dependencies:
+    "@tabler/icons" "3.1.0"
+
+"@tabler/icons@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.1.0.tgz#d69d184eae572db6adb452b511562442133cc26d"
+  integrity sha512-CpZGyS1IVJKFcv88yZ2sYZIpWWhQ6oy76BQKQ5SF0fGgOqgyqKdBGG/YGyyMW632on37MX7VqQIMTzN/uQqmFg==
+
 "@testing-library/dom@^9.0.0":
   version "9.3.4"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-9.3.4.tgz#50696ec28376926fec0a1bf87d9dbac5e27f60ce"
