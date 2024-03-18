@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { IconPlus } from '@tabler/icons-vue'
 
 import Button from './button.vue'
 
@@ -7,11 +8,17 @@ const meta = {
   component: Button,
   tags: ['autodocs'],
   render: (args) => ({
-    components: { Button },
+    components: { Button, IconPlus },
     setup() {
       return { args }
     },
-    template: '<Button v-bind="args">Click Me!</Button>',
+    template: `
+    <Button v-bind="args">
+      Click Me!
+      <template v-if="${'prependIcon' in args}" #prependIcon="prependIcon">${args.prependIcon}</template>
+      <template v-if="${'appendIcon' in args}" #appendIcon="appendIcon">${args.appendIcon}</template>
+    </Button>
+    `,
   }),
 } satisfies Meta<typeof Button>
 
@@ -54,5 +61,31 @@ export const DisabledCompact: Story = {
   args: {
     disabled: true,
     compact: true,
+  },
+}
+
+export const WithPrependIcon: Story = {
+  args: {
+    prependIcon: '<IconPlus v-bind="prependIcon" />',
+  },
+}
+
+export const WithAppendIcon: Story = {
+  args: {
+    appendIcon: '<IconPlus v-bind="appendIcon" />',
+  },
+}
+
+export const WithPrependIconCompact: Story = {
+  args: {
+    compact: true,
+    prependIcon: '<IconPlus v-bind="prependIcon" />',
+  },
+}
+
+export const WithAppendIconCompact: Story = {
+  args: {
+    compact: true,
+    appendIcon: '<IconPlus v-bind="appendIcon" />',
   },
 }

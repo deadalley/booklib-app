@@ -1,5 +1,9 @@
 <template>
-  <button :class="classes.wrapper" :disabled="disabled"><slot></slot></button>
+  <button :class="classes.wrapper" :disabled="disabled">
+    <slot name="prependIcon" :size="iconSize" stroke="1.5"></slot>
+    <slot></slot>
+    <slot name="appendIcon" :size="iconSize" stroke="1.5"></slot>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -22,9 +26,13 @@ const props = defineProps({
   },
 })
 
+const iconSize = computed(() => (props.compact ? 18 : 20))
+
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
-    wrapper: ['inline-flex text-base rounded-3xl font-medium'],
+    wrapper: [
+      'inline-flex items-center gap-2 text-base rounded-3xl font-medium',
+    ],
   }
 
   if (props.disabled) {
