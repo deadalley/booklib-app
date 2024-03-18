@@ -1,8 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  css: ['@/assets/css/main.css'],
-  modules: ['@nuxtjs/supabase', '@nuxtjs/tailwindcss', '@nuxtjs/storybook'],
+  css: ['@/assets/css/main.css', '@/assets/css/forms.css'],
+  modules: [
+    '@nuxtjs/supabase',
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/storybook',
+    '@vueform/nuxt',
+  ],
   components: {
     dirs: [
       {
