@@ -6,7 +6,7 @@ useHead({
 const user = useSupabaseUser()
 
 if (user.value) {
-  navigateTo('/dashboard')
+  navigateTo('/library')
 } else {
   navigateTo('/login')
 }

@@ -19,8 +19,10 @@
           <template #icon="iconProps">
             <component v-bind="iconProps" :is="button.icon"></component>
           </template>
-          {{ button.label }}</bl-nav-sidebar-button
-        >
+          <NuxtLink :to="button.to">
+            {{ button.label }}
+          </NuxtLink>
+        </bl-nav-sidebar-button>
       </div>
       <div class="flex flex-col gap-3" @click="onLogout">
         <bl-nav-sidebar-button
@@ -35,14 +37,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { IconLogout, IconHome, IconBooks } from '@tabler/icons-vue'
+import { IconLogout, IconBooks } from '@tabler/icons-vue'
 
 const supabase = useSupabaseClient()
 
-const buttons = [
-  { label: 'Home', icon: IconHome },
-  { label: 'Library', icon: IconBooks },
-]
+const buttons = [{ label: 'Library', icon: IconBooks, to: '/library' }]
 const activeItem = ref()
 
 function setActiveItem(item: string) {

@@ -32,7 +32,7 @@ export default {
         lg: '1.2rem',
         xl: '1.44rem',
         '2xl': '1.728rem',
-        '3xl': '2.074.rem',
+        '3xl': '2.074rem',
         '4xl': '2.488rem',
         '5xl': '2.986rem',
       },
