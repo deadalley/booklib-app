@@ -9,6 +9,7 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
     'vue/multi-word-component-names': 0,
+    'vue/require-default-prop': 'off',
     'prettier/prettier': ['error', { singleQuote: true, semi: false }],
   },
 }
