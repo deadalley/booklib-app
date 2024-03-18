@@ -11,10 +11,10 @@
     <div class="flex flex-col justify-between flex-1">
       <div class="flex flex-col gap-3 flex-1">
         <bl-nav-sidebar-button
-          v-for="button in buttons"
+          v-for="(button, index) in buttons"
           :key="button.label"
-          :active="activeItem === button.label"
-          @click="setActiveItem(button.label)"
+          :active="activeItemIndex === index"
+          @click="setActiveItem(button.to)"
         >
           <template #icon="iconProps">
             <component v-bind="iconProps" :is="button.icon"></component>
@@ -36,16 +36,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { IconLogout, IconBooks } from '@tabler/icons-vue'
 
+const route = useRoute()
 const supabase = useSupabaseClient()
 
 const buttons = [{ label: 'Library', icon: IconBooks, to: '/library' }]
-const activeItem = ref()
+const activeItemIndex = computed(() =>
+  buttons.findIndex(({ to }) => route.path === to),
+)
 
 function setActiveItem(item: string) {
-  activeItem.value = item
+  navigateTo(item)
 }
 
 function onTitleClick() {
