@@ -8,6 +8,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     label: 'Label',
+    editing: true,
     // @ts-ignore
     placeholder: 'Placeholder',
   },
@@ -39,5 +40,12 @@ export const WithPrefix: Story = {
 export const WithPostfix: Story = {
   args: {
     postfix: 'km',
+  },
+}
+
+export const NotEditing: Story = {
+  args: {
+    editing: false,
+    value: 'Value 123',
   },
 }
