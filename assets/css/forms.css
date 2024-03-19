@@ -2,12 +2,19 @@
 :before,
 :after,
 * {
-  .form-gap-y-gutter,
-  .form-gap-x-gutter {
-    @apply gap-5;
+  .form-container {
+    @apply grid grid-cols-12 gap-16;
+  }
+
+  .form-container section {
+    @apply grid grid-cols-12 col-span-12 gap-4;
+  }
+
+  .form-container section:not(:first-child) {
+    @apply border-t border-t-accent pt-8;
   }
 
   .form-row {
-    @apply grid grid-cols-12 col-span-12 gap-5;
+    @apply grid grid-cols-12 col-span-12 gap-4;
   }
 }

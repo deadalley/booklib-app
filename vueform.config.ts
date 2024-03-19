@@ -38,5 +38,8 @@ export default defineConfig({
     ElementAddon: {
       container: 'text-gray-dark',
     },
+    FormElements: {
+      container: 'form-container',
+    },
   },
 })
