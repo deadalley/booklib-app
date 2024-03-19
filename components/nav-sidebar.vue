@@ -43,7 +43,7 @@ const supabase = useSupabaseClient()
 
 const buttons = [{ label: 'Library', icon: IconBooks, to: '/library' }]
 const activeItemIndex = computed(() =>
-  buttons.findIndex(({ to }) => route.path === to),
+  buttons.findIndex(({ to }) => route.path.includes(to)),
 )
 
 function setActiveItem(item: string) {

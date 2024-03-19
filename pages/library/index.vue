@@ -1,8 +1,17 @@
 <template>
-  <bl-book-form></bl-book-form>
+  <NuxtLink to="library/book/new">
+    <bl-button>
+      <template #prependIcon="prependIcon">
+        <IconPlus v-bind="prependIcon" />
+      </template>
+      New Book</bl-button
+    >
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
+import { IconPlus } from '@tabler/icons-vue'
+
 useHead({
   title: 'BookLib | My Library',
 })

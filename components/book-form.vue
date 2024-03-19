@@ -2,7 +2,7 @@
   <ClientOnly>
     <Vueform endpoint="/book" method="post">
       <section>
-        <h5>Overview</h5>
+        <h4>Overview</h4>
         <bl-input name="title" label="Title" placeholder="Title" />
         <div name="container" class="form-row">
           <bl-input
@@ -54,10 +54,12 @@
           placeholder="ISBN"
           input-type="number"
         />
-      </section>
-      <section>
-        <h5>Summary</h5>
-        <bl-textarea-input name="summary" placeholder="Summary" :rows="10" />
+        <bl-textarea-input
+          name="summary"
+          label="Summary"
+          placeholder="Summary"
+          :rows="4"
+        />
       </section>
       <div class="flex gap-2 justify-end col-span-12">
         <bl-button compact variant="secondary">Discard</bl-button>

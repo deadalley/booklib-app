@@ -31,7 +31,7 @@ const iconSize = computed(() => (props.compact ? 18 : 20))
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
     wrapper: [
-      'inline-flex items-center gap-2 text-base rounded-3xl font-medium',
+      'inline-flex items-center gap-2 text-base rounded-3xl font-medium w-fit',
     ],
   }
 

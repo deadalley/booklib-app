@@ -3,7 +3,7 @@
     <aside class="h-full w-1/6">
       <bl-nav-sidebar></bl-nav-sidebar>
     </aside>
-    <main class="h-full flex-1 flex flex-col">
+    <main class="h-screen flex-1 flex flex-col">
       <nav class="flex gap-10 items-center px-8 py-4 border-b border-b-accent">
         <NuxtLink class="flex-1" to="/">
           <h4>Library</h4>
@@ -28,8 +28,8 @@
           </NuxtLink>
         </div>
       </nav>
-      <div class="flex flex-col p-16 pt-10">
-        <NuxtPage></NuxtPage>
+      <div class="flex flex-col flex-1 p-16 pt-10 overflow-auto">
+        <slot></slot>
       </div>
     </main>
   </div>

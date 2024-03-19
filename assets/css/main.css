@@ -8,7 +8,7 @@
 
 @layer base {
   html {
-    font-size: 15px;
+    font-size: 14px;
 
     :focus-visible {
       outline: 0 !important;
@@ -32,7 +32,7 @@
   }
 
   h4 {
-    @apply font-medium text-[1.728rem];
+    @apply font-semibold text-[1.728rem];
   }
 
   h5 {
@@ -44,6 +44,6 @@
   }
 
   p {
-    @apply text-black;
+    @apply text-black font-normal;
   }
 }

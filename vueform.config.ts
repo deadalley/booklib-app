@@ -6,7 +6,9 @@ const baseStyles: Record<string, string[]> = {
   wrapper: ['flex flex-col justify-end'],
   outerWrapper: ['flex flex-col gap-2'],
   inputContainer: ['flex items-center gap-3'],
-  input: ['w-full px-5 rounded-m outline-none  text-base'],
+  input: [
+    'w-full px-5 rounded-m outline-none text-base placeholder:text-accent',
+  ],
   label: ['text-base font-medium'],
 }
 

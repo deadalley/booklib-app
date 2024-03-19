@@ -3,7 +3,7 @@
 :after,
 * {
   .form-container {
-    @apply grid grid-cols-12 gap-16;
+    @apply grid grid-cols-12 gap-6;
   }
 
   .form-container section {
