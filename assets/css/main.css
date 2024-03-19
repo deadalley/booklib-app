@@ -9,6 +9,10 @@
 @layer base {
   html {
     font-size: 15px;
+
+    :focus-visible {
+      outline: 0 !important;
+    }
   }
 
   body {

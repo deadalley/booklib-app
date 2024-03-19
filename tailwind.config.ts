@@ -1,12 +1,8 @@
 import type { Config } from 'tailwindcss'
 
 export default {
-  content: [
-    './vueform.config.ts',
-    './node_modules/@vueform/vueform/themes/tailwind/**/*.vue',
-    './node_modules/@vueform/vueform/themes/tailwind/**/*.js',
-  ],
-  plugins: [require('@vueform/vueform/tailwind')],
+  content: [],
+  plugins: [],
   theme: {
     colors: {
       accent: '#C3BBAE',

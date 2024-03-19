@@ -4,7 +4,7 @@
     <h6 v-if="$attrs.value">{{ $attrs.value }}</h6>
     <p v-if="!$attrs.value" class="text-gray">Empty</p>
   </div>
-  <TextElement
+  <TextareaElement
     v-if="editing"
     v-bind="{ ...$attrs, ...$props }"
     :placeholder="placeholder"
@@ -12,7 +12,7 @@
   >
     <template v-if="prefix" #addon-before> {{ prefix }} </template>
     <template v-if="postfix" #addon-after> {{ postfix }} </template>
-  </TextElement>
+  </TextareaElement>
 </template>
 
 <script setup lang="ts">
