@@ -1,64 +1,25 @@
 <template>
-  <div v-if="!editing" :class="classes.ElementLayout.container">
-    <label :class="classes.ElementLabel.container">{{ label }}</label>
+  <div v-if="!editing" class="formkit-wrapper">
+    <label class="formkit-label text-accent-dark">{{ $attrs.label }}</label>
     <h6 v-if="$attrs.value">{{ $attrs.value }}</h6>
     <p v-if="!$attrs.value" class="text-gray">Empty</p>
   </div>
-  <TextareaElement
+  <FormKit
     v-if="editing"
-    v-bind="{ ...$attrs, ...$props }"
-    :placeholder="placeholder"
-    :add-classes="classes"
-  >
-    <template v-if="prefix" #addon-before> {{ prefix }} </template>
-    <template v-if="postfix" #addon-after> {{ postfix }} </template>
-  </TextareaElement>
+    v-bind="$attrs"
+    type="textarea"
+    :classes="{
+      label: 'ml-5 text-gray-dark',
+      input: 'py-5',
+    }"
+  />
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  columns: {
-    type: Number,
-    required: false,
-  },
+defineProps({
   editing: {
     type: Boolean,
     default: true,
   },
-  type: {
-    type: String,
-    default: 'text',
-  },
-  placeholder: {
-    type: String,
-    required: false,
-  },
-  prefix: String,
-  postfix: String,
-})
-
-const classes = computed(() => {
-  const baseStyles: Record<string, string[]> = {
-    wrapper: [''],
-    label: [],
-  }
-
-  if (props.editing) {
-    baseStyles.label.push('ml-5')
-  } else {
-    if (props.columns) {
-      // col-span-6
-      baseStyles.wrapper.push(`col-span-${props.columns}`)
-    }
-  }
-
-  return {
-    ElementLayout: {
-      container: baseStyles.wrapper.join(' '),
-    },
-    ElementLabel: {
-      container: baseStyles.label.join(' '),
-    },
-  }
 })
 </script>

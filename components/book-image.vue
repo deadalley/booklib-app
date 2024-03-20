@@ -1,11 +1,11 @@
 <template>
   <div
-    class="relative inline-flex flex-col items-center gap-3 w-3/5 h-3/5 rounded-m"
+    class="relative inline-flex flex-col items-center gap-3 flex-1 h-3/5 rounded-m"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
     <bl-icon-button
-      v-if="hovered"
+      v-if="editing && hovered"
       class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark"
     >
       <template #default="iconProps">
@@ -13,15 +13,10 @@
       </template>
     </bl-icon-button>
     <div
-      v-if="hovered"
+      v-if="editing && hovered"
       class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
     ></div>
-    <img
-      v-if="coverSrc"
-      :src="coverSrc"
-      :alt="alt"
-      class="rounded-2xl w-full"
-    />
+    <img v-if="coverSrc" :src="coverSrc" :alt="alt" class="rounded-m w-full" />
     <div
       v-if="!coverSrc"
       class="bg-gray-light p-10 w-full rounded-m h-full relative"

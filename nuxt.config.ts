@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/storybook',
-    '@vueform/nuxt',
+    '@formkit/nuxt',
   ],
   components: {
     dirs: [

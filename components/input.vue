@@ -1,64 +1,38 @@
 <template>
-  <div v-if="!editing" :class="classes.ElementLayout.container">
-    <label :class="classes.ElementLabel.container">{{ label }}</label>
-    <h6 v-if="$attrs.value">{{ $attrs.value }}</h6>
-    <p v-if="!$attrs.value" class="text-gray">Empty</p>
+  <div v-if="!editing" class="formkit-wrapper">
+    <label class="formkit-label text-accent-dark">{{ $attrs.label }}</label>
+    <h5 v-if="value">{{ value }}</h5>
+    <p v-if="!value" class="text-gray-dark">Empty</p>
   </div>
-  <TextElement
+  <FormKit
     v-if="editing"
-    v-bind="{ ...$attrs, ...$props }"
-    :placeholder="placeholder"
-    :add-classes="classes"
-  >
-    <template v-if="prefix" #addon-before> {{ prefix }} </template>
-    <template v-if="postfix" #addon-after> {{ postfix }} </template>
-  </TextElement>
+    v-bind="$attrs"
+    :classes="{
+      outer: editing ? '' : '!hidden',
+      label: 'ml-5 text-gray-dark',
+      input: 'py-3',
+    }"
+  />
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  columns: {
-    type: Number,
-    required: false,
-  },
+import { useFormKitContext } from '@formkit/vue'
+
+const attrs = useAttrs()
+const value = ref()
+
+defineProps({
+  asd: { type: String, default: '' },
   editing: {
     type: Boolean,
     default: true,
   },
-  type: {
-    type: String,
-    default: 'text',
-  },
-  placeholder: {
-    type: String,
-    required: false,
-  },
-  prefix: String,
-  postfix: String,
 })
 
-const classes = computed(() => {
-  const baseStyles: Record<string, string[]> = {
-    wrapper: [''],
-    label: [],
-  }
+useFormKitContext((form) => {
+  const name = attrs.name as string
+  const formValues = form._value as Record<string, any>
 
-  if (props.editing) {
-    baseStyles.label.push('ml-5')
-  } else {
-    if (props.columns) {
-      // col-span-6
-      baseStyles.wrapper.push(`col-span-${props.columns}`)
-    }
-  }
-
-  return {
-    ElementLayout: {
-      container: baseStyles.wrapper.join(' '),
-    },
-    ElementLabel: {
-      container: baseStyles.label.join(' '),
-    },
-  }
+  value.value = formValues[name]
 })
 </script>
