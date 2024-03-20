@@ -1,12 +1,12 @@
 <template>
   <div class="h-screen flex">
-    <aside class="h-full w-1/6">
+    <aside class="h-full w-[255px]">
       <bl-nav-sidebar></bl-nav-sidebar>
     </aside>
     <main class="h-screen flex-1 flex flex-col">
       <nav class="flex gap-10 items-center px-8 py-4 border-b border-b-accent">
         <NuxtLink class="flex-1" to="/">
-          <h4>Library</h4>
+          <h5>Library</h5>
         </NuxtLink>
         <ul class="flex gap-3">
           <li class="text-lg">
