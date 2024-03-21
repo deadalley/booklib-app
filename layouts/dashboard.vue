@@ -4,11 +4,11 @@
       <bl-nav-sidebar></bl-nav-sidebar>
     </aside>
     <main class="h-screen flex-1 flex flex-col">
-      <nav class="flex gap-10 items-center px-8 py-4 border-b border-b-accent">
-        <NuxtLink class="flex-1" to="/">
+      <nav class="flex gap-16 items-center px-8 py-4 border-b border-b-accent">
+        <NuxtLink class="flex-1" to="/library">
           <h5>Library</h5>
         </NuxtLink>
-        <ul class="flex gap-3">
+        <ul class="flex gap-5">
           <li class="text-lg">
             <NuxtLink to="/library/books">Books</NuxtLink>
           </li>

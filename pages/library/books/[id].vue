@@ -14,8 +14,8 @@
     </header>
     <div class="flex gap-10 flex-1 overflow-auto">
       <bl-book-image
-        :editing="editing"
-        :cover-src="book.coverSrc"
+        :editing="true"
+        :cover-src="'https://picsum.photos/200/300'"
         alt="book-cover"
       ></bl-book-image>
       <div class="overflow-y-auto flex-[3]">

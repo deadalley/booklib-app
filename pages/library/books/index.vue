@@ -16,7 +16,7 @@
         </NuxtLink>
       </div>
     </div>
-    <div>
+    <div class="flex gap-16">
       <bl-book-card v-for="book in books" :key="book.title" :book="book">
       </bl-book-card>
     </div>

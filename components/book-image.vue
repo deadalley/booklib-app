@@ -16,7 +16,13 @@
       v-if="editing && hovered"
       class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
     ></div>
-    <img v-if="coverSrc" :src="coverSrc" :alt="alt" class="rounded-m w-full" />
+    <img
+      v-if="coverSrc"
+      :src="coverSrc"
+      :alt="alt"
+      class="rounded-m h-full w-full object-center object-cover"
+    />
+    <!-- <bl-empty-book-image v-if="!coverSrc"></bl-empty-book-image> -->
     <div
       v-if="!coverSrc"
       class="bg-gray-light p-10 w-full rounded-m h-full relative"
@@ -36,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconPhoto, IconUpload } from '@tabler/icons-vue'
+import { IconUpload } from '@tabler/icons-vue'
 defineProps({
   coverSrc: {
     type: String,

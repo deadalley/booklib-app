@@ -23,7 +23,7 @@ export function bookToDbBook(book: Book, userId: string): BookDB {
   } = book
   return {
     ...rest,
-    author_id: authorId,
+    author_id: authorId ?? 1,
     user_id: userId,
     original_title: originalTitle,
     created_at: createdAt,
