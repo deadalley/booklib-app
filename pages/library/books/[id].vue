@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-10 flex-1 overflow-auto">
+  <div v-if="book" class="flex flex-col gap-10 flex-1 overflow-auto">
     <header class="flex flex-col gap-2">
       <div class="flex gap-3 justify-between items-end">
         <h2 class="flex items-end leading-none">{{ book.title }}</h2>
@@ -20,7 +20,7 @@
         <bl-book-form
           :default-values="book"
           :editing="editing"
-          :on-edit="() => onEdit(true)"
+          :on-edit="onEdit"
           :on-discard="() => onEdit(false)"
         ></bl-book-form>
       </div>
@@ -29,18 +29,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from '../../../types/book'
+import type { Book } from '~/types/book'
 
-const book: Book = {
-  title: 'Revival',
-  author: 'Stephen King',
-  coverSrc: 'https://picsum.photos/160/220',
-  year: 2022,
-  summary:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur tristique ligula sit amet orci egestas, quis lacinia nisi volutpat. Aliquam consectetur metus sit amet dui suscipit, eget sagittis diam luctus. Donec et elit diam. Aenean metus massa, dapibus vitae odio vel, congue aliquam quam. Nunc dictum id nisl sed feugiat. Donec posuere a neque non pretium.',
-}
+const route = useRoute()
 
 const editing = ref(false)
+
+const { data: book } = useFetch<Book>(`/api/books/${route.params.id}`)
 
 function onEdit(value: boolean) {
   editing.value = value

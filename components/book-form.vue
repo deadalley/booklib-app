@@ -11,7 +11,7 @@
       <section v-if="!editing">
         <div class="flex justify-between w-full col-span-12">
           <h4>Summary</h4>
-          <bl-button compact variant="secondary" @click="onEdit()"
+          <bl-button compact variant="secondary" @click="onEdit(true)"
             >Edit</bl-button
           >
         </div>
@@ -117,7 +117,7 @@
 import type { PropType } from 'vue'
 import type { Book } from '~/types/book'
 
-defineProps({
+const props = defineProps({
   defaultValues: {
     type: Object as PropType<Book>,
     required: false,
@@ -137,9 +137,11 @@ defineProps({
 })
 
 async function onSubmit(book: Book) {
-  useFetch('/api/books', {
+  $fetch('/api/books', {
     method: 'post',
     body: book,
   })
+
+  props.onEdit(false)
 }
 </script>
