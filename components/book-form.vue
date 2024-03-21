@@ -14,7 +14,9 @@
             >Edit</bl-button
           >
         </div>
-        <p class="col-span-12">{{ defaultValues?.summary }}</p>
+        <p class="col-span-12 text-gray-dark">
+          {{ defaultValues?.summary ?? 'No summary available' }}
+        </p>
       </section>
       <section>
         <h4>Overview</h4>

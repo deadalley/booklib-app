@@ -9,13 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      authors: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       books: {
         Row: {
+          author_id: number | null
           cover_src: string | null
           created_at: string
           id: number
           isbn: string | null
           language: string | null
+          original_language: string | null
           original_title: string | null
           pages: number | null
           publisher: string | null
@@ -26,11 +46,13 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          author_id?: number | null
           cover_src?: string | null
           created_at?: string
           id?: number
           isbn?: string | null
           language?: string | null
+          original_language?: string | null
           original_title?: string | null
           pages?: number | null
           publisher?: string | null
@@ -41,11 +63,13 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          author_id?: number | null
           cover_src?: string | null
           created_at?: string
           id?: number
           isbn?: string | null
           language?: string | null
+          original_language?: string | null
           original_title?: string | null
           pages?: number | null
           publisher?: string | null
@@ -56,6 +80,13 @@ export type Database = {
           year?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "public_books_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "public_books_user_id_fkey"
             columns: ["user_id"]

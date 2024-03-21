@@ -6,7 +6,7 @@
         <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
       </div>
       <div class="flex">
-        <NuxtLink to="books/new">
+        <NuxtLink to="/library/books/new">
           <bl-button compact>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
@@ -36,5 +36,6 @@ useHead({
 definePageMeta({
   middleware: 'auth',
   layout: 'dashboard',
+  alias: ['/library'],
 })
 </script>
