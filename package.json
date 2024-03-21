@@ -14,7 +14,7 @@
     "lint:fix": "prettier --write --list-different . && yarn lint:js --fix",
     "storybook": "storybook dev --port 6006",
     "build:storybook": "storybook build",
-    "generate:types": "supabase gen types typescript --project-id yrznmuvfaewvjtyhzwrm > types/database.ts"
+    "generate:types": "supabase gen types typescript --project-id yrznmuvfaewvjtyhzwrm > types/db.generate.ts"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.0",

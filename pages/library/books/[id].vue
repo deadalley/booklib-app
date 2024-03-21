@@ -2,8 +2,10 @@
   <div v-if="book" class="flex flex-col gap-10 flex-1 overflow-auto">
     <header class="flex flex-col gap-2">
       <div class="flex gap-3 justify-between items-end">
-        <h2 class="flex items-end leading-none">{{ book.title }}</h2>
-        <div class="flex flex-col leading-tight justify-end">
+        <h2 class="flex items-end leading-none">
+          {{ isNew ? 'New Book' : book.title }}
+        </h2>
+        <div v-if="!isNew" class="flex flex-col leading-tight justify-end">
           <p>Added on</p>
           <h6>01/01/2021</h6>
         </div>
@@ -33,9 +35,19 @@ import type { Book } from '~/types/book'
 
 const route = useRoute()
 
-const editing = ref(false)
+const isNew = computed(() => route.params.id === 'new')
 
-const { data: book } = useFetch<Book>(`/api/books/${route.params.id}`)
+const editing = ref(isNew.value)
+const book = ref()
+
+if (route.params.id === 'new') {
+  book.value = {}
+} else {
+  const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
+  book.value = data
+}
+
+console.log(book.value)
 
 function onEdit(value: boolean) {
   editing.value = value
@@ -43,5 +55,9 @@ function onEdit(value: boolean) {
 
 useHead({
   title: 'BookLib | My Library',
+})
+
+definePageMeta({
+  alias: ['/new'],
 })
 </script>

@@ -10,10 +10,10 @@
         </NuxtLink>
         <ul class="flex gap-3">
           <li class="text-lg">
-            <NuxtLink to="library/books">Books</NuxtLink>
+            <NuxtLink to="/library/books">Books</NuxtLink>
           </li>
           <li class="text-lg">
-            <NuxtLink to="library/collections">Collections</NuxtLink>
+            <NuxtLink to="/library/collections">Collections</NuxtLink>
           </li>
         </ul>
         <div

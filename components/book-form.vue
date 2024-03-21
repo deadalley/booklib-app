@@ -6,9 +6,8 @@
       :actions="false"
       @submit="onSubmit"
     >
-      <bl-input id="id" type="hidden" name="id"></bl-input>
-
       <section v-if="!editing">
+        <bl-input id="id" type="hidden" name="id"></bl-input>
         <div class="flex justify-between w-full col-span-12">
           <h4>Summary</h4>
           <bl-button compact variant="secondary" @click="onEdit(true)"
@@ -137,9 +136,10 @@ const props = defineProps({
 })
 
 async function onSubmit(book: Book) {
+  console.log(book)
   $fetch('/api/books', {
     method: 'post',
-    body: book,
+    body: { ...book, id: book.id ?? props.defaultValues?.id },
   })
 
   props.onEdit(false)
