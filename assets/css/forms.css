@@ -21,7 +21,13 @@
 
   input.formkit-input,
   textarea.formkit-input {
-    @apply w-full px-5 rounded-m outline-none text-base placeholder:text-accent;
+    @apply w-full px-5 rounded-m outline-none text-base placeholder:text-accent border border-white;
+  }
+
+  input:focus.formkit-input,
+  textarea:focus.formkit-input,
+  button:focus {
+    @apply border border-accent;
   }
 
   .formkit-wrapper {
