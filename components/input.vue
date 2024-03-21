@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!editing" class="formkit-wrapper">
+  <div v-if="!editing" class="formkit-wrapper flex-1">
     <label class="formkit-label text-accent-dark">{{ $attrs.label }}</label>
     <h5 v-if="value">{{ value }}</h5>
     <p v-if="!value" class="text-gray-dark">Empty</p>
@@ -8,7 +8,8 @@
     v-if="editing"
     v-bind="$attrs"
     :classes="{
-      outer: editing ? '' : '!hidden',
+      outer: editing ? 'flex-1' : 'flex-1 !hidden',
+      wrapper: 'flex-1',
       label: 'ml-5 text-gray-dark',
       input: 'py-3',
     }"

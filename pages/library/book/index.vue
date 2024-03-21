@@ -45,4 +45,8 @@ const editing = ref(false)
 function onEdit(value: boolean) {
   editing.value = value
 }
+
+useHead({
+  title: 'BookLib | My Library',
+})
 </script>

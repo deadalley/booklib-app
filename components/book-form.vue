@@ -1,6 +1,13 @@
 <template>
   <ClientOnly>
-    <FormKit type="form" :actions="false" :value="defaultValues">
+    <FormKit
+      type="form"
+      :value="defaultValues"
+      :actions="false"
+      @submit="onSubmit"
+    >
+      <bl-input id="id" type="hidden" name="id"></bl-input>
+
       <section v-if="!editing">
         <div class="flex justify-between w-full col-span-12">
           <h4>Summary</h4>
@@ -15,7 +22,6 @@
         <div class="form-row">
           <bl-input
             id="title"
-            asd="title"
             :editing="editing"
             name="title"
             label="Title"
@@ -99,7 +105,9 @@
         <bl-button compact variant="secondary" @click="onDiscard()"
           >Discard</bl-button
         >
-        <bl-button compact type="submit">Save</bl-button>
+        <FormKit type="submit">
+          <bl-button compact>Save</bl-button>
+        </FormKit>
       </div>
     </FormKit>
   </ClientOnly>
@@ -107,7 +115,7 @@
 
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { Book } from '../types/book'
+import type { Book } from '~/types/book'
 
 defineProps({
   defaultValues: {
@@ -127,4 +135,11 @@ defineProps({
     required: true,
   },
 })
+
+async function onSubmit(book: Book) {
+  useFetch('/api/books', {
+    method: 'post',
+    body: book,
+  })
+}
 </script>
