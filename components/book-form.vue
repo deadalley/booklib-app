@@ -136,7 +136,6 @@ const props = defineProps({
 })
 
 async function onSubmit(book: Book) {
-  console.log(book)
   $fetch('/api/books', {
     method: 'post',
     body: { ...book, id: book.id ?? props.defaultValues?.id },

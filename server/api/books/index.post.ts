@@ -8,14 +8,12 @@ export default defineEventHandler(async (event) => {
 
   const book = await readBody(event)
 
-  console.log({ user })
   if (!user?.id) {
     throw new Error('Unauthenticated')
   } else {
-    const { data, ...d } = await client
+    const { data } = await client
       .from('books')
       .upsert(bookToDbBook(book, user.id))
-    console.log(d)
     return data
   }
 })

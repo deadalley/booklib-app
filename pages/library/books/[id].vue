@@ -47,8 +47,6 @@ if (route.params.id === 'new') {
   book.value = data
 }
 
-console.log(book.value)
-
 function onEdit(value: boolean) {
   editing.value = value
 }
