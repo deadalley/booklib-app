@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   if (!user?.id) {
     throw createError('Unauthenticated')
-  } else if (!id) {
+  } else if (!id || id === 'undefined') {
     throw createError('No id provided')
   } else {
     try {

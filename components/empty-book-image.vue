@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-gray-light p-10 w-full rounded-m h-full relative">
+  <div
+    class="bg-gray-light p-10 w-full rounded-m h-full relative"
+    v-bind="$attrs"
+  >
     <div
       class="h-full w-full flex flex-col items-center justify-center border-2 border-gray-dark border-dashed rounded-m text-gray-dark gap-3"
     >

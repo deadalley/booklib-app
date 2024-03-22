@@ -1,15 +1,16 @@
 <template>
   <div class="inline-flex flex-col items-center gap-3">
     <NuxtLink :to="`/library/books/${book.id}`">
-      <div class="h-96 w-64">
-        <bl-empty-book-image v-if="!book.coverSrc"></bl-empty-book-image>
-        <img
-          v-if="book.coverSrc"
-          :src="book.coverSrc ?? undefined"
-          :alt="book.title"
-          class="rounded-2xl"
-        />
-      </div>
+      <bl-empty-book-image
+        v-if="!coverSrc"
+        class="rounded-2xl h-64 w-auto"
+      ></bl-empty-book-image>
+      <img
+        v-if="coverSrc"
+        :src="coverSrc ?? undefined"
+        :alt="book.title"
+        class="rounded-2xl h-64 w-auto"
+      />
     </NuxtLink>
     <div class="flex-col w-full">
       <NuxtLink :to="`/library/books/${book.id}`">
@@ -25,10 +26,14 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 
-defineProps({
+const props = defineProps({
   book: {
     type: Object as PropType<Omit<Book, 'authorId'> & { author?: string }>,
     required: true,
   },
 })
+
+const { data: coverSrc } = await useFetch<string>(
+  `/api/books/${props.book.id}/cover`,
+)
 </script>

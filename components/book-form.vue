@@ -101,7 +101,7 @@
         </div>
       </section>
       <div v-if="editing" class="flex gap-2 justify-end">
-        <bl-button compact variant="secondary" @click="onDiscard()"
+        <bl-button compact variant="secondary" @click="() => onEdit(false)"
           >Discard</bl-button
         >
         <FormKit type="submit">
@@ -129,9 +129,9 @@ const props = defineProps({
     type: Function,
     required: true,
   },
-  onDiscard: {
+  onRefetch: {
     type: Function,
-    required: true,
+    required: false,
   },
 })
 
@@ -143,6 +143,7 @@ async function onSubmit(book: Book) {
 
   if (updatedBook) {
     props.onEdit(false)
+    props.onRefetch?.()
   }
 }
 </script>

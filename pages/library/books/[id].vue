@@ -23,7 +23,7 @@
           :default-values="book"
           :editing="editing"
           :on-edit="onEdit"
-          :on-discard="() => onEdit(false)"
+          :on-refetch="fetchBook"
         ></bl-book-form>
       </div>
     </div>
@@ -40,16 +40,22 @@ const isNew = computed(() => route.params.id === 'new')
 const editing = ref(isNew.value)
 const book = ref()
 
-if (route.params.id === 'new') {
-  book.value = {}
-} else {
-  const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
-  book.value = data
+async function fetchBook() {
+  if (route.params.id === 'new') {
+    book.value = {}
+  } else {
+    const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
+    book.value = data
+  }
 }
 
 function onEdit(value: boolean) {
   editing.value = value
 }
+
+onMounted(() => {
+  fetchBook()
+})
 
 useHead({
   title: 'BookLib | My Library',
