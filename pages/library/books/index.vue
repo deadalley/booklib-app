@@ -7,7 +7,7 @@
       </div>
       <div class="flex">
         <NuxtLink to="/library/books/new">
-          <bl-button compact>
+          <bl-button>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
             </template>

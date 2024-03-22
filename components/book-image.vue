@@ -4,6 +4,7 @@
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
+    <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
     <bl-icon-button
       v-if="editing && hovered"
       class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark"
@@ -15,6 +16,7 @@
     <div
       v-if="editing && hovered"
       class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
+      @click="onUploadClick()"
     ></div>
     <img
       v-if="coverSrc"
@@ -22,29 +24,17 @@
       :alt="alt"
       class="rounded-m h-full w-full object-center object-cover"
     />
-    <!-- <bl-empty-book-image v-if="!coverSrc"></bl-empty-book-image> -->
-    <div
-      v-if="!coverSrc"
-      class="bg-gray-light p-10 w-full rounded-m h-full relative"
-    >
-      <div
-        class="h-full w-full flex flex-col items-center justify-center border-2 border-gray-dark border-dashed rounded-m text-gray-dark gap-3"
-      >
-        <IconPhoto :size="40" :stroke-width="1.5" />
-        <h6 class="leading-tight text-center text-gray-dark font-normal">
-          Book
-          <br />
-          Cover
-        </h6>
-      </div>
-    </div>
+    <bl-empty-book-image v-if="!coverSrc"></bl-empty-book-image>
   </div>
 </template>
 
 <script setup lang="ts">
 import { IconUpload } from '@tabler/icons-vue'
-defineProps({
-  coverSrc: {
+
+const fileInput = ref()
+
+const props = defineProps({
+  bookId: {
     type: String,
     required: false,
   },
@@ -60,7 +50,29 @@ defineProps({
 
 const hovered = ref(false)
 
+const { data: coverSrc, refresh } = await useFetch<string>(
+  `/api/books/${props.bookId}/cover`,
+)
+
 function setHovered(value: boolean) {
   hovered.value = value
+}
+
+function onUploadClick() {
+  fileInput.value.click()
+}
+
+async function onFileChange(e: any) {
+  const file = e.target.files[0] as File
+
+  const formData = new FormData()
+  formData.append('img', file, props.bookId)
+
+  await $fetch(`/api/books/${props.bookId}/cover`, {
+    method: 'post',
+    body: formData,
+  })
+
+  refresh()
 }
 </script>

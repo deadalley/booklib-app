@@ -15,7 +15,7 @@
     <div class="flex gap-10 flex-1 overflow-auto">
       <bl-book-image
         :editing="true"
-        :cover-src="'https://picsum.photos/200/300'"
+        :book-id="book.id"
         alt="book-cover"
       ></bl-book-image>
       <div class="overflow-y-auto flex-[3]">
