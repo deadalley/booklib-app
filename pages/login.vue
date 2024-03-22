@@ -11,24 +11,20 @@ const supabase = useSupabaseClient()
 
 const loading = ref(false)
 
-const handleLogin = async () => {
-  try {
-    loading.value = true
+async function handleLogin() {
+  loading.value = true
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'http://localhost:3000/confirm',
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'http://localhost:3000/confirm',
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
       },
-    })
+    },
+  })
 
-    if (error) throw error
-  } catch (error) {
-    console.log(error)
-  }
+  if (error) throw error
 }
 </script>

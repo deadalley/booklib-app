@@ -45,12 +45,8 @@ const activeItemIndex = computed(() =>
 )
 
 async function onLogout() {
-  try {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    navigateTo('/login')
-  } catch (error) {
-    console.log(error)
-  }
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+  navigateTo('/login')
 }
 </script>
