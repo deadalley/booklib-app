@@ -1,6 +1,7 @@
 <template>
   <ClientOnly>
     <FormKit
+      ref="formRef"
       type="form"
       :value="defaultValues"
       :actions="false"
@@ -27,7 +28,6 @@
             name="title"
             label="Title"
             placeholder="Title"
-            :value="defaultValues?.title"
           />
         </div>
         <div class="form-row">
@@ -37,7 +37,6 @@
             name="publisher"
             label="Publisher"
             placeholder="Publisher"
-            default-value="defaultValues.publisher"
           />
           <bl-input
             id="language"
@@ -54,7 +53,7 @@
             name="year"
             label="Year"
             placeholder="Year"
-            input-type="number"
+            type="number"
           />
           <bl-input
             id="pages"
@@ -62,7 +61,7 @@
             name="pages"
             label="Pages"
             placeholder="Pages"
-            input-type="number"
+            type="number"
           />
         </div>
         <div class="form-row">
@@ -88,7 +87,6 @@
             name="isbn"
             label="ISBN"
             placeholder="ISBN"
-            input-type="number"
           />
         </div>
         <div v-if="editing" class="form-row">
@@ -138,11 +136,13 @@ const props = defineProps({
 })
 
 async function onSubmit(book: Book) {
-  $fetch('/api/books', {
+  const updatedBook = await $fetch<Book>('/api/books', {
     method: 'post',
     body: { ...book, id: book.id ?? props.defaultValues?.id },
   })
 
-  props.onEdit(false)
+  if (updatedBook) {
+    props.onEdit(false)
+  }
 }
 </script>

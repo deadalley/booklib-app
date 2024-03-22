@@ -9,9 +9,13 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    throw new Error('No id provided')
+    throw createError('No id provided')
   } else {
-    const { data } = await client.from('books').select('*').eq('id', id)
+    const { data, error } = await client.from('books').select('*').eq('id', id)
+
+    // if (error) {
+    //   throw createError(error.message)
+    // }
 
     if (data) {
       return dbBooktoBook(data[0])

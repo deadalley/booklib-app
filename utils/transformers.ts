@@ -2,17 +2,28 @@ import type { Book } from '~/types/book'
 import type { BookDB } from '~/types/database'
 
 export function dbBooktoBook(dbBook: BookDB): Book {
+  const {
+    author_id,
+    original_language,
+    original_title,
+    created_at,
+    cover_src,
+    ...rest
+  } = dbBook
   return {
-    ...dbBook,
-    authorId: dbBook.author_id,
-    originalLanguage: dbBook.original_language,
-    originalTitle: dbBook.original_title,
-    createdAt: dbBook.created_at,
-    coverSrc: dbBook.cover_src,
+    ...rest,
+    authorId: author_id,
+    originalLanguage: original_language,
+    originalTitle: original_title,
+    createdAt: created_at,
+    coverSrc: cover_src,
   }
 }
 
-export function bookToDbBook(book: Book, userId: string): BookDB {
+export function bookToDbBook(
+  book: Book,
+  userId: string,
+): Omit<BookDB, 'created_at'> {
   const {
     authorId,
     originalTitle,
@@ -26,7 +37,7 @@ export function bookToDbBook(book: Book, userId: string): BookDB {
     author_id: authorId ?? 1,
     user_id: userId,
     original_title: originalTitle,
-    created_at: createdAt,
+    // created_at: createdAt,
     cover_src: coverSrc,
     original_language: originalLanguage,
   }

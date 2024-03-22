@@ -23,7 +23,6 @@ const attrs = useAttrs()
 const value = ref()
 
 defineProps({
-  asd: { type: String, default: '' },
   editing: {
     type: Boolean,
     default: true,
