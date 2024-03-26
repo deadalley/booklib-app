@@ -1,6 +1,6 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import { Database } from '~/types/db.generate'
-import { bookToDbBook, dbBooktoBook } from '~/utils'
+import { bookToDbBook, dbBooktoBook, logger } from '~/utils'
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
@@ -20,7 +20,19 @@ export default defineEventHandler(async (event) => {
       .select('*')
 
     if (error) {
+      logger.error(error)
       throw createError({ statusMessage: error.message })
+    }
+
+    if (book.tempCoverSrc) {
+      const { error: storageError } = await client.storage
+        .from('book-covers')
+        .move(`${user.id}/${book.tempCoverSrc}`, `${user.id}/${data[0].id}`)
+
+      if (storageError) {
+        logger.error(storageError)
+        throw createError(storageError.message)
+      }
     }
 
     return dbBooktoBook(data[0])

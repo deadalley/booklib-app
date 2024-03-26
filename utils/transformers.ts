@@ -3,6 +3,7 @@ import type { BookDB } from '~/types/database'
 
 export function dbBooktoBook(dbBook: BookDB): Book {
   const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     author_id,
     original_language,
     original_title,
@@ -12,7 +13,6 @@ export function dbBooktoBook(dbBook: BookDB): Book {
   } = dbBook
   return {
     ...rest,
-    authorId: author_id,
     originalLanguage: original_language,
     originalTitle: original_title,
     createdAt: created_at,
@@ -23,22 +23,22 @@ export function dbBooktoBook(dbBook: BookDB): Book {
 export function bookToDbBook(
   book: Book,
   userId: string,
-): Omit<BookDB, 'created_at'> {
-  const {
-    authorId,
-    originalTitle,
-    createdAt,
-    coverSrc,
-    originalLanguage,
-    ...rest
-  } = book
+): Omit<BookDB, 'created_at' | 'id'> {
   return {
-    ...rest,
-    author_id: authorId ?? 1,
+    author_id: 1,
     user_id: userId,
-    original_title: originalTitle,
+    ...(book.id ? { id: book.id } : {}),
     // created_at: createdAt,
-    cover_src: coverSrc,
-    original_language: originalLanguage,
+    original_title: book.originalTitle,
+    cover_src: book.coverSrc,
+    original_language: book.originalLanguage,
+    isbn: book.isbn,
+    language: book.language,
+    pages: book.pages,
+    publisher: book.publisher,
+    rating: book.rating,
+    summary: book.summary,
+    title: book.title,
+    year: book.year,
   }
 }

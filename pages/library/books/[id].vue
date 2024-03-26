@@ -17,7 +17,7 @@
 
       <bl-book-image
         :editing="true"
-        :book-id="book.id"
+        :book-id="book?.id ?? tempCoverSrc"
         alt="book-cover"
       ></bl-book-image>
       <div class="overflow-y-auto flex-[3] flex flex-col gap-16">
@@ -34,12 +34,6 @@
           </p>
         </section>
         <section class="book-section">
-          <!-- <bl-book-form
-            :default-values="book"
-            :editing="editing"
-            :on-cancel="onCancel"
-            :on-submit="onSubmit"
-          ></bl-book-form> -->
           <ClientOnly>
             <FormKit
               ref="formRef"
@@ -166,6 +160,7 @@
 </template>
 
 <script setup lang="ts">
+import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
 
 const route = useRoute()
@@ -176,6 +171,7 @@ const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref()
 const loading = ref(false)
+const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
@@ -208,25 +204,30 @@ function onCancel() {
   if (isNew.value) {
     navigateTo('/library')
   } else {
-    editing.value = false
+    onEdit(false)
   }
 }
 
 async function onSubmit(book: Book) {
-  console.log(book)
-  const updatedBook = await $fetch<Book>('/api/books', {
-    method: 'post',
-    body: book,
-  })
+  try {
+    const updatedBook = await $fetch<Book>('/api/books', {
+      method: 'post',
+      body: {
+        ...book,
+        tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
+      },
+    })
 
-  console.log(updatedBook)
-
-  if (updatedBook) {
-    if (isNew) {
-      navigateTo(`/library/books/${updatedBook.id}`)
-    } else {
-      fetchBook()
+    if (updatedBook) {
+      if (isNew.value) {
+        navigateTo(`/library/books/${updatedBook.id}`)
+      } else {
+        onEdit(false)
+        fetchBook()
+      }
     }
+  } catch (error) {
+    console.error(error)
   }
 }
 

@@ -12,7 +12,7 @@
         v-if="!pending && coverSrc"
         :src="coverSrc ?? undefined"
         :alt="book.title"
-        class="rounded-2xl h-64 w-auto"
+        class="rounded-2xl h-64 w-auto object-center object-cover"
       />
     </NuxtLink>
     <div class="flex-col w-full">
