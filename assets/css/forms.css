@@ -28,7 +28,7 @@
   input:focus.formkit-input,
   textarea:focus.formkit-input,
   button:focus {
-    @apply border border-accent;
+    @apply ring-0 ring-accent ring-inset;
   }
 
   .formkit-wrapper {

@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@headlessui/vue": "^1.7.19",
     "@nuxt/eslint-config": "^0.2.0",
     "@nuxtjs/storybook": "7.0.0",
     "@nuxtjs/supabase": "^1.1.7",

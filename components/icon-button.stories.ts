@@ -13,11 +13,11 @@ const meta = {
       return { args }
     },
     template: `
-    <IconButton v-bind="args">
-      <template v-slot="iconProps">
-        <IconHeart v-bind="iconProps" />
-      </template>
-    </IconButton>
+      <IconButton v-bind="args">
+        <template v-slot="iconProps">
+          <IconHeart v-bind="iconProps" />
+        </template>
+      </IconButton>
     `,
   }),
 } satisfies Meta<typeof IconButton>
