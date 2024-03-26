@@ -1,5 +1,5 @@
 <template>
-  <div class="inline-flex flex-col items-center gap-3">
+  <div class="inline-flex flex-col items-start gap-3">
     <NuxtLink :to="`/library/books/${book.id}`">
       <bl-empty-book-image
         v-if="!coverSrc"
@@ -14,9 +14,11 @@
     </NuxtLink>
     <div class="flex-col w-full">
       <NuxtLink :to="`/library/books/${book.id}`">
-        <h4 class="font-medium">{{ book.title }}</h4>
+        <h4 class="font-medium truncate">
+          {{ book.title }}
+        </h4>
       </NuxtLink>
-      <p v-if="book.author" class="text-sm text-gray-600">
+      <p v-if="book.author" class="text-sm text-gray-600 truncate">
         {{ book.author }}
       </p>
     </div>
