@@ -6,7 +6,7 @@
     <NuxtLink class="h-full w-4/6" :to="`/library/books/${book.id}`">
       <bl-empty-book-image
         v-if="!coverSrc"
-        class="!rounded-2xl !p-6 h-full w-full"
+        class="!rounded-2xl !p-6 min-h-56 h-full w-full"
       ></bl-empty-book-image>
       <img
         v-if="!pending && coverSrc"
