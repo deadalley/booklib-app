@@ -7,19 +7,7 @@
       :actions="false"
       @submit="onSubmit"
     >
-      <section v-if="!editing">
-        <bl-input id="id" type="hidden" name="id"></bl-input>
-        <div class="flex justify-between w-full col-span-12">
-          <h4>Summary</h4>
-          <bl-button compact variant="secondary" @click="onEdit(true)"
-            >Edit</bl-button
-          >
-        </div>
-        <p class="col-span-12 text-gray-dark">
-          {{ defaultValues?.summary ?? 'No summary available' }}
-        </p>
-      </section>
-      <section>
+      <div class="form-section">
         <h4>Overview</h4>
         <div class="form-row">
           <bl-input
@@ -99,7 +87,7 @@
             :rows="4"
           />
         </div>
-      </section>
+      </div>
       <div v-if="editing" class="flex gap-2 justify-end">
         <bl-button compact variant="secondary" @click="() => onEdit(false)"
           >Discard</bl-button

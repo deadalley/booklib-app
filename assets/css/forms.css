@@ -3,11 +3,12 @@
 :after,
 * {
   .formkit-form,
-  .formkit-form section {
-    @apply flex flex-col gap-5 mb-10;
+  .formkit-form section,
+  .form-section {
+    @apply flex flex-col gap-5;
   }
 
-  .formkit-form section:not(:first-child) {
+  .book-section:not(:first-child) {
     @apply border-t border-t-accent pt-8;
   }
 

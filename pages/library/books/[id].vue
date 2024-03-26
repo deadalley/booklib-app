@@ -18,13 +18,27 @@
         :book-id="book.id"
         alt="book-cover"
       ></bl-book-image>
-      <div class="overflow-y-auto flex-[3]">
-        <bl-book-form
-          :default-values="book"
-          :editing="editing"
-          :on-edit="onEdit"
-          :on-refetch="fetchBook"
-        ></bl-book-form>
+      <div class="overflow-y-auto flex-[3] flex flex-col gap-16">
+        <section v-if="!editing" class="book-section">
+          <bl-input id="id" type="hidden" name="id"></bl-input>
+          <div class="flex justify-between w-full col-span-12">
+            <h4>Summary</h4>
+            <bl-button compact variant="secondary" @click="onEdit(true)"
+              >Edit</bl-button
+            >
+          </div>
+          <p class="col-span-12 text-gray-dark">
+            {{ book?.summary ?? 'No summary available' }}
+          </p>
+        </section>
+        <section class="book-section">
+          <bl-book-form
+            :default-values="book"
+            :editing="editing"
+            :on-edit="onEdit"
+            :on-refetch="fetchBook"
+          ></bl-book-form>
+        </section>
       </div>
     </div>
   </div>
