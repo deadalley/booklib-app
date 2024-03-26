@@ -4,7 +4,7 @@ import { IconHeart } from '@tabler/icons-vue'
 import IconButton from './icon-button.vue'
 
 const meta = {
-  title: 'Components/IconButton',
+  title: 'Components/Icon Button',
   component: IconButton,
   tags: ['autodocs'],
   render: (args) => ({

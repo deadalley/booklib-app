@@ -78,8 +78,9 @@
           />
         </div>
         <div v-if="editing" class="form-row">
-          <bl-textarea-input
+          <bl-input
             id="summary"
+            type="textarea"
             :editing="editing"
             name="summary"
             label="Summary"

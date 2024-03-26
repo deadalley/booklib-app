@@ -1,15 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 
 import BookCard from './book-card.vue'
+import { buildBook } from '../utils'
 
 const meta = {
-  title: 'Components/BookCard',
+  title: 'Components/Book Card',
   component: BookCard,
   tags: ['autodocs'],
   args: {
-    title: 'Book Title',
-    author: 'Book Author',
-    coverSrc: 'https://picsum.photos/160/220',
+    book: buildBook(),
   },
 } satisfies Meta<typeof BookCard>
 

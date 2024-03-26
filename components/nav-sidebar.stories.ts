@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import NavSidebar from './nav-sidebar.vue'
 
 const meta = {
-  title: 'Components/NavSidebar',
+  title: 'Components/Nav Sidebar',
   component: NavSidebar,
   tags: ['autodocs'],
   render: (args) => ({
