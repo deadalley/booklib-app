@@ -14,5 +14,14 @@ const config: StorybookConfig = {
   docs: {
     autodocs: 'tag',
   },
+  core: {
+    // @ts-ignore
+    builder: {
+      name: '@storybook/builder-vite',
+      options: {
+        viteConfigPath: './.storybook/vite.config.ts',
+      },
+    },
+  },
 }
 export default config
