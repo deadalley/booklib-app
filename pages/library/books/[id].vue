@@ -39,6 +39,16 @@
             :on-refetch="fetchBook"
           ></bl-book-form>
         </section>
+        <section v-if="!isNew" class="book-section">
+          <h5>Delete book</h5>
+          <div class="flex gap-3 justify-between">
+            <p>
+              Are you sure you want to delete this book? This action cannot be
+              undone.
+            </p>
+            <bl-button compact @click="deleteBook">Delete</bl-button>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -61,6 +71,14 @@ async function fetchBook() {
     const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
     book.value = data
   }
+}
+
+async function deleteBook() {
+  const data = await $fetch<Book>(`/api/books/${route.params.id}`, {
+    method: 'delete',
+  })
+
+  navigateTo('/library')
 }
 
 function onEdit(value: boolean) {
