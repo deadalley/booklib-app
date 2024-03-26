@@ -21,12 +21,14 @@
     ></div>
     <bl-loading v-if="pending"></bl-loading>
     <img
-      v-if="coverSrc && !pending"
+      v-if="bookId && coverSrc && !pending"
       :src="coverSrc"
       :alt="alt"
       class="rounded-m h-full w-full object-center object-cover"
     />
-    <bl-empty-book-image v-if="!bookId"></bl-empty-book-image>
+    <bl-empty-book-image
+      v-if="!pending && (!bookId || !coverSrc)"
+    ></bl-empty-book-image>
   </div>
 </template>
 
