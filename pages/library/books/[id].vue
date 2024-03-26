@@ -7,14 +7,12 @@
         </h2>
         <div v-if="!isNew" class="flex flex-col leading-tight justify-end">
           <p>Added on</p>
-          <h6>01/01/2021</h6>
+          <h6>{{ formattedDate }}</h6>
         </div>
       </div>
       <h5>{{ book.author }}</h5>
     </header>
     <div class="flex gap-10 flex-1 overflow-auto">
-      <!-- <bl-loading v-if="true"></bl-loading> -->
-
       <bl-book-image
         :editing="true"
         :book-id="book?.id ?? tempCoverSrc"
@@ -160,6 +158,7 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
 
@@ -172,6 +171,10 @@ const deleteModalRef = ref()
 const book = ref()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
+
+const formattedDate = computed(() =>
+  format(book.value.createdAt, 'dd MMM yyyy'),
+)
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
