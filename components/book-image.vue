@@ -1,6 +1,7 @@
 <template>
   <div
     class="relative inline-flex flex-col items-center gap-3 flex-1 h-3/5 rounded-m"
+    :class="{ 'justify-center': pending }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
@@ -18,13 +19,14 @@
       class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
       @click="onUploadClick()"
     ></div>
+    <bl-loading v-if="pending"></bl-loading>
     <img
-      v-if="coverSrc"
+      v-if="coverSrc && !pending"
       :src="coverSrc"
       :alt="alt"
       class="rounded-m h-full w-full object-center object-cover"
     />
-    <bl-empty-book-image v-if="!coverSrc"></bl-empty-book-image>
+    <bl-empty-book-image v-if="!bookId"></bl-empty-book-image>
   </div>
 </template>
 
@@ -50,9 +52,11 @@ const props = defineProps({
 
 const hovered = ref(false)
 
-const { data: coverSrc, refresh } = await useFetch<string>(
-  `/api/books/${props.bookId}/cover`,
-)
+const {
+  data: coverSrc,
+  pending,
+  refresh,
+} = await useFetch<string>(`/api/books/${props.bookId}/cover`, { lazy: true })
 
 function setHovered(value: boolean) {
   hovered.value = value

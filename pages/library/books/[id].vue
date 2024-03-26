@@ -13,6 +13,8 @@
       <h5>{{ book.author }}</h5>
     </header>
     <div class="flex gap-10 flex-1 overflow-auto">
+      <!-- <bl-loading v-if="true"></bl-loading> -->
+
       <bl-book-image
         :editing="true"
         :book-id="book.id"
@@ -73,6 +75,7 @@ const isNew = computed(() => route.params.id === 'new')
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref()
+const loading = ref(false)
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
@@ -82,13 +85,15 @@ async function fetchBook() {
   if (route.params.id === 'new') {
     book.value = {}
   } else {
+    loading.value = true
     const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
     book.value = data
+    loading.value = false
   }
 }
 
 async function deleteBook() {
-  const data = await $fetch<Book>(`/api/books/${route.params.id}`, {
+  await $fetch<Book>(`/api/books/${route.params.id}`, {
     method: 'delete',
   })
 

@@ -1,12 +1,15 @@
 <template>
-  <div class="inline-flex flex-col items-start gap-3">
+  <div class="flex flex-col items-start gap-3">
+    <div v-if="pending" class="h-96 w-full flex justify-center items-center">
+      <bl-loading></bl-loading>
+    </div>
     <NuxtLink :to="`/library/books/${book.id}`">
       <bl-empty-book-image
         v-if="!coverSrc"
         class="rounded-2xl h-64 w-auto"
       ></bl-empty-book-image>
       <img
-        v-if="coverSrc"
+        v-if="!pending && coverSrc"
         :src="coverSrc ?? undefined"
         :alt="book.title"
         class="rounded-2xl h-64 w-auto"
@@ -35,7 +38,7 @@ const props = defineProps({
   },
 })
 
-const { data: coverSrc } = await useFetch<string>(
+const { data: coverSrc, pending } = await useFetch<string>(
   `/api/books/${props.book.id}/cover`,
 )
 </script>

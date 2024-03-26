@@ -30,6 +30,7 @@
       </nav>
       <div class="flex flex-col flex-1 p-16 pt-10 overflow-auto">
         <slot></slot>
+        <NuxtLoadingIndicator color="#985858" />
       </div>
     </main>
   </div>
