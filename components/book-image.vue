@@ -19,7 +19,7 @@
       class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
       @click="onUploadClick()"
     ></div>
-    <bl-loading v-if="pending"></bl-loading>
+    <bl-loading v-if="pending && !!bookId"></bl-loading>
     <img
       v-if="bookId && coverSrc && !pending"
       :src="coverSrc"
@@ -58,7 +58,10 @@ const {
   data: coverSrc,
   pending,
   refresh,
-} = await useFetch<string>(`/api/books/${props.bookId}/cover`, { lazy: true })
+} = await useFetch<string>(`/api/books/${props.bookId}/cover`, {
+  lazy: true,
+  immediate: !!props.bookId,
+})
 
 function setHovered(value: boolean) {
   hovered.value = value
