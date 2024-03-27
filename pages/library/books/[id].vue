@@ -39,6 +39,7 @@
               type="form"
               :value="book"
               :actions="false"
+              @keyup.escape="onCancel"
               @submit="onSubmit"
             >
               <div class="form-section">
