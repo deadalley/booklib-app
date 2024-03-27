@@ -52,6 +52,5 @@ useHead({
 definePageMeta({
   middleware: 'auth',
   layout: 'dashboard',
-  alias: ['/library'],
 })
 </script>

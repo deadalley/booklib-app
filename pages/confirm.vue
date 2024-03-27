@@ -18,7 +18,7 @@ watch(
         useCookie(`${cookieName}-redirect-path`).value = null
         return navigateTo(redirectPath || '/')
       } else {
-        return navigateTo('/library')
+        return navigateTo('/library/books')
       }
     }
   },

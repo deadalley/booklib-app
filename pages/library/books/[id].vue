@@ -225,7 +225,7 @@ async function deleteBook() {
     method: 'delete',
   })
 
-  navigateTo('/library')
+  navigateTo('/library/books')
 }
 
 function onEdit(value: boolean) {
@@ -234,7 +234,7 @@ function onEdit(value: boolean) {
 
 function onCancel() {
   if (isNew.value) {
-    navigateTo('/library')
+    navigateTo('/library/books')
   } else {
     onEdit(false)
   }

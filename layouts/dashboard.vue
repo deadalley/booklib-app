@@ -5,7 +5,7 @@
     </aside>
     <main class="h-screen flex-1 flex flex-col">
       <nav class="flex gap-16 items-center px-8 py-4 border-b border-b-accent">
-        <NuxtLink class="flex-1" to="/library">
+        <NuxtLink class="flex-1" to="/library/books">
           <h5>Library</h5>
         </NuxtLink>
         <ul class="flex gap-5">
