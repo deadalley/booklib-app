@@ -12,14 +12,14 @@
         v-if="!pending && coverSrc"
         :src="coverSrc ?? undefined"
         :alt="book.title"
-        class="rounded-2xl h-64 w-auto object-center object-cover"
+        class="rounded-2xl h-56 w-auto object-center object-cover"
       />
     </NuxtLink>
     <div class="flex-col w-full">
       <NuxtLink :to="`/library/books/${book.id}`">
-        <h4 class="font-medium truncate">
+        <h5 class="truncate">
           {{ book.title }}
-        </h4>
+        </h5>
       </NuxtLink>
       <p v-if="book.author" class="text-sm text-gray-600 truncate">
         {{ book.author }}
