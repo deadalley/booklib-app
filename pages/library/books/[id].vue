@@ -34,6 +34,7 @@
         <section class="book-section">
           <ClientOnly>
             <FormKit
+              id="bookForm"
               ref="formRef"
               type="form"
               :value="book"
@@ -166,6 +167,7 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
+const formRef = ref({})
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref()

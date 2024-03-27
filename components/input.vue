@@ -1,11 +1,12 @@
 <template>
   <div v-if="!editing" class="formkit-wrapper flex-1">
     <label class="formkit-label text-accent-dark">{{ $attrs.label }}</label>
-    <h5 v-if="value">{{ value }}</h5>
-    <p v-if="!value" class="text-gray-dark">Empty</p>
+    <h5 v-if="inputModel">{{ inputModel }}</h5>
+    <p v-if="!inputModel" class="text-gray-dark">Empty</p>
   </div>
   <FormKit
     v-if="editing"
+    v-model="inputModel"
     v-bind="$attrs"
     :classes="{
       outer: editing ? 'flex-1' : 'flex-1 !hidden',
@@ -20,7 +21,7 @@
 import { useFormKitContext } from '@formkit/vue'
 
 const attrs = useAttrs()
-const value = ref()
+const inputModel = ref()
 
 defineProps({
   editing: {
@@ -33,6 +34,6 @@ useFormKitContext((form) => {
   const name = attrs.name as string
   const formValues = form._value as Record<string, any>
 
-  value.value = formValues[name]
+  inputModel.value = formValues[name]
 })
 </script>
