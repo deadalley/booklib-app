@@ -3,7 +3,7 @@
     <div v-if="pending" class="h-96 w-full flex justify-center items-center">
       <bl-loading></bl-loading>
     </div>
-    <NuxtLink class="h-full w-4/6" :to="`/library/books/${book.id}`">
+    <NuxtLink class="h-full w-10/12" :to="`/library/books/${book.id}`">
       <bl-empty-book-image
         v-if="!coverSrc"
         class="!rounded-2xl !p-6 min-h-56 h-full w-full"

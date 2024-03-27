@@ -269,14 +269,14 @@ async function onSubmitRating(rating: number) {
 
 async function onSubmitGenre(genre: string, index: number) {
   if (genre) {
-    const genres: string[] = book.value.genres.concat()
+    const genres: string[] = (book.value.genres ?? []).concat()
     genres.splice(index, 1, genre)
     return onSubmit({ ...book.value, genres })
   }
 }
 
 async function onRemoveGenre(index: number) {
-  const genres: string[] = book.value.genres.concat()
+  const genres: string[] = (book.value.genres ?? []).concat()
   genres.splice(index, 1)
   return onSubmit({ ...book.value, genres })
 }

@@ -17,6 +17,7 @@ export function dbBooktoBook(dbBook: BookDB): Book {
     originalTitle: original_title,
     createdAt: created_at,
     coverSrc: cover_src,
+    genres: dbBook.genres ?? [],
   }
 }
 
