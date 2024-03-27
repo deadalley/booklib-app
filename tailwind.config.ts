@@ -36,6 +36,9 @@ export default {
         '4xl': '2.488rem',
         '5xl': '2.986rem',
       },
+      boxShadow: {
+        'inner-m': 'inset 0 2px 8px 0 rgb(0 0 0 / 0.3)',
+      },
     },
   },
 } satisfies Config

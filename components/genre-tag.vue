@@ -9,7 +9,7 @@
     @keydown.enter="_onCommit"
     @keydown.escape="onCancel"
   >
-    <IconTag :size="16" stroke-width="2"></IconTag>
+    <IconTag :size="16" stroke="2"></IconTag>
     <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
       initialContent
     }}</span>
@@ -20,7 +20,7 @@
     <IconCircleX
       v-if="!loading"
       :size="16"
-      stroke-width="2"
+      stroke="2"
       class="absolute right-6 cursor-pointer opacity-0"
       :class="{ 'opacity-100': hovered }"
       @click="_onRemove"
@@ -31,7 +31,7 @@
     class="flex items-center justify-center cursor-pointer rounded-full py-2 h-[35px] aspect-square bg-green hover:bg-green/80"
     @click="onNew"
   >
-    <IconPlus :size="16" stroke-width="2"></IconPlus>
+    <IconPlus :size="16" stroke="2"></IconPlus>
   </div>
 </template>
 
