@@ -1,6 +1,6 @@
 <template>
   <RadioGroup
-    v-model="plan"
+    v-bind="$attrs"
     as="ul"
     class="flex items-center rounded-3xl bg-accent-light text-black"
   >
@@ -10,6 +10,4 @@
 
 <script setup lang="ts">
 import { RadioGroup } from '@headlessui/vue'
-
-const plan = ref('cards')
 </script>

@@ -14,7 +14,7 @@
             Book
           </bl-button>
         </NuxtLink>
-        <bl-switch>
+        <bl-switch v-model="view">
           <bl-switch-option value="cards">
             <template #icon="iconProps">
               <IconLayoutDashboard v-bind="iconProps" />
@@ -28,7 +28,7 @@
         </bl-switch>
       </div>
     </div>
-    <div class="grid grid-cols-10 gap-y-5">
+    <div v-if="view === 'cards'" class="grid grid-cols-10 gap-y-5">
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
     </div>
@@ -39,11 +39,19 @@
 import type { Book } from '~/types/book'
 import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
 
+const router = useRouter()
+
 const { data: books } = await useFetch<Book[]>('/api/books')
 
 const sortedBooks = computed(() =>
   books.value?.sort((b1, b2) => b1.title.localeCompare(b2.title)),
 )
+
+const view = ref('cards')
+
+watch(view, (v) => {
+  router.push({ query: { view: v } })
+})
 
 useHead({
   title: 'BookLib | My Library',
