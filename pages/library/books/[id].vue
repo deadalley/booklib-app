@@ -2,9 +2,15 @@
   <div v-if="book" class="flex flex-col gap-10 flex-1 overflow-auto">
     <header class="flex flex-col gap-2">
       <div class="flex gap-3 justify-between items-end">
-        <h2 class="flex items-end leading-none">
-          {{ isNew ? 'New Book' : book.title }}
-        </h2>
+        <div class="flex gap-5">
+          <h2 class="flex items-end leading-none">
+            {{ isNew ? 'New Book' : book.title }}
+          </h2>
+          <bl-rating
+            :rating="book.rating"
+            :on-commit="onSubmitRating"
+          ></bl-rating>
+        </div>
         <div v-if="!isNew" class="flex flex-col leading-tight justify-end">
           <p>Added on</p>
           <h6>{{ formattedDate }}</h6>
@@ -235,6 +241,10 @@ async function onSubmit(book: Book) {
   } catch (error) {
     console.error(error)
   }
+}
+
+async function onSubmitRating(rating: number) {
+  onSubmit({ ...book.value, rating })
 }
 
 onMounted(() => {
