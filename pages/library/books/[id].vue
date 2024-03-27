@@ -38,6 +38,7 @@
           </p>
         </section>
         <section class="book-section">
+          <h4>Overview</h4>
           <ClientOnly>
             <FormKit
               id="bookForm"
@@ -49,7 +50,6 @@
               @submit="onSubmit"
             >
               <div class="form-section">
-                <h4>Overview</h4>
                 <div class="form-row">
                   <bl-input
                     id="title"
@@ -140,6 +140,26 @@
               </div>
             </FormKit>
           </ClientOnly>
+        </section>
+        <section class="book-section">
+          <h4>Genres</h4>
+          <div class="flex gap-3 flex-wrap">
+            <bl-genre-tag
+              v-for="(genre, index) in book.genres"
+              :key="genre"
+              :value="genre"
+              :index="index"
+              :on-commit="onSubmitGenre"
+              :on-remove="onRemoveGenre"
+            ></bl-genre-tag>
+            <bl-genre-tag
+              key="new"
+              :new-genre="true"
+              :index="book.genres.length"
+              :on-commit="onSubmitGenre"
+              :on-remove="onRemoveGenre"
+            ></bl-genre-tag>
+          </div>
         </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete book</h5>
@@ -235,7 +255,7 @@ async function onSubmit(book: Book) {
         navigateTo(`/library/books/${updatedBook.id}`)
       } else {
         onEdit(false)
-        fetchBook()
+        await fetchBook()
       }
     }
   } catch (error) {
@@ -245,6 +265,20 @@ async function onSubmit(book: Book) {
 
 async function onSubmitRating(rating: number) {
   onSubmit({ ...book.value, rating })
+}
+
+async function onSubmitGenre(genre: string, index: number) {
+  if (genre) {
+    const genres: string[] = book.value.genres.concat()
+    genres.splice(index, 1, genre)
+    return onSubmit({ ...book.value, genres })
+  }
+}
+
+async function onRemoveGenre(index: number) {
+  const genres: string[] = book.value.genres.concat()
+  genres.splice(index, 1)
+  return onSubmit({ ...book.value, genres })
 }
 
 onMounted(() => {

@@ -8,6 +8,10 @@
     @apply flex flex-col gap-5;
   }
 
+  .book-section h4 {
+    @apply mb-5;
+  }
+
   .book-section:not(:first-child) {
     @apply border-t border-t-accent pt-8;
   }

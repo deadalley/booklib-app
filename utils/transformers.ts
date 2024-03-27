@@ -40,5 +40,6 @@ export function bookToDbBook(
     summary: book.summary,
     title: book.title,
     year: book.year,
+    genres: book.genres,
   }
 }

@@ -12,4 +12,5 @@ export type Book = {
   rating: number | null
   summary: string | null
   year: number | null
+  genres: string[] | null
 }
