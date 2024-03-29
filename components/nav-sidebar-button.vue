@@ -7,7 +7,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ICON_SIZE_MEDIUM } from '~/utils'
 
 const props = defineProps({
   active: {

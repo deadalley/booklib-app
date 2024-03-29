@@ -1,5 +1,5 @@
 <template>
-  <div class="formkit-inner !w-96">
+  <div class="formkit-inner !lg:w-[500px] !w-full">
     <IconSearch :size="ICON_SIZE_MEDIUM" />
     <input class="w-full" v-bind="$attrs" />
   </div>
@@ -7,7 +7,6 @@
 
 <script setup lang="ts">
 import { IconSearch } from '@tabler/icons-vue'
-import { ICON_SIZE_MEDIUM } from '~/utils'
 
 defineOptions({
   inheritAttrs: false,

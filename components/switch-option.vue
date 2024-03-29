@@ -1,11 +1,12 @@
 <template>
   <RadioGroupOption
     v-slot="{ checked }"
+    as="li"
     :value="value"
-    class="flex w-full cursor-pointer items-center border-r border-accent-dark first:rounded-l-3xl last:rounded-r-3xl last:border-0 hover:bg-accent active:bg-accent-dark"
+    class="flex cursor-pointer items-center border-r border-accent-dark first:rounded-l-3xl last:rounded-r-3xl last:border-0 hover:bg-accent active:bg-accent-dark lg:w-full"
   >
-    <li
-      class="flex w-full items-center rounded-[inherit] px-3 first:pl-5 last:pr-5"
+    <span
+      class="flex items-center rounded-[inherit] px-3 first:pl-5 last:pr-5 lg:w-full"
       :class="{
         'bg-accent-dark shadow-inner-m': !!checked,
         'py-2': compact,
@@ -13,13 +14,12 @@
       }"
     >
       <slot name="icon" :size="iconSize" stroke="1.5"></slot>
-    </li>
+    </span>
   </RadioGroupOption>
 </template>
 
 <script setup lang="ts">
 import { RadioGroupOption } from '@headlessui/vue'
-import { ICON_SIZE_MEDIUM, ICON_SIZE_SMALL } from '~/utils'
 
 const props = defineProps<{ compact?: boolean; value: string | number }>()
 

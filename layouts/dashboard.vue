@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen">
-    <aside class="h-full w-[255px]">
+    <aside class="h-full w-min md:w-[255px]">
       <bl-nav-sidebar></bl-nav-sidebar>
     </aside>
     <main class="flex h-screen flex-1 flex-col">

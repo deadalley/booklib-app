@@ -2,7 +2,7 @@
   <div v-if="pending" class="flex size-full items-center justify-center">
     <bl-loading></bl-loading>
   </div>
-  <NuxtLink :to="`/library/books/${book.id}`">
+  <NuxtLink :to="`/library/books/${book.id}`" class="w-full">
     <bl-empty-book-image
       v-if="!coverSrc"
       class="!h-48 min-w-32 !rounded-2xl !p-5"
@@ -11,7 +11,7 @@
       v-if="!pending && coverSrc"
       :src="coverSrc ?? undefined"
       :alt="book.title"
-      class="h-48 w-auto rounded-2xl object-cover object-center"
+      class="h-auto w-full max-w-full rounded-2xl object-cover object-center md:h-48 md:w-auto"
     />
   </NuxtLink>
 </template>

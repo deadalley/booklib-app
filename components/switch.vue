@@ -2,7 +2,7 @@
   <RadioGroup
     v-bind="$attrs"
     as="ul"
-    class="flex h-min items-center rounded-3xl bg-accent-light text-black"
+    class="inline-flex h-min items-center rounded-3xl bg-accent-light text-black"
   >
     <slot v-bind="$props"></slot>
   </RadioGroup>

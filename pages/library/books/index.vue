@@ -1,15 +1,15 @@
 <template>
   <div class="flex flex-col gap-8">
-    <div class="flex justify-between">
-      <div class="flex items-baseline gap-3">
+    <div class="flex flex-col justify-between lg:flex-row">
+      <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
           <h3>All Books</h3>
         </NuxtLink>
         <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
       </div>
-      <div class="flex gap-3">
+      <div class="flex flex-col gap-3 lg:flex-row">
         <bl-search-bar @input="onSearch"></bl-search-bar>
-        <NuxtLink to="/library/books/new">
+        <NuxtLink class="flex md:inline-flex" to="/library/books/new">
           <bl-button>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
@@ -17,22 +17,27 @@
             Book
           </bl-button>
         </NuxtLink>
-        <bl-button variant="secondary"> Filter </bl-button>
-        <bl-switch v-slot="props" v-model="view">
-          <bl-switch-option value="cards" v-bind="props">
-            <template #icon="iconProps">
-              <IconLayoutDashboard v-bind="iconProps" />
-            </template>
-          </bl-switch-option>
-          <bl-switch-option value="table" v-bind="props">
-            <template #icon="iconProps">
-              <IconTable v-bind="iconProps" />
-            </template>
-          </bl-switch-option>
-        </bl-switch>
+        <div class="flex gap-3">
+          <bl-button variant="secondary"> Filter </bl-button>
+          <bl-switch v-slot="props" v-model="view">
+            <bl-switch-option value="cards" v-bind="props">
+              <template #icon="iconProps">
+                <IconLayoutDashboard v-bind="iconProps" />
+              </template>
+            </bl-switch-option>
+            <bl-switch-option value="table" v-bind="props">
+              <template #icon="iconProps">
+                <IconTable v-bind="iconProps" />
+              </template>
+            </bl-switch-option>
+          </bl-switch>
+        </div>
       </div>
     </div>
-    <div v-if="view === 'cards'" class="grid grid-cols-10 gap-y-5">
+    <div
+      v-if="view === 'cards'"
+      class="grid grid-cols-1 gap-x-3 gap-y-5 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+    >
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
     </div>
@@ -43,7 +48,6 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
-import { filterElements } from '~/utils'
 
 const router = useRouter()
 const route = useRoute()

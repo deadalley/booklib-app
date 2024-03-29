@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ICON_SIZE_MEDIUM } from '~/utils'
 
 const props = withDefaults(
   defineProps<{
@@ -26,7 +25,7 @@ const iconSize = computed(() =>
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
     wrapper: [
-      'inline-flex items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
+      'flex md:inline-flex flex-1 justify-center items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
     ],
   }
 
