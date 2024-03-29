@@ -7,7 +7,8 @@
             {{ isNew ? 'New Book' : book.title }}
           </h2>
           <bl-rating
-            :rating="book.rating"
+            :editing="true"
+            :rating="book.rating ?? 0"
             :on-commit="onSubmitRating"
           ></bl-rating>
         </div>
@@ -194,7 +195,6 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const formRef = ref({})
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref()

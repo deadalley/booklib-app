@@ -19,8 +19,11 @@
 
 <script setup lang="ts">
 import { RadioGroupOption } from '@headlessui/vue'
+import { ICON_SIZE_MEDIUM, ICON_SIZE_SMALL } from '~/utils'
 
 const props = defineProps<{ compact?: boolean; value: string | number }>()
 
-const iconSize = computed(() => (props.compact ? 21 : 24))
+const iconSize = computed(() =>
+  props.compact ? ICON_SIZE_MEDIUM : ICON_SIZE_SMALL,
+)
 </script>

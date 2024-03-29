@@ -6,15 +6,17 @@
         <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
       </div>
       <div class="flex gap-3">
+        <bl-search-bar @input="onSearch"></bl-search-bar>
         <NuxtLink to="/library/books/new">
-          <bl-button compact>
+          <bl-button>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
             </template>
             Book
           </bl-button>
         </NuxtLink>
-        <bl-switch v-slot="props" v-model="view" compact>
+        <bl-button variant="secondary"> Filter </bl-button>
+        <bl-switch v-slot="props" v-model="view">
           <bl-switch-option value="cards" v-bind="props">
             <template #icon="iconProps">
               <IconLayoutDashboard v-bind="iconProps" />
@@ -39,21 +41,30 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
+import { filterElements } from '~/utils'
 
 const router = useRouter()
 const route = useRoute()
 
 const { data: books } = await useFetch<Book[]>('/api/books')
 
-const sortedBooks = computed(() =>
-  books.value?.sort((b1, b2) => b1.title.localeCompare(b2.title)),
-)
-
+const textSearch = ref()
 const view = ref(route.query.view ?? 'cards')
 
 watch(view, (v) => {
   router.push({ query: { view: v } })
 })
+
+const sortedBooks = computed(() =>
+  filterElements(
+    books.value?.sort((b1, b2) => b1.title.localeCompare(b2.title)) ?? [],
+    textSearch.value,
+  ),
+)
+
+function onSearch($event: Event) {
+  textSearch.value = ($event.target as any)?.value as string
+}
 
 useHead({
   title: 'BookLib | My Library',

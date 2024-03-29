@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ICON_SIZE_MEDIUM } from '~/utils'
 
 const props = withDefaults(
   defineProps<{
@@ -18,7 +19,9 @@ const props = withDefaults(
   { variant: 'primary' },
 )
 
-const iconSize = computed(() => (props.compact ? 21 : 24))
+const iconSize = computed(() =>
+  props.compact ? ICON_SIZE_MEDIUM : ICON_SIZE_SMALL,
+)
 
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {

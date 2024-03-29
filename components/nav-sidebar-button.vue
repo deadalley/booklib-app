@@ -1,12 +1,13 @@
 <template>
   <button :class="classes.wrapper">
-    <slot name="icon" :size="22" stroke="1.5"></slot>
+    <slot name="icon" :size="ICON_SIZE_MEDIUM" stroke="1.5"></slot>
     <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ICON_SIZE_MEDIUM } from '~/utils'
 
 const props = defineProps({
   active: {
