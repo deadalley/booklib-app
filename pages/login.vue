@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen flex items-center justify-center">
+  <div class="flex h-screen w-screen items-center justify-center">
     <bl-button @click="handleLogin">
       {{ loading ? 'Loading' : 'Google Sign-In' }}
     </bl-button>

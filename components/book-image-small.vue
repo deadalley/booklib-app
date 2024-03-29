@@ -1,17 +1,17 @@
 <template>
-  <div v-if="pending" class="h-full w-full flex justify-center items-center">
+  <div v-if="pending" class="flex size-full items-center justify-center">
     <bl-loading></bl-loading>
   </div>
   <NuxtLink :to="`/library/books/${book.id}`">
     <bl-empty-book-image
       v-if="!coverSrc"
-      class="!rounded-2xl !p-5 !h-48 min-w-32"
+      class="!h-48 min-w-32 !rounded-2xl !p-5"
     ></bl-empty-book-image>
     <img
       v-if="!pending && coverSrc"
       :src="coverSrc ?? undefined"
       :alt="book.title"
-      class="rounded-2xl h-48 w-auto object-center object-cover"
+      class="h-48 w-auto rounded-2xl object-cover object-center"
     />
   </NuxtLink>
 </template>

@@ -1,7 +1,7 @@
 <template>
-  <div v-if="book" class="flex flex-col gap-10 flex-1 overflow-auto">
+  <div v-if="book" class="flex flex-1 flex-col gap-10 overflow-auto">
     <header class="flex flex-col gap-2">
-      <div class="flex gap-3 justify-between items-end">
+      <div class="flex items-end justify-between gap-3">
         <div class="flex gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Book' : book.title }}
@@ -12,23 +12,23 @@
             :on-commit="onSubmitRating"
           ></bl-rating>
         </div>
-        <div v-if="!isNew" class="flex flex-col leading-tight justify-end">
+        <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
           <p>Added on</p>
           <h6>{{ formattedDate }}</h6>
         </div>
       </div>
       <h5>{{ book.author }}</h5>
     </header>
-    <div class="flex gap-10 flex-1 overflow-auto">
+    <div class="flex flex-1 gap-10 overflow-auto">
       <bl-book-image
         :editing="true"
         :book-id="book?.id ?? tempCoverSrc"
         alt="book-cover"
       ></bl-book-image>
-      <div class="overflow-y-auto flex-[3] flex flex-col gap-16">
+      <div class="flex flex-[3] flex-col gap-16 overflow-y-auto">
         <section v-if="!editing" class="book-section">
           <bl-input id="id" type="hidden" name="id"></bl-input>
-          <div class="flex justify-between w-full col-span-12">
+          <div class="col-span-12 flex w-full justify-between">
             <h4>Summary</h4>
             <bl-button compact variant="secondary" @click="onEdit(true)"
               >Edit</bl-button
@@ -131,7 +131,7 @@
                   />
                 </div>
               </div>
-              <div v-if="editing" class="flex gap-2 justify-end">
+              <div v-if="editing" class="flex justify-end gap-2">
                 <bl-button compact variant="secondary" @click="onCancel"
                   >Discard</bl-button
                 >
@@ -144,7 +144,7 @@
         </section>
         <section class="book-section">
           <h4>Genres</h4>
-          <div class="flex gap-3 flex-wrap">
+          <div class="flex flex-wrap gap-3">
             <bl-genre-tag
               v-for="(genre, index) in genres"
               :key="genre"
@@ -164,7 +164,7 @@
         </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete book</h5>
-          <div class="flex gap-3 justify-between">
+          <div class="flex justify-between gap-3">
             <p>
               Are you sure you want to delete this book? This action cannot be
               undone.

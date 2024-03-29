@@ -1,13 +1,10 @@
 <template>
-  <div
-    class="bg-gray-light p-10 w-full rounded-m h-full relative"
-    v-bind="$attrs"
-  >
+  <div class="relative size-full rounded-m bg-gray-light p-10" v-bind="$attrs">
     <div
-      class="h-full w-full flex flex-col items-center justify-center border-2 border-gray-dark border-dashed rounded-[inherit] text-gray-dark gap-3"
+      class="flex size-full flex-col items-center justify-center gap-3 rounded-[inherit] border-2 border-dashed border-gray-dark text-gray-dark"
     >
       <IconPhoto :size="40" stroke="1.5" />
-      <h6 class="leading-tight text-center text-gray-dark font-normal">
+      <h6 class="text-center font-normal leading-tight text-gray-dark">
         Book
         <br />
         Cover

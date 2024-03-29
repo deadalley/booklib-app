@@ -2,10 +2,10 @@
   <RadioGroupOption
     v-slot="{ checked }"
     :value="value"
-    class="flex items-center w-full first:rounded-l-3xl last:rounded-r-3xl border-r last:border-0 border-accent-dark cursor-pointer hover:bg-accent active:bg-accent-dark"
+    class="flex w-full cursor-pointer items-center border-r border-accent-dark first:rounded-l-3xl last:rounded-r-3xl last:border-0 hover:bg-accent active:bg-accent-dark"
   >
     <li
-      class="flex items-center w-full px-3 first:pl-5 last:pr-5 rounded-[inherit]"
+      class="flex w-full items-center rounded-[inherit] px-3 first:pl-5 last:pr-5"
       :class="{
         'bg-accent-dark shadow-inner-m': !!checked,
         'py-2': compact,

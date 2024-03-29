@@ -6,12 +6,12 @@
     <!-- Full-screen container to center the panel -->
     <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
       <!-- The actual dialog panel -->
-      <DialogPanel class="min-w-max bg-background rounded-m p-9">
+      <DialogPanel class="min-w-max rounded-m bg-background p-9">
         <DialogTitle as="h3" class="mb-4 font-medium"
           ><slot name="title"></slot
         ></DialogTitle>
         <slot></slot>
-        <div class="flex gap-2 justify-end">
+        <div class="flex justify-end gap-2">
           <bl-button variant="secondary" @click="_onCancel">
             <slot name="cancel-label"></slot>
           </bl-button>

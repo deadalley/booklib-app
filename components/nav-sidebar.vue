@@ -1,14 +1,14 @@
 <template>
   <nav
-    class="bg-main px-6 pt-16 pb-8 h-full text-accent-light gap-6 flex flex-col"
+    class="flex h-full flex-col gap-6 bg-main px-6 pb-8 pt-16 text-accent-light"
   >
     <h3
-      class="text-accent-light font-normal tracking-wider mb-6 cursor-pointer"
+      class="mb-6 cursor-pointer font-normal tracking-wider text-accent-light"
     >
       <NuxtLink to="/"> BOOKLIB </NuxtLink>
     </h3>
-    <div class="flex flex-col justify-between flex-1">
-      <div class="flex flex-col gap-3 flex-1">
+    <div class="flex flex-1 flex-col justify-between">
+      <div class="flex flex-1 flex-col gap-3">
         <bl-nav-sidebar-button
           v-for="(button, index) in buttons"
           :key="button.label"

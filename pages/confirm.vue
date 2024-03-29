@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen flex items-center justify-center">
+  <div class="flex h-screen w-screen items-center justify-center">
     Waiting for login...
   </div>
 </template>

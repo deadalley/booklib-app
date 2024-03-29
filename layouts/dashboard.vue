@@ -1,10 +1,10 @@
 <template>
-  <div class="h-screen flex">
+  <div class="flex h-screen">
     <aside class="h-full w-[255px]">
       <bl-nav-sidebar></bl-nav-sidebar>
     </aside>
-    <main class="h-screen flex-1 flex flex-col">
-      <nav class="flex gap-16 items-center px-8 py-4 border-b border-b-accent">
+    <main class="flex h-screen flex-1 flex-col">
+      <nav class="flex items-center gap-16 border-b border-b-accent px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
           <h5>Library</h5>
         </NuxtLink>
@@ -17,18 +17,18 @@
           </li>
         </ul>
         <div
-          class="flex items-center justify-center w-12 h-12 rounded-full overflow-hidden bg-gray-200 cursor-pointer"
+          class="flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full"
         >
           <NuxtLink to="/profile">
             <img
               :src="profileUrl"
               alt="Profile"
-              class="w-full h-full object-cover"
+              class="size-full object-cover"
             />
           </NuxtLink>
         </div>
       </nav>
-      <div class="flex flex-col flex-1 p-16 pt-10 overflow-auto">
+      <div class="flex flex-1 flex-col overflow-auto p-16 pt-10">
         <slot></slot>
         <NuxtLoadingIndicator color="#985858" />
       </div>

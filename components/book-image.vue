@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-flex flex-col items-center gap-3 flex-1 h-3/5 rounded-m"
+    class="relative inline-flex h-3/5 flex-1 flex-col items-center gap-3 rounded-m"
     :class="{ 'justify-center': pending }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
@@ -8,7 +8,7 @@
     <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
     <bl-icon-button
       v-if="editing && hovered"
-      class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark"
+      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark"
     >
       <template #default="iconProps">
         <IconUpload v-bind="iconProps" />
@@ -16,7 +16,7 @@
     </bl-icon-button>
     <div
       v-if="editing && hovered"
-      class="absolute inset-0 z-10 bg-gray-dark opacity-60 transition-opacity duration-300 rounded-m cursor-pointer"
+      class="absolute inset-0 z-10 cursor-pointer rounded-m bg-gray-dark opacity-60 transition-opacity duration-300"
       @click="onUploadClick()"
     ></div>
     <bl-loading v-if="pending"></bl-loading>
@@ -24,7 +24,7 @@
       v-if="coverSrc && !pending"
       :src="coverSrc"
       :alt="alt"
-      class="rounded-m h-full w-full object-center object-cover"
+      class="size-full rounded-m object-cover object-center"
     />
     <bl-empty-book-image v-if="!pending && !coverSrc"></bl-empty-book-image>
   </div>

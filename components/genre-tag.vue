@@ -2,7 +2,7 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex items-center gap-2 px-12 py-2 rounded-m bg-green font-medium cursor-text"
+    class="relative flex cursor-text items-center gap-2 rounded-m bg-green px-12 py-2 font-medium"
     @click="onClick"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
@@ -15,7 +15,7 @@
     }}</span>
     <bl-loading
       v-if="loading"
-      class="!w-4 !h-4 !text-gray-dark !fill-black"
+      class="!h-4 !w-4 !fill-black !text-gray-dark"
     ></bl-loading>
     <IconCircleX
       v-if="!loading"
@@ -28,7 +28,7 @@
   </div>
   <div
     v-if="newGenre && !editing"
-    class="flex items-center justify-center cursor-pointer rounded-full py-2 h-[35px] aspect-square bg-green hover:bg-green/80"
+    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-green py-2 hover:bg-green/80"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2"></IconPlus>

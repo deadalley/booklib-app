@@ -4,7 +4,11 @@ module.exports = {
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },
-  extends: ['@nuxt/eslint-config', 'plugin:prettier/recommended'],
+  extends: [
+    '@nuxt/eslint-config',
+    'plugin:prettier/recommended',
+    'plugin:tailwindcss/recommended',
+  ],
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
