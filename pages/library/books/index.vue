@@ -2,7 +2,9 @@
   <div class="flex flex-col gap-8">
     <div class="flex justify-between">
       <div class="flex items-baseline gap-3">
-        <h3>All Books</h3>
+        <NuxtLink to="/library/books">
+          <h3>All Books</h3>
+        </NuxtLink>
         <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
       </div>
       <div class="flex gap-3">
@@ -54,6 +56,13 @@ const view = ref(route.query.view ?? 'cards')
 watch(view, (v) => {
   router.push({ query: { view: v } })
 })
+
+watch(
+  () => route.query.view,
+  (v) => {
+    view.value = (v as string) ?? 'cards'
+  },
+)
 
 const sortedBooks = computed(() =>
   filterElements(
