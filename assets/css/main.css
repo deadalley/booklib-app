@@ -48,8 +48,8 @@
   }
 
   table {
+    @apply w-max md:w-full overflow-x-auto;
     table-layout: fixed;
-    width: 100%;
   }
 
   th,

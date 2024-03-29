@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-8">
+  <div class="relative flex w-full flex-col gap-8 overflow-hidden">
     <div class="flex flex-col justify-between lg:flex-row">
       <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
@@ -41,7 +41,9 @@
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
     </div>
-    <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
+    <div class="overflow-x-auto">
+      <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
+    </div>
   </div>
 </template>
 
