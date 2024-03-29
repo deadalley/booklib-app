@@ -61,6 +61,10 @@
     @apply bg-accent-light font-semibold text-left;
   }
 
+  thead th > span {
+    @apply flex gap-3 items-center;
+  }
+
   th:first-child {
     @apply rounded-l-2xl;
   }

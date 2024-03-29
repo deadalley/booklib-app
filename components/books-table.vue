@@ -6,6 +6,7 @@
 import { createColumnHelper, type CellContext } from '@tanstack/vue-table'
 import type { Book } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
+import BlRating from './rating.vue'
 
 const props = defineProps<{ books: Book[] }>()
 
@@ -22,6 +23,7 @@ const columns = [
         book,
       })
     },
+    enableSorting: false,
   }),
   columnHelper.accessor('title', {
     header: 'Title',
@@ -45,7 +47,19 @@ const columns = [
   }),
   columnHelper.accessor('rating', {
     header: 'Rating',
-    cell,
+    cell: (info) => {
+      const rating = info.getValue()
+
+      if (rating) {
+        return h(BlRating, {
+          rating: info.getValue() ?? 0,
+          editing: false,
+          iconSize: 16,
+        })
+      } else {
+        return null
+      }
+    },
   }),
   columnHelper.accessor('originalTitle', {
     header: 'Original Title',
@@ -67,9 +81,5 @@ const data = props.books
 <style scoped>
 /deep/ th:first-child,
 /deep/ td:first-child {
-  width: 10%;
-  /* min-width: max-content;
-  max-width: max-content;
-  width: max-content; */
 }
 </style>

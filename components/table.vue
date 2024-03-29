@@ -6,12 +6,38 @@
           v-for="header in headerGroup.headers"
           :key="header.id"
           :colSpan="header.colSpan"
+          :class="
+            header.column.getCanSort() ? 'cursor-pointer select-none' : ''
+          "
+          @click="header.column.getToggleSortingHandler()?.($event)"
         >
-          <FlexRender
-            v-if="!header.isPlaceholder"
-            :render="header.column.columnDef.header"
-            :props="header.getContext()"
-          />
+          <span v-if="!header.isPlaceholder">
+            <FlexRender
+              :render="header.column.columnDef.header"
+              :props="header.getContext()"
+            />
+            <IconArrowsSort
+              v-if="header.column.getCanSort() && !header.column.getIsSorted()"
+              :size="16"
+              stroke="2"
+            />
+            <IconSortAscending
+              v-if="
+                header.column.getCanSort() &&
+                header.column.getIsSorted() === 'asc'
+              "
+              :size="16"
+              stroke="2"
+            />
+            <IconSortDescending
+              v-if="
+                header.column.getCanSort() &&
+                header.column.getIsSorted() === 'desc'
+              "
+              :size="16"
+              stroke="2"
+            />
+          </span>
         </th>
       </tr>
     </thead>
@@ -49,8 +75,14 @@ import {
   type ColumnDef,
   type ColumnOrderState,
   getCoreRowModel,
+  getSortedRowModel,
   FlexRender,
 } from '@tanstack/vue-table'
+import {
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending,
+} from '@tabler/icons-vue'
 
 const props = defineProps<{ data: T[]; columns: ColumnDef<T, any>[] }>()
 
@@ -77,6 +109,7 @@ const table = useVueTable({
     columnOrder.value = order as string[]
   },
   getCoreRowModel: getCoreRowModel(),
+  getSortedRowModel: getSortedRowModel(),
 
   defaultColumn: {
     size: 0,

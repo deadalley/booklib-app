@@ -7,7 +7,7 @@
   >
     <template v-for="(star, index) in stars" :key="index">
       <span
-        class="cursor-pointer"
+        :class="{ 'cursor-pointer': editing }"
         @mousemove="($event) => setRating($event, index + 1)"
       >
         <IconStarFilled v-if="star === 1" :size="iconSize" stroke="1.5" />
@@ -21,22 +21,16 @@
 <script setup lang="ts">
 import { IconStar, IconStarFilled, IconStarHalfFilled } from '@tabler/icons-vue'
 
-const props = defineProps({
-  editing: {
-    type: Boolean,
-    default: true,
-  },
-  rating: {
-    type: Number,
-    required: true,
-  },
-  onCommit: {
-    type: Function,
-    required: false,
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    editing: boolean
+    rating: number
+    iconSize?: number
+    onCommit?: (value: number) => Promise<void>
+  }>(),
+  { iconSize: 24 },
+)
 
-const iconSize = ref(24)
 const initialRating = ref(props.rating)
 const currentRating = ref(props.rating)
 const hovered = ref(false)
@@ -70,7 +64,7 @@ function setHovered(value: boolean) {
 }
 
 function getPosition($event: MouseEvent) {
-  const starWidth = (92 / 100) * iconSize.value
+  const starWidth = (92 / 100) * props.iconSize
   const offset = Math.max($event.offsetX, 1)
   const position = Math.round((100 / starWidth) * offset)
 
@@ -78,21 +72,25 @@ function getPosition($event: MouseEvent) {
 }
 
 function setRating($event: MouseEvent, id: number) {
-  const maxRating = 5
-  let newRating: number | undefined
+  if (props.editing) {
+    const maxRating = 5
+    let newRating: number | undefined
 
-  const position = getPosition($event) / 100
+    const position = getPosition($event) / 100
 
-  newRating = +(id + position - 1).toFixed(2)
-  newRating = newRating > maxRating ? maxRating : newRating
+    newRating = +(id + position - 1).toFixed(2)
+    newRating = newRating > maxRating ? maxRating : newRating
 
-  const roundedRating = Math.round(newRating * 2) / 2
+    const roundedRating = Math.round(newRating * 2) / 2
 
-  currentRating.value = roundedRating
+    currentRating.value = roundedRating
+  }
 }
 
 function _onCommit() {
-  initialRating.value = currentRating.value
-  props.onCommit?.(currentRating.value)
+  if (props.editing) {
+    initialRating.value = currentRating.value
+    props.onCommit?.(currentRating.value)
+  }
 }
 </script>
