@@ -12,7 +12,6 @@
       outer: editing ? 'flex-1' : 'flex-1 !hidden',
       wrapper: 'flex-1',
       label: 'ml-5 text-gray-dark',
-      input: 'py-3',
     }"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData"

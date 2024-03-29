@@ -26,7 +26,7 @@ const iconSize = computed(() =>
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
     wrapper: [
-      'flex md:inline-flex md:flex-grow-0 justify-center md:justify-start items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
+      'flex lg:inline-flex lg:flex-grow-0 justify-center lg:justify-start items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
     ],
   }
 
