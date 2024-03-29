@@ -32,6 +32,7 @@
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
     </div>
+    <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import type { Book } from '~/types/book'
 import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const { data: books } = await useFetch<Book[]>('/api/books')
 
@@ -47,7 +49,7 @@ const sortedBooks = computed(() =>
   books.value?.sort((b1, b2) => b1.title.localeCompare(b2.title)),
 )
 
-const view = ref('cards')
+const view = ref(route.query.view ?? 'cards')
 
 watch(view, (v) => {
   router.push({ query: { view: v } })

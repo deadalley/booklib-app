@@ -37,7 +37,7 @@ const fileInput = ref()
 
 const props = defineProps({
   bookId: {
-    type: String,
+    type: Number,
     required: false,
   },
   alt: {
@@ -72,13 +72,17 @@ async function onFileChange(e: any) {
   const file = e.target.files[0] as File
 
   const formData = new FormData()
-  formData.append('img', file, props.bookId)
+  formData.append('img', file, `${props.bookId}`)
 
-  await $fetch(`/api/books/${props.bookId}/cover`, {
-    method: 'post',
-    body: formData,
-  })
+  try {
+    await $fetch(`/api/books/${props.bookId}/cover`, {
+      method: 'post',
+      body: formData,
+    })
 
-  refresh()
+    refresh()
+  } catch (error) {
+    console.error(error)
+  }
 }
 </script>

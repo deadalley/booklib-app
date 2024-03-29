@@ -6,7 +6,7 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     title: faker.commerce.productName(),
     coverSrc: faker.string.alpha(),
     createdAt: faker.date.past().toISOString(),
-    id: faker.string.uuid(),
+    id: faker.number.float(),
     isbn: faker.commerce.isbn(),
     language: 'English',
     originalTitle: faker.commerce.productName(),
@@ -16,6 +16,7 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     rating: faker.number.int(),
     summary: faker.lorem.lines(5),
     year: faker.date.past().getFullYear(),
+    genres: faker.helpers.multiple(faker.color.human, { count: 5 }),
     ...overwrite,
   }
 }

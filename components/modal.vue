@@ -28,7 +28,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Dialog, DialogTitle } from '@headlessui/vue'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'
 
 const props = defineProps({
   onCancel: {

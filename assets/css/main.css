@@ -46,4 +46,30 @@
   p {
     @apply text-black font-normal;
   }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  th,
+  td {
+    @apply py-5 px-8 text-base;
+  }
+
+  thead th {
+    @apply bg-accent-light font-semibold text-left;
+  }
+
+  th:first-child {
+    @apply rounded-l-2xl;
+  }
+
+  th:last-child {
+    @apply rounded-r-2xl;
+  }
+
+  td {
+    @apply text-base border-b border-accent-light;
+  }
 }
