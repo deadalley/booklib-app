@@ -37,7 +37,7 @@ const fileInput = ref()
 
 const props = defineProps({
   bookId: {
-    type: Number,
+    type: Number || String,
     required: false,
   },
   alt: {

@@ -146,7 +146,7 @@
           <h4>Genres</h4>
           <div class="flex gap-3 flex-wrap">
             <bl-genre-tag
-              v-for="(genre, index) in book.genres"
+              v-for="(genre, index) in genres"
               :key="genre"
               :value="genre"
               :index="index"
@@ -156,7 +156,7 @@
             <bl-genre-tag
               key="new"
               :new-genre="true"
-              :index="book.genres.length"
+              :index="genres.length"
               :on-commit="onSubmitGenre"
               :on-remove="onRemoveGenre"
             ></bl-genre-tag>
@@ -200,6 +200,11 @@ const deleteModalRef = ref()
 const book = ref()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
+const genres = ref(book.value?.genres ?? [])
+
+watch(book, () => {
+  genres.value = book.value?.genres ?? []
+})
 
 const formattedDate = computed(() =>
   format(book.value.createdAt, 'dd MMM yyyy'),
@@ -269,16 +274,16 @@ async function onSubmitRating(rating: number) {
 
 async function onSubmitGenre(genre: string, index: number) {
   if (genre) {
-    const genres: string[] = (book.value.genres ?? []).concat()
-    genres.splice(index, 1, genre)
-    return onSubmit({ ...book.value, genres })
+    const _genres: string[] = (genres.value ?? []).concat()
+    _genres.splice(index, 1, genre)
+    return onSubmit({ ...book.value, genres: _genres })
   }
 }
 
 async function onRemoveGenre(index: number) {
-  const genres: string[] = (book.value.genres ?? []).concat()
-  genres.splice(index, 1)
-  return onSubmit({ ...book.value, genres })
+  const _genres: string[] = (genres.value ?? []).concat()
+  _genres.splice(index, 1)
+  return onSubmit({ ...book.value, genres: _genres })
 }
 
 onMounted(() => {
