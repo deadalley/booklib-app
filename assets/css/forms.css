@@ -17,7 +17,7 @@
   }
 
   .form-row {
-    @apply flex gap-4;
+    @apply flex gap-4 flex-col sm:flex-row;
   }
 
   .formkit-label {

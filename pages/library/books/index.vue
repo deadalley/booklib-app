@@ -10,7 +10,7 @@
       <div class="flex flex-col gap-3 lg:flex-row">
         <bl-search-bar @input="onSearch"></bl-search-bar>
         <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-          <bl-button>
+          <bl-button expand>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
             </template>
@@ -18,7 +18,7 @@
           </bl-button>
         </NuxtLink>
         <div class="flex gap-3">
-          <bl-button variant="secondary"> Filter </bl-button>
+          <bl-button expand variant="secondary"> Filter </bl-button>
           <bl-switch v-slot="props" v-model="view">
             <bl-switch-option value="cards" v-bind="props">
               <template #icon="iconProps">

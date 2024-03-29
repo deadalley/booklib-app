@@ -1,5 +1,5 @@
 <template>
-  <div v-if="book" class="flex flex-1 flex-col gap-10 overflow-auto">
+  <div v-if="book" class="flex flex-1 flex-col gap-10 lg:overflow-auto">
     <header class="flex flex-col gap-2">
       <div class="flex items-end justify-between gap-3">
         <div class="flex gap-5">
@@ -19,13 +19,13 @@
       </div>
       <h5>{{ book.author }}</h5>
     </header>
-    <div class="flex flex-1 gap-10 overflow-auto">
+    <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <bl-book-image
         :editing="true"
         :book-id="book?.id ?? tempCoverSrc"
         alt="book-cover"
       ></bl-book-image>
-      <div class="flex flex-[3] flex-col gap-16 overflow-y-auto">
+      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
         <section v-if="!editing" class="book-section">
           <bl-input id="id" type="hidden" name="id"></bl-input>
           <div class="col-span-12 flex w-full justify-between">

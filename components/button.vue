@@ -11,6 +11,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
+    expand?: boolean
     compact?: boolean
     disabled?: boolean
     variant?: 'primary' | 'secondary'
@@ -25,8 +26,12 @@ const iconSize = computed(() =>
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
     wrapper: [
-      'flex md:inline-flex flex-1 justify-center items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
+      'flex md:inline-flex md:flex-grow-0 justify-center md:justify-start items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
     ],
+  }
+
+  if (props.expand) {
+    baseStyles.wrapper.push('flex-1')
   }
 
   if (props.disabled) {

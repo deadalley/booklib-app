@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-flex h-3/5 flex-1 flex-col items-center gap-3 rounded-m"
+    class="relative inline-flex h-min flex-col items-center gap-3 rounded-m lg:flex-1"
     :class="{ 'justify-center': pending }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
@@ -16,7 +16,7 @@
     </bl-icon-button>
     <div
       v-if="editing && hovered"
-      class="absolute inset-0 z-10 cursor-pointer rounded-m bg-gray-dark opacity-60 transition-opacity duration-300"
+      class="absolute inset-0 z-10 size-full cursor-pointer rounded-m bg-gray-dark opacity-60 transition-opacity duration-300"
       @click="onUploadClick()"
     ></div>
     <bl-loading v-if="pending"></bl-loading>
@@ -26,7 +26,10 @@
       :alt="alt"
       class="size-full rounded-m object-cover object-center"
     />
-    <bl-empty-book-image v-if="!pending && !coverSrc"></bl-empty-book-image>
+    <bl-empty-book-image
+      v-if="!pending && !coverSrc"
+      class="!lg:h-[600px] h-[400px]"
+    ></bl-empty-book-image>
   </div>
 </template>
 
