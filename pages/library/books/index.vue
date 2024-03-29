@@ -7,20 +7,20 @@
       </div>
       <div class="flex gap-3">
         <NuxtLink to="/library/books/new">
-          <bl-button>
+          <bl-button compact>
             <template #prependIcon="prependIcon">
               <IconPlus v-bind="prependIcon" />
             </template>
             Book
           </bl-button>
         </NuxtLink>
-        <bl-switch v-model="view">
-          <bl-switch-option value="cards">
+        <bl-switch v-slot="props" v-model="view" compact>
+          <bl-switch-option value="cards" v-bind="props">
             <template #icon="iconProps">
               <IconLayoutDashboard v-bind="iconProps" />
             </template>
           </bl-switch-option>
-          <bl-switch-option value="table">
+          <bl-switch-option value="table" v-bind="props">
             <template #icon="iconProps">
               <IconTable v-bind="iconProps" />
             </template>

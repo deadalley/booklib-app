@@ -9,24 +9,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps({
-  compact: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  variant: {
-    default: 'primary',
-    validator(value: string) {
-      return ['primary', 'secondary'].includes(value)
-    },
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    compact?: boolean
+    disabled?: boolean
+    variant?: 'primary' | 'secondary'
+  }>(),
+  { variant: 'primary' },
+)
 
-const iconSize = computed(() => (props.compact ? 18 : 20))
+const iconSize = computed(() => (props.compact ? 21 : 24))
 
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
