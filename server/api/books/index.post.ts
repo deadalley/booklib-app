@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         .from('book-covers')
         .move(`${user.id}/${book.tempCoverSrc}`, `${user.id}/${data[0].id}`)
 
-      if (storageError) {
+      if (storageError && storageError.message !== 'Object not found') {
         logger.error(storageError)
         throw createError(storageError.message)
       }

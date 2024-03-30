@@ -10,6 +10,7 @@
         <NuxtLink class="flex-1" to="/library/books">
           <h5>Library</h5>
         </NuxtLink>
+
         <ul class="flex gap-5">
           <li class="text-lg">
             <NuxtLink to="/library/books">Books</NuxtLink>
@@ -18,11 +19,12 @@
             <NuxtLink to="/library/collections">Collections</NuxtLink>
           </li>
         </ul>
+
         <div
           class="flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full"
         >
           <NuxtLink to="/profile">
-            <img
+            <NuxtImg
               :src="profileUrl"
               alt="Profile"
               class="size-full object-cover"

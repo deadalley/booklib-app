@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/storybook',
     '@formkit/nuxt',
+    "@nuxt/image"
   ],
   components: {
     dirs: [

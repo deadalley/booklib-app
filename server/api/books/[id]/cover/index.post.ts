@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError('Unauthenticated')
   } else {
     try {
-      const { data, error } = await client.storage
+      const { error } = await client.storage
         .from(`book-covers/${user.id}`)
         .upload(fileName, formData, {
           cacheControl: '3600',
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         throw createError(error.message)
       }
 
-      return data.path
+      return getBookCoverUrl(client, user.id, fileName)
     } catch (error) {
       throw createError(error as Error)
     }

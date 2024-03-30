@@ -8,7 +8,6 @@
         <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
       </div>
       <div class="flex flex-col gap-3 lg:flex-row">
-        <bl-search-bar @input="onSearch"></bl-search-bar>
         <NuxtLink class="flex md:inline-flex" to="/library/books/new">
           <bl-button expand>
             <template #prependIcon="prependIcon">
@@ -17,6 +16,8 @@
             Book
           </bl-button>
         </NuxtLink>
+        <bl-search-bar @input="onSearch"></bl-search-bar>
+
         <div class="flex gap-3">
           <bl-button expand variant="secondary"> Filter </bl-button>
           <bl-switch v-slot="props" v-model="view">
@@ -36,7 +37,7 @@
     </div>
     <div
       v-if="view === 'cards'"
-      class="grid grid-cols-1 gap-x-3 gap-y-5 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+      class="grid w-full grid-cols-1 gap-x-3 gap-y-5 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
     >
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>

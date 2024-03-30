@@ -22,8 +22,8 @@
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <bl-book-image
         :editing="true"
-        :book-id="book?.id ?? tempCoverSrc"
-        alt="book-cover"
+        :book="book"
+        :temp-cover-src="tempCoverSrc"
       ></bl-book-image>
       <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
         <section v-if="!editing" class="book-section">
@@ -42,12 +42,9 @@
           <h4>Overview</h4>
           <ClientOnly>
             <FormKit
-              id="bookForm"
-              ref="formRef"
               type="form"
               :value="book"
               :actions="false"
-              @keyup.escape="onCancel"
               @submit="onSubmit"
             >
               <div class="form-section">
@@ -136,7 +133,7 @@
                   >Discard</bl-button
                 >
                 <FormKit type="submit">
-                  <bl-button compact>Save</bl-button>
+                  <bl-button type="submit" compact>Save</bl-button>
                 </FormKit>
               </div>
             </FormKit>
@@ -246,6 +243,7 @@ function onCancel() {
 }
 
 async function onSubmit(book: Book) {
+  console.log('onSubmit')
   try {
     const updatedBook = await $fetch<Book>('/api/books', {
       method: 'post',

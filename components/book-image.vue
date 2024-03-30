@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative inline-flex h-min flex-col items-center gap-3 rounded-m lg:flex-1"
-    :class="{ 'justify-center': pending }"
+    :class="{ 'justify-center': loading }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
@@ -19,15 +19,15 @@
       class="absolute inset-0 z-10 size-full cursor-pointer rounded-m bg-gray-dark opacity-60 transition-opacity duration-300"
       @click="onUploadClick()"
     ></div>
-    <bl-loading v-if="pending"></bl-loading>
-    <img
-      v-if="coverSrc && !pending"
+    <bl-loading v-if="loading"></bl-loading>
+    <NuxtImg
+      v-if="coverSrc && !loading"
       :src="coverSrc"
-      :alt="alt"
+      :alt="book.title"
       class="size-full rounded-m object-cover object-center"
     />
     <bl-empty-book-image
-      v-if="!pending && !coverSrc"
+      v-if="!coverSrc && !loading"
       class="!lg:h-[600px] h-[400px]"
     ></bl-empty-book-image>
   </div>
@@ -35,33 +35,19 @@
 
 <script setup lang="ts">
 import { IconUpload } from '@tabler/icons-vue'
+import type { Book } from '~/types/book'
 
 const fileInput = ref()
 
-const props = defineProps({
-  bookId: {
-    type: Number || String,
-    required: false,
-  },
-  alt: {
-    type: String,
-    default: 'Book cover',
-  },
-  editing: {
-    type: Boolean,
-    default: true,
-  },
-})
+const props = defineProps<{
+  book: Book
+  editing: boolean
+  tempCoverSrc?: string
+}>()
 
+const loading = ref(false)
+const coverSrc = ref(props.book.coverSrc)
 const hovered = ref(false)
-
-const {
-  data: coverSrc,
-  pending,
-  refresh,
-} = await useFetch<string>(`/api/books/${props.bookId}/cover`, {
-  lazy: true,
-})
 
 function setHovered(value: boolean) {
   hovered.value = value
@@ -72,20 +58,28 @@ function onUploadClick() {
 }
 
 async function onFileChange(e: any) {
+  loading.value = true
   const file = e.target.files[0] as File
 
   const formData = new FormData()
-  formData.append('img', file, `${props.bookId}`)
+  formData.append('img', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
-    await $fetch(`/api/books/${props.bookId}/cover`, {
-      method: 'post',
-      body: formData,
-    })
+    console.log(props.book, props.tempCoverSrc)
+    const newCoverSrc = await $fetch(
+      `/api/books/${props.book?.id ?? props.tempCoverSrc}/cover`,
+      {
+        method: 'post',
+        body: formData,
+      },
+    )
 
-    refresh()
+    coverSrc.value = newCoverSrc
+    console.log(coverSrc.value)
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
 }
 </script>

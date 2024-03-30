@@ -1,9 +1,21 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { Database } from '~/types/db.generate'
+import { executePromisesInChunks } from '~/utils'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
+  const user = await serverSupabaseUser(event)
+  const client = await serverSupabaseClient<Database>(event)
 
   const { data } = await client.from('books').select('*')
 
-  return data?.map((b: any) => ({ ...b, coverSrc: b.cover_src }))
+  let bookCovers: string[] = []
+  if (!user?.id) {
+    throw createError('Unauthenticated')
+  } else {
+    bookCovers = await executePromisesInChunks(
+      (data ?? []).map((book) => getBookCoverUrl(client, user?.id, book.id)),
+    )
+  }
+
+  return data?.map((b, index) => ({ ...b, coverSrc: bookCovers[index] }))
 })
