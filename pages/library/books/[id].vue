@@ -243,7 +243,6 @@ function onCancel() {
 }
 
 async function onSubmit(book: Book) {
-  console.log('onSubmit')
   try {
     const updatedBook = await $fetch<Book>('/api/books', {
       method: 'post',

@@ -1,7 +1,4 @@
 <template>
-  <!-- <div v-if="pending" class="flex size-full items-center justify-center">
-    <bl-loading></bl-loading>
-  </div> -->
   <NuxtLink :to="`/library/books/${book.id}`" class="w-full">
     <bl-empty-book-image
       v-if="!coverSrc"
@@ -22,12 +19,4 @@ import type { Book } from '~/types/book'
 const props = defineProps<{ book: Book }>()
 
 const coverSrc = ref(props.book.coverSrc)
-
-// const { data: coverSrc, pending } = await useFetch<string>(
-//   `/api/books/${props.book.id}/cover`,
-// )
-
-// if (props.book.id === 21) {
-//   console.log({ coverSrc })
-// }
 </script>

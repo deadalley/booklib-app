@@ -65,7 +65,6 @@ async function onFileChange(e: any) {
   formData.append('img', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
-    console.log(props.book, props.tempCoverSrc)
     const newCoverSrc = await $fetch(
       `/api/books/${props.book?.id ?? props.tempCoverSrc}/cover`,
       {
@@ -75,7 +74,6 @@ async function onFileChange(e: any) {
     )
 
     coverSrc.value = newCoverSrc
-    console.log(coverSrc.value)
   } catch (error) {
     console.error(error)
   } finally {
