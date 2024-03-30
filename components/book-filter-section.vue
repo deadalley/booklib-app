@@ -3,10 +3,10 @@
     <h5 class="mb-4">{{ title }}</h5>
     <div class="flex w-full flex-wrap gap-3">
       <bl-pill
-        v-for="(element, index) in elements"
+        v-for="element in elements"
         :key="element"
         :selected="selectedElements.includes(element)"
-        @click="onSelect(selectedElements, element, index)"
+        @click="onSelect(selectedElements, element)"
       >
         {{ element }}
       </bl-pill>
@@ -21,8 +21,9 @@ defineProps<{
   selectedElements: string[]
 }>()
 
-function onSelect(elements: string[], element: string, index: number) {
+function onSelect(elements: string[], element: string) {
   if (elements.includes(element)) {
+    const index = elements.findIndex((el) => el === element)
     elements.splice(index, 1)
   } else {
     elements.push(element)

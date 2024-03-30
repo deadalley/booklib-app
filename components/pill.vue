@@ -1,8 +1,9 @@
 <template>
   <span
-    class="relative inline-flex cursor-pointer items-center gap-2 rounded-m border border-accent bg-accent-light px-12 py-2 font-medium transition-all hover:bg-accent-light/20"
+    class="relative inline-flex cursor-pointer items-center gap-2 rounded-m border px-12 py-2 font-medium transition-all active:bg-accent-dark"
     :class="{
-      'border-main bg-main text-white hover:bg-main/80': !!selected,
+      'border-accent bg-accent-light hover:bg-accent-light/20': !selected,
+      'border-accent-dark bg-accent hover:bg-accent/80': !!selected,
     }"
   >
     <slot></slot>
