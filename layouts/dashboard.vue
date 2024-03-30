@@ -33,7 +33,7 @@
         </div>
       </nav>
       <div
-        class="flex w-screen flex-1 flex-col overflow-auto p-16 pt-10 md:w-[unset]"
+        class="relative flex w-screen flex-1 flex-col overflow-auto p-16 pt-10 md:w-[unset]"
       >
         <slot></slot>
         <NuxtLoadingIndicator color="#985858" />

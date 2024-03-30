@@ -2,6 +2,7 @@
   <button
     v-bind="$attrs"
     type="button"
+    class="flex h-min w-fit items-center justify-center gap-2 rounded-3xl text-base font-medium transition-all lg:inline-flex lg:grow-0 lg:justify-start"
     :class="classes.wrapper"
     :disabled="disabled"
   >
@@ -30,9 +31,7 @@ const iconSize = computed(() =>
 
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
-    wrapper: [
-      'flex lg:inline-flex lg:flex-grow-0 justify-center lg:justify-start items-center gap-2 text-base rounded-3xl font-medium w-fit h-min',
-    ],
+    wrapper: [],
   }
 
   if (props.expand) {
@@ -45,12 +44,12 @@ const classes = computed(() => {
     switch (props.variant) {
       case 'primary':
         baseStyles.wrapper.push(
-          'text-white bg-main hover:bg-main-light active:bg-main-dark',
+          'text-white bg-main hover:bg-main/90 active:bg-main-dark',
         )
         break
       case 'secondary':
         baseStyles.wrapper.push(
-          'text-black bg-accent-light hover:bg-accent active:bg-accent-dark',
+          'text-black bg-accent-light hover:bg-accent-light/20 hover:ring-1 hover:ring-accent ring-inset active:bg-accent-dark',
         )
         break
       default:

@@ -1,5 +1,9 @@
 <template>
-  <button :class="classes.wrapper" :disabled="disabled">
+  <button
+    class="inline-flex items-center justify-center gap-2 rounded-3xl text-base font-medium"
+    :class="classes.wrapper"
+    :disabled="disabled"
+  >
     <slot :size="iconSize" stroke="1.5"></slot>
   </button>
 </template>
@@ -7,30 +11,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps({
-  compact: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  variant: {
-    default: 'primary',
-    validator(value: string) {
-      return ['primary', 'secondary'].includes(value)
-    },
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    compact?: boolean
+    disabled?: boolean
+    variant?: 'primary' | 'secondary' | 'tertiary'
+  }>(),
+  { variant: 'primary' },
+)
 
 const iconSize = computed(() => (props.compact ? 18 : 24))
 
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
-    wrapper: [
-      'inline-flex items-center justify-center gap-2 text-base rounded-3xl font-medium',
-    ],
+    wrapper: [],
   }
 
   if (props.disabled) {
@@ -46,6 +40,9 @@ const classes = computed(() => {
         baseStyles.wrapper.push(
           'text-black bg-accent-light hover:bg-accent active:bg-accent-dark',
         )
+        break
+      case 'tertiary':
+        baseStyles.wrapper.push('text-accent-dark border border-accent p-2')
         break
       default:
         break

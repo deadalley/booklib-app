@@ -1,5 +1,8 @@
 <template>
-  <div class="relative flex w-full flex-col gap-8 overflow-hidden">
+  <div
+    class="relative flex w-full flex-col gap-8 overflow-hidden"
+    v-bind="$attrs"
+  >
     <div class="flex flex-col justify-between lg:flex-row">
       <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
@@ -19,7 +22,9 @@
         <bl-search-bar @input="onSearch"></bl-search-bar>
 
         <div class="flex gap-3">
-          <bl-button expand variant="secondary"> Filter </bl-button>
+          <bl-button expand variant="secondary" @click="onFilterOpen">
+            Filter
+          </bl-button>
           <bl-switch v-slot="props" v-model="view">
             <bl-switch-option value="cards" v-bind="props">
               <template #icon="iconProps">
@@ -46,6 +51,9 @@
       <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
     </div>
   </div>
+  <bl-sidebar :is-open="!!sidebarContent" :on-close="onCloseSidebar">
+    <bl-book-filter :books="books"></bl-book-filter>
+  </bl-sidebar>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +65,7 @@ const route = useRoute()
 
 const { data: books } = await useFetch<Book[]>('/api/books')
 
+const sidebarContent = ref()
 const textSearch = ref()
 const view = ref(route.query.view ?? 'cards')
 
@@ -80,6 +89,14 @@ const sortedBooks = computed(() =>
 
 function onSearch($event: Event) {
   textSearch.value = ($event.target as any)?.value as string
+}
+
+function onFilterOpen() {
+  sidebarContent.value = true
+}
+
+function onCloseSidebar() {
+  sidebarContent.value = undefined
 }
 
 useHead({
