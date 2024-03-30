@@ -8,13 +8,17 @@
     leave-from="-translate-x-0"
     leave-to="translate-x-full"
     as="div"
-    class="absolute right-0 top-0 flex h-full flex-col gap-8 border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
+    class="absolute right-0 top-0 flex h-full flex-col gap-12 border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
   >
-    <bl-icon-button variant="tertiary" @click="onClose">
-      <template #default="iconProps">
-        <IconX v-bind="iconProps" />
-      </template>
-    </bl-icon-button>
+    <div class="flex justify-between">
+      <h4 v-if="!!title">{{ title }}</h4>
+
+      <bl-icon-button variant="tertiary" @click="onClose">
+        <template #default="iconProps">
+          <IconX v-bind="iconProps" />
+        </template>
+      </bl-icon-button>
+    </div>
     <div>
       <slot></slot>
     </div>
@@ -25,5 +29,5 @@
 import { TransitionRoot } from '@headlessui/vue'
 import { IconX } from '@tabler/icons-vue'
 
-defineProps<{ isOpen: boolean; onClose: () => void }>()
+defineProps<{ title?: string; isOpen: boolean; onClose: () => void }>()
 </script>

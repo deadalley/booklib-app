@@ -1,6 +1,4 @@
 <template>
-  <h4 class="mb-8">Filter</h4>
-
   <div class="flex flex-col gap-16">
     <bl-book-filter-section
       title="Publisher"

@@ -51,7 +51,11 @@
       <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
     </div>
   </div>
-  <bl-sidebar :is-open="!!sidebarContent" :on-close="onCloseSidebar">
+  <bl-sidebar
+    :title="sidebarContent"
+    :is-open="!!sidebarContent"
+    :on-close="onCloseSidebar"
+  >
     <bl-book-filter :books="books"></bl-book-filter>
   </bl-sidebar>
 </template>
@@ -92,7 +96,7 @@ function onSearch($event: Event) {
 }
 
 function onFilterOpen() {
-  sidebarContent.value = true
+  sidebarContent.value = 'Filter'
 }
 
 function onCloseSidebar() {
