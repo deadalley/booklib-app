@@ -15,6 +15,10 @@
       title="Original Language"
       :elements="originalLanguages"
     ></bl-book-filter-section>
+    <div>
+      <h5 class="mb-4">Year</h5>
+      <bl-slider :min="minYear" :max="maxYear" :step="1"></bl-slider>
+    </div>
   </div>
 </template>
 
@@ -29,11 +33,15 @@ const props = defineProps<{
   selectedOriginalLanguages: string[]
 }>()
 
+const years = computed(() => getUniqueElements(props.books, 'year'))
 const publishers = computed(() => getUniqueElements(props.books, 'publisher'))
 const languages = computed(() => getUniqueElements(props.books, 'language'))
 const originalLanguages = computed(() =>
   getUniqueElements(props.books, 'originalLanguage'),
 )
+
+const minYear = computed(() => Math.min(...years.value))
+const maxYear = computed(() => new Date().getFullYear())
 
 const emit = defineEmits([
   'update:selectedPublishers',
