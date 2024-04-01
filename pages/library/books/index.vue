@@ -56,7 +56,12 @@
     :is-open="!!sidebarContent"
     :on-close="onCloseSidebar"
   >
-    <bl-book-filter :books="books"></bl-book-filter>
+    <bl-book-filter
+      v-model:selectedPublishers="selectedPublishers"
+      v-model:selectedLanguages="selectedLanguages"
+      v-model:selectedOriginalLanguages="selectedOriginalLanguages"
+      :books="books"
+    ></bl-book-filter>
   </bl-sidebar>
 </template>
 
@@ -72,6 +77,9 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 const sidebarContent = ref()
 const textSearch = ref()
 const view = ref(route.query.view ?? 'cards')
+const selectedPublishers = ref<string[]>([])
+const selectedLanguages = ref<string[]>([])
+const selectedOriginalLanguages = ref<string[]>([])
 
 watch(view, (v) => {
   router.push({ query: { view: v } })
@@ -84,12 +92,53 @@ watch(
   },
 )
 
-const sortedBooks = computed(() =>
-  filterElements(
-    books.value?.sort((b1, b2) => b1.title.localeCompare(b2.title)) ?? [],
+const sortedBooks = computed(() => {
+  const hasFilter =
+    selectedPublishers.value.length ||
+    selectedLanguages.value.length ||
+    selectedOriginalLanguages.value.length
+
+  let combinedFilters: Book[] = books.value ?? []
+
+  if (hasFilter) {
+    const filterByPublisher = filterElementsBySelectedArray(
+      'publisher',
+      books.value ?? [],
+      selectedPublishers.value,
+    )
+
+    const filterByLanguage = filterElementsBySelectedArray(
+      'language',
+      books.value ?? [],
+      selectedLanguages.value,
+    )
+
+    const filterByOriginalLanguage = filterElementsBySelectedArray(
+      'originalLanguage',
+      books.value ?? [],
+      selectedOriginalLanguages.value,
+    )
+
+    combinedFilters = mergeAndFilter(
+      'id',
+      filterByPublisher,
+      filterByLanguage,
+      filterByOriginalLanguage,
+    )
+  }
+
+  const filterByTextSearch = filterElementsBySearchParam(
+    combinedFilters,
     textSearch.value,
-  ),
-)
+    ['title'],
+  )
+
+  const sorted = filterByTextSearch?.sort((b1, b2) =>
+    b1.title.localeCompare(b2.title),
+  )
+
+  return sorted
+})
 
 function onSearch($event: Event) {
   textSearch.value = ($event.target as any)?.value as string

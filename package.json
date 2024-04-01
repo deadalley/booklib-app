@@ -25,6 +25,7 @@
     "@tanstack/vue-table": "^8.15.0",
     "@vueuse/core": "^10.9.0",
     "date-fns": "^3.6.0",
+    "lodash": "^4.17.21",
     "nuxt": "^3.11.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

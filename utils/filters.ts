@@ -1,15 +1,17 @@
-export function filterElements<T extends object>(
-  elements: T[],
-  searchParam?: string,
-): T[] {
+import { flatten, uniqBy } from 'lodash'
+
+export function filterElementsBySearchParam<
+  T extends object,
+  K extends keyof T,
+>(elements: T[], searchParam?: string, keys?: K[]): T[] {
   return elements.filter((element) => {
     if (!searchParam) {
       return elements
     }
 
     const lowerCaseSearchParam = searchParam?.toLowerCase()
-    return Object.values(element).some((value) => {
-      if (value) {
+    return Object.entries(element).some(([key, value]) => {
+      if (value && (!keys || keys.includes(key as K))) {
         return `${value}`.toLowerCase().includes(lowerCaseSearchParam)
       }
       return false
@@ -30,4 +32,20 @@ export function getUniqueElements<
       return uniqueKeys
     }, [])
     .filter((p): p is Exclude<T[K], null> => !!p)
+}
+
+export function filterElementsBySelectedArray<
+  T extends object,
+  K extends keyof T,
+>(key: K, elements: T[], selectedArray: T[K][]): T[] {
+  return elements.filter(
+    (element) => element[key] && selectedArray.includes(element[key]),
+  )
+}
+
+export function mergeAndFilter<T extends object, K extends keyof T>(
+  key: K,
+  ...elements: T[][]
+) {
+  return uniqBy(flatten(elements), key)
 }

@@ -6,7 +6,7 @@
         v-for="element in elements"
         :key="element"
         :selected="selectedElements.includes(element)"
-        @click="onSelect(selectedElements, element)"
+        @click="onSelect(element)"
       >
         {{ element }}
       </bl-pill>
@@ -18,15 +18,19 @@
 defineProps<{
   title: string
   elements: string[]
-  selectedElements: string[]
 }>()
 
-function onSelect(elements: string[], element: string) {
-  if (elements.includes(element)) {
-    const index = elements.findIndex((el) => el === element)
-    elements.splice(index, 1)
+const selectedElements = defineModel({
+  type: Array<String>,
+  default: [],
+})
+
+function onSelect(element: string) {
+  if (selectedElements.value.includes(element)) {
+    const index = selectedElements.value.findIndex((el) => el === element)
+    selectedElements.value.splice(index, 1)
   } else {
-    elements.push(element)
+    selectedElements.value.push(element)
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot
-    :show="isOpen ?? false"
+    :show="!!isOpen"
     enter="transition ease-in-out duration-300 transform"
     enter-from="translate-x-full"
     enter-to="-translate-x-0"

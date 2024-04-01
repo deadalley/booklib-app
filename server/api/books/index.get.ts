@@ -1,6 +1,6 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import { Database } from '~/types/db.generate'
-import { executePromisesInChunks } from '~/utils'
+import { dbBooktoBook, executePromisesInChunks } from '~/utils'
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
@@ -17,5 +17,7 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  return data?.map((b, index) => ({ ...b, coverSrc: bookCovers[index] }))
+  return data?.map((b, index) =>
+    dbBooktoBook({ ...b, cover_src: bookCovers[index] }),
+  )
 })
