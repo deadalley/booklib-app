@@ -14,6 +14,8 @@
           class="m-0 box-border w-1/4 rounded-md border border-accent bg-accent-light py-1"
           :style="{ width: barMin + '%' }"
           @click="onBarLeftClick"
+          @mousedown="onLeftThumbMousedown"
+          @touchstart="onLeftThumbMousedown"
         ></div>
         <input
           class="pointer-events-none absolute left-0 top-0 w-full opacity-0"
@@ -83,6 +85,8 @@
           class="m-0 box-border w-1/4 rounded-md border border-accent bg-accent-light py-1"
           :style="{ width: barMax + '%' }"
           @click="onBarRightClick"
+          @mousedown="onRightThumbMousedown"
+          @touchstart="onRightThumbMousedown"
         ></div>
       </div>
     </div>
@@ -116,7 +120,7 @@ const rangeMarginValue = ref(props.step)
 function getNewPosition(clientX: number) {
   const moveDistance = clientX - startX.value
   const movePercentage =
-    moveDistance / (barBox.value as unknown as DOMRect)?.width ?? 1
+    moveDistance / ((barBox.value as unknown as DOMRect)?.width ?? 1)
   const maxRange = props.max - props.min
 
   let newValue = barValue.value + maxRange * movePercentage
@@ -261,6 +265,12 @@ const barMinVal = computed(() =>
 const barMaxVal = computed(() =>
   (valueMax.value || 100).toFixed(props.step.toString().includes('.') ? 2 : 0),
 )
+
+const value = defineModel<[number, number]>()
+
+watch([valueMin, valueMax], (v) => {
+  value.value = v
+})
 </script>
 
 <style scoped>

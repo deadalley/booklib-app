@@ -1,5 +1,20 @@
 import { flatten, uniqBy } from 'lodash'
 
+export function getUniqueElements<
+  T extends Record<K, unknown>,
+  K extends keyof T,
+>(elements: T[], key: K): Exclude<T[K], null>[] {
+  return elements
+    .reduce<T[K][]>((uniqueKeys, element) => {
+      const value = element[key]
+      if (!uniqueKeys.includes(value)) {
+        uniqueKeys.push(value)
+      }
+      return uniqueKeys
+    }, [])
+    .filter((p): p is Exclude<T[K], null> => !!p)
+}
+
 export function filterElementsBySearchParam<
   T extends object,
   K extends keyof T,
@@ -19,27 +34,27 @@ export function filterElementsBySearchParam<
   })
 }
 
-export function getUniqueElements<
-  T extends Record<K, unknown>,
-  K extends keyof T,
->(elements: T[], key: K): Exclude<T[K], null>[] {
-  return elements
-    .reduce<T[K][]>((uniqueKeys, element) => {
-      const value = element[key]
-      if (!uniqueKeys.includes(value)) {
-        uniqueKeys.push(value)
-      }
-      return uniqueKeys
-    }, [])
-    .filter((p): p is Exclude<T[K], null> => !!p)
-}
-
 export function filterElementsBySelectedArray<
-  T extends object,
+  T extends Record<K, unknown>,
   K extends keyof T,
 >(key: K, elements: T[], selectedArray: T[K][]): T[] {
   return elements.filter(
     (element) => element[key] && selectedArray.includes(element[key]),
+  )
+}
+
+export function filterElementsByRange<T extends object, K extends keyof T>(
+  key: K,
+  elements: T[],
+  range: [number, number],
+): T[] {
+  console.log('asd')
+  return elements.filter(
+    (element) =>
+      element[key] === undefined ||
+      element[key] === null ||
+      ((element[key] as number) >= range[0] &&
+        (element[key] as number) <= range[1]),
   )
 }
 

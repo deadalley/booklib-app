@@ -17,7 +17,12 @@
     ></bl-book-filter-section>
     <div>
       <h5 class="mb-4">Year</h5>
-      <bl-slider :min="minYear" :max="maxYear" :step="1"></bl-slider>
+      <bl-slider
+        v-model="_selectedYearRange"
+        :min="minYear"
+        :max="maxYear"
+        :step="1"
+      ></bl-slider>
     </div>
   </div>
 </template>
@@ -31,6 +36,7 @@ const props = defineProps<{
   selectedPublishers: string[]
   selectedLanguages: string[]
   selectedOriginalLanguages: string[]
+  selectedYearRange: [number, number]
 }>()
 
 const years = computed(() => getUniqueElements(props.books, 'year'))
@@ -47,6 +53,7 @@ const emit = defineEmits([
   'update:selectedPublishers',
   'update:selectedLanguages',
   'update:selectedOriginalLanguages',
+  'update:selectedYearRange',
 ])
 
 const _selectedPublishers = useVModel(props, 'selectedPublishers', emit)
@@ -56,4 +63,5 @@ const _selectedOriginalLanguages = useVModel(
   'selectedOriginalLanguages',
   emit,
 )
+const _selectedYearRange = useVModel(props, 'selectedYearRange', emit)
 </script>
