@@ -33,6 +33,9 @@
         :step="50"
       ></bl-slider>
     </div>
+    <bl-button expand variant="secondary" @click="onReset"
+      >Reset Filters</bl-button
+    >
   </div>
 </template>
 
@@ -54,6 +57,8 @@ const props = defineProps<{
   selectedOriginalLanguages: string[]
   selectedYearRange: [number, number]
   selectedPageRange: [number, number]
+
+  onReset: () => void
 }>()
 
 const emit = defineEmits([

@@ -8,7 +8,11 @@
         <NuxtLink to="/library/books">
           <h3>All Books</h3>
         </NuxtLink>
-        <h6 class="text-accent-dark">TOTAL {{ books?.length }}</h6>
+        <h6 class="flex gap-3 text-accent-dark">
+          <span> TOTAL {{ books?.length }} </span>
+          <span v-if="!!filterCount">—</span>
+          <span v-if="!!filterCount"> SHOWING {{ sortedBooks.length }} </span>
+        </h6>
       </div>
       <div class="flex flex-col gap-3 lg:flex-row">
         <NuxtLink class="flex md:inline-flex" to="/library/books/new">
@@ -71,6 +75,7 @@
       :min-max-year-range="[minYear, maxYear]"
       :min-max-page-range="[minPages, maxPages]"
       :books="books"
+      :on-reset="onResetFilter"
     ></bl-book-filter>
   </bl-sidebar>
 </template>
@@ -224,6 +229,16 @@ function onFilterOpen() {
 
 function onCloseSidebar() {
   sidebarContent.value = undefined
+}
+
+function onResetFilter() {
+  console.log('ididiid')
+  selectedPublishers.value = []
+  selectedLanguages.value = []
+  selectedOriginalLanguages.value = []
+
+  selectedYearRange.value = [minYear.value, maxYear.value]
+  selectedPageRange.value = [minPages.value, maxPages.value]
 }
 
 useHead({
