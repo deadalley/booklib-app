@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex w-full flex-col gap-8 overflow-hidden"
+    class="relative flex size-full flex-col gap-8 overflow-hidden"
     v-bind="$attrs"
   >
     <div class="flex flex-col justify-between lg:flex-row">
@@ -42,7 +42,7 @@
     </div>
     <div
       v-if="view === 'cards'"
-      class="grid w-full grid-cols-1 gap-x-3 gap-y-5 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+      class="grid h-min w-full grid-cols-1 gap-x-3 gap-y-5 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
     >
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
