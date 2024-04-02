@@ -21,6 +21,8 @@
         v-model="_selectedYearRange"
         :min="minMaxYearRange[0]"
         :max="minMaxYearRange[1]"
+        :min-value="_selectedYearRange[0]"
+        :max-value="_selectedYearRange[1]"
         :step="1"
       ></bl-slider>
     </div>
@@ -30,6 +32,8 @@
         v-model="_selectedPageRange"
         :min="minMaxPageRange[0]"
         :max="minMaxPageRange[1]"
+        :min-value="selectedPageRange[0]"
+        :max-value="selectedPageRange[1]"
         :step="50"
       ></bl-slider>
     </div>

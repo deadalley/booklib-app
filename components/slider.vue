@@ -107,8 +107,8 @@ const props = withDefaults(
   { step: 1, min: 0, max: 100 },
 )
 
-const valueMin = ref(props.min)
-const valueMax = ref(props.max)
+const valueMin = ref(props.minValue ?? props.min)
+const valueMax = ref(props.maxValue ?? props.max)
 
 const startX = ref(0)
 
