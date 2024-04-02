@@ -7,16 +7,24 @@
   >
     <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
     <bl-icon-button
-      v-if="editing && hovered"
-      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark"
+      v-if="editing"
+      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 !bg-gray !text-gray-dark transition-opacity duration-300"
+      :class="{
+        'opacity-0': !hovered,
+        'opacity-100': hovered,
+      }"
     >
       <template #default="iconProps">
         <IconUpload v-bind="iconProps" />
       </template>
     </bl-icon-button>
     <div
-      v-if="editing && hovered"
-      class="absolute inset-0 z-10 size-full cursor-pointer rounded-m bg-gray-dark opacity-60 transition-opacity duration-300"
+      v-if="editing"
+      class="absolute inset-0 z-10 size-full cursor-pointer rounded-m bg-gray-dark transition-opacity duration-300"
+      :class="{
+        'opacity-0': !hovered,
+        'opacity-60': hovered,
+      }"
       @click="onUploadClick()"
     ></div>
     <bl-loading v-if="loading"></bl-loading>
