@@ -4,7 +4,7 @@
     <div class="w-full flex-col">
       <NuxtLink :to="`/library/books/${book.id}`">
         <h5 class="truncate">
-          {{ book.title }}
+          {{ book.pages }}
         </h5>
       </NuxtLink>
       <!-- <p v-if="book.author" class="text-sm text-gray-600 truncate">

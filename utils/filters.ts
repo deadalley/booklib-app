@@ -48,7 +48,6 @@ export function filterElementsByRange<T extends object, K extends keyof T>(
   elements: T[],
   range: [number, number],
 ): T[] {
-  console.log('asd')
   return elements.filter(
     (element) =>
       element[key] === undefined ||

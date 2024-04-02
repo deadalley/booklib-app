@@ -61,6 +61,7 @@
       v-model:selectedLanguages="selectedLanguages"
       v-model:selectedOriginalLanguages="selectedOriginalLanguages"
       v-model:selectedYearRange="selectedYearRange"
+      v-model:selectedPageRange="selectedPageRange"
       :books="books"
     ></bl-book-filter>
   </bl-sidebar>
@@ -82,6 +83,7 @@ const selectedPublishers = ref<string[]>([])
 const selectedLanguages = ref<string[]>([])
 const selectedOriginalLanguages = ref<string[]>([])
 const selectedYearRange = ref<[number, number]>([0, 9999])
+const selectedPageRange = ref<[number, number]>([0, 9999])
 
 watch(view, (v) => {
   router.push({ query: { view: v } })
@@ -141,7 +143,15 @@ const sortedBooks = computed(() => {
     selectedYearRange.value,
   )
 
-  const sorted = filterByYear?.sort((b1, b2) =>
+  const filterByPages = filterElementsByRange(
+    'pages',
+    filterByYear,
+    selectedPageRange.value,
+  )
+
+  console.log(selectedPageRange.value)
+
+  const sorted = filterByPages?.sort((b1, b2) =>
     b1.title.localeCompare(b2.title),
   )
 
