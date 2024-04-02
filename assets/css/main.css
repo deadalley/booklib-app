@@ -48,7 +48,7 @@
   }
 
   .bl-table {
-    @apply w-max md:w-full overflow-x-auto;
+    @apply relative w-max md:w-full overflow-x-auto;
     table-layout: fixed;
   }
 
@@ -59,6 +59,7 @@
 
   .bl-table thead th {
     @apply bg-accent-light font-semibold text-left;
+    position: sticky;
   }
 
   .bl-table thead th > span {

@@ -54,9 +54,8 @@
       <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
       </bl-book-card>
     </div>
-    <div class="overflow-x-auto">
+    <div v-if="view === 'table'" class="overflow-x-auto">
       <bl-books-table
-        v-if="view === 'table'"
         :books="sortedBooks"
         :selected-table-columns="selectedTableColumns"
       ></bl-books-table>
