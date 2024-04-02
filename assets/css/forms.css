@@ -28,6 +28,10 @@
     @apply flex gap-3 items-center w-full px-5 rounded-m outline-none text-base placeholder:text-accent border  bg-white h-min py-3 transition-all ease-in duration-100;
   }
 
+  select.formkit-input {
+    @apply w-full cursor-pointer bg-white;
+  }
+
   input.formkit-input,
   textarea.formkit-input {
     @apply w-full;

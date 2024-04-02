@@ -67,10 +67,12 @@
                   />
                   <bl-input
                     id="language"
+                    type="select"
                     :editing="editing"
                     name="language"
                     label="Language"
                     placeholder="Language"
+                    :options="languageOptions"
                   />
                 </div>
                 <div class="form-row">
@@ -187,6 +189,7 @@
 import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
+import languageOptions from '~/public/languages-2.json'
 
 const route = useRoute()
 
