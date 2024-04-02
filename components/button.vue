@@ -44,12 +44,12 @@ const classes = computed(() => {
     switch (props.variant) {
       case 'primary':
         baseStyles.wrapper.push(
-          'text-white bg-main hover:bg-main/90 active:bg-main-dark',
+          'text-white bg-main hover:bg-main/90 active:bg-main-dark active:shadow-inner-m',
         )
         break
       case 'secondary':
         baseStyles.wrapper.push(
-          'text-black bg-accent-light hover:bg-accent-light/20 hover:ring-1 hover:ring-accent ring-inset active:bg-accent-dark',
+          'text-black bg-accent-light hover:bg-accent-light/20 hover:ring-1 hover:ring-accent ring-inset active:bg-accent-dark active:shadow-inner-m',
         )
         break
       default:
