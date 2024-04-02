@@ -23,7 +23,7 @@
 
         <div class="flex gap-3">
           <bl-button expand variant="secondary" @click="onFilterOpen">
-            Filter
+            Filter {{ filterCount ? `(${filterCount})` : '' }}
           </bl-button>
           <bl-switch v-slot="props" v-model="view">
             <bl-switch-option value="cards" v-bind="props">
@@ -48,7 +48,10 @@
       </bl-book-card>
     </div>
     <div class="overflow-x-auto">
-      <bl-books-table v-if="view === 'table'" :books="books"></bl-books-table>
+      <bl-books-table
+        v-if="view === 'table'"
+        :books="sortedBooks"
+      ></bl-books-table>
     </div>
   </div>
   <bl-sidebar
@@ -62,6 +65,11 @@
       v-model:selectedOriginalLanguages="selectedOriginalLanguages"
       v-model:selectedYearRange="selectedYearRange"
       v-model:selectedPageRange="selectedPageRange"
+      :publishers="publishers"
+      :languages="languages"
+      :original-languages="originalLanguages"
+      :min-max-year-range="[minYear, maxYear]"
+      :min-max-page-range="[minPages, maxPages]"
       :books="books"
     ></bl-book-filter>
   </bl-sidebar>
@@ -79,11 +87,6 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 const sidebarContent = ref()
 const textSearch = ref()
 const view = ref(route.query.view ?? 'cards')
-const selectedPublishers = ref<string[]>([])
-const selectedLanguages = ref<string[]>([])
-const selectedOriginalLanguages = ref<string[]>([])
-const selectedYearRange = ref<[number, number]>([0, 9999])
-const selectedPageRange = ref<[number, number]>([0, 9999])
 
 watch(view, (v) => {
   router.push({ query: { view: v } })
@@ -95,6 +98,61 @@ watch(
     view.value = (v as string) ?? 'cards'
   },
 )
+
+const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))
+const years = computed(() => getUniqueElements(books.value ?? [], 'year'))
+const publishers = computed(() =>
+  getUniqueElements(books.value ?? [], 'publisher'),
+)
+const languages = computed(() =>
+  getUniqueElements(books.value ?? [], 'language'),
+)
+const originalLanguages = computed(() =>
+  getUniqueElements(books.value ?? [], 'originalLanguage'),
+)
+
+const minPages = computed(() => Math.max(Math.min(...pages.value) - 100, 0))
+const maxPages = computed(() => Math.max(...pages.value))
+
+const minYear = computed(() => Math.min(...years.value))
+const maxYear = computed(() => new Date().getFullYear())
+
+const selectedPublishers = ref<string[]>([])
+const selectedLanguages = ref<string[]>([])
+const selectedOriginalLanguages = ref<string[]>([])
+const selectedYearRange = ref<[number, number]>([minYear.value, maxYear.value])
+const selectedPageRange = ref<[number, number]>([
+  minPages.value,
+  maxPages.value,
+])
+
+const filterCount = computed(() => {
+  let count = 0
+
+  if (selectedPublishers.value.length) {
+    count++
+  }
+  if (selectedLanguages.value.length) {
+    count++
+  }
+  if (selectedOriginalLanguages.value.length) {
+    count++
+  }
+  if (
+    selectedYearRange.value[0] !== minYear.value ||
+    selectedYearRange.value[1] !== maxYear.value
+  ) {
+    count++
+  }
+  if (
+    selectedPageRange.value[0] !== minPages.value ||
+    selectedPageRange.value[1] !== maxPages.value
+  ) {
+    count++
+  }
+
+  return count
+})
 
 const sortedBooks = computed(() => {
   const hasFilter =
@@ -148,8 +206,6 @@ const sortedBooks = computed(() => {
     filterByYear,
     selectedPageRange.value,
   )
-
-  console.log(selectedPageRange.value)
 
   const sorted = filterByPages?.sort((b1, b2) =>
     b1.title.localeCompare(b2.title),

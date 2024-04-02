@@ -2,7 +2,7 @@
   <button
     v-bind="$attrs"
     type="button"
-    class="flex h-min w-fit items-center justify-center gap-2 rounded-3xl text-base font-medium transition-all lg:inline-flex lg:grow-0 lg:justify-start"
+    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-3xl text-base font-medium transition-all lg:inline-flex lg:grow-0 lg:justify-start"
     :class="classes.wrapper"
     :disabled="disabled"
   >

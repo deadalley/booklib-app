@@ -19,8 +19,8 @@
       <h5 class="mb-4">Year</h5>
       <bl-slider
         v-model="_selectedYearRange"
-        :min="minYear"
-        :max="maxYear"
+        :min="minMaxYearRange[0]"
+        :max="minMaxYearRange[1]"
         :step="1"
       ></bl-slider>
     </div>
@@ -28,8 +28,8 @@
       <h5 class="mb-4">Page</h5>
       <bl-slider
         v-model="_selectedPageRange"
-        :min="minPages"
-        :max="maxPages"
+        :min="minMaxPageRange[0]"
+        :max="minMaxPageRange[1]"
         :step="50"
       ></bl-slider>
     </div>
@@ -42,26 +42,19 @@ import type { Book } from '~/types/book'
 
 const props = defineProps<{
   books: Book[]
+
+  publishers: string[]
+  languages: string[]
+  originalLanguages: string[]
+  minMaxYearRange: [number, number]
+  minMaxPageRange: [number, number]
+
   selectedPublishers: string[]
   selectedLanguages: string[]
   selectedOriginalLanguages: string[]
   selectedYearRange: [number, number]
   selectedPageRange: [number, number]
 }>()
-
-const pages = computed(() => getUniqueElements(props.books, 'pages'))
-const years = computed(() => getUniqueElements(props.books, 'year'))
-const publishers = computed(() => getUniqueElements(props.books, 'publisher'))
-const languages = computed(() => getUniqueElements(props.books, 'language'))
-const originalLanguages = computed(() =>
-  getUniqueElements(props.books, 'originalLanguage'),
-)
-
-const minPages = computed(() => Math.max(Math.min(...pages.value) - 100, 0))
-const maxPages = computed(() => Math.max(...pages.value))
-
-const minYear = computed(() => Math.min(...years.value))
-const maxYear = computed(() => new Date().getFullYear())
 
 const emit = defineEmits([
   'update:selectedPublishers',
