@@ -1,6 +1,6 @@
 <template>
   <div
-    class="formkit-inner !lg:min-w-[500px] !w-full"
+    class="inline-flex h-min items-center gap-3 rounded-m border bg-white px-5 py-3 text-base outline-none transition-all duration-100 ease-in placeholder:text-accent lg:w-[355px]"
     :class="{
       'border-white': !focused,
       'border-accent': focused,

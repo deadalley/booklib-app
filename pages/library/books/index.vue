@@ -3,7 +3,7 @@
     class="relative flex size-full flex-col gap-8 overflow-hidden"
     v-bind="$attrs"
   >
-    <div class="flex flex-col justify-between lg:flex-row">
+    <div class="flex flex-col justify-between gap-5 lg:flex-row">
       <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
           <h3>All Books</h3>
@@ -15,7 +15,7 @@
         </h6>
       </div>
       <div
-        class="flex flex-col gap-3 transition-all ease-in-out lg:flex-row"
+        class="flex flex-1 flex-col justify-end gap-3 transition-all ease-in-out lg:flex-row"
         :class="{ 'md:mr-[355px]': !!sidebarContent }"
       >
         <NuxtLink class="flex md:inline-flex" to="/library/books/new">
