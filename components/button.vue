@@ -20,7 +20,7 @@ const props = withDefaults(
     expand?: boolean
     compact?: boolean
     disabled?: boolean
-    variant?: 'primary' | 'secondary'
+    variant?: 'primary' | 'secondary' | 'tertiary'
   }>(),
   { variant: 'primary' },
 )
@@ -52,6 +52,11 @@ const classes = computed(() => {
       case 'secondary':
         baseStyles.wrapper.push(
           'text-black bg-accent-light hover:bg-accent-light/20 hover:ring-1 hover:ring-accent ring-inset active:bg-accent-dark active:shadow-inner-m',
+        )
+        break
+      case 'tertiary':
+        baseStyles.wrapper.push(
+          'text-black border border-accent p-2 hover:bg-accent-light/20',
         )
         break
       default:
