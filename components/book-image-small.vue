@@ -2,7 +2,7 @@
   <NuxtLink :to="`/library/books/${book.id}`" class="w-full">
     <bl-empty-book-image
       v-if="!coverSrc"
-      class="!h-48 min-w-32 !rounded-2xl !p-5"
+      class="!h-48 !rounded-2xl !p-5"
     ></bl-empty-book-image>
     <NuxtImg
       v-if="coverSrc"
