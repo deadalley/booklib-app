@@ -27,5 +27,4 @@ function onBlur() {
 defineOptions({
   inheritAttrs: false,
 })
-watch(focused, (v) => console.log(v))
 </script>

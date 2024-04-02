@@ -37,6 +37,20 @@
         :step="50"
       ></bl-slider>
     </div>
+    <div v-if="isTableView">
+      <h5 class="mb-4">Table columns</h5>
+      <bl-list-checkbox>
+        <bl-list-checkbox-option
+          v-for="column in tableColumns"
+          :key="column.value"
+          :value="column.value"
+          :checked="column.checked"
+          @input="onColumnFilter"
+        >
+          {{ column.label }}
+        </bl-list-checkbox-option>
+      </bl-list-checkbox>
+    </div>
     <bl-button expand variant="secondary" @click="onReset"
       >Reset Filters</bl-button
     >
@@ -44,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core'
+import { useVModels } from '@vueuse/core'
 import type { Book } from '~/types/book'
 
 const props = defineProps<{
@@ -62,8 +76,16 @@ const props = defineProps<{
   selectedYearRange: [number, number]
   selectedPageRange: [number, number]
 
+  selectedTableColumns: {
+    [key in keyof Book]?: { label: string; checked: boolean }
+  }
+
   onReset: () => void
 }>()
+
+const route = useRoute()
+
+const isTableView = ref(route.query.view === 'table')
 
 const emit = defineEmits([
   'update:selectedPublishers',
@@ -71,15 +93,33 @@ const emit = defineEmits([
   'update:selectedOriginalLanguages',
   'update:selectedYearRange',
   'update:selectedPageRange',
+  'update:selectedTableColumns',
 ])
 
-const _selectedPublishers = useVModel(props, 'selectedPublishers', emit)
-const _selectedLanguages = useVModel(props, 'selectedLanguages', emit)
-const _selectedOriginalLanguages = useVModel(
-  props,
-  'selectedOriginalLanguages',
-  emit,
+const {
+  selectedPublishers: _selectedPublishers,
+  selectedLanguages: _selectedLanguages,
+  selectedOriginalLanguages: _selectedOriginalLanguages,
+  selectedYearRange: _selectedYearRange,
+  selectedPageRange: _selectedPageRange,
+} = useVModels(props, emit)
+
+const tableColumns = computed(() =>
+  Object.entries(props.selectedTableColumns).map(([value, rest]) => ({
+    value,
+    ...rest,
+  })),
 )
-const _selectedYearRange = useVModel(props, 'selectedYearRange', emit)
-const _selectedPageRange = useVModel(props, 'selectedPageRange', emit)
+
+function onColumnFilter(v: any) {
+  const { value, checked } = v.target
+
+  const entry =
+    props.selectedTableColumns[value as keyof typeof props.selectedTableColumns]
+
+  emit('update:selectedTableColumns', {
+    ...props.selectedTableColumns,
+    [value]: { ...entry, checked },
+  })
+}
 </script>

@@ -8,7 +8,7 @@
     leave-from="-translate-x-0"
     leave-to="translate-x-full"
     as="div"
-    class="absolute right-0 top-0 flex h-full flex-col gap-12 border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
+    class="absolute right-0 top-0 flex h-full flex-col gap-12 overflow-auto border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
   >
     <div class="flex justify-between">
       <h4 v-if="!!title">{{ title }}</h4>

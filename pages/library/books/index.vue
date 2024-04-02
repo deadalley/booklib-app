@@ -14,7 +14,10 @@
           <span v-if="!!filterCount"> SHOWING {{ sortedBooks.length }} </span>
         </h6>
       </div>
-      <div class="flex flex-col gap-3 lg:flex-row">
+      <div
+        class="flex flex-col gap-3 transition-all ease-in-out lg:flex-row"
+        :class="{ 'md:mr-[355px]': !!sidebarContent }"
+      >
         <NuxtLink class="flex md:inline-flex" to="/library/books/new">
           <bl-button expand>
             <template #prependIcon="prependIcon">
@@ -55,6 +58,7 @@
       <bl-books-table
         v-if="view === 'table'"
         :books="sortedBooks"
+        :selected-table-columns="selectedTableColumns"
       ></bl-books-table>
     </div>
   </div>
@@ -69,6 +73,7 @@
       v-model:selectedOriginalLanguages="selectedOriginalLanguages"
       v-model:selectedYearRange="selectedYearRange"
       v-model:selectedPageRange="selectedPageRange"
+      v-model:selected-table-columns="selectedTableColumns"
       :publishers="publishers"
       :languages="languages"
       :original-languages="originalLanguages"
@@ -104,6 +109,18 @@ watch(
   },
 )
 
+const defaultTableColumns = {
+  coverSrc: { label: 'Cover', checked: true },
+  publisher: { label: 'Publisher', checked: true },
+  language: { label: 'Language', checked: true },
+  year: { label: 'Year', checked: true },
+  pages: { label: 'Pages', checked: true },
+  rating: { label: 'Rating', checked: true },
+  originalTitle: { label: 'Original Title', checked: true },
+  originalLanguage: { label: 'Original Language', checked: true },
+  isbn: { label: 'ISBN', checked: true },
+}
+
 const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))
 const years = computed(() => getUniqueElements(books.value ?? [], 'year'))
 const publishers = computed(() =>
@@ -130,6 +147,9 @@ const selectedPageRange = ref<[number, number]>([
   minPages.value,
   maxPages.value,
 ])
+const selectedTableColumns = ref<{
+  [key in keyof Book]?: { label: string; checked: boolean }
+}>(defaultTableColumns)
 
 const filterCount = computed(() => {
   let count = 0
@@ -232,17 +252,17 @@ function onCloseSidebar() {
 }
 
 function onResetFilter() {
-  console.log('ididiid')
   selectedPublishers.value = []
   selectedLanguages.value = []
   selectedOriginalLanguages.value = []
 
   selectedYearRange.value = [minYear.value, maxYear.value]
   selectedPageRange.value = [minPages.value, maxPages.value]
+
+  selectedTableColumns.value = defaultTableColumns
 }
 
 definePageMeta({
   middleware: 'auth',
-  // layout: 'dashboard',
 })
 </script>

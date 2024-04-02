@@ -47,33 +47,33 @@
     @apply text-black font-normal;
   }
 
-  table {
+  .bl-table {
     @apply w-max md:w-full overflow-x-auto;
     table-layout: fixed;
   }
 
-  th,
-  td {
+  .bl-table th,
+  .bl-table td {
     @apply py-5 px-8 text-base;
   }
 
-  thead th {
+  .bl-table thead th {
     @apply bg-accent-light font-semibold text-left;
   }
 
-  thead th > span {
+  .bl-table thead th > span {
     @apply flex gap-3 items-center;
   }
 
-  th:first-child {
+  .bl-table th:first-child {
     @apply rounded-l-2xl;
   }
 
-  th:last-child {
+  .bl-table th:last-child {
     @apply rounded-r-2xl;
   }
 
-  td {
+  .bl-table td {
     @apply text-base border-b border-accent-light;
   }
 }

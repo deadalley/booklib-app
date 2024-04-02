@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table class="bl-table">
     <thead>
       <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
         <th
