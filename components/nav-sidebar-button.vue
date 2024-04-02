@@ -1,5 +1,8 @@
 <template>
-  <button :class="classes.wrapper">
+  <button
+    class="flex items-center gap-3 rounded-m px-5 py-3 text-lg transition-all hover:bg-accent/30 active:bg-accent-dark/20"
+    :class="classes.wrapper"
+  >
     <slot name="icon" :size="ICON_SIZE_MEDIUM" stroke="1.5"></slot>
     <slot></slot>
   </button>
@@ -17,13 +20,11 @@ const props = defineProps({
 
 const classes = computed(() => {
   const baseStyles: Record<string, string[]> = {
-    wrapper: [
-      'flex items-center gap-3 text-lg rounded-m hover:bg-accent/20 active:bg-accent-dark/20 py-3 px-5',
-    ],
+    wrapper: [],
   }
 
   if (props.active) {
-    baseStyles.wrapper.push('bg-accent/20 hover:bg-accent/20 font-medium')
+    baseStyles.wrapper.push('bg-accent/20 hover:bg-accent/20')
   }
 
   return {

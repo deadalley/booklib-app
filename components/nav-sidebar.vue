@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="flex h-full flex-col gap-6 bg-main px-6 pb-8 pt-16 text-accent-light"
+    class="flex h-full flex-col gap-6 bg-main-dark px-6 pb-8 pt-16 text-accent-light"
   >
     <h3
       class="mb-6 cursor-pointer font-normal tracking-wider text-accent-light"
