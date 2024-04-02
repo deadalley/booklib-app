@@ -9,6 +9,12 @@
           :class="
             header.column.getCanSort() ? 'cursor-pointer select-none' : ''
           "
+          :style="{
+            width:
+              header.column.getSize() === 0
+                ? 'auto'
+                : `${header.column.getSize()}%`,
+          }"
           @click="header.column.getToggleSortingHandler()?.($event)"
         >
           <span v-if="!header.isPlaceholder">
@@ -50,7 +56,16 @@
         }"
         @click="onRowClick(row.original)"
       >
-        <td v-for="cell in row.getVisibleCells()" :key="cell.id">
+        <td
+          v-for="cell in row.getVisibleCells()"
+          :key="cell.id"
+          :style="{
+            width:
+              cell.column.getSize() === 0
+                ? 'auto'
+                : `${cell.column.getSize()}%`,
+          }"
+        >
           <FlexRender
             :render="cell.column.columnDef.cell"
             :props="cell.getContext()"

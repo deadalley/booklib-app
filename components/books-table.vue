@@ -34,6 +34,7 @@ const columns = computed(() =>
         })
       },
       enableSorting: false,
+      size: 10,
     }),
     columnHelper.accessor('title', {
       header: 'Title',
@@ -50,10 +51,12 @@ const columns = computed(() =>
     columnHelper.accessor('year', {
       header: 'Year',
       cell,
+      size: 8,
     }),
     columnHelper.accessor('pages', {
       header: 'Pages',
       cell,
+      size: 8,
     }),
     columnHelper.accessor('rating', {
       header: 'Rating',
@@ -78,6 +81,7 @@ const columns = computed(() =>
     columnHelper.accessor('originalLanguage', {
       header: 'Original Language',
       cell,
+      size: 12,
     }),
     columnHelper.accessor('isbn', {
       header: 'ISBN',
@@ -97,14 +101,6 @@ const columns = computed(() =>
 const data = computed(() => props.books)
 
 function onRowClick(row: Book) {
-  console.log(row)
   navigateTo(`/library/books/${row.id}`)
 }
 </script>
-
-<style scoped>
-:deep(th:first-child),
-:deep(td:first-child) {
-  width: 10%;
-}
-</style>
