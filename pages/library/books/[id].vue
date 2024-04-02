@@ -73,6 +73,7 @@
                     label="Language"
                     placeholder="Language"
                     :options="languageOptions"
+                    :value="book.language"
                   />
                 </div>
                 <div class="form-row">
@@ -111,6 +112,7 @@
                     label="Original Language"
                     placeholder="Original Language"
                     :options="languageOptions"
+                    :value="book.originalLanguage"
                   />
                 </div>
                 <div class="form-row">
@@ -193,9 +195,7 @@
 import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
-import rawLanguageOptions from '~/public/languages-2.json'
-
-const languageOptions = computed(() => rawLanguageOptions)
+import languageOptions from '~/public/languages-2.json'
 
 const route = useRoute()
 

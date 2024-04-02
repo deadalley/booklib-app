@@ -8,7 +8,7 @@
         :selected="selectedElements.includes(element)"
         @click="onSelect(element)"
       >
-        {{ element }}
+        {{ getDisplayValue(element) }}
       </bl-pill>
     </div>
   </div>
@@ -24,6 +24,10 @@ const selectedElements = defineModel({
   type: Array<String>,
   default: [],
 })
+
+function getDisplayValue(element: string) {
+  return getDisplayLanguage(element)
+}
 
 function onSelect(element: string) {
   if (selectedElements.value.includes(element)) {

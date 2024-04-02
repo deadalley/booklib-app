@@ -1,5 +1,6 @@
 import type { Book } from '~/types/book'
 import type { BookDB } from '~/types/database'
+import languageOptions from '~/public/languages-2.json'
 
 export function dbBooktoBook(dbBook: BookDB): Book {
   const {
@@ -44,4 +45,8 @@ export function bookToDbBook(
     year: book.year,
     genres: book.genres,
   }
+}
+
+export function getDisplayLanguage(langCode: string) {
+  return languageOptions[langCode as keyof typeof languageOptions] ?? langCode
 }

@@ -1,7 +1,7 @@
 <template>
   <div v-if="!editing" class="formkit-wrapper flex-1">
-    <label class="formkit-label text-accent-dark">{{ $attrs.label }}</label>
-    <h5 v-if="inputModel">{{ inputModel }}</h5>
+    <label class="formkit-label">{{ $attrs.label }}</label>
+    <h5 v-if="inputModel">{{ displayValue }}</h5>
     <p v-if="!inputModel" class="text-gray-dark">Empty</p>
   </div>
   <FormKit
@@ -30,18 +30,20 @@ const attrs = useAttrs()
 const inputModel = ref()
 const focused = ref(false)
 
-defineProps({
-  editing: {
-    type: Boolean,
-    default: true,
-  },
-})
+withDefaults(defineProps<{ editing?: boolean }>(), { editing: true })
 
 useFormKitContext((form) => {
   const name = attrs.name as string
   const formValues = form._value as Record<string, any>
 
   inputModel.value = formValues[name]
+})
+
+const displayValue = computed(() => {
+  if ((attrs.name as string).toLowerCase().includes('language')) {
+    return getDisplayLanguage(attrs.value as string)
+  }
+  return inputModel.value
 })
 
 function onFocus() {
