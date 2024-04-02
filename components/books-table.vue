@@ -1,5 +1,9 @@
 <template>
-  <bl-table :data="data" :columns="columns"></bl-table>
+  <bl-table
+    :data="data"
+    :columns="columns"
+    :on-row-click="onRowClick"
+  ></bl-table>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +37,7 @@ const columns = computed(() =>
     }),
     columnHelper.accessor('title', {
       header: 'Title',
-      cell,
+      cell: (info) => h('h6', info.getValue()),
     }),
     columnHelper.accessor('publisher', {
       header: 'Publisher',
@@ -91,6 +95,11 @@ const columns = computed(() =>
 )
 
 const data = computed(() => props.books)
+
+function onRowClick(row: Book) {
+  console.log(row)
+  navigateTo(`/library/books/${row.id}`)
+}
 </script>
 
 <style scoped>

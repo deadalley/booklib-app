@@ -42,7 +42,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="row in table.getRowModel().rows" :key="row.id">
+      <tr
+        v-for="row in table.getRowModel().rows"
+        :key="row.id"
+        :class="{
+          'cursor-pointer hover:bg-accent-light/40': !!onRowClick,
+        }"
+        @click="onRowClick(row.original)"
+      >
         <td v-for="cell in row.getVisibleCells()" :key="cell.id">
           <FlexRender
             :render="cell.column.columnDef.cell"
@@ -84,7 +91,11 @@ import {
   IconSortDescending,
 } from '@tabler/icons-vue'
 
-const props = defineProps<{ data: T[]; columns: ColumnDef<T, any>[] }>()
+const props = defineProps<{
+  data: T[]
+  columns: ColumnDef<T, any>[]
+  onRowClick: (row: T) => void
+}>()
 
 const columnVisibility = ref({})
 const columnOrder = ref<ColumnOrderState>([])
