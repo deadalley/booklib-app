@@ -8,16 +8,19 @@
         class="flex items-center gap-16 border-b border-b-accent px-8 py-4 shadow-md"
       >
         <NuxtLink class="flex-1" to="/library/books">
-          <h5>Library</h5>
+          <h5>{{ title }}</h5>
         </NuxtLink>
 
-        <ul class="flex gap-5">
-          <li class="text-lg">
+        <ul v-if="!!navItems?.length" class="flex gap-5">
+          <li v-for="item of navItems" :key="item.label" class="text-lg">
+            <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
+          </li>
+          <!-- <li class="text-lg">
             <NuxtLink to="/library/books">Books</NuxtLink>
           </li>
           <li class="text-lg">
             <NuxtLink to="/library/collections">Collections</NuxtLink>
-          </li>
+          </li> -->
         </ul>
 
         <div
@@ -46,4 +49,6 @@
 const user = useSupabaseUser()
 
 const profileUrl = computed(() => user.value?.user_metadata.avatar_url)
+
+defineProps<{ title: string; navItems?: { to?: string; label: string }[] }>()
 </script>

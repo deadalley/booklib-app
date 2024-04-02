@@ -13,13 +13,12 @@
           v-for="(button, index) in buttons"
           :key="button.label"
           :active="activeItemIndex === index"
+          :to="button.to"
         >
           <template #icon="iconProps">
             <component v-bind="iconProps" :is="button.icon"></component>
           </template>
-          <NuxtLink :to="button.to">
-            {{ button.label }}
-          </NuxtLink>
+          {{ button.label }}
         </bl-nav-sidebar-button>
       </div>
       <div class="flex flex-col gap-3" @click="onLogout">
@@ -34,12 +33,15 @@
 </template>
 
 <script setup lang="ts">
-import { IconLogout, IconBooks } from '@tabler/icons-vue'
+import { IconLogout, IconBooks, IconHome } from '@tabler/icons-vue'
 
 const route = useRoute()
 const supabase = useSupabaseClient()
 
-const buttons = [{ label: 'Library', icon: IconBooks, to: '/library' }]
+const buttons = [
+  { label: 'Home', icon: IconHome, to: '/home' },
+  { label: 'Library', icon: IconBooks, to: '/library' },
+]
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),
 )

@@ -241,12 +241,8 @@ function onResetFilter() {
   selectedPageRange.value = [minPages.value, maxPages.value]
 }
 
-useHead({
-  title: 'BookLib | My Library',
-})
-
 definePageMeta({
   middleware: 'auth',
-  layout: 'dashboard',
+  // layout: 'dashboard',
 })
 </script>
