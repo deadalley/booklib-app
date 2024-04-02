@@ -83,6 +83,7 @@
                     label="Year"
                     placeholder="Year"
                     type="number"
+                    :min="0"
                   />
                   <bl-input
                     id="pages"
@@ -91,6 +92,7 @@
                     label="Pages"
                     placeholder="Pages"
                     type="number"
+                    :min="0"
                   />
                 </div>
                 <div class="form-row">
@@ -103,10 +105,12 @@
                   />
                   <bl-input
                     id="originalLanguage"
+                    type="select"
                     :editing="editing"
                     name="originalLanguage"
                     label="Original Language"
                     placeholder="Original Language"
+                    :options="languageOptions"
                   />
                 </div>
                 <div class="form-row">
@@ -189,7 +193,9 @@
 import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
-import languageOptions from '~/public/languages-2.json'
+import rawLanguageOptions from '~/public/languages-2.json'
+
+const languageOptions = computed(() => rawLanguageOptions)
 
 const route = useRoute()
 
