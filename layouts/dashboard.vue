@@ -15,12 +15,6 @@
           <li v-for="item of navItems" :key="item.label" class="text-lg">
             <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
           </li>
-          <!-- <li class="text-lg">
-            <NuxtLink to="/library/books">Books</NuxtLink>
-          </li>
-          <li class="text-lg">
-            <NuxtLink to="/library/collections">Collections</NuxtLink>
-          </li> -->
         </ul>
 
         <div

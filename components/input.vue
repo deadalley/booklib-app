@@ -9,10 +9,13 @@
     v-model="inputModel"
     v-bind="$attrs"
     :classes="{
-      outer: editing ? 'flex-1' : 'flex-1 !hidden',
+      outer: `flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'flex-1',
-      label: 'ml-5 text-gray-dark',
+      label: 'ml-5',
+      inner: `${focused ? 'border-accent' : 'border-white'}`,
     }"
+    @focus="onFocus"
+    @blur="onBlur"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData"
       ><slot :name="name" v-bind="slotData"></slot
@@ -25,6 +28,7 @@ import { useFormKitContext } from '@formkit/vue'
 
 const attrs = useAttrs()
 const inputModel = ref()
+const focused = ref(false)
 
 defineProps({
   editing: {
@@ -39,4 +43,12 @@ useFormKitContext((form) => {
 
   inputModel.value = formValues[name]
 })
+
+function onFocus() {
+  focused.value = true
+}
+
+function onBlur() {
+  focused.value = false
+}
 </script>

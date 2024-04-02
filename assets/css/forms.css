@@ -21,11 +21,11 @@
   }
 
   .formkit-label {
-    @apply text-base font-medium;
+    @apply text-base font-medium text-black;
   }
 
   .formkit-inner {
-    @apply flex gap-3 items-center w-full px-5 rounded-m outline-none text-base placeholder:text-accent border border-white bg-white h-min py-3;
+    @apply flex gap-3 items-center w-full px-5 rounded-m outline-none text-base placeholder:text-accent border  bg-white h-min py-3 transition-all ease-in duration-100;
   }
 
   input.formkit-input,
