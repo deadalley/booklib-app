@@ -1,4 +1,4 @@
-import { flatten, uniqBy } from 'lodash'
+import { flatten, intersection, uniqBy } from 'lodash'
 
 export function getUniqueElements<
   T extends Record<K, unknown>,
@@ -7,9 +7,17 @@ export function getUniqueElements<
   return elements
     .reduce<T[K][]>((uniqueKeys, element) => {
       const value = element[key]
-      if (!uniqueKeys.includes(value)) {
-        uniqueKeys.push(value)
+
+      if (Array.isArray(value)) {
+        value.forEach((v) => {
+          uniqueKeys.push(v)
+        })
+      } else {
+        if (!uniqueKeys.includes(value)) {
+          uniqueKeys.push(value)
+        }
       }
+
       return uniqueKeys
     }, [])
     .filter((p): p is Exclude<T[K], null> => !!p)
@@ -38,9 +46,15 @@ export function filterElementsBySelectedArray<
   T extends Record<K, unknown>,
   K extends keyof T,
 >(key: K, elements: T[], selectedArray: T[K][]): T[] {
-  return elements.filter(
-    (element) => element[key] && selectedArray.includes(element[key]),
-  )
+  return elements.filter((element) => {
+    if (Array.isArray(element[key])) {
+      return !!intersection(
+        element[key] as Array<any>,
+        selectedArray[0] as Array<any>,
+      ).length
+    }
+    return element[key] && selectedArray.includes(element[key])
+  })
 }
 
 export function filterElementsByRange<T extends object, K extends keyof T>(

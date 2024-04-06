@@ -153,6 +153,7 @@
             <bl-genre-tag
               v-for="(genre, index) in genres"
               :key="genre"
+              removable
               :value="genre"
               :index="index"
               :on-commit="onSubmitGenre"
@@ -160,6 +161,7 @@
             ></bl-genre-tag>
             <bl-genre-tag
               key="new"
+              removable
               :new-genre="true"
               :index="genres.length"
               :on-commit="onSubmitGenre"

@@ -4,12 +4,22 @@
     <div class="flex w-full flex-wrap gap-3">
       <bl-pill
         v-for="element in elements"
+        v-if="!genre"
         :key="element"
         :selected="selectedElements.includes(element)"
         @click="onSelect(element)"
       >
         {{ getDisplayValue(element) }}
       </bl-pill>
+      <bl-genre-tag
+        v-for="(element, index) in elements"
+        v-if="!!genre"
+        :key="element"
+        :value="element"
+        :index="index"
+        :selected="selectedElements.includes(element)"
+        @click="onSelect(element)"
+      />
     </div>
   </div>
 </template>
@@ -18,6 +28,7 @@
 defineProps<{
   title: string
   elements: string[]
+  genre?: boolean
 }>()
 
 const selectedElements = defineModel({

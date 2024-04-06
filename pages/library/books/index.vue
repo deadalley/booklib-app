@@ -72,10 +72,12 @@
       v-model:selectedOriginalLanguages="selectedOriginalLanguages"
       v-model:selectedYearRange="selectedYearRange"
       v-model:selectedPageRange="selectedPageRange"
-      v-model:selected-table-columns="selectedTableColumns"
+      v-model:selectedTableColumns="selectedTableColumns"
+      v-model:selectedGenres="selectedGenres"
       :publishers="publishers"
       :languages="languages"
       :original-languages="originalLanguages"
+      :genres="genres"
       :min-max-year-range="[minYear, maxYear]"
       :min-max-page-range="[minPages, maxPages]"
       :books="books"
@@ -131,6 +133,7 @@ const languages = computed(() =>
 const originalLanguages = computed(() =>
   getUniqueElements(books.value ?? [], 'originalLanguage'),
 )
+const genres = computed(() => getUniqueElements(books.value ?? [], 'genres'))
 
 const minPages = computed(() => Math.max(Math.min(...pages.value) - 100, 0))
 const maxPages = computed(() => Math.max(...pages.value))
@@ -141,6 +144,7 @@ const maxYear = computed(() => new Date().getFullYear())
 const selectedPublishers = ref<string[]>([])
 const selectedLanguages = ref<string[]>([])
 const selectedOriginalLanguages = ref<string[]>([])
+const selectedGenres = ref<string[]>([])
 const selectedYearRange = ref<[number, number]>([minYear.value, maxYear.value])
 const selectedPageRange = ref<[number, number]>([
   minPages.value,
@@ -160,6 +164,9 @@ const filterCount = computed(() => {
     count++
   }
   if (selectedOriginalLanguages.value.length) {
+    count++
+  }
+  if (selectedGenres.value.length) {
     count++
   }
   if (
@@ -182,7 +189,8 @@ const sortedBooks = computed(() => {
   const hasFilter =
     selectedPublishers.value.length ||
     selectedLanguages.value.length ||
-    selectedOriginalLanguages.value.length
+    selectedOriginalLanguages.value.length ||
+    selectedGenres.value.length
 
   let combinedFilters: Book[] = books.value ?? []
 
@@ -205,11 +213,18 @@ const sortedBooks = computed(() => {
       selectedOriginalLanguages.value,
     )
 
+    const filterByGenres = filterElementsBySelectedArray(
+      'genres',
+      books.value ?? [],
+      [selectedGenres.value],
+    )
+
     combinedFilters = mergeAndFilter(
       'id',
       filterByPublisher,
       filterByLanguage,
       filterByOriginalLanguage,
+      filterByGenres,
     )
   }
 

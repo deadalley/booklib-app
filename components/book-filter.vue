@@ -15,6 +15,12 @@
       title="Original Language"
       :elements="originalLanguages"
     ></bl-book-filter-section>
+    <bl-book-filter-section
+      v-model="_selectedGenres"
+      title="Genres"
+      :elements="genres"
+      :genre="true"
+    ></bl-book-filter-section>
     <div>
       <h5 class="mb-4">Year</h5>
       <bl-slider
@@ -67,12 +73,14 @@ const props = defineProps<{
   publishers: string[]
   languages: string[]
   originalLanguages: string[]
+  genres: string[]
   minMaxYearRange: [number, number]
   minMaxPageRange: [number, number]
 
   selectedPublishers: string[]
   selectedLanguages: string[]
   selectedOriginalLanguages: string[]
+  selectedGenres: string[]
   selectedYearRange: [number, number]
   selectedPageRange: [number, number]
 
@@ -91,6 +99,7 @@ const emit = defineEmits([
   'update:selectedPublishers',
   'update:selectedLanguages',
   'update:selectedOriginalLanguages',
+  'update:selectedGenres',
   'update:selectedYearRange',
   'update:selectedPageRange',
   'update:selectedTableColumns',
@@ -100,6 +109,7 @@ const {
   selectedPublishers: _selectedPublishers,
   selectedLanguages: _selectedLanguages,
   selectedOriginalLanguages: _selectedOriginalLanguages,
+  selectedGenres: _selectedGenres,
   selectedYearRange: _selectedYearRange,
   selectedPageRange: _selectedPageRange,
 } = useVModels(props, emit)

@@ -2,7 +2,11 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex cursor-text items-center gap-2 rounded-m bg-green px-12 py-2 font-medium"
+    class="relative flex cursor-default items-center gap-2 rounded-m bg-green px-12 py-2 font-medium"
+    :class="{
+      'cursor-pointer': !!attrs.onClick,
+      'bg-main-light text-white  ring-main-light': !!selected,
+    }"
     @click="onClick"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
@@ -18,7 +22,7 @@
       class="!h-4 !w-4 !fill-black !text-gray-dark"
     ></bl-loading>
     <IconCircleX
-      v-if="!loading"
+      v-if="!loading && removable"
       :size="16"
       stroke="2"
       class="absolute right-6 cursor-pointer opacity-0"
@@ -39,32 +43,18 @@
 import { IconTag, IconCircleX, IconPlus } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
-const props = defineProps({
-  value: {
-    type: String,
-    required: false,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
-  newGenre: {
-    type: Boolean,
-    default: false,
-  },
-  onCommit: {
-    type: Function,
-    required: false,
-  },
-  onRemove: {
-    type: Function,
-    required: false,
-  },
-})
+const attrs = useAttrs() as any
+
+const props = defineProps<{
+  value?: string
+  index: number
+  editable?: boolean
+  removable?: boolean
+  newGenre?: boolean
+  selected?: boolean
+  onCommit?: (value: string | undefined, index: number) => {}
+  onRemove?: (index: number) => {}
+}>()
 
 const loading = ref(false)
 const hovered = ref(false)
@@ -120,6 +110,8 @@ function onNew() {
 }
 
 function onClick() {
+  attrs.onClick?.()
+
   if (props.editable) {
     focused.value = true
     editing.value = true

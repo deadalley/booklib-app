@@ -12,6 +12,7 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
+    'vue/no-use-v-if-with-v-for': 0,
     'vue/no-multiple-template-root': 0,
     'vue/multi-word-component-names': 0,
     'vue/require-default-prop': 'off',
