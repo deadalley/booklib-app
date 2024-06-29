@@ -1,8 +1,8 @@
 export type Book = {
+  id: number
   title: string
   coverSrc: string | null
   createdAt: string
-  id: number
   isbn: string | null
   language: string | null
   originalTitle: string | null

@@ -1,52 +1,39 @@
 <template>
-  <div
-    class="relative flex size-full flex-col gap-8 overflow-hidden"
-    v-bind="$attrs"
+  <NuxtLayout
+    name="library"
+    title="All Books"
+    :total="books?.length ?? 0"
+    :sidebar-content="sidebarContent"
   >
-    <div class="flex flex-col justify-between gap-5 lg:flex-row">
-      <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
-        <NuxtLink to="/library/books">
-          <h3>All Books</h3>
-        </NuxtLink>
-        <h6 class="flex gap-3 text-accent-dark">
-          <span> TOTAL {{ books?.length }} </span>
-          <span v-if="!!filterCount">—</span>
-          <span v-if="!!filterCount"> SHOWING {{ sortedBooks.length }} </span>
-        </h6>
-      </div>
-      <div
-        class="flex flex-1 flex-col justify-end gap-3 transition-all ease-in-out lg:flex-row"
-        :class="{ 'md:mr-[355px]': !!sidebarContent }"
-      >
-        <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-          <bl-button expand>
-            <template #prependIcon="prependIcon">
-              <IconPlus v-bind="prependIcon" />
-            </template>
-            Book
-          </bl-button>
-        </NuxtLink>
-        <bl-search-bar @input="onSearch"></bl-search-bar>
+    <template #navbar>
+      <NuxtLink class="flex md:inline-flex" to="/library/books/new">
+        <bl-button expand>
+          <template #prependIcon="prependIcon">
+            <IconPlus v-bind="prependIcon" />
+          </template>
+          Book
+        </bl-button>
+      </NuxtLink>
+      <bl-search-bar @input="onSearch"></bl-search-bar>
 
-        <div class="flex gap-3">
-          <bl-button expand variant="secondary" @click="onFilterOpen">
-            Filter {{ filterCount ? `(${filterCount})` : '' }}
-          </bl-button>
-          <bl-switch v-slot="props" v-model="view">
-            <bl-switch-option value="cards" v-bind="props">
-              <template #icon="iconProps">
-                <IconLayoutDashboard v-bind="iconProps" />
-              </template>
-            </bl-switch-option>
-            <bl-switch-option value="table" v-bind="props">
-              <template #icon="iconProps">
-                <IconTable v-bind="iconProps" />
-              </template>
-            </bl-switch-option>
-          </bl-switch>
-        </div>
+      <div class="flex gap-3">
+        <bl-button expand variant="secondary" @click="onFilterOpen">
+          Filter {{ filterCount ? `(${filterCount})` : '' }}
+        </bl-button>
+        <bl-switch v-slot="props" v-model="view">
+          <bl-switch-option value="cards" v-bind="props">
+            <template #icon="iconProps">
+              <IconLayoutDashboard v-bind="iconProps" />
+            </template>
+          </bl-switch-option>
+          <bl-switch-option value="table" v-bind="props">
+            <template #icon="iconProps">
+              <IconTable v-bind="iconProps" />
+            </template>
+          </bl-switch-option>
+        </bl-switch>
       </div>
-    </div>
+    </template>
     <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
@@ -60,30 +47,30 @@
         :selected-table-columns="selectedTableColumns"
       ></bl-books-table>
     </div>
-  </div>
-  <bl-sidebar
-    :title="sidebarContent"
-    :is-open="!!sidebarContent"
-    :on-close="onCloseSidebar"
-  >
-    <bl-book-filter
-      v-model:selectedPublishers="selectedPublishers"
-      v-model:selectedLanguages="selectedLanguages"
-      v-model:selectedOriginalLanguages="selectedOriginalLanguages"
-      v-model:selectedYearRange="selectedYearRange"
-      v-model:selectedPageRange="selectedPageRange"
-      v-model:selectedTableColumns="selectedTableColumns"
-      v-model:selectedGenres="selectedGenres"
-      :publishers="publishers"
-      :languages="languages"
-      :original-languages="originalLanguages"
-      :genres="genres"
-      :min-max-year-range="[minYear, maxYear]"
-      :min-max-page-range="[minPages, maxPages]"
-      :books="books"
-      :on-reset="onResetFilter"
-    ></bl-book-filter>
-  </bl-sidebar>
+    <bl-sidebar
+      :title="sidebarContent"
+      :is-open="!!sidebarContent"
+      :on-close="onCloseSidebar"
+    >
+      <bl-book-filter
+        v-model:selectedPublishers="selectedPublishers"
+        v-model:selectedLanguages="selectedLanguages"
+        v-model:selectedOriginalLanguages="selectedOriginalLanguages"
+        v-model:selectedYearRange="selectedYearRange"
+        v-model:selectedPageRange="selectedPageRange"
+        v-model:selectedTableColumns="selectedTableColumns"
+        v-model:selectedGenres="selectedGenres"
+        :publishers="publishers"
+        :languages="languages"
+        :original-languages="originalLanguages"
+        :genres="genres"
+        :min-max-year-range="[minYear, maxYear]"
+        :min-max-page-range="[minPages, maxPages]"
+        :books="books"
+        :on-reset="onResetFilter"
+      ></bl-book-filter>
+    </bl-sidebar>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
