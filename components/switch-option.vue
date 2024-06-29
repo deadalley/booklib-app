@@ -14,7 +14,7 @@
         'py-3': !compact,
       }"
     >
-      <slot name="icon" :size="iconSize" stroke="1.5"></slot>
+      <slot name="icon" :size="iconSize" stroke="1.5" />
     </span>
   </RadioGroupOption>
 </template>

@@ -10,7 +10,7 @@
             :editing="true"
             :rating="book.rating ?? 0"
             :on-commit="onSubmitRating"
-          ></bl-rating>
+          />
         </div>
         <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
           <p>Added on</p>
@@ -24,10 +24,10 @@
         :editing="true"
         :book="book"
         :temp-cover-src="tempCoverSrc"
-      ></bl-book-image>
+      />
       <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
         <section v-if="!editing" class="book-section">
-          <bl-input id="id" type="hidden" name="id"></bl-input>
+          <bl-input id="id" type="hidden" name="id" />
           <div class="col-span-12 flex w-full justify-between">
             <h4>Summary</h4>
             <bl-button compact variant="secondary" @click="onEdit(true)"
@@ -158,7 +158,7 @@
               :index="index"
               :on-commit="onSubmitGenre"
               :on-remove="onRemoveGenre"
-            ></bl-genre-tag>
+            />
             <bl-genre-tag
               key="new"
               removable
@@ -166,7 +166,7 @@
               :index="genres.length"
               :on-commit="onSubmitGenre"
               :on-remove="onRemoveGenre"
-            ></bl-genre-tag>
+            />
           </div>
         </section>
         <section v-if="!isNew" class="book-section">

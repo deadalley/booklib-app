@@ -13,14 +13,11 @@
     @keydown.enter="_onCommit"
     @keydown.escape="onCancel"
   >
-    <IconTag :size="16" stroke="2"></IconTag>
+    <IconTag :size="16" stroke="2" />
     <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
       initialContent
     }}</span>
-    <bl-loading
-      v-if="loading"
-      class="!h-4 !w-4 !fill-black !text-gray-dark"
-    ></bl-loading>
+    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-black !text-gray-dark" />
     <IconCircleX
       v-if="!loading && removable"
       :size="16"
@@ -28,14 +25,14 @@
       class="absolute right-6 cursor-pointer opacity-0"
       :class="{ 'opacity-100': hovered }"
       @click="_onRemove"
-    ></IconCircleX>
+    />
   </div>
   <div
     v-if="newGenre && !editing"
     class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-green py-2 hover:bg-green/80"
     @click="onNew"
   >
-    <IconPlus :size="16" stroke="2"></IconPlus>
+    <IconPlus :size="16" stroke="2" />
   </div>
 </template>
 
@@ -43,7 +40,7 @@
 import { IconTag, IconCircleX, IconPlus } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
-const attrs = useAttrs() as any
+const attrs = useAttrs()
 
 const props = defineProps<{
   value?: string
@@ -52,8 +49,8 @@ const props = defineProps<{
   removable?: boolean
   newGenre?: boolean
   selected?: boolean
-  onCommit?: (value: string | undefined, index: number) => {}
-  onRemove?: (index: number) => {}
+  onCommit?: (value: string | undefined, index: number) => void
+  onRemove?: (index: number) => void
 }>()
 
 const loading = ref(false)
@@ -110,6 +107,7 @@ function onNew() {
 }
 
 function onClick() {
+  // @ts-expect-error onclick should be clickable
   attrs.onClick?.()
 
   if (props.editable) {

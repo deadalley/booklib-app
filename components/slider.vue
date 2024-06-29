@@ -16,7 +16,7 @@
           @click="onBarLeftClick"
           @mousedown="onLeftThumbMousedown"
           @touchstart="onLeftThumbMousedown"
-        ></div>
+        />
         <input
           class="pointer-events-none absolute left-0 top-0 w-full opacity-0"
           type="range"
@@ -49,13 +49,13 @@
             @click="onInnerBarLeftClick"
             @mousedown="onLeftThumbMousedown"
             @touchstart="onLeftThumbMousedown"
-          ></div>
+          />
           <div
             class="w-1/2"
             @click="onInnerBarRightClick"
             @mousedown="onRightThumbMousedown"
             @touchstart="onRightThumbMousedown"
-          ></div>
+          />
         </div>
         <input
           class="pointer-events-none absolute left-0 top-0 w-full opacity-0"
@@ -87,13 +87,15 @@
           @click="onBarRightClick"
           @mousedown="onRightThumbMousedown"
           @touchstart="onRightThumbMousedown"
-        ></div>
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { isMouseEvent, isTouchEvent } from '~/utils'
+
 const props = withDefaults(
   defineProps<{
     label?: string
@@ -112,15 +114,14 @@ const valueMax = ref(props.maxValue ?? props.max)
 
 const startX = ref(0)
 
-const barBox = ref(null)
+const barBox = ref<DOMRect | null>(null)
 const barValue = ref(0)
 
 const rangeMarginValue = ref(props.step)
 
 function getNewPosition(clientX: number) {
   const moveDistance = clientX - startX.value
-  const movePercentage =
-    moveDistance / ((barBox.value as unknown as DOMRect)?.width ?? 1)
+  const movePercentage = moveDistance / (barBox.value?.width ?? 1)
   const maxRange = props.max - props.min
 
   let newValue = barValue.value + maxRange * movePercentage
@@ -156,33 +157,35 @@ function onInnerBarRightClick() {
   }
 }
 
-function onLeftThumbMousedown(e: any) {
+function onLeftThumbMousedown(e: MouseEvent | TouchEvent) {
   e.preventDefault()
 
-  startX.value = e.clientX
-
-  if (e.type === 'touchstart') {
+  if (isTouchEvent(e)) {
     if (e.touches.length === 1) {
       startX.value = e.touches[0].clientX
     } else {
       return
     }
+  } else if (isMouseEvent(e)) {
+    startX.value = e.clientX
+
+    barValue.value = valueMin.value
+    barBox.value =
+      (e.target as HTMLDivElement)?.parentElement?.getBoundingClientRect() ??
+      null
+
+    document.addEventListener('mousemove', onLeftThumbMousemove)
+    document.addEventListener('mouseup', onLeftThumbMouseup)
+    document.addEventListener('touchmove', onLeftThumbMousemove)
+    document.addEventListener('touchend', onLeftThumbMouseup)
   }
-
-  barValue.value = valueMin.value
-  barBox.value = e.target?.parentNode.getBoundingClientRect()
-
-  document.addEventListener('mousemove', onLeftThumbMousemove)
-  document.addEventListener('mouseup', onLeftThumbMouseup)
-  document.addEventListener('touchmove', onLeftThumbMousemove)
-  document.addEventListener('touchend', onLeftThumbMouseup)
 }
 
-function onLeftThumbMousemove(e: any) {
-  let clientX = e.clientX
+function onLeftThumbMousemove(e: MouseEvent | TouchEvent) {
+  let clientX = (e as MouseEvent).clientX
 
   if (e.type === 'touchmove') {
-    clientX = e.touches[0].clientX
+    clientX = (e as TouchEvent).touches[0].clientX
   }
 
   let newValue = getNewPosition(clientX)
@@ -203,33 +206,35 @@ function onLeftThumbMouseup() {
   document.removeEventListener('touchend', onLeftThumbMouseup)
 }
 
-function onRightThumbMousedown(e: any) {
+function onRightThumbMousedown(e: MouseEvent | TouchEvent) {
   e.preventDefault()
 
-  startX.value = e.clientX
-
-  if (e.type === 'touchstart') {
+  if (isTouchEvent(e)) {
     if (e.touches.length === 1) {
       startX.value = e.touches[0].clientX
     } else {
       return
     }
+  } else if (isMouseEvent(e)) {
+    startX.value = e.clientX
+
+    barValue.value = valueMax.value
+    barBox.value =
+      (e.target as HTMLDivElement)?.parentElement?.getBoundingClientRect() ??
+      null
+
+    document.addEventListener('mousemove', onRightThumbMousemove)
+    document.addEventListener('mouseup', onRightThumbMouseup)
+    document.addEventListener('touchmove', onRightThumbMousemove)
+    document.addEventListener('touchend', onRightThumbMouseup)
   }
-
-  barValue.value = valueMax.value
-  barBox.value = e.target.parentNode.getBoundingClientRect()
-
-  document.addEventListener('mousemove', onRightThumbMousemove)
-  document.addEventListener('mouseup', onRightThumbMouseup)
-  document.addEventListener('touchmove', onRightThumbMousemove)
-  document.addEventListener('touchend', onRightThumbMouseup)
 }
 
-function onRightThumbMousemove(e: any) {
-  let clientX = e.clientX
+function onRightThumbMousemove(e: MouseEvent | TouchEvent) {
+  let clientX = (e as MouseEvent).clientX
 
   if (e.type === 'touchmove') {
-    clientX = e.touches[0].clientX
+    clientX = (e as TouchEvent).touches[0].clientX
   }
 
   let newValue = getNewPosition(clientX)

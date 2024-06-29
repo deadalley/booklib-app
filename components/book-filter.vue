@@ -4,23 +4,23 @@
       v-model="_selectedPublishers"
       title="Publisher"
       :elements="publishers"
-    ></bl-book-filter-section>
+    />
     <bl-book-filter-section
       v-model="_selectedLanguages"
       title="Language"
       :elements="languages"
-    ></bl-book-filter-section>
+    />
     <bl-book-filter-section
       v-model="_selectedOriginalLanguages"
       title="Original Language"
       :elements="originalLanguages"
-    ></bl-book-filter-section>
+    />
     <bl-book-filter-section
       v-model="_selectedGenres"
       title="Genres"
       :elements="genres"
       :genre="true"
-    ></bl-book-filter-section>
+    />
     <div>
       <h5 class="mb-4">Year</h5>
       <bl-slider
@@ -30,7 +30,7 @@
         :min-value="_selectedYearRange[0]"
         :max-value="_selectedYearRange[1]"
         :step="1"
-      ></bl-slider>
+      />
     </div>
     <div>
       <h5 class="mb-4">Page</h5>
@@ -41,7 +41,7 @@
         :min-value="selectedPageRange[0]"
         :max-value="selectedPageRange[1]"
         :step="50"
-      ></bl-slider>
+      />
     </div>
     <div v-if="isTableView">
       <h5 class="mb-4">Table columns</h5>
@@ -121,8 +121,8 @@ const tableColumns = computed(() =>
   })),
 )
 
-function onColumnFilter(v: any) {
-  const { value, checked } = v.target
+function onColumnFilter(v: Event) {
+  const { value, checked } = v.target as HTMLInputElement
 
   const entry =
     props.selectedTableColumns[value as keyof typeof props.selectedTableColumns]

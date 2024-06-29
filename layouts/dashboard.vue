@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen">
     <aside class="hidden h-full w-min md:block md:w-[255px]">
-      <bl-nav-sidebar></bl-nav-sidebar>
+      <bl-nav-sidebar />
     </aside>
     <main class="flex h-screen flex-1 flex-col">
       <nav
@@ -32,7 +32,7 @@
       <div
         class="relative flex w-screen flex-1 flex-col overflow-auto p-16 pt-10 md:w-[unset]"
       >
-        <slot></slot>
+        <slot />
         <NuxtLoadingIndicator color="#985858" />
       </div>
     </main>

@@ -20,7 +20,7 @@
       </bl-icon-button>
     </div>
     <div>
-      <slot></slot>
+      <slot />
     </div>
   </TransitionRoot>
 </template>

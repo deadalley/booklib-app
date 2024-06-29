@@ -16,7 +16,7 @@
           :to="button.to"
         >
           <template #icon="iconProps">
-            <component v-bind="iconProps" :is="button.icon"></component>
+            <component v-bind="iconProps" :is="button.icon" />
           </template>
           {{ button.label }}
         </bl-nav-sidebar-button>

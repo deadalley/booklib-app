@@ -6,8 +6,8 @@
       'bg-accent/20 hover:bg-accent/20': active,
     }"
   >
-    <slot name="icon" :size="ICON_SIZE_MEDIUM" stroke="1.5"></slot>
-    <slot></slot>
+    <slot name="icon" :size="ICON_SIZE_MEDIUM" stroke="1.5" />
+    <slot />
   </NuxtLink>
 </template>
 

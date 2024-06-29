@@ -108,7 +108,7 @@ import {
 
 const props = defineProps<{
   data: T[]
-  columns: ColumnDef<T, any>[]
+  columns: ColumnDef<T, unknown>[]
   onRowClick: (row: T) => void
 }>()
 

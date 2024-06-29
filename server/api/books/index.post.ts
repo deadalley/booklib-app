@@ -1,5 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
-import { Database } from '~/types/db.generate'
+import type { Database } from '~/types/db.generate'
 import { bookToDbBook, dbBooktoBook, logger } from '~/utils'
 
 export default defineEventHandler(async (event) => {

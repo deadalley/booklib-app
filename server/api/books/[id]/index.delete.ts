@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
-import { Book } from '~/types/book'
-import { Database } from '~/types/db.generate'
+import type { Book } from '~/types/book'
+import type { Database } from '~/types/db.generate'
 import { dbBooktoBook } from '~/utils'
 
 export default defineEventHandler<Promise<Book | undefined>>(async (event) => {

@@ -18,8 +18,8 @@
     @blur="onBlur"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData"
-      ><slot :name="name" v-bind="slotData"></slot
-    ></template>
+      ><slot :name="name" v-bind="slotData"
+    /></template>
   </FormKit>
 </template>
 
@@ -34,7 +34,7 @@ withDefaults(defineProps<{ editing?: boolean }>(), { editing: true })
 
 useFormKitContext((form) => {
   const name = attrs.name as string
-  const formValues = form._value as Record<string, any>
+  const formValues = form._value as Record<string, unknown>
 
   inputModel.value = formValues[name]
 })

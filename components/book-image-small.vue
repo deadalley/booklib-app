@@ -3,7 +3,7 @@
     <bl-empty-book-image
       v-if="!coverSrc"
       class="!h-48 !rounded-2xl !p-5 hover:border hover:border-accent-dark hover:shadow-md"
-    ></bl-empty-book-image>
+    />
     <NuxtImg
       v-if="coverSrc"
       :src="coverSrc ?? undefined"

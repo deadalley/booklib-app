@@ -3,23 +3,21 @@ import type { BookDB } from '~/types/database'
 import languageOptions from '~/public/languages-2.json'
 
 export function dbBooktoBook(dbBook: BookDB): Book {
-  const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    author_id,
-    original_language,
-    original_title,
-    created_at,
-    cover_src,
-    ...rest
-  } = dbBook
   return {
-    ...rest,
-    originalLanguage: original_language,
-    originalTitle: original_title,
-    createdAt: created_at,
-    coverSrc: cover_src,
-    genres: dbBook.genres ?? [],
+    id: dbBook.id ?? undefined,
+    title: dbBook.title ?? undefined,
+    coverSrc: dbBook.cover_src ?? undefined,
+    createdAt: dbBook.created_at ?? undefined,
+    isbn: dbBook.isbn ?? undefined,
+    language: dbBook.language ?? undefined,
+    originalTitle: dbBook.original_title ?? undefined,
+    originalLanguage: dbBook.original_language ?? undefined,
+    pages: dbBook.pages ?? undefined,
+    publisher: dbBook.publisher ?? undefined,
     rating: dbBook.rating ?? 0,
+    summary: dbBook.summary ?? undefined,
+    year: dbBook.year ?? undefined,
+    genres: dbBook.genres ?? [],
   }
 }
 
@@ -31,19 +29,18 @@ export function bookToDbBook(
     author_id: 1,
     user_id: userId,
     ...(book.id ? { id: book.id } : {}),
-    // created_at: createdAt,
-    original_title: book.originalTitle,
-    cover_src: book.coverSrc,
-    original_language: book.originalLanguage,
-    isbn: book.isbn,
-    language: book.language,
-    pages: book.pages,
-    publisher: book.publisher,
-    rating: book.rating,
-    summary: book.summary,
+    original_title: book.originalTitle ?? null,
+    cover_src: book.coverSrc ?? null,
+    original_language: book.originalLanguage ?? null,
+    isbn: book.isbn ?? null,
+    language: book.language ?? null,
+    pages: book.pages ?? null,
+    publisher: book.publisher ?? null,
+    rating: book.rating ?? null,
+    summary: book.summary ?? null,
     title: book.title,
-    year: book.year,
-    genres: book.genres,
+    year: book.year ?? null,
+    genres: book.genres ?? null,
   }
 }
 

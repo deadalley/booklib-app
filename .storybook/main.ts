@@ -15,7 +15,7 @@ const config: StorybookConfig = {
     autodocs: 'tag',
   },
   core: {
-    // @ts-ignore
+    // @ts-expect-error should work
     builder: {
       name: '@storybook/builder-vite',
       options: {

@@ -16,10 +16,10 @@
         class="flex flex-1 flex-col justify-end gap-3 transition-all ease-in-out lg:flex-row"
         :class="{ 'md:mr-[355px]': !!sidebarContent }"
       >
-        <slot name="navbar"></slot>
+        <slot name="navbar" />
       </div>
     </div>
-    <slot></slot>
+    <slot />
   </div>
 </template>
 

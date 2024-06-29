@@ -6,7 +6,7 @@
       'border-accent-dark bg-accent hover:bg-accent/80': !!selected,
     }"
   >
-    <slot></slot>
+    <slot />
   </span>
 </template>
 

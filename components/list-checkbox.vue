@@ -1,6 +1,6 @@
 <template>
   <ul class="rounded-2xl border border-accent">
-    <slot></slot>
+    <slot />
   </ul>
 </template>
 

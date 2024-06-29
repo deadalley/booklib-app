@@ -6,9 +6,9 @@
     :class="classes.wrapper"
     :disabled="disabled"
   >
-    <slot name="prependIcon" :size="iconSize" stroke="1.5"></slot>
-    <slot></slot>
-    <slot name="appendIcon" :size="iconSize" stroke="1.5"></slot>
+    <slot name="prependIcon" :size="iconSize" stroke="1.5" />
+    <slot />
+    <slot name="appendIcon" :size="iconSize" stroke="1.5" />
   </button>
 </template>
 

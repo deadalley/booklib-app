@@ -6,8 +6,8 @@
       v-model="_checked"
       v-bind="$attrs"
       class="cursor-pointer px-5 py-3"
-      ><slot></slot
-    ></bl-checkbox>
+      ><slot
+    /></bl-checkbox>
   </li>
 </template>
 

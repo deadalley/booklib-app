@@ -14,7 +14,7 @@
           Collection
         </bl-button>
       </NuxtLink>
-      <bl-search-bar @input="onSearch"></bl-search-bar>
+      <bl-search-bar @input="onSearch" />
 
       <div class="flex gap-3">
         <bl-switch v-slot="props" v-model="view">
@@ -34,12 +34,12 @@
     <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
-    ></div>
+    />
     <div v-if="view === 'table'" class="overflow-x-auto">
       <bl-collections-table
         :collections="sortedCollections"
         :selected-table-columns="selectedTableColumns"
-      ></bl-collections-table>
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -68,6 +68,6 @@ const sortedCollections = computed(() => {
 })
 
 function onSearch($event: Event) {
-  textSearch.value = ($event.target as any)?.value as string
+  textSearch.value = ($event.target as HTMLInputElement)?.value
 }
 </script>

@@ -4,7 +4,7 @@
     as="ul"
     class="inline-flex h-min items-center rounded-3xl"
   >
-    <slot v-bind="$props"></slot>
+    <slot v-bind="$props" />
   </RadioGroup>
 </template>
 

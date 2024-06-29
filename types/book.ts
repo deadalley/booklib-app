@@ -1,16 +1,16 @@
 export type Book = {
   id: number
   title: string
-  coverSrc: string | null
+  coverSrc?: string
   createdAt: string
-  isbn: string | null
-  language: string | null
-  originalTitle: string | null
-  originalLanguage: string | null
-  pages: number | null
-  publisher: string | null
-  rating: number | null
-  summary: string | null
-  year: number | null
-  genres: string[] | null
+  isbn?: string
+  language?: string
+  originalTitle?: string
+  originalLanguage?: string
+  pages?: number
+  publisher?: string
+  rating?: number
+  summary?: string
+  year?: number
+  genres?: string[]
 }

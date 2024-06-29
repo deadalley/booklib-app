@@ -32,7 +32,7 @@ defineProps<{
 }>()
 
 const selectedElements = defineModel({
-  type: Array<String>,
+  type: Array<string>,
   default: [],
 })
 

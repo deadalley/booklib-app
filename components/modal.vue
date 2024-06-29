@@ -8,16 +8,16 @@
       <!-- The actual dialog panel -->
       <DialogPanel class="min-w-max rounded-m bg-background p-9">
         <DialogTitle as="h3" class="mb-4 font-medium"
-          ><slot name="title"></slot
-        ></DialogTitle>
-        <slot></slot>
+          ><slot name="title"
+        /></DialogTitle>
+        <slot />
         <div class="flex justify-end gap-2">
           <bl-button variant="secondary" @click="_onCancel">
-            <slot name="cancel-label"></slot>
+            <slot name="cancel-label" />
           </bl-button>
           <FormKit type="submit">
             <bl-button @click="_onConfirm">
-              <slot name="action-label"></slot>
+              <slot name="action-label" />
             </bl-button>
           </FormKit>
         </div>
@@ -26,24 +26,18 @@
   </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'
 
-const props = defineProps({
-  onCancel: {
-    type: Function,
-    required: false,
-  },
-  onConfirm: {
-    type: Function,
-    required: false,
-  },
-})
+const props = defineProps<{
+  onCancel?: () => void
+  onConfirm?: () => void
+}>()
 
 const isOpen = ref(false)
 
-function setIsOpen(value) {
+function setIsOpen(value: boolean) {
   isOpen.value = value
 }
 

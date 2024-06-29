@@ -49,8 +49,8 @@ export function filterElementsBySelectedArray<
   return elements.filter((element) => {
     if (Array.isArray(element[key])) {
       return !!intersection(
-        element[key] as Array<any>,
-        selectedArray[0] as Array<any>,
+        element[key] as Array<T>,
+        selectedArray[0] as Array<T>,
       ).length
     }
     return element[key] && selectedArray.includes(element[key])

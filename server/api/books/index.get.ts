@@ -1,5 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
-import { Database } from '~/types/db.generate'
+import type { Database } from '~/types/db.generate'
 import { dbBooktoBook, executePromisesInChunks } from '~/utils'
 
 export default defineEventHandler(async (event) => {
@@ -8,16 +8,16 @@ export default defineEventHandler(async (event) => {
 
   const { data } = await client.from('books').select('*')
 
-  let bookCovers: string[] = []
+  let bookCovers: (string | undefined)[] = []
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
     bookCovers = await executePromisesInChunks(
-      (data ?? []).map((book) => getBookCoverUrl(client, user?.id, book.id)),
+      (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),
     )
   }
 
   return data?.map((b, index) =>
-    dbBooktoBook({ ...b, cover_src: bookCovers[index] }),
+    dbBooktoBook({ ...b, cover_src: bookCovers[index] ?? null }),
   )
 })

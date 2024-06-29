@@ -1,9 +1,5 @@
 <template>
-  <bl-table
-    :data="data"
-    :columns="columns"
-    :on-row-click="onRowClick"
-  ></bl-table>
+  <bl-table :data="data" :columns="columns" :on-row-click="onRowClick" />
 </template>
 
 <script setup lang="ts">
@@ -88,8 +84,7 @@ const columns = computed(() =>
       cell,
     }),
   ].filter((column) => {
-    const key = (column as any)
-      .accessorKey as keyof typeof props.selectedTableColumns
+    const key = column.accessorKey as keyof typeof props.selectedTableColumns
 
     return (
       !props.selectedTableColumns[key] ||

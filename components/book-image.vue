@@ -26,8 +26,8 @@
         'opacity-60': hovered,
       }"
       @click="onUploadClick()"
-    ></div>
-    <bl-loading v-if="loading"></bl-loading>
+    />
+    <bl-loading v-if="loading" />
     <NuxtImg
       v-if="coverSrc && !loading"
       :src="coverSrc"
@@ -37,7 +37,7 @@
     <bl-empty-book-image
       v-if="!coverSrc && !loading"
       class="!lg:h-[600px] h-[400px]"
-    ></bl-empty-book-image>
+    />
   </div>
 </template>
 
@@ -65,9 +65,9 @@ function onUploadClick() {
   fileInput.value.click()
 }
 
-async function onFileChange(e: any) {
+async function onFileChange(e: Event) {
   loading.value = true
-  const file = e.target.files[0] as File
+  const file = (e.target as HTMLInputElement)?.files?.[0] as File
 
   const formData = new FormData()
   formData.append('img', file, `${props.book.id ?? props.tempCoverSrc}`)

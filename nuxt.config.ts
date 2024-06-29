@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxtjs/storybook',
     '@formkit/nuxt',
     '@nuxt/image',
+    '@nuxt/eslint',
   ],
   components: {
     dirs: [

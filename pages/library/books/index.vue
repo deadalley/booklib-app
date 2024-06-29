@@ -14,7 +14,7 @@
           Book
         </bl-button>
       </NuxtLink>
-      <bl-search-bar @input="onSearch"></bl-search-bar>
+      <bl-search-bar @input="onSearch" />
 
       <div class="flex gap-3">
         <bl-button expand variant="secondary" @click="onFilterOpen">
@@ -38,14 +38,17 @@
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
     >
-      <bl-book-card v-for="book in sortedBooks" :key="book.title" :book="book">
-      </bl-book-card>
+      <bl-book-card
+        v-for="book in sortedBooks"
+        :key="book.title"
+        :book="book"
+      />
     </div>
     <div v-if="view === 'table'" class="overflow-x-auto">
       <bl-books-table
         :books="sortedBooks"
         :selected-table-columns="selectedTableColumns"
-      ></bl-books-table>
+      />
     </div>
     <bl-sidebar
       :title="sidebarContent"
@@ -68,7 +71,7 @@
         :min-max-page-range="[minPages, maxPages]"
         :books="books"
         :on-reset="onResetFilter"
-      ></bl-book-filter>
+      />
     </bl-sidebar>
   </NuxtLayout>
 </template>
@@ -241,7 +244,7 @@ const sortedBooks = computed(() => {
 })
 
 function onSearch($event: Event) {
-  textSearch.value = ($event.target as any)?.value as string
+  textSearch.value = ($event.target as HTMLInputElement)?.value
 }
 
 function onFilterOpen() {

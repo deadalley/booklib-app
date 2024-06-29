@@ -4,7 +4,7 @@
     :class="classes.wrapper"
     :disabled="disabled"
   >
-    <slot :size="iconSize" stroke="1.5"></slot>
+    <slot :size="iconSize" stroke="1.5" />
   </button>
 </template>
 
