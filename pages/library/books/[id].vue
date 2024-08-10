@@ -17,7 +17,7 @@
           <h6>{{ formattedDate }}</h6>
         </div>
       </div>
-      <h5>{{ book.author }}</h5>
+      <!-- <h5>{{ book.author }}</h5> -->
     </header>
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <bl-book-image
@@ -205,7 +205,7 @@ const isNew = computed(() => route.params.id === 'new')
 
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
-const book = ref()
+const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const genres = ref(book.value?.genres ?? [])
@@ -215,7 +215,7 @@ watch(book, () => {
 })
 
 const formattedDate = computed(() =>
-  format(book.value.createdAt, 'dd MMM yyyy'),
+  format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
 function openDeleteModal() {
@@ -224,7 +224,7 @@ function openDeleteModal() {
 
 async function fetchBook() {
   if (route.params.id === 'new') {
-    book.value = {}
+    book.value = {} as Book
   } else {
     loading.value = true
     const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
@@ -277,11 +277,13 @@ async function onSubmit(book: Book) {
 }
 
 async function onSubmitRating(rating: number) {
-  onSubmit({ ...book.value, rating })
+  if (book.value) {
+    onSubmit({ ...book.value, rating })
+  }
 }
 
 async function onSubmitGenre(genre: string, index: number) {
-  if (genre) {
+  if (book.value && genre) {
     const _genres: string[] = (genres.value ?? []).concat()
     _genres.splice(index, 1, genre)
     return onSubmit({ ...book.value, genres: _genres })
@@ -289,9 +291,11 @@ async function onSubmitGenre(genre: string, index: number) {
 }
 
 async function onRemoveGenre(index: number) {
-  const _genres: string[] = (genres.value ?? []).concat()
-  _genres.splice(index, 1)
-  return onSubmit({ ...book.value, genres: _genres })
+  if (book.value) {
+    const _genres: string[] = (genres.value ?? []).concat()
+    _genres.splice(index, 1)
+    return onSubmit({ ...book.value, genres: _genres })
+  }
 }
 
 onMounted(() => {

@@ -24,5 +24,5 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ title: string; total: number; sidebarContent: string }>()
+defineProps<{ title: string; total: number; sidebarContent?: string }>()
 </script>

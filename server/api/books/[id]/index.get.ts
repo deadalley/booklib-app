@@ -1,11 +1,15 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import type { Book } from '~/types/book'
 import type { Database } from '~/types/db.generate'
-import { dbBooktoBook } from '~/utils'
+import { dbBookToBook } from '~/utils'
 
 export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
-  const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)
+  const user = await serverSupabaseUser(event)
+
+  if (!user?.id) {
+    throw createError('Unauthenticated')
+  }
 
   const id = getRouterParam(event, 'id')
 
@@ -21,7 +25,7 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
     const coverSrc = await getBookCoverUrl(client, user?.id, data[0].id)
 
     if (data) {
-      return dbBooktoBook({ ...data[0], cover_src: coverSrc })
+      return dbBookToBook({ ...data[0], cover_src: coverSrc ?? '' })
     }
   }
 })

@@ -3,7 +3,6 @@
     name="library"
     title="All Collections"
     :total="collections?.length ?? 0"
-    :sidebar-content="false"
   >
     <template #navbar>
       <NuxtLink class="flex md:inline-flex" to="/library/collections/new">
@@ -34,7 +33,13 @@
     <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
-    />
+    >
+      <bl-collection-card
+        v-for="collection in sortedCollections"
+        :key="collection.id"
+        :collection="collection"
+      />
+    </div>
     <div v-if="view === 'table'" class="overflow-x-auto">
       <bl-collections-table
         :collections="sortedCollections"
@@ -50,21 +55,31 @@ import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
 
 const route = useRoute()
 
+const { data: collections } = await useFetch<Collection[]>('/api/collections')
+
 const textSearch = ref()
 const view = ref(route.query.view ?? 'cards')
 
 const defaultTableColumns = {
-  title: { label: 'Title', checked: true },
+  name: { label: 'Name', checked: true },
 }
 
 const selectedTableColumns = ref<{
   [key in keyof Collection]?: { label: string; checked: boolean }
 }>(defaultTableColumns)
 
-const collections: Collection[] = []
-
 const sortedCollections = computed(() => {
-  return collections
+  const filterByTextSearch = filterElementsBySearchParam(
+    collections.value ?? [],
+    textSearch.value,
+    ['name'],
+  )
+
+  const sorted = filterByTextSearch?.sort((b1, b2) =>
+    b1.name.localeCompare(b2.name),
+  )
+
+  return sorted
 })
 
 function onSearch($event: Event) {

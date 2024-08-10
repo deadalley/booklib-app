@@ -1,7 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Book } from '~/types/book'
 import type { Database } from '~/types/db.generate'
-import { dbBooktoBook } from '~/utils'
+import { dbBookToBook } from '~/utils'
 
 export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
   const client = await serverSupabaseClient<Database>(event)
@@ -18,7 +18,7 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
     }
 
     if (data) {
-      return dbBooktoBook(data[0])
+      return dbBookToBook(data[0])
     }
   }
 })

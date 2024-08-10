@@ -1,8 +1,9 @@
 import type { Book } from '~/types/book'
-import type { BookDB } from '~/types/database'
+import type { BookDB, CollectionDB } from '~/types/database'
 import languageOptions from '~/public/languages-2.json'
+import type { Collection } from '~/types/collection'
 
-export function dbBooktoBook(dbBook: BookDB): Book {
+export function dbBookToBook(dbBook: BookDB): Book {
   return {
     id: dbBook.id ?? undefined,
     title: dbBook.title ?? undefined,
@@ -41,6 +42,31 @@ export function bookToDbBook(
     title: book.title,
     year: book.year ?? null,
     genres: book.genres ?? null,
+  }
+}
+
+export function dbCollectionToCollection(
+  dbCollection: CollectionDB,
+  books: Pick<BookDB, 'id'>[],
+): Collection {
+  return {
+    id: dbCollection.id ?? undefined,
+    name: dbCollection.name,
+    description: dbCollection.description ?? undefined,
+    createdAt: dbCollection.created_at,
+    books: books.map(({ id }) => ({ id })),
+  }
+}
+
+export function collectionToDbCollection(
+  collection: Collection,
+  userId: string,
+): Omit<CollectionDB, 'created_at' | 'id'> {
+  return {
+    ...(collection.id ? { id: collection.id } : {}),
+    user_id: userId,
+    name: collection.name,
+    description: collection.description ?? null,
   }
 }
 

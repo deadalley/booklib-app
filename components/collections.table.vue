@@ -17,7 +17,7 @@ const columnHelper = createColumnHelper<Collection>()
 
 const columns = computed(() =>
   [
-    columnHelper.accessor('title', {
+    columnHelper.accessor('name', {
       header: 'Title',
       cell: (info) => h('h6', info.getValue()),
     }),

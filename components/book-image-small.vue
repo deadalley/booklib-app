@@ -16,7 +16,13 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 
-const props = defineProps<{ book: Book }>()
+const props = defineProps<{
+  book: {
+    id: Book['id']
+    title?: Book['title']
+    coverSrc?: Book['coverSrc']
+  }
+}>()
 
 const coverSrc = ref(props.book.coverSrc)
 </script>

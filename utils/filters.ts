@@ -1,9 +1,9 @@
 import { flatten, intersection, uniqBy } from 'lodash'
 
 export function getUniqueElements<
-  T extends Record<K, unknown>,
+  T extends Partial<Record<K, unknown>>,
   K extends keyof T,
->(elements: T[], key: K): Exclude<T[K], null>[] {
+>(elements: T[], key: K): Exclude<T[K], null | undefined>[] {
   return elements
     .reduce<T[K][]>((uniqueKeys, element) => {
       const value = element[key]
@@ -20,7 +20,7 @@ export function getUniqueElements<
 
       return uniqueKeys
     }, [])
-    .filter((p): p is Exclude<T[K], null> => !!p)
+    .filter((p): p is Exclude<T[K], null | undefined> => !!p)
 }
 
 export function filterElementsBySearchParam<
@@ -43,7 +43,7 @@ export function filterElementsBySearchParam<
 }
 
 export function filterElementsBySelectedArray<
-  T extends Record<K, unknown>,
+  T extends Partial<Record<K, unknown>>,
   K extends keyof T,
 >(key: K, elements: T[], selectedArray: T[K][]): T[] {
   return elements.filter((element) => {

@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const navItems = [
   {
     to: '/library/books',
@@ -16,7 +17,9 @@ const navItems = [
   },
 ]
 
-navigateTo('/library/books')
+if (route.path === '/library' || route.path === '/library/') {
+  navigateTo('/library/books')
+}
 
 useHead({
   title: 'BookLib | Library',
