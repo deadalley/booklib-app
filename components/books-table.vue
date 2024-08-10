@@ -26,7 +26,9 @@ const columns = computed(() =>
       cell: (info) => {
         const book = info.row.original
         return h(BlBookImageSmall, {
-          book,
+          href: `/library/books/${book.id}`,
+          alt: book.title,
+          coverSrc: book.coverSrc,
         })
       },
       enableSorting: false,

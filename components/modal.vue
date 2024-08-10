@@ -6,16 +6,22 @@
     <!-- Full-screen container to center the panel -->
     <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
       <!-- The actual dialog panel -->
-      <DialogPanel class="min-w-max rounded-m bg-background p-9">
+      <DialogPanel
+        class="relative flex size-4/5 flex-col overflow-auto rounded-m bg-background p-9"
+      >
         <DialogTitle as="h3" class="mb-4 font-medium"
           ><slot name="title"
         /></DialogTitle>
         <slot />
-        <div class="flex justify-end gap-2">
-          <bl-button variant="secondary" @click="_onCancel">
+        <div class="flex items-baseline justify-end gap-2">
+          <bl-button
+            v-if="$slots['cancel-label']"
+            variant="secondary"
+            @click="_onCancel"
+          >
             <slot name="cancel-label" />
           </bl-button>
-          <FormKit type="submit">
+          <FormKit v-if="$slots['action-label']" type="submit">
             <bl-button @click="_onConfirm">
               <slot name="action-label" />
             </bl-button>

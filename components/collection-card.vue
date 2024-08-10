@@ -2,9 +2,17 @@
   <div class="flex flex-col items-start gap-3">
     <div class="flex">
       <div v-for="book in bookCovers" :key="book.id">
-        <bl-book-image-small :book="book" />
+        <bl-book-image-small
+          :alt="book.title"
+          :href="`/library/books/${book.id}`"
+          :cover-src="book.coverSrc"
+        />
       </div>
-      <bl-book-image-small v-if="!bookCovers?.length" :book="{ id: '' }" />
+      <bl-book-image-small
+        v-if="!bookCovers?.length"
+        :href="`/library/collections/${collection.id}`"
+        :alt="collection.name"
+      />
     </div>
     <div class="w-full flex-col">
       <NuxtLink :to="`/library/collections/${collection.id}`">
@@ -42,6 +50,4 @@ const { data: bookCovers } = await useAsyncData<
     ),
   ),
 )
-
-console.log(props.collection, bookCovers)
 </script>

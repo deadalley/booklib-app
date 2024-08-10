@@ -7,9 +7,12 @@
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
         </div>
-        <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
-          <p>Added on</p>
-          <h6>{{ formattedDate }}</h6>
+        <div class="flex gap-3">
+          <bl-button compact @click="openAddBooksModal">Add books</bl-button>
+          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
+            <p>Added on</p>
+            <h6>{{ formattedDate }}</h6>
+          </div>
         </div>
       </div>
     </header>
@@ -78,7 +81,7 @@
             <bl-button compact @click="openDeleteModal">Delete</bl-button>
           </div>
           <bl-modal ref="deleteModalRef" :on-confirm="deleteCollection">
-            <template #name
+            <template #title
               >Are you sure you want to delete
               <strong>{{ collection.name }}</strong
               >?</template
@@ -88,6 +91,22 @@
             <template #action-label> Delete </template>
           </bl-modal>
         </section>
+        <bl-modal ref="addBooksRef">
+          <template #title
+            >Add new books to <strong>{{ collection.name }}</strong></template
+          >
+          <div class="relative flex w-full flex-col items-end gap-3">
+            <div>
+              <bl-view-switch v-model:view="view" />
+            </div>
+            <bl-books-views
+              :view="view"
+              :books="sortedBooks"
+              :selected-table-columns="selectedTableColumns"
+            />
+          </div>
+          <template #cancel-label> Close </template>
+        </bl-modal>
       </div>
     </div>
   </div>
@@ -95,14 +114,18 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns'
+import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 const route = useRoute()
+
+const { data: books } = await useFetch<Book[]>('/api/books')
 
 const isNew = computed(() => route.params.id === 'new')
 
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
+const addBooksRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
 
@@ -110,8 +133,16 @@ const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
+const { view, sortedBooks, selectedTableColumns } = useSortBooks(
+  books.value ?? [],
+)
+
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
+}
+
+function openAddBooksModal() {
+  addBooksRef.value.setIsOpen(true)
 }
 
 async function fetchCollection() {

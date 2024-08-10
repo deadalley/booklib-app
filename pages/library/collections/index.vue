@@ -16,18 +16,7 @@
       <bl-search-bar @input="onSearch" />
 
       <div class="flex gap-3">
-        <bl-switch v-slot="props" v-model="view">
-          <bl-switch-option value="cards" v-bind="props">
-            <template #icon="iconProps">
-              <IconLayoutDashboard v-bind="iconProps" />
-            </template>
-          </bl-switch-option>
-          <bl-switch-option value="table" v-bind="props">
-            <template #icon="iconProps">
-              <IconTable v-bind="iconProps" />
-            </template>
-          </bl-switch-option>
-        </bl-switch>
+        <bl-book-view-switch v-model:view="view" />
       </div>
     </template>
     <div
@@ -51,38 +40,10 @@
 
 <script setup lang="ts">
 import type { Collection } from '~/types/collection'
-import { IconPlus, IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
-
-const route = useRoute()
+import { IconPlus } from '@tabler/icons-vue'
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
-const textSearch = ref()
-const view = ref(route.query.view ?? 'cards')
-
-const defaultTableColumns = {
-  name: { label: 'Name', checked: true },
-}
-
-const selectedTableColumns = ref<{
-  [key in keyof Collection]?: { label: string; checked: boolean }
-}>(defaultTableColumns)
-
-const sortedCollections = computed(() => {
-  const filterByTextSearch = filterElementsBySearchParam(
-    collections.value ?? [],
-    textSearch.value,
-    ['name'],
-  )
-
-  const sorted = filterByTextSearch?.sort((b1, b2) =>
-    b1.name.localeCompare(b2.name),
-  )
-
-  return sorted
-})
-
-function onSearch($event: Event) {
-  textSearch.value = ($event.target as HTMLInputElement)?.value
-}
+const { view, sortedCollections, selectedTableColumns, onSearch } =
+  useSortCollections(collections.value ?? [])
 </script>
