@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
         throw createError(error.message)
       }
 
-      return getBookCoverUrl(client, user.id, fileName)
+      // TODO: check
+      return getBookCoverUrl(client, user.id, 0)
     } catch (error) {
       throw createError(error as Error)
     }

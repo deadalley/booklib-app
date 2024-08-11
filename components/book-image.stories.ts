@@ -7,8 +7,7 @@ const meta = {
   component: BookImage,
   tags: ['autodocs'],
   args: {
-    bookId: 'bookId123',
-    alt: 'Book Title',
+    book: buildBook(),
     editing: false,
   },
   render: (args) => ({
