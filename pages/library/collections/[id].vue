@@ -102,6 +102,7 @@
             <bl-books-views
               :view="view"
               :books="sortedBooks"
+              :selectable="true"
               :selected-table-columns="selectedTableColumns"
             />
           </div>

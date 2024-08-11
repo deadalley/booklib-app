@@ -11,9 +11,7 @@ const config: StorybookConfig = {
     name: '@storybook-vue/nuxt',
     options: {},
   },
-  docs: {
-    autodocs: 'tag',
-  },
+  docs: {},
   core: {
     // @ts-expect-error should work
     builder: {

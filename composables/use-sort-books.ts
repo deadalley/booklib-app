@@ -1,4 +1,5 @@
 import type { Book } from '~/types/book'
+import type { View } from '~/types/ui'
 
 export const useSortBooks = (books: Book[]) => {
   const router = useRouter()
@@ -6,7 +7,7 @@ export const useSortBooks = (books: Book[]) => {
 
   const sidebarContent = ref()
   const textSearch = ref()
-  const view = ref(route.query.view ?? 'cards')
+  const view = ref<View>((route.query.view as View) ?? 'cards')
 
   watch(view, (v) => {
     router.push({ query: { view: v } })
@@ -15,7 +16,7 @@ export const useSortBooks = (books: Book[]) => {
   watch(
     () => route.query.view,
     (v) => {
-      view.value = (v as string) ?? 'cards'
+      view.value = (v as View) ?? 'cards'
     },
   )
 

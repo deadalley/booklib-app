@@ -1,6 +1,6 @@
 import type { Book } from '~/types/book'
 import type { BookDB, CollectionDB } from '~/types/database'
-import languageOptions from '~/public/languages-2.json'
+import languageOptions from '../public/languages-2.json'
 import type { Collection } from '~/types/collection'
 
 export function dbBookToBook(dbBook: BookDB): Book {

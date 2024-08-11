@@ -1,8 +1,14 @@
 <template>
   <div class="flex flex-col items-start gap-3">
-    <bl-book-image-small :book="book" />
+    <bl-book-image-small
+      v-model:selected="selected"
+      :alt="book.title"
+      :href="href"
+      :cover-src="book.coverSrc"
+      :selectable="selectable"
+    />
     <div class="w-full flex-col">
-      <NuxtLink :to="`/library/books/${book.id}`">
+      <NuxtLink :to="href">
         <h5 class="truncate">
           {{ book.title }}
         </h5>
@@ -17,5 +23,12 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 
-defineProps<{ book: Book }>()
+const props = defineProps<{
+  book: Pick<Book, 'id' | 'title' | 'coverSrc'>
+  selectable?: boolean
+}>()
+
+const href = `/library/books/${props.book.id}`
+
+const selected = ref(false)
 </script>

@@ -16,9 +16,10 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core'
 import { IconLayoutDashboard, IconTable } from '@tabler/icons-vue'
+import type { View } from '~/types/ui'
 
 const props = defineProps<{
-  view: 'cards' | 'table'
+  view: View
 }>()
 
 const emit = defineEmits(['update:view'])
