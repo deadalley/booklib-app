@@ -53,7 +53,7 @@ export function dbCollectionToCollection(
     id: dbCollection.id ?? undefined,
     name: dbCollection.name,
     createdAt: dbCollection.created_at,
-    books: books.map(({ id }) => ({ id })),
+    books: books.map(({ id }) => id),
   }
 }
 

@@ -8,9 +8,7 @@
           </h2>
         </div>
         <div v-if="!isNew" class="flex gap-3">
-          <bl-button compact variant="secondary" @click="onEdit(true)"
-            >Edit</bl-button
-          >
+          <bl-button variant="secondary" @click="onEdit(true)">Edit</bl-button>
           <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6>{{ formattedDate }}</h6>
@@ -42,7 +40,7 @@
               </div>
               <div v-if="editing" class="flex justify-end gap-2">
                 <bl-button compact variant="secondary" @click="onCancel"
-                  >Discard</bl-button
+                  >Discarsd</bl-button
                 >
                 <FormKit type="submit">
                   <bl-button type="submit" compact>Save</bl-button>
@@ -52,7 +50,27 @@
           </ClientOnly>
         </section>
         <section class="book-section flex flex-col items-end gap-4">
-          <bl-view-switch v-model:view="view" />
+          <div class="flex justify-end gap-3">
+            <bl-button
+              v-if="!managingBooks"
+              variant="secondary"
+              @click="managingBooks = true"
+              >Manage books</bl-button
+            >
+            <bl-button
+              v-if="managingBooks"
+              variant="secondary"
+              @click="onCancelBooks"
+              >Cancel</bl-button
+            >
+            <bl-button
+              v-if="managingBooks"
+              variant="primary"
+              @click="onSaveBooks"
+              >Save</bl-button
+            >
+            <bl-view-switch v-model:view="view" />
+          </div>
           <bl-books-views
             :view="view"
             :books="sortedBooks"
@@ -97,17 +115,28 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 
 const isNew = computed(() => route.params.id === 'new')
 
+const managingBooks = ref(false)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
+const booksInCollection = ref<(Book & { inCollection: boolean })[]>(
+  (books.value ?? []).map((book) => ({
+    ...book,
+    inCollection: !!collection.value?.books.includes(book.id),
+  })),
+)
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(
-  books.value ?? [],
+  managingBooks.value
+    ? books.value ?? []
+    : booksInCollection.value.filter((book) =>
+        collection.value?.books.includes(book.id),
+      ),
 )
 
 function openDeleteModal() {
@@ -166,6 +195,14 @@ async function onSubmit(collection: Collection) {
   } catch (error) {
     console.error(error)
   }
+}
+
+function onCancelBooks() {
+  managingBooks.value = false
+}
+
+async function onSaveBooks() {
+  managingBooks.value = false
 }
 
 onMounted(() => {

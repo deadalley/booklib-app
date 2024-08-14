@@ -40,7 +40,7 @@ const { data: bookCovers } = await useAsyncData<
   }[]
 >('bookCovers', () =>
   Promise.all(
-    props.collection.books.map(({ id }) =>
+    props.collection.books.map((id) =>
       $fetch(`/api/books/${id}/cover`).then((coverSrc) => ({ id, coverSrc })),
     ),
   ),
