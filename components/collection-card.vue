@@ -30,11 +30,6 @@ import type { Collection } from '~/types/collection'
 
 const props = defineProps<{
   collection: Collection
-  bookCovers: {
-    id: Book['id']
-    title?: Book['title']
-    coverSrc: Book['coverSrc']
-  }[]
 }>()
 
 const { data: bookCovers } = await useAsyncData<

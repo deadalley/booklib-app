@@ -132,21 +132,18 @@ export type Database = {
       collections: {
         Row: {
           created_at: string
-          description: string | null
           id: number
           name: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          description?: string | null
           id?: number
           name: string
           user_id: string
         }
         Update: {
           created_at?: string
-          description?: string | null
           id?: number
           name?: string
           user_id?: string

@@ -52,7 +52,6 @@ export function dbCollectionToCollection(
   return {
     id: dbCollection.id ?? undefined,
     name: dbCollection.name,
-    description: dbCollection.description ?? undefined,
     createdAt: dbCollection.created_at,
     books: books.map(({ id }) => ({ id })),
   }
@@ -66,7 +65,6 @@ export function collectionToDbCollection(
     ...(collection.id ? { id: collection.id } : {}),
     user_id: userId,
     name: collection.name,
-    description: collection.description ?? null,
   }
 }
 

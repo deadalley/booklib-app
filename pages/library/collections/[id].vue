@@ -7,30 +7,20 @@
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
         </div>
-        <div class="flex gap-3">
-          <bl-button compact @click="openAddBooksModal">Add books</bl-button>
-          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
+        <div v-if="!isNew" class="flex gap-3">
+          <bl-button compact variant="secondary" @click="onEdit(true)"
+            >Edit</bl-button
+          >
+          <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6>{{ formattedDate }}</h6>
           </div>
         </div>
       </div>
     </header>
-    <div
-      class="flex flex-1 flex-col gap-10 md:w-2/3 lg:flex-row lg:overflow-auto"
-    >
+    <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
-        <section v-if="!editing" class="book-section">
-          <bl-input id="id" type="hidden" name="id" />
-          <div class="col-span-12 flex w-full justify-between">
-            <h4>Description</h4>
-            <bl-button compact variant="secondary" @click="onEdit(true)"
-              >Edit</bl-button
-            >
-          </div>
-          <p class="col-span-12 text-gray-dark">
-            {{ collection?.description ?? 'No description available' }}
-          </p>
+        <section v-if="editing" class="book-section">
           <ClientOnly>
             <FormKit
               type="form"
@@ -38,6 +28,7 @@
               :actions="false"
               @submit="onSubmit"
             >
+              <bl-input id="id" type="hidden" name="id" />
               <div class="form-section">
                 <div class="form-row">
                   <bl-input
@@ -46,17 +37,6 @@
                     name="name"
                     label="Name"
                     placeholder="Name"
-                  />
-                </div>
-                <div v-if="editing" class="form-row">
-                  <bl-input
-                    id="description"
-                    type="textarea"
-                    :editing="editing"
-                    name="description"
-                    label="Description"
-                    placeholder="Description"
-                    :rows="4"
                   />
                 </div>
               </div>
@@ -70,6 +50,16 @@
               </div>
             </FormKit>
           </ClientOnly>
+        </section>
+        <section class="book-section flex flex-col items-end gap-4">
+          <bl-view-switch v-model:view="view" />
+          <bl-books-views
+            :view="view"
+            :books="sortedBooks"
+            :small="true"
+            :selectable="true"
+            :selected-table-columns="selectedTableColumns"
+          />
         </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete collection</h5>
@@ -91,23 +81,6 @@
             <template #action-label> Delete </template>
           </bl-modal>
         </section>
-        <bl-modal ref="addBooksRef">
-          <template #title
-            >Add new books to <strong>{{ collection.name }}</strong></template
-          >
-          <div class="relative flex w-full flex-col items-end gap-3">
-            <div>
-              <bl-view-switch v-model:view="view" />
-            </div>
-            <bl-books-views
-              :view="view"
-              :books="sortedBooks"
-              :selectable="true"
-              :selected-table-columns="selectedTableColumns"
-            />
-          </div>
-          <template #cancel-label> Close </template>
-        </bl-modal>
       </div>
     </div>
   </div>
@@ -126,7 +99,6 @@ const isNew = computed(() => route.params.id === 'new')
 
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
-const addBooksRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
 
@@ -140,10 +112,6 @@ const { view, sortedBooks, selectedTableColumns } = useSortBooks(
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
-}
-
-function openAddBooksModal() {
-  addBooksRef.value.setIsOpen(true)
 }
 
 async function fetchCollection() {
