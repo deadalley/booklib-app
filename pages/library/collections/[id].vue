@@ -40,7 +40,7 @@
               </div>
               <div v-if="editing" class="flex justify-end gap-2">
                 <bl-button compact variant="secondary" @click="onCancel"
-                  >Discarsd</bl-button
+                  >Discard</bl-button
                 >
                 <FormKit type="submit">
                   <bl-button type="submit" compact>Save</bl-button>
@@ -133,7 +133,7 @@ const formattedDate = computed(() =>
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(
   managingBooks.value
-    ? (books.value ?? [])
+    ? books.value ?? []
     : booksInCollection.value.filter((book) =>
         collection.value?.books.includes(book.id),
       ),
