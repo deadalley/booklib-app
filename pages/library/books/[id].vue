@@ -282,7 +282,7 @@ async function onSubmitRating(rating: number) {
   }
 }
 
-async function onSubmitGenre(genre: string, index: number) {
+async function onSubmitGenre(genre: string | undefined, index: number) {
   if (book.value && genre) {
     const _genres: string[] = (genres.value ?? []).concat()
     _genres.splice(index, 1, genre)

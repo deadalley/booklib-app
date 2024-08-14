@@ -39,7 +39,7 @@ export const useSortBooks = (books: Book[]) => {
   const originalLanguages = computed(() =>
     getUniqueElements(books ?? [], 'originalLanguage'),
   )
-  const genres = computed(() => getUniqueElements(books ?? [], 'genres'))
+  const genres = computed(() => getUniqueElements(books ?? [], 'genres').flat())
 
   const minPages = computed(() => Math.max(Math.min(...pages.value) - 100, 0))
   const maxPages = computed(() => Math.max(...pages.value))

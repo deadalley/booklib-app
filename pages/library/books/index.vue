@@ -47,7 +47,7 @@
         :genres="genres"
         :min-max-year-range="[minYear, maxYear]"
         :min-max-page-range="[minPages, maxPages]"
-        :books="books"
+        :books="books ?? []"
         :on-reset="onResetFilter"
       />
     </bl-sidebar>

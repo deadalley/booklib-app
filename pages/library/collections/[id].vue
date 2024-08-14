@@ -133,7 +133,7 @@ const formattedDate = computed(() =>
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(
   managingBooks.value
-    ? books.value ?? []
+    ? (books.value ?? [])
     : booksInCollection.value.filter((book) =>
         collection.value?.books.includes(book.id),
       ),

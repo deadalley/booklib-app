@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { createColumnHelper } from '@tanstack/vue-table'
+import { createColumnHelper, type ColumnDef } from '@tanstack/vue-table'
 import type { Collection } from '~/types/collection'
 
 const props = defineProps<{
@@ -15,20 +15,21 @@ const props = defineProps<{
 
 const columnHelper = createColumnHelper<Collection>()
 
-const columns = computed(() =>
-  [
-    columnHelper.accessor('name', {
-      header: 'Title',
-      cell: (info) => h('h6', info.getValue()),
-    }),
-  ].filter((column) => {
-    const key = column.accessorKey as keyof typeof props.selectedTableColumns
+const columns = computed(
+  () =>
+    [
+      columnHelper.accessor('name', {
+        header: 'Title',
+        cell: (info) => h('h6', info.getValue()),
+      }),
+    ].filter((column) => {
+      const key = column.accessorKey as keyof typeof props.selectedTableColumns
 
-    return (
-      !props.selectedTableColumns[key] ||
-      props.selectedTableColumns[key]?.checked
-    )
-  }),
+      return (
+        !props.selectedTableColumns[key] ||
+        props.selectedTableColumns[key]?.checked
+      )
+    }) as ColumnDef<Collection, unknown>[],
 )
 
 const data = computed(() => props.collections)
