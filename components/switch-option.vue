@@ -4,7 +4,7 @@
     v-slot="{ checked }"
     as="li"
     :value="value"
-    class="radio-group-option flex cursor-pointer items-center border-r border-r-accent bg-accent-light text-black ring-inset transition-all first:rounded-l-3xl last:rounded-r-3xl last:border-0 hover:bg-accent-light/20 hover:ring-1 hover:ring-accent active:bg-accent-dark active:shadow-inner-m lg:w-full"
+    class="radio-group-option flex cursor-pointer items-center border-r border-r-accent bg-accent-light text-black ring-inset transition-all first:rounded-l-3xl last:rounded-r-3xl last:border-0 hover:bg-accent-light/20 hover:ring-1 hover:ring-accent active:bg-accent-dark active:shadow-inner-m lg:w-full [&:first-child>*]:pl-5 [&:last-child>*]:pr-5"
   >
     <span
       class="flex items-center rounded-[inherit] px-3 transition-all lg:w-full"
@@ -28,13 +28,3 @@ const iconSize = computed(() =>
   props.compact ? ICON_SIZE_MEDIUM : ICON_SIZE_SMALL,
 )
 </script>
-
-<style scoped>
-.radio-group-option:first-child * {
-  @apply pl-5;
-}
-
-.radio-group-option:last-child * {
-  @apply pr-5;
-}
-</style>
