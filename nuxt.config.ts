@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['@/assets/css/main.css', '@/assets/css/forms.css'],
+
   modules: [
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
@@ -10,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/eslint',
   ],
+
   components: {
     dirs: [
       {
@@ -18,6 +20,7 @@ export default defineNuxtConfig({
       },
     ],
   },
+
   supabase: {
     redirect: false,
     redirectOptions: {
@@ -28,10 +31,15 @@ export default defineNuxtConfig({
       cookieRedirect: false,
     },
   },
+
   typescript: {
     strict: true,
   },
+
   storybook: {
     port: 6006,
+    enabled: false,
   },
+
+  compatibilityDate: '2024-08-14',
 })
