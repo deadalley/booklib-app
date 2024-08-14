@@ -1,7 +1,7 @@
 import type { Book } from '~/types/book'
 import type { View } from '~/types/ui'
 
-export const useSortBooks = (books: Book[]) => {
+export const useSortBooks = (books: Ref<Book[] | null>) => {
   const router = useRouter()
   const route = useRoute()
 
@@ -32,19 +32,27 @@ export const useSortBooks = (books: Book[]) => {
     isbn: { label: 'ISBN', checked: true },
   }
 
-  const pages = computed(() => getUniqueElements(books ?? [], 'pages'))
-  const years = computed(() => getUniqueElements(books ?? [], 'year'))
-  const publishers = computed(() => getUniqueElements(books ?? [], 'publisher'))
-  const languages = computed(() => getUniqueElements(books ?? [], 'language'))
-  const originalLanguages = computed(() =>
-    getUniqueElements(books ?? [], 'originalLanguage'),
+  const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))
+  const years = computed(() => getUniqueElements(books.value ?? [], 'year'))
+  const publishers = computed(() =>
+    getUniqueElements(books.value ?? [], 'publisher'),
   )
-  const genres = computed(() => getUniqueElements(books ?? [], 'genres').flat())
+  const languages = computed(() =>
+    getUniqueElements(books.value ?? [], 'language'),
+  )
+  const originalLanguages = computed(() =>
+    getUniqueElements(books.value ?? [], 'originalLanguage'),
+  )
+  const genres = computed(() =>
+    getUniqueElements(books.value ?? [], 'genres').flat(),
+  )
 
-  const minPages = computed(() => Math.max(Math.min(...pages.value) - 100, 0))
-  const maxPages = computed(() => Math.max(...pages.value))
+  const minPages = computed(() =>
+    Math.max(Math.min(...pages.value, 0) - 100, 0),
+  )
+  const maxPages = computed(() => Math.max(...pages.value, +Infinity))
 
-  const minYear = computed(() => Math.min(...years.value))
+  const minYear = computed(() => Math.min(...years.value, -Infinity))
   const maxYear = computed(() => new Date().getFullYear())
 
   const selectedPublishers = ref<string[]>([])
@@ -95,36 +103,37 @@ export const useSortBooks = (books: Book[]) => {
   })
 
   const sortedBooks = computed(() => {
-    const hasFilter =
+    const hasFilter = !!(
       selectedPublishers.value.length ||
       selectedLanguages.value.length ||
       selectedOriginalLanguages.value.length ||
       selectedGenres.value.length
+    )
 
-    let combinedFilters: Book[] = books ?? []
+    let combinedFilters: Book[] = books.value ?? []
 
     if (hasFilter) {
       const filterByPublisher = filterElementsBySelectedArray(
         'publisher',
-        books ?? [],
+        books.value ?? [],
         selectedPublishers.value,
       )
 
       const filterByLanguage = filterElementsBySelectedArray(
         'language',
-        books ?? [],
+        books.value ?? [],
         selectedLanguages.value,
       )
 
       const filterByOriginalLanguage = filterElementsBySelectedArray(
         'originalLanguage',
-        books ?? [],
+        books.value ?? [],
         selectedOriginalLanguages.value,
       )
 
       const filterByGenres = filterElementsBySelectedArray(
         'genres',
-        books ?? [],
+        books.value ?? [],
         [selectedGenres.value],
       )
 

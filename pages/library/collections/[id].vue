@@ -116,11 +116,11 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 const isNew = computed(() => route.params.id === 'new')
 
 const managingBooks = ref(false)
-const editing = ref(isNew.value)
+const editing = ref(isNew)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const booksInCollection = ref<(Book & { inCollection: boolean })[]>(
+const allBooks = ref<(Book & { inCollection: boolean })[]>(
   (books.value ?? []).map((book) => ({
     ...book,
     inCollection: !!collection.value?.books.includes(book.id),
@@ -131,13 +131,15 @@ const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
-const { view, sortedBooks, selectedTableColumns } = useSortBooks(
+const booksDisplayed = computed(() =>
   managingBooks.value
-    ? books.value ?? []
-    : booksInCollection.value.filter((book) =>
+    ? (books.value ?? [])
+    : allBooks.value.filter((book) =>
         collection.value?.books.includes(book.id),
       ),
 )
+
+const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
