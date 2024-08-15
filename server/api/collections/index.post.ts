@@ -1,4 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import type { Collection } from '~/types/collection'
 import type { Database } from '~/types/db.generate'
 import {
   collectionToDbCollection,
@@ -10,8 +11,9 @@ export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)
 
-  const collection = await readBody(event)
+  const collection: Collection = await readBody(event)
 
+  console.log({ collection })
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
@@ -23,9 +25,21 @@ export default defineEventHandler(async (event) => {
       })
       .select('*, books(id)')
 
+    const { error: bookCollectionError } = await client
+      .from('collection-book')
+      .insert(
+        collection.books.map((bookId) => ({
+          book_id: bookId,
+          collection_id: collection.id,
+        })),
+      )
+
     if (error) {
       logger.error(error)
       throw createError({ statusMessage: error.message })
+    } else if (bookCollectionError) {
+      logger.error(bookCollectionError)
+      throw createError({ statusMessage: bookCollectionError.message })
     }
 
     return dbCollectionToCollection(data[0], data[0].books)

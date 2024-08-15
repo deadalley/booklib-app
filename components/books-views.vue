@@ -12,6 +12,8 @@
       :key="book.title"
       :book="book"
       :selectable="selectable"
+      :selected="book.inCollection"
+      @selected="(selected) => onSelectBook(book.id, selected)"
     />
   </div>
   <div v-if="view === 'table'" class="overflow-x-auto">
@@ -28,11 +30,19 @@ import type { View } from '~/types/ui'
 
 defineProps<{
   view: View
-  books: Book[]
+  books: (Book & { inCollection?: boolean })[]
   small?: boolean
   selectable?: boolean
   selectedTableColumns: {
     [key in keyof Book]?: { label: string; checked: boolean }
   }
 }>()
+
+const emit = defineEmits<{
+  (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
+}>()
+
+function onSelectBook(bookId: Book['id'], selected: boolean) {
+  emit('book-select', { bookId, selected })
+}
 </script>

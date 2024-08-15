@@ -75,8 +75,9 @@
             :view="view"
             :books="sortedBooks"
             :small="true"
-            :selectable="true"
+            :selectable="managingBooks"
             :selected-table-columns="selectedTableColumns"
+            @book-select="onSelectBook"
           />
         </section>
         <section v-if="!isNew" class="book-section">
@@ -131,13 +132,11 @@ const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
-const booksDisplayed = computed(() =>
-  managingBooks.value
-    ? (books.value ?? [])
-    : allBooks.value.filter((book) =>
-        collection.value?.books.includes(book.id),
-      ),
-)
+const booksDisplayed = computed(() => {
+  return managingBooks.value
+    ? allBooks.value
+    : allBooks.value.filter((book) => book.inCollection)
+})
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
 
@@ -179,11 +178,16 @@ function onCancel() {
   }
 }
 
-async function onSubmit(collection: Collection) {
+async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
   try {
+    const booksInCollection = allBooks.value
+      .filter(({ inCollection }) => !!inCollection)
+      .map(({ id }) => id)
+
+    console.log(allBooks.value, booksInCollection)
     const updatedCollection = await $fetch<Collection>('/api/collections', {
       method: 'post',
-      body: collection,
+      body: { ...collection, books: booksInCollection },
     })
 
     if (updatedCollection) {
@@ -199,12 +203,29 @@ async function onSubmit(collection: Collection) {
   }
 }
 
+function onSelectBook({
+  bookId,
+  selected,
+}: {
+  bookId: Book['id']
+  selected: boolean
+}) {
+  console.log({ bookId, selected })
+  allBooks.value = allBooks.value.map((book) =>
+    book.id === bookId ? { ...book, inCollection: selected } : book,
+  )
+}
+
 function onCancelBooks() {
   managingBooks.value = false
 }
 
 async function onSaveBooks() {
-  managingBooks.value = false
+  if (collection.value) {
+    const { id, name } = collection.value
+    await onSubmit({ id, name })
+    managingBooks.value = false
+  }
 }
 
 onMounted(() => {

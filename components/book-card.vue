@@ -1,11 +1,12 @@
 <template>
   <div class="flex flex-col items-start gap-3">
     <bl-book-image-small
-      v-model:selected="selected"
       :alt="book.title"
       :href="href"
       :cover-src="book.coverSrc"
       :selectable="selectable"
+      :selected="book.inCollection"
+      @click="onSelect"
     />
     <div class="w-full flex-col">
       <NuxtLink :to="href">
@@ -24,11 +25,17 @@
 import type { Book } from '~/types/book'
 
 const props = defineProps<{
-  book: Pick<Book, 'id' | 'title' | 'coverSrc'>
+  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & { inCollection?: boolean }
   selectable?: boolean
 }>()
 
 const href = `/library/books/${props.book.id}`
 
-const selected = ref(false)
+const emit = defineEmits(['selected'])
+
+function onSelect() {
+  if (props.selectable) {
+    emit('selected', !props.book.inCollection)
+  }
+}
 </script>
