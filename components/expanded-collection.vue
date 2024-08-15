@@ -1,18 +1,16 @@
 <template>
   <Disclosure v-slot="{ open }" :default-open="true">
-    <DisclosureButton class="text-start">
-      <div
-        class="flex items-center justify-between rounded-2xl px-4 py-2 hover:bg-accent-light"
-      >
-        <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
-          <h4>
-            {{ collection.name }}
-          </h4>
-          <h6 class="flex gap-3 text-accent-dark">TOTAL {{ books.length }}</h6>
-        </div>
-        <IconChevronDown v-if="!open" :size="20" />
-        <IconChevronUp v-if="open" :size="20" />
+    <DisclosureButton
+      class="mb-2 flex items-center justify-between rounded-2xl px-4 py-2 text-start hover:bg-accent-light"
+    >
+      <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
+        <h4>
+          {{ collection.name }}
+        </h4>
+        <h6 class="flex gap-3 text-accent-dark">TOTAL {{ books.length }}</h6>
       </div>
+      <IconChevronDown v-if="!open" :size="20" />
+      <IconChevronUp v-if="open" :size="20" />
     </DisclosureButton>
     <DisclosurePanel class="flex gap-x-6 overflow-x-auto p-1">
       <bl-book-card
