@@ -121,12 +121,7 @@ const editing = ref(isNew)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const allBooks = ref<(Book & { inCollection: boolean })[]>(
-  (books.value ?? []).map((book) => ({
-    ...book,
-    inCollection: !!collection.value?.books.includes(book.id),
-  })),
-)
+const allBooks = ref<(Book & { inCollection: boolean })[]>([])
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
@@ -154,6 +149,10 @@ async function fetchCollection() {
       {},
     )
     collection.value = data
+    allBooks.value = (books.value ?? []).map((book) => ({
+      ...book,
+      inCollection: !!collection.value?.books.includes(book.id),
+    }))
     loading.value = false
   }
 }

@@ -24,18 +24,26 @@ export default defineEventHandler(async (event) => {
       })
       .select('*, books(id)')
 
+    const { error: deleteBookCollectionError } = await client
+      .from('collection-book')
+      .delete()
+      .eq('user_id', user.id)
     const { error: bookCollectionError } = await client
       .from('collection-book')
       .insert(
         collection.books.map((bookId) => ({
           book_id: bookId,
           collection_id: collection.id,
+          user_id: user.id,
         })),
       )
 
     if (error) {
       logger.error(error)
       throw createError({ statusMessage: error.message })
+    } else if (deleteBookCollectionError) {
+      logger.error(deleteBookCollectionError)
+      throw createError({ statusMessage: deleteBookCollectionError.message })
     } else if (bookCollectionError) {
       logger.error(bookCollectionError)
       throw createError({ statusMessage: bookCollectionError.message })
