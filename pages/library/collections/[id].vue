@@ -184,7 +184,6 @@ async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
       .filter(({ inCollection }) => !!inCollection)
       .map(({ id }) => id)
 
-    console.log(allBooks.value, booksInCollection)
     const updatedCollection = await $fetch<Collection>('/api/collections', {
       method: 'post',
       body: { ...collection, books: booksInCollection },
@@ -210,7 +209,6 @@ function onSelectBook({
   bookId: Book['id']
   selected: boolean
 }) {
-  console.log({ bookId, selected })
   allBooks.value = allBooks.value.map((book) =>
     book.id === bookId ? { ...book, inCollection: selected } : book,
   )

@@ -13,7 +13,6 @@ export default defineEventHandler(async (event) => {
 
   const collection: Collection = await readBody(event)
 
-  console.log({ collection })
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
