@@ -28,30 +28,30 @@
       :books="sortedBooks"
       :selected-table-columns="selectedTableColumns"
     />
-    <bl-sidebar
-      :title="sidebarContent"
-      :is-open="!!sidebarContent"
-      :on-close="onCloseSidebar"
-    >
-      <bl-book-filter
-        v-model:selectedPublishers="selectedPublishers"
-        v-model:selectedLanguages="selectedLanguages"
-        v-model:selectedOriginalLanguages="selectedOriginalLanguages"
-        v-model:selectedYearRange="selectedYearRange"
-        v-model:selectedPageRange="selectedPageRange"
-        v-model:selectedTableColumns="selectedTableColumns"
-        v-model:selectedGenres="selectedGenres"
-        :publishers="publishers"
-        :languages="languages"
-        :original-languages="originalLanguages"
-        :genres="genres"
-        :min-max-year-range="[minYear, maxYear]"
-        :min-max-page-range="[minPages, maxPages]"
-        :books="books ?? []"
-        :on-reset="onResetFilter"
-      />
-    </bl-sidebar>
   </NuxtLayout>
+  <bl-sidebar
+    :title="sidebarContent"
+    :is-open="!!sidebarContent"
+    :on-close="onCloseSidebar"
+  >
+    <bl-book-filter
+      v-model:selectedPublishers="selectedPublishers"
+      v-model:selectedLanguages="selectedLanguages"
+      v-model:selectedOriginalLanguages="selectedOriginalLanguages"
+      v-model:selectedYearRange="selectedYearRange"
+      v-model:selectedPageRange="selectedPageRange"
+      v-model:selectedTableColumns="selectedTableColumns"
+      v-model:selectedGenres="selectedGenres"
+      :publishers="publishers"
+      :languages="languages"
+      :original-languages="originalLanguages"
+      :genres="genres"
+      :min-max-year-range="[minYear, maxYear]"
+      :min-max-page-range="[minPages, maxPages]"
+      :books="books ?? []"
+      :on-reset="onResetFilter"
+    />
+  </bl-sidebar>
 </template>
 
 <script setup lang="ts">
