@@ -1,5 +1,5 @@
 <template>
-  <Disclosure v-slot="{ open }">
+  <Disclosure v-slot="{ open }" :default-open="true">
     <DisclosureButton class="text-start">
       <div
         class="flex items-center justify-between rounded-2xl px-4 py-2 hover:bg-accent-light"
