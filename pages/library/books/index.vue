@@ -20,7 +20,7 @@
         <bl-button expand variant="secondary" @click="onFilterOpen">
           Filter {{ filterCount ? `(${filterCount})` : '' }}
         </bl-button>
-        <bl-book-view-switch v-model:view="view" />
+        <bl-book-views v-model:view="view" />
       </div>
     </template>
     <bl-books-views
@@ -84,7 +84,7 @@ const {
   onFilterOpen,
   onCloseSidebar,
   onResetFilter,
-} = useSortBooks(books.value ?? [])
+} = useSortBooks(books)
 
 definePageMeta({
   middleware: 'auth',

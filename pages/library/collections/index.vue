@@ -16,7 +16,7 @@
       <bl-search-bar @input="onSearch" />
 
       <div class="flex gap-3">
-        <bl-book-view-switch v-model:view="view" />
+        <bl-book-views v-model:view="view" />
       </div>
     </template>
     <div
