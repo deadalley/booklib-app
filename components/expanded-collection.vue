@@ -15,7 +15,12 @@
       </div>
     </DisclosureButton>
     <DisclosurePanel class="flex gap-x-6 overflow-x-auto p-1">
-      <bl-book-card v-for="book in books" :key="book.title" :book="book" />
+      <bl-book-card
+        v-for="book in books"
+        :key="book.title"
+        :book="book"
+        class="w-1/12"
+      />
     </DisclosurePanel>
   </Disclosure>
 </template>
