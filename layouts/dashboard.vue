@@ -4,9 +4,7 @@
       <bl-nav-sidebar />
     </aside>
     <main class="flex h-screen flex-1 flex-col">
-      <nav
-        class="flex items-center gap-16 border-b border-b-accent px-8 py-4 shadow-md"
-      >
+      <nav class="flex items-center gap-16 border-b border-b-accent px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
           <h5>{{ title }}</h5>
         </NuxtLink>
