@@ -1,1 +1,1 @@
-export type View = 'cards' | 'table'
+export type View = 'cards' | 'table' | 'expanded-cards'

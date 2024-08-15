@@ -16,7 +16,10 @@
       <bl-search-bar @input="onSearch" />
 
       <div class="flex gap-3">
-        <bl-book-views v-model:view="view" />
+        <bl-view-switch
+          v-model:view="view"
+          :views="['cards', 'expanded-cards']"
+        />
       </div>
     </template>
     <div
@@ -29,10 +32,12 @@
         :collection="collection"
       />
     </div>
-    <div v-if="view === 'table'" class="overflow-x-auto">
-      <bl-collections-table
-        :collections="sortedCollections"
-        :selected-table-columns="selectedTableColumns"
+    <div v-if="view === 'expanded-cards'" class="flex flex-col">
+      <bl-expanded-collection
+        v-for="collection in sortedCollections"
+        :key="collection.id"
+        :collection="collection"
+        :books="booksByCollectionId[collection.id]"
       />
     </div>
   </NuxtLayout>
@@ -41,9 +46,25 @@
 <script setup lang="ts">
 import type { Collection } from '~/types/collection'
 import { IconPlus } from '@tabler/icons-vue'
+import type { Book } from '~/types/book'
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
+const { data: books } = await useFetch<Book[]>('/api/books')
 
-const { view, sortedCollections, selectedTableColumns, onSearch } =
-  useSortCollections(collections.value ?? [])
+const booksByCollectionId = computed(
+  () =>
+    collections.value?.reduce<Record<string, Book[]>>(
+      (collectionBooks, collection) => ({
+        ...collectionBooks,
+        [collection.id]: (books.value ?? []).filter((book) =>
+          collection.books.includes(book.id),
+        ),
+      }),
+      {},
+    ) ?? {},
+)
+
+const { view, sortedCollections, onSearch } = useSortCollections(
+  collections.value ?? [],
+)
 </script>

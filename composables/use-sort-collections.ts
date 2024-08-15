@@ -1,18 +1,11 @@
 import type { Collection } from '~/types/collection'
+import type { View } from '~/types/ui'
 
 export const useSortCollections = (collections: Collection[]) => {
   const route = useRoute()
 
   const textSearch = ref()
-  const view = ref(route.query.view ?? 'cards')
-
-  const defaultTableColumns = {
-    name: { label: 'Name', checked: true },
-  }
-
-  const selectedTableColumns = ref<{
-    [key in keyof Collection]?: { label: string; checked: boolean }
-  }>(defaultTableColumns)
+  const view = ref<View>((route.query.view as View) ?? 'cards')
 
   const sortedCollections = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(
@@ -35,7 +28,6 @@ export const useSortCollections = (collections: Collection[]) => {
   return {
     view,
     sortedCollections,
-    selectedTableColumns,
     textSearch,
     onSearch,
   }
