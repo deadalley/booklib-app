@@ -22,12 +22,12 @@
               :render="header.column.columnDef.header"
               :props="header.getContext()"
             />
-            <IconArrowsSort
+            <IconSelector
               v-if="header.column.getCanSort() && !header.column.getIsSorted()"
               :size="16"
               stroke="2"
             />
-            <IconSortAscending
+            <IconChevronUp
               v-if="
                 header.column.getCanSort() &&
                 header.column.getIsSorted() === 'asc'
@@ -35,7 +35,7 @@
               :size="16"
               stroke="2"
             />
-            <IconSortDescending
+            <IconChevronDown
               v-if="
                 header.column.getCanSort() &&
                 header.column.getIsSorted() === 'desc'
@@ -100,11 +100,7 @@ import {
   getSortedRowModel,
   FlexRender,
 } from '@tanstack/vue-table'
-import {
-  IconArrowsSort,
-  IconSortAscending,
-  IconSortDescending,
-} from '@tabler/icons-vue'
+import { IconSelector, IconChevronUp, IconChevronDown } from '@tabler/icons-vue'
 
 const props = defineProps<{
   data: T[]

@@ -48,13 +48,16 @@
   }
 
   .bl-table {
-    @apply relative w-max overflow-x-auto md:w-full;
+    @apply relative w-full overflow-x-auto md:w-full;
     table-layout: fixed;
   }
 
-  .bl-table th,
+  .bl-table th {
+    @apply px-8 py-4 text-base;
+  }
+
   .bl-table td {
-    @apply px-8 py-5 text-base;
+    @apply px-8 py-3 text-base;
   }
 
   .bl-table thead th {
@@ -67,11 +70,11 @@
   }
 
   .bl-table th:first-child {
-    @apply rounded-l-2xl;
+    @apply rounded-l-lg;
   }
 
   .bl-table th:last-child {
-    @apply rounded-r-2xl;
+    @apply rounded-r-lg;
   }
 
   .bl-table td {
