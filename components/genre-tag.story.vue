@@ -1,19 +1,15 @@
 <script setup>
-import GenreTag from './genre-tag.vue'
-
 const state = reactive({
   value: 'Mystery',
 })
 </script>
 
 <template>
-  <Story title="Genre Tag">
-    <Variant title="Default">
-      <GenreTag :value="state.value" />
+  <Story title="Atoms/Genre Tag">
+    <bl-genre-tag :value="state.value" />
 
-      <template #controls>
-        Value: <input v-model="state.value" type="text" />
-      </template>
-    </Variant>
+    <template #controls>
+      Value: <input v-model="state.value" type="text" />
+    </template>
   </Story>
 </template>

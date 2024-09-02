@@ -6,7 +6,7 @@ const state = reactive({
 </script>
 
 <template>
-  <Story title="View Switch">
+  <Story title="Organisms/View Switch">
     <bl-view-switch :views="state.views" :view="state.view" />
   </Story>
 </template>

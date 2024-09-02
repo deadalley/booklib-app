@@ -3,7 +3,7 @@ import { IconLayoutDashboard, IconMist, IconTable } from '@tabler/icons-vue'
 </script>
 
 <template>
-  <Story title="Switch">
+  <Story title="Molecules/Switch">
     <bl-switch v-slot="switchProps" v-model="_view">
       <bl-switch-option value="cards" v-bind="switchProps">
         <template #icon="iconProps">

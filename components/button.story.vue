@@ -1,28 +1,27 @@
 <script setup>
 import { IconPlus } from '@tabler/icons-vue'
-import Button from './button.vue'
 </script>
 
 <template>
-  <Story title="Button">
+  <Story title="Atoms/Button">
     <Variant title="Default">
-      <Button>Button</Button>
+      <bl-button>Button</bl-button>
     </Variant>
     <Variant title="Prepend Icon">
-      <Button>
+      <bl-button>
         <template #prependIcon="prependIcon">
           <IconPlus v-bind="prependIcon" />
         </template>
         Button
-      </Button>
+      </bl-button>
     </Variant>
     <Variant title="Append Icon">
-      <Button>
+      <bl-button>
         <template #appendIcon="appendIcon">
           <IconPlus v-bind="appendIcon" />
         </template>
         Button
-      </Button>
+      </bl-button>
     </Variant>
   </Story>
 </template>

@@ -1,5 +1,4 @@
 <script setup>
-import BookImageSmall from './book-image-small.vue'
 import { buildBook } from '../utils'
 
 const state = reactive({
@@ -8,15 +7,15 @@ const state = reactive({
 </script>
 
 <template>
-  <Story title="Book Image Small">
+  <Story title="Atoms/Book Image Small">
     <Variant title="Default">
       <div class="w-[300px]">
-        <BookImageSmall :coverSrc="state.book.coverSrc" />
+        <bl-book-image-small :coverSrc="state.book.coverSrc" />
       </div>
     </Variant>
     <Variant title="Empty">
       <div class="w-[300px]">
-        <BookImageSmall />
+        <bl-book-image-small />
       </div>
     </Variant>
   </Story>

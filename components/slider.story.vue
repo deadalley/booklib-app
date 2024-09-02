@@ -1,6 +1,4 @@
 <script setup>
-import Slider from './slider.vue'
-
 const state = reactive({
   label: 'Slider',
   min: 0,
@@ -12,5 +10,5 @@ const state = reactive({
 </script>
 
 <template>
-  <Story title="Slider"><Slider v-bind="state" /></Story>
+  <Story title="Atoms/Slider"><bl-slider v-bind="state" /></Story>
 </template>

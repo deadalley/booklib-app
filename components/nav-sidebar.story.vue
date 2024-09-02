@@ -1,11 +1,7 @@
-<script setup>
-import NavSidebar from './nav-sidebar.vue'
-</script>
-
 <template>
-  <Story title="Navigation Sidebar">
+  <Story title="Organisms/Navigation Sidebar">
     <div class="h-screen">
-      <NavSidebar />
+      <bl-nav-sidebar />
     </div>
   </Story>
 </template>

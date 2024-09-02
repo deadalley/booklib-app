@@ -1,14 +1,13 @@
 <script setup>
 import { IconHeart } from '@tabler/icons-vue'
-import IconButton from './icon-button.vue'
 </script>
 
 <template>
-  <Story title="Icon Button">
-    <IconButton>
+  <Story title="Atoms/Icon Button">
+    <bl-icon-button>
       <template v-slot="iconProps">
         <IconHeart v-bind="iconProps" />
       </template>
-    </IconButton>
+    </bl-icon-button>
   </Story>
 </template>

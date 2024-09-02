@@ -1,6 +1,5 @@
 <script setup>
 import config from '../formkit.config.ts'
-import Input from './input.vue'
 
 const state = reactive({
   name: 'inputName',
@@ -16,23 +15,23 @@ function setupApp({ app }) {
 </script>
 
 <template>
-  <Story title="Input">
+  <Story title="Atoms/Input">
     <Variant title="Default">
-      <Input
+      <bl-input
         :name="state.name"
         :label="state.label"
         :placeholder="state.placeholder"
       />
     </Variant>
     <Variant title="Prefix">
-      <Input>
+      <bl-input>
         <template #prefix>{{ state.prefix }}</template>
-      </Input>
+      </bl-input>
     </Variant>
     <Variant title="Postfix">
-      <Input>
+      <bl-input>
         <template #postfix>{{ state.postfix }}</template>
-      </Input>
+      </bl-input>
     </Variant>
   </Story>
 </template>
