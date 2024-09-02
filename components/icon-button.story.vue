@@ -5,7 +5,7 @@ import { IconHeart } from '@tabler/icons-vue'
 <template>
   <Story title="Atoms/Icon Button">
     <bl-icon-button>
-      <template v-slot="iconProps">
+      <template #default="iconProps">
         <IconHeart v-bind="iconProps" />
       </template>
     </bl-icon-button>

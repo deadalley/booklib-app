@@ -10,7 +10,7 @@ const state = reactive({
   <Story title="Atoms/Book Image Small">
     <Variant title="Default">
       <div class="w-[300px]">
-        <bl-book-image-small :coverSrc="state.book.coverSrc" />
+        <bl-book-image-small :cover-src="state.book.coverSrc" />
       </div>
     </Variant>
     <Variant title="Empty">

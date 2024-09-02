@@ -1,6 +1,6 @@
 <template>
   <button
-    class="inline-flex h-8 w-8 items-center justify-center gap-2 rounded-3xl text-base font-medium"
+    class="inline-flex size-8 items-center justify-center gap-2 rounded-3xl text-base font-medium"
     :class="{
       'bg-main text-white hover:bg-main/90 active:bg-main-dark':
         variant === 'primary',

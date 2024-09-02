@@ -1,8 +1,6 @@
 <script setup>
 import { buildBook } from '../utils'
 
-const cell = (info) => info.getValue()
-
 const state = reactive({
   books: [
     buildBook(),

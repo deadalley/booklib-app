@@ -9,7 +9,7 @@ const state = reactive({
 <template>
   <Story title="Molecules/Book Card">
     <div class="w-[300px]">
-      <bl-book-card :book="state.book" authorName="Author name" />
+      <bl-book-card :book="state.book" author-name="Author name" />
     </div>
   </Story>
 </template>

@@ -14,9 +14,9 @@
           {{ book.title }}
         </h5>
       </NuxtLink>
-      <p v-if="authorName" class="text-gray-600 truncate text-sm">
+      <h6 v-if="authorName" class="truncate">
         {{ authorName }}
-      </p>
+      </h6>
     </div>
   </div>
 </template>
