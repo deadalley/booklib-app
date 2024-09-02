@@ -7,12 +7,12 @@
     <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
       <!-- The actual dialog panel -->
       <DialogPanel
-        class="relative flex size-4/5 flex-col rounded-m bg-background p-9"
+        class="relative flex size-4/5 flex-col rounded-lg bg-background p-9"
       >
-        <DialogTitle as="h3" class="mb-4 font-medium"
+        <DialogTitle as="h4" class="mb-4 font-medium"
           ><slot name="title"
         /></DialogTitle>
-        <div class="relative flex flex-col overflow-auto">
+        <div class="relative flex h-full flex-col overflow-auto">
           <slot />
         </div>
         <div class="flex items-baseline justify-end gap-2">
