@@ -5,9 +5,10 @@
     <bl-checkbox
       v-model="_checked"
       v-bind="$attrs"
-      class="cursor-pointer px-5 py-3"
-      ><slot
-    /></bl-checkbox>
+      class="cursor-pointer px-4 py-2"
+    >
+      <slot />
+    </bl-checkbox>
   </li>
 </template>
 

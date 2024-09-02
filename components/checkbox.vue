@@ -13,7 +13,7 @@
       :checked="checked"
       :value="value"
       type="checkbox"
-      class="peer relative aspect-square size-5 cursor-pointer appearance-none rounded-md border border-accent-dark transition-all before:absolute before:left-2/4 before:top-2/4 before:block before:size-12 before:-translate-x-2/4 before:-translate-y-2/4 before:rounded-md before:opacity-0 before:transition-opacity checked:border-main-light checked:bg-main-light checked:before:bg-main-light"
+      class="peer relative aspect-square size-5 cursor-pointer appearance-none rounded-lg border border-accent-dark transition-all before:absolute before:left-2/4 before:top-2/4 before:block before:size-12 before:-translate-x-2/4 before:-translate-y-2/4 before:rounded-lg before:opacity-0 before:transition-opacity checked:border-main checked:bg-main checked:before:bg-main"
     />
     <span
       class="pointer-events-none absolute left-2/4 top-2/4 -translate-x-2/4 -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100"

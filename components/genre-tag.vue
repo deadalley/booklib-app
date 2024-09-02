@@ -2,10 +2,10 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex cursor-default items-center gap-2 rounded-m bg-green px-12 py-2 font-medium"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-lg bg-main px-4 py-2 text-base text-white"
     :class="{
       'cursor-pointer': !!attrs.onClick,
-      'bg-main-light text-white  ring-main-light': !!selected,
+      'bg-main-dark': !!selected,
     }"
     @click="onClick"
     @mouseenter="setHovered(true)"
@@ -13,23 +13,27 @@
     @keydown.enter="_onCommit"
     @keydown.escape="onCancel"
   >
-    <IconTag :size="16" stroke="2" />
     <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
       initialContent
     }}</span>
-    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-black !text-gray-dark" />
-    <IconCircleX
-      v-if="!loading && removable"
-      :size="16"
-      stroke="2"
-      class="absolute right-6 cursor-pointer opacity-0"
+    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-white" />
+    <IconCircleXFilled
+      v-if="!loading && removable && hovered"
+      :size="18"
+      stroke="1.5"
+      class="cursor-pointer opacity-0"
       :class="{ 'opacity-100': hovered }"
       @click="_onRemove"
+    />
+    <IconTagFilled
+      v-if="!removable || (!loading && !hovered)"
+      :size="18"
+      stroke="1.5"
     />
   </div>
   <div
     v-if="newGenre && !editing"
-    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-green py-2 hover:bg-green/80"
+    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-main py-2 text-white hover:bg-main/80"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />
@@ -37,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconTag, IconCircleX, IconPlus } from '@tabler/icons-vue'
+import { IconCircleXFilled, IconPlus, IconTagFilled } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
 const attrs = useAttrs()

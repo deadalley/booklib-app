@@ -1,12 +1,9 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div class="formkit-wrapper flex-1">
-    <label
-      v-if="!!label"
-      for="default-range"
-      class="formkit-label text-gray-dark"
-      >{{ label }}</label
-    >
+    <label v-if="!!label" for="default-range" class="formkit-label">{{
+      label
+    }}</label>
     <div class="relative mt-16 flex flex-col px-4">
       <div class="flex">
         <!-- Bar left -->
@@ -41,9 +38,7 @@
           </div>
         </div>
         <!-- Bar inner -->
-        <div
-          class="relative flex shrink grow justify-between border border-main bg-main-light"
-        >
+        <div class="relative flex shrink grow justify-between bg-main">
           <div
             class="w-1/2"
             @click="onInnerBarLeftClick"
@@ -280,7 +275,7 @@ watch([valueMin, valueMax], (v) => {
 
 <style scoped>
 .thumb::before {
-  @apply absolute bg-accent-dark w-6 h-6 rounded-full z-10 cursor-pointer -top-2 -left-3;
+  @apply absolute -left-3 -top-2 z-10 h-6 w-6 cursor-pointer rounded-full bg-main;
   content: '';
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div
-    class="inline-flex h-min items-center gap-3 rounded-m border bg-white px-5 py-3 text-base outline-none transition-all duration-100 ease-in placeholder:text-accent lg:w-[355px]"
+    class="inline-flex h-min items-center gap-3 rounded-lg border bg-white px-5 py-3 text-base outline-none transition-all duration-100 ease-in placeholder:text-accent lg:w-[355px]"
     :class="{
-      'border-white': !focused,
-      'border-accent': focused,
+      'border-accent-dark text-black': focused,
+      'border-accent text-accent-dark': !focused,
     }"
   >
-    <IconSearch :size="ICON_SIZE_MEDIUM" />
+    <IconSearch :size="ICON_SIZE_SMALL" />
     <input class="w-full" v-bind="$attrs" @focus="onFocus" @blur="onBlur" />
   </div>
 </template>

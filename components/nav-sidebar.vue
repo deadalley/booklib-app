@@ -1,10 +1,8 @@
 <template>
   <nav
-    class="flex h-full flex-col gap-6 bg-main-dark px-6 pb-8 pt-16 text-accent-light"
+    class="flex h-full flex-col gap-6 border-r border-r-accent bg-background px-6 pb-8 pt-16"
   >
-    <h3
-      class="mb-6 cursor-pointer font-normal tracking-wider text-accent-light"
-    >
+    <h3 class="mb-6 cursor-pointer text-2xl font-medium tracking-wider">
       <NuxtLink to="/"> BOOKLIB </NuxtLink>
     </h3>
     <div class="flex flex-1 flex-col justify-between">
@@ -22,18 +20,25 @@
         </bl-nav-sidebar-button>
       </div>
       <div class="flex flex-col gap-3" @click="onLogout">
-        <bl-nav-sidebar-button
-          ><template #icon="iconProps"
-            ><IconLogout v-bind="iconProps" /></template
-          >Logout</bl-nav-sidebar-button
-        >
+        <bl-nav-sidebar-button>
+          <template #icon="iconProps">
+            <IconLogout v-bind="iconProps" />
+          </template>
+          Logout
+        </bl-nav-sidebar-button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { IconLogout, IconBooks, IconHome } from '@tabler/icons-vue'
+import {
+  IconLogout,
+  IconBooks,
+  IconHome,
+  IconClockHour3,
+  IconChartLine,
+} from '@tabler/icons-vue'
 
 const route = useRoute()
 const supabase = useSupabaseClient()
@@ -41,6 +46,8 @@ const supabase = useSupabaseClient()
 const buttons = [
   { label: 'Home', icon: IconHome, to: '/home' },
   { label: 'Library', icon: IconBooks, to: '/library' },
+  { label: 'Statistics', icon: IconChartLine, to: '/stats' },
+  { label: 'Tracking', icon: IconClockHour3, to: '/tracking' },
 ]
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),

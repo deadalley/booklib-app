@@ -2,7 +2,7 @@
   <div v-if="!editing" class="formkit-wrapper flex-1">
     <label class="formkit-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel">{{ displayValue }}</h5>
-    <p v-if="!inputModel" class="text-gray-dark">Empty</p>
+    <p v-if="!inputModel" class="text-black">Empty</p>
   </div>
   <FormKit
     v-if="editing"
@@ -12,7 +12,7 @@
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'flex-1',
       label: 'ml-5',
-      inner: `${focused ? 'border-accent' : 'border-white'}`,
+      inner: `${focused ? '!border-main' : 'border-accent'}`,
     }"
     @focus="onFocus"
     @blur="onBlur"

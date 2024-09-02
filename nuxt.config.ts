@@ -6,7 +6,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/storybook',
     '@formkit/nuxt',
     '@nuxt/image',
     '@nuxt/eslint',
@@ -34,11 +33,6 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-  },
-
-  storybook: {
-    port: 6006,
-    enabled: false,
   },
 
   compatibilityDate: '2024-08-14',
