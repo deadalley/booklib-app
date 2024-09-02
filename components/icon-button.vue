@@ -2,13 +2,14 @@
   <button
     class="inline-flex h-8 w-8 items-center justify-center gap-2 rounded-3xl text-base font-medium"
     :class="{
-      'bg-main text-white hover:bg-main/90 active:bg-main-dark active:shadow-inner-m':
+      'bg-main text-white hover:bg-main/90 active:bg-main-dark':
         variant === 'primary',
-      'bg-accent-light text-black ring-inset hover:bg-accent-light/20 hover:ring-1 hover:ring-accent active:bg-accent-dark active:shadow-inner-m':
+      'bg-accent-light text-black hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
         variant === 'secondary',
-      'border border-accent p-2 text-accent-dark hover:bg-accent-light/20':
+      'border border-accent p-2 text-black hover:bg-accent-light/20':
         variant === 'tertiary',
-      'bg-gray-light text-gray': !!disabled,
+      '!bg-accent-light !text-accent-dark': !!disabled,
+      'cursor-pointer': !disabled,
     }"
     :disabled="disabled"
   >
