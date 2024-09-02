@@ -6,7 +6,7 @@
       v-bind="switchProps"
     >
       <template #icon="iconProps">
-        <IconLayoutDashboard v-bind="iconProps" />
+        <IconLayoutGrid v-bind="iconProps" />
       </template>
     </bl-switch-option>
     <bl-switch-option
@@ -24,7 +24,7 @@
       v-bind="switchProps"
     >
       <template #icon="iconProps">
-        <IconTable v-bind="iconProps" />
+        <IconList v-bind="iconProps" />
       </template>
     </bl-switch-option>
   </bl-switch>
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core'
-import { IconLayoutDashboard, IconMist, IconTable } from '@tabler/icons-vue'
+import { IconLayoutGrid, IconMist, IconList } from '@tabler/icons-vue'
 import type { View } from '~/types/ui'
 
 const props = withDefaults(
