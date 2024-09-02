@@ -37,7 +37,7 @@ import type { View } from '~/types/ui'
 
 const props = withDefaults(
   defineProps<{
-    views: View[]
+    views?: View[]
     view: View
   }>(),
   { views: () => ['cards', 'table'] },

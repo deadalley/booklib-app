@@ -57,9 +57,9 @@
         </bl-list-checkbox-option>
       </bl-list-checkbox>
     </div>
-    <bl-button expand variant="secondary" @click="onReset"
-      >Reset Filters</bl-button
-    >
+    <bl-button expand variant="secondary" @click="onReset">
+      Reset Filters
+    </bl-button>
   </div>
 </template>
 

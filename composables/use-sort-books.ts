@@ -50,9 +50,9 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
   const minPages = computed(() =>
     Math.max(Math.min(...pages.value, 0) - 100, 0),
   )
-  const maxPages = computed(() => Math.max(...pages.value, +Infinity))
+  const maxPages = computed(() => Math.max(...pages.value, 300))
 
-  const minYear = computed(() => Math.min(...years.value, -Infinity))
+  const minYear = computed(() => Math.min(...years.value, 0))
   const maxYear = computed(() => new Date().getFullYear())
 
   const selectedPublishers = ref<string[]>([])
@@ -187,6 +187,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
     selectedPublishers.value = []
     selectedLanguages.value = []
     selectedOriginalLanguages.value = []
+    selectedGenres.value = []
 
     selectedYearRange.value = [minYear.value, maxYear.value]
     selectedPageRange.value = [minPages.value, maxPages.value]
