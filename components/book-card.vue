@@ -5,7 +5,7 @@
       :href="href"
       :cover-src="book.coverSrc"
       :selectable="selectable"
-      :selected="book.inCollection"
+      :selected="book.selected"
       @click="onSelect"
     />
     <div class="w-full flex-col">
@@ -14,9 +14,9 @@
           {{ book.title }}
         </h5>
       </NuxtLink>
-      <!-- <p v-if="book.author" class="text-sm text-gray-600 truncate">
-        {{ book.author }}
-      </p> -->
+      <p v-if="authorName" class="text-gray-600 truncate text-sm">
+        {{ authorName }}
+      </p>
     </div>
   </div>
 </template>
@@ -25,7 +25,8 @@
 import type { Book } from '~/types/book'
 
 const props = defineProps<{
-  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & { inCollection?: boolean }
+  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & { selected?: boolean }
+  authorName: string
   selectable?: boolean
 }>()
 
@@ -35,7 +36,7 @@ const emit = defineEmits(['selected'])
 
 function onSelect() {
   if (props.selectable) {
-    emit('selected', !props.book.inCollection)
+    emit('selected', !props.book.selected)
   }
 }
 </script>

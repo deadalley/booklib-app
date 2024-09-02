@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative size-full w-full rounded-m border border-accent bg-accent-light p-10"
+    class="relative size-full w-full rounded-lg bg-accent-light p-10"
     v-bind="$attrs"
   >
     <div
