@@ -89,8 +89,6 @@
 </template>
 
 <script setup lang="ts">
-import { isMouseEvent, isTouchEvent } from '~/utils'
-
 const props = withDefaults(
   defineProps<{
     label?: string
@@ -155,25 +153,24 @@ function onInnerBarRightClick() {
 function onLeftThumbMousedown(e: MouseEvent | TouchEvent) {
   e.preventDefault()
 
-  if (isTouchEvent(e)) {
-    if (e.touches.length === 1) {
-      startX.value = e.touches[0].clientX
+  startX.value = (e as MouseEvent).clientX
+
+  if (e.type === 'touchstart') {
+    if ((e as TouchEvent).touches.length === 1) {
+      startX.value = (e as TouchEvent).touches[0].clientX
     } else {
       return
     }
-  } else if (isMouseEvent(e)) {
-    startX.value = e.clientX
-
-    barValue.value = valueMin.value
-    barBox.value =
-      (e.target as HTMLDivElement)?.parentElement?.getBoundingClientRect() ??
-      null
-
-    document.addEventListener('mousemove', onLeftThumbMousemove)
-    document.addEventListener('mouseup', onLeftThumbMouseup)
-    document.addEventListener('touchmove', onLeftThumbMousemove)
-    document.addEventListener('touchend', onLeftThumbMouseup)
   }
+
+  barValue.value = valueMin.value
+  barBox.value =
+    (e.target as HTMLElement)?.parentElement?.getBoundingClientRect() ?? null
+
+  document.addEventListener('mousemove', onLeftThumbMousemove)
+  document.addEventListener('mouseup', onLeftThumbMouseup)
+  document.addEventListener('touchmove', onLeftThumbMousemove)
+  document.addEventListener('touchend', onLeftThumbMouseup)
 }
 
 function onLeftThumbMousemove(e: MouseEvent | TouchEvent) {
@@ -204,25 +201,24 @@ function onLeftThumbMouseup() {
 function onRightThumbMousedown(e: MouseEvent | TouchEvent) {
   e.preventDefault()
 
-  if (isTouchEvent(e)) {
-    if (e.touches.length === 1) {
-      startX.value = e.touches[0].clientX
+  startX.value = (e as MouseEvent).clientX
+
+  if (e.type === 'touchstart') {
+    if ((e as TouchEvent).touches.length === 1) {
+      startX.value = (e as TouchEvent).touches[0].clientX
     } else {
       return
     }
-  } else if (isMouseEvent(e)) {
-    startX.value = e.clientX
-
-    barValue.value = valueMax.value
-    barBox.value =
-      (e.target as HTMLDivElement)?.parentElement?.getBoundingClientRect() ??
-      null
-
-    document.addEventListener('mousemove', onRightThumbMousemove)
-    document.addEventListener('mouseup', onRightThumbMouseup)
-    document.addEventListener('touchmove', onRightThumbMousemove)
-    document.addEventListener('touchend', onRightThumbMouseup)
   }
+
+  barValue.value = valueMax.value
+  barBox.value =
+    (e.target as HTMLElement)?.parentElement?.getBoundingClientRect() ?? null
+
+  document.addEventListener('mousemove', onRightThumbMousemove)
+  document.addEventListener('mouseup', onRightThumbMouseup)
+  document.addEventListener('touchmove', onRightThumbMousemove)
+  document.addEventListener('touchend', onRightThumbMouseup)
 }
 
 function onRightThumbMousemove(e: MouseEvent | TouchEvent) {
