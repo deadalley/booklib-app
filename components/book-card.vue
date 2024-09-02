@@ -26,7 +26,7 @@ import type { Book } from '~/types/book'
 
 const props = defineProps<{
   book: Pick<Book, 'id' | 'title' | 'coverSrc'> & { selected?: boolean }
-  authorName: string
+  authorName?: string
   selectable?: boolean
 }>()
 

@@ -4,7 +4,7 @@ import type { Book } from '~/types/book'
 export function buildBook(overwrite?: Partial<Book>): Book {
   return {
     title: faker.commerce.productName(),
-    coverSrc: faker.image.urlPicsumPhotos({ height: 540, width: 300 }),
+    coverSrc: faker.image.urlPicsumPhotos({ height: 540, width: 340 }),
     createdAt: faker.date.past().toISOString(),
     id: faker.number.float(),
     isbn: faker.commerce.isbn(),

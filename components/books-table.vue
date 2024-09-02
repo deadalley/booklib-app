@@ -100,8 +100,6 @@ const columns = computed(
     }) as ColumnDef<Book, unknown>[],
 )
 
-console.log({ data: props.books, columns })
-
 function onRowClick(row: Book) {
   navigateTo(`/library/books/${row.id}`)
 }

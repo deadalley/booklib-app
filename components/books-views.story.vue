@@ -24,11 +24,15 @@ const state = reactive({
     isbn: { label: 'ISBN', checked: true },
   },
 })
+
+const view = ref('cards')
 </script>
 
 <template>
-  <Story title="Organisms/Books Table">
-    <bl-books-table
+  <Story title="Organisms/Books Views">
+    <bl-view-switch v-model:view="view" />
+    <bl-books-views
+      :view="view"
       :books="state.books"
       :selected-table-columns="state.selectedTableColumns"
     />
