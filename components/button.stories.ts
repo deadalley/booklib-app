@@ -43,27 +43,6 @@ export const Disabled: Story = {
   },
 }
 
-export const PrimaryCompact: Story = {
-  args: {
-    variant: 'primary',
-    compact: true,
-  },
-}
-
-export const SecondaryCompact: Story = {
-  args: {
-    variant: 'secondary',
-    compact: true,
-  },
-}
-
-export const DisabledCompact: Story = {
-  args: {
-    disabled: true,
-    compact: true,
-  },
-}
-
 export const WithPrependIcon: Story = {
   args: {
     prependIcon: '<IconPlus v-bind="prependIcon" />',
@@ -72,20 +51,6 @@ export const WithPrependIcon: Story = {
 
 export const WithAppendIcon: Story = {
   args: {
-    appendIcon: '<IconPlus v-bind="appendIcon" />',
-  },
-}
-
-export const WithPrependIconCompact: Story = {
-  args: {
-    compact: true,
-    prependIcon: '<IconPlus v-bind="prependIcon" />',
-  },
-}
-
-export const WithAppendIconCompact: Story = {
-  args: {
-    compact: true,
     appendIcon: '<IconPlus v-bind="appendIcon" />',
   },
 }
