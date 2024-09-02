@@ -187,6 +187,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
     selectedPublishers.value = []
     selectedLanguages.value = []
     selectedOriginalLanguages.value = []
+    selectedGenres.value = []
 
     selectedYearRange.value = [minYear.value, maxYear.value]
     selectedPageRange.value = [minPages.value, maxPages.value]
