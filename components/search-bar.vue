@@ -6,7 +6,7 @@
       'border-accent text-accent-dark': !focused,
     }"
   >
-    <IconSearch :size="ICON_SIZE_MEDIUM" />
+    <IconSearch :size="ICON_SIZE_SMALL" />
     <input class="w-full" v-bind="$attrs" @focus="onFocus" @blur="onBlur" />
   </div>
 </template>

@@ -2,13 +2,13 @@
   <button
     v-bind="$attrs"
     type="button"
-    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-lg px-5 py-2 text-base font-medium lg:inline-flex lg:grow-0"
+    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-lg px-5 py-3 text-base font-medium lg:inline-flex lg:grow-0"
     :class="{
       'bg-main text-white hover:bg-main/90 active:bg-main-dark':
         variant === 'primary',
       'bg-accent-light text-black hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
         variant === 'secondary',
-      'border border-accent p-2 text-black hover:bg-accent-light/20':
+      'border border-accent p-2 text-black hover:bg-accent-light active:bg-accent':
         variant === 'tertiary',
       '!bg-accent-light !text-accent-dark': !!disabled,
       'cursor-pointer': !disabled,

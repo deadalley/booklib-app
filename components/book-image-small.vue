@@ -4,7 +4,7 @@
     class="w-full"
     @click="$emit('click')"
   >
-    <bl-empty-book-image v-if="!coverSrc" class="!h-48 !rounded-2xl !p-5" />
+    <bl-empty-book-image v-if="!coverSrc" class="!h-48 !rounded-lg !p-5" />
     <NuxtImg
       v-if="coverSrc"
       :src="coverSrc ?? undefined"

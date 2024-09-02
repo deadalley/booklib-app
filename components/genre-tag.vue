@@ -2,10 +2,10 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-l-lg rounded-r-full bg-main px-4 py-2 text-base text-white"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-lg bg-main px-4 py-2 text-base text-white"
     :class="{
       'cursor-pointer': !!attrs.onClick,
-      'bg-main-light text-white ring-main-light': !!selected,
+      'bg-main-dark': !!selected,
     }"
     @click="onClick"
     @mouseenter="setHovered(true)"
@@ -16,19 +16,24 @@
     <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
       initialContent
     }}</span>
-    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-black !text-black" />
-    <IconCircleX
-      v-if="!loading && removable"
-      :size="16"
-      stroke="2"
-      class="absolute right-6 cursor-pointer opacity-0"
+    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-white" />
+    <IconCircleXFilled
+      v-if="!loading && removable && hovered"
+      :size="18"
+      stroke="1.5"
+      class="cursor-pointer opacity-0"
       :class="{ 'opacity-100': hovered }"
       @click="_onRemove"
+    />
+    <IconTagFilled
+      v-if="!removable || (!loading && !hovered)"
+      :size="18"
+      stroke="1.5"
     />
   </div>
   <div
     v-if="newGenre && !editing"
-    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-main py-2 hover:bg-main/80"
+    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-main py-2 text-white hover:bg-main/80"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />
@@ -36,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconCircleX, IconPlus } from '@tabler/icons-vue'
+import { IconCircleXFilled, IconPlus, IconTagFilled } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
 const attrs = useAttrs()

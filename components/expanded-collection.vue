@@ -1,7 +1,7 @@
 <template>
   <Disclosure v-slot="{ open }" :default-open="true">
     <DisclosureButton
-      class="mb-2 flex items-center justify-between rounded-2xl px-4 py-2 text-start hover:bg-accent-light"
+      class="mb-2 flex items-center justify-between rounded-lg px-4 py-2 text-start hover:bg-accent-light"
     >
       <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <h4>

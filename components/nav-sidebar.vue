@@ -1,5 +1,7 @@
 <template>
-  <nav class="flex h-full flex-col gap-6 bg-background px-6 pb-8 pt-16">
+  <nav
+    class="flex h-full flex-col gap-6 border-r border-r-accent bg-background px-6 pb-8 pt-16"
+  >
     <h3 class="mb-6 cursor-pointer text-2xl font-medium tracking-wider">
       <NuxtLink to="/"> BOOKLIB </NuxtLink>
     </h3>

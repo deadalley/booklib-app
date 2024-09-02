@@ -12,7 +12,7 @@
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'flex-1',
       label: 'ml-5',
-      inner: `${focused ? 'border-accent' : 'border-white'}`,
+      inner: `${focused ? '!border-main' : 'border-accent'}`,
     }"
     @focus="onFocus"
     @blur="onBlur"

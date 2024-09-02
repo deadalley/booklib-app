@@ -6,7 +6,7 @@
         variant === 'primary',
       'bg-accent-light text-black hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
         variant === 'secondary',
-      'border border-accent p-2 text-black hover:bg-accent-light/20':
+      'border border-accent p-2 text-black hover:bg-accent-light active:bg-accent':
         variant === 'tertiary',
       '!bg-accent-light !text-accent-dark': !!disabled,
       'cursor-pointer': !disabled,

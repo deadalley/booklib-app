@@ -1,5 +1,8 @@
 <template>
-  <div v-if="book" class="flex flex-1 flex-col gap-10 lg:overflow-auto">
+  <div
+    v-if="book"
+    class="flex flex-1 flex-col gap-10 lg:w-9/12 lg:overflow-auto"
+  >
     <header class="flex flex-col gap-2">
       <div class="flex items-end justify-between gap-3">
         <div class="flex gap-5">
@@ -25,7 +28,7 @@
         :book="book"
         :temp-cover-src="tempCoverSrc"
       />
-      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
+      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[4]">
         <section v-if="!editing" class="book-section">
           <bl-input id="id" type="hidden" name="id" />
           <div class="col-span-12 flex w-full justify-between">

@@ -10,13 +10,14 @@ export default {
       'accent-light': '#F6F6F6',
       background: '#FFFFFF',
       black: '#202020',
-      'main-dark': '#B13838',
+      'main-dark': '#791616',
       'main-light': '#E59696',
       main: '#CA3D3D',
       white: '#FFFFFF',
     },
     fontFamily: {
       RadioCanada: ['Radio Canada', 'sans-serif'],
+      Sarala: ['Sarala', 'sans-serif'],
     },
     extend: {
       borderRadius: {
