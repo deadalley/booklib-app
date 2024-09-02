@@ -9,7 +9,8 @@ const state = reactive({
   editing: true,
 })
 
-function setupApp({ app, story, variant }) {
+// eslint-disable-next-line
+function setupApp({ app }) {
   app.use(plugin, defaultConfig(config))
 }
 </script>

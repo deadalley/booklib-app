@@ -34,7 +34,7 @@
               >Edit</bl-button
             >
           </div>
-          <p class="col-span-12 text-gray-dark">
+          <p class="col-span-12 text-black">
             {{ book?.summary ?? 'No summary available' }}
           </p>
         </section>

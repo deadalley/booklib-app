@@ -17,15 +17,15 @@
   }
 
   .form-row {
-    @apply flex gap-4 flex-col sm:flex-row;
+    @apply flex flex-col gap-4 sm:flex-row;
   }
 
   .formkit-label {
-    @apply text-base font-medium text-gray-dark;
+    @apply text-base font-medium text-black;
   }
 
   .formkit-inner {
-    @apply flex gap-3 items-center w-full px-5 rounded-m outline-none text-base placeholder:text-accent border  bg-white h-min py-3 transition-all ease-in duration-100;
+    @apply flex h-min w-full items-center gap-3 rounded-m border bg-white px-5 py-3 text-base outline-none transition-all duration-100 ease-in placeholder:text-accent;
   }
 
   select.formkit-input {
@@ -40,7 +40,7 @@
   input:focus.formkit-input,
   textarea:focus.formkit-input,
   button:focus {
-    @apply ring-0 ring-accent ring-inset;
+    @apply ring-0 ring-inset ring-accent;
   }
 
   .formkit-wrapper {

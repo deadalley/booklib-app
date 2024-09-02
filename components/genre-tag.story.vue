@@ -12,7 +12,7 @@ const state = reactive({
       <GenreTag :value="state.value" />
 
       <template #controls>
-        Value: <input type="text" v-model="state.value" />
+        Value: <input v-model="state.value" type="text" />
       </template>
     </Variant>
   </Story>

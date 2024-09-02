@@ -13,7 +13,6 @@
     @keydown.enter="_onCommit"
     @keydown.escape="onCancel"
   >
-    <!-- <IconTag :size="16" stroke="2" /> -->
     <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
       initialContent
     }}</span>
@@ -37,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconTag, IconCircleX, IconPlus } from '@tabler/icons-vue'
+import { IconCircleX, IconPlus } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
 const attrs = useAttrs()
