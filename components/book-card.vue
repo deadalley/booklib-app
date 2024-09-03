@@ -6,6 +6,7 @@
       :cover-src="book.coverSrc"
       :selectable="selectable"
       :selected="book.selected"
+      class="transition duration-300 ease-in-out hover:scale-110"
       @click="onSelect"
     />
     <div class="w-full flex-col">

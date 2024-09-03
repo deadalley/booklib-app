@@ -12,7 +12,7 @@
         'bg-accent-dark': !!checked,
       }"
     >
-      <slot name="icon" :size="ICON_SIZE_SMALL" stroke="1.5" />
+      <slot name="icon" :size="21" stroke="1.5" />
     </span>
   </RadioGroupOption>
 </template>
