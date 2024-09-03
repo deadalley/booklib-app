@@ -20,6 +20,9 @@ export default defineEventHandler(async (event) => {
 
       if (error) {
         logger.error(error)
+        if (error.message === 'Object not found') {
+          return undefined
+        }
         throw createError(error.message)
       }
 

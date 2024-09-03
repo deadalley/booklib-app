@@ -24,22 +24,18 @@
     <div>
       <h5 class="mb-4">Year</h5>
       <bl-slider
-        v-model="_selectedYearRange"
+        v-model:values="_selectedYearRange"
         :min="minMaxYearRange[0]"
         :max="minMaxYearRange[1]"
-        :min-value="_selectedYearRange[0]"
-        :max-value="_selectedYearRange[1]"
         :step="1"
       />
     </div>
     <div>
       <h5 class="mb-4">Page</h5>
       <bl-slider
-        v-model="_selectedPageRange"
+        v-model:values="_selectedPageRange"
         :min="minMaxPageRange[0]"
         :max="minMaxPageRange[1]"
-        :min-value="selectedPageRange[0]"
-        :max-value="selectedPageRange[1]"
         :step="50"
       />
     </div>

@@ -5,7 +5,7 @@ export const useSortCollections = (collections: Collection[]) => {
   const route = useRoute()
 
   const textSearch = ref()
-  const view = ref<View>((route.query.view as View) ?? 'cards')
+  const view = ref<View>((route.query.view as View) ?? 'expanded-cards')
 
   const sortedCollections = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(

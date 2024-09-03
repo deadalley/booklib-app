@@ -4,274 +4,49 @@
     <label v-if="!!label" for="default-range" class="formkit-label">{{
       label
     }}</label>
-    <div class="relative mt-16 flex flex-col px-4">
-      <div class="flex">
-        <!-- Bar left -->
-        <div
-          class="m-0 box-border w-1/4 rounded-md border border-accent bg-accent-light py-1"
-          :style="{ width: barMin + '%' }"
-          @click="onBarLeftClick"
-          @mousedown="onLeftThumbMousedown"
-          @touchstart="onLeftThumbMousedown"
-        />
-        <input
-          class="pointer-events-none absolute left-0 top-0 w-full opacity-0"
-          type="range"
-          :min="min"
-          :max="max"
-          :step="step"
-          :value="valueMin"
-        />
-        <!-- Thumb left -->
-        <div
-          class="thumb relative z-10 cursor-pointer"
-          @mousedown="onLeftThumbMousedown"
-          @touchstart="onLeftThumbMousedown"
+
+    <div class="px-5">
+      <SliderRoot
+        v-model="_values"
+        :max="max"
+        :min="min"
+        :step="step"
+        class="relative mt-16 flex h-5 w-[200px] touch-none select-none items-center"
+      >
+        <SliderTrack
+          class="relative h-[5px] grow cursor-pointer rounded-full bg-accent"
         >
+          <SliderRange class="absolute h-full rounded-full bg-main" />
+        </SliderTrack>
+        <SliderThumb v-for="(value, index) in _values" :key="index">
+          <span class="block size-5 cursor-pointer rounded-[10px] bg-main" />
           <div
-            class="absolute bottom-12 left-0 flex items-center justify-center overflow-visible"
+            class="absolute bottom-8 left-0 flex -translate-x-1/4 items-center justify-center rounded-md bg-accent px-3 py-1 font-ReemKufi text-black"
           >
-            <span
-              class="absolute whitespace-nowrap rounded-lg bg-accent-light px-3 py-1 text-center text-black"
-              >{{ barMinVal }}</span
-            >
+            {{ value }}
           </div>
-        </div>
-        <!-- Bar inner -->
-        <div class="relative flex shrink grow justify-between bg-main">
-          <div
-            class="w-1/2"
-            @click="onInnerBarLeftClick"
-            @mousedown="onLeftThumbMousedown"
-            @touchstart="onLeftThumbMousedown"
-          />
-          <div
-            class="w-1/2"
-            @click="onInnerBarRightClick"
-            @mousedown="onRightThumbMousedown"
-            @touchstart="onRightThumbMousedown"
-          />
-        </div>
-        <input
-          class="pointer-events-none absolute left-0 top-0 w-full opacity-0"
-          type="range"
-          :min="min"
-          :max="max"
-          :step="step"
-          :value="valueMax"
-        />
-        <!-- Thumb right -->
-        <div
-          class="thumb relative z-10 cursor-pointer"
-          @mousedown="onRightThumbMousedown"
-          @touchstart="onRightThumbMousedown"
-        >
-          <div
-            class="absolute bottom-12 left-0 flex items-center justify-center overflow-visible"
-          >
-            <span
-              class="absolute whitespace-nowrap rounded-lg bg-accent-light px-3 py-1 text-center text-black"
-              >{{ barMaxVal }}</span
-            >
-          </div>
-        </div>
-        <!-- Bar right -->
-        <div
-          class="m-0 box-border w-1/4 rounded-md border border-accent bg-accent-light py-1"
-          :style="{ width: barMax + '%' }"
-          @click="onBarRightClick"
-          @mousedown="onRightThumbMousedown"
-          @touchstart="onRightThumbMousedown"
-        />
-      </div>
+        </SliderThumb>
+      </SliderRoot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useVModel } from '@vueuse/core'
+import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'radix-vue'
+
 const props = withDefaults(
   defineProps<{
     label?: string
     min?: number
     max?: number
-    minValue?: number
-    maxValue?: number
     step?: number
-    rangeMargin?: number
+    values: [number, number]
   }>(),
   { step: 1, min: 0, max: 100 },
 )
 
-const valueMin = ref(props.minValue ?? props.min)
-const valueMax = ref(props.maxValue ?? props.max)
+const emit = defineEmits(['update:values'])
 
-const startX = ref(0)
-
-const barBox = ref<DOMRect | null>(null)
-const barValue = ref(0)
-
-const rangeMarginValue = ref(props.step)
-
-function getNewPosition(clientX: number) {
-  const moveDistance = clientX - startX.value
-  const movePercentage = moveDistance / (barBox.value?.width ?? 1)
-  const maxRange = props.max - props.min
-
-  let newValue = barValue.value + maxRange * movePercentage
-
-  newValue -= newValue % props.step
-
-  return newValue
-}
-
-function onBarLeftClick() {
-  valueMin.value =
-    valueMin.value - props.step >= props.min
-      ? valueMin.value - props.step
-      : props.min
-}
-
-function onInnerBarLeftClick() {
-  if (valueMin.value + rangeMarginValue.value < valueMax.value) {
-    valueMin.value = valueMin.value + props.step
-  }
-}
-
-function onBarRightClick() {
-  valueMax.value =
-    valueMax.value + props.step <= props.max
-      ? valueMax.value + props.step
-      : props.max
-}
-
-function onInnerBarRightClick() {
-  if (valueMax.value - rangeMarginValue.value > valueMin.value) {
-    valueMax.value = valueMax.value - props.step
-  }
-}
-
-function onLeftThumbMousedown(e: MouseEvent | TouchEvent) {
-  e.preventDefault()
-
-  startX.value = (e as MouseEvent).clientX
-
-  if (e.type === 'touchstart') {
-    if ((e as TouchEvent).touches.length === 1) {
-      startX.value = (e as TouchEvent).touches[0].clientX
-    } else {
-      return
-    }
-  }
-
-  barValue.value = valueMin.value
-  barBox.value =
-    (e.target as HTMLElement)?.parentElement?.getBoundingClientRect() ?? null
-
-  document.addEventListener('mousemove', onLeftThumbMousemove)
-  document.addEventListener('mouseup', onLeftThumbMouseup)
-  document.addEventListener('touchmove', onLeftThumbMousemove)
-  document.addEventListener('touchend', onLeftThumbMouseup)
-}
-
-function onLeftThumbMousemove(e: MouseEvent | TouchEvent) {
-  let clientX = (e as MouseEvent).clientX
-
-  if (e.type === 'touchmove') {
-    clientX = (e as TouchEvent).touches[0].clientX
-  }
-
-  let newValue = getNewPosition(clientX)
-
-  if (newValue < props.min) {
-    newValue = props.min
-  } else if (newValue > valueMax.value - rangeMarginValue.value) {
-    newValue = valueMax.value - rangeMarginValue.value
-  }
-
-  valueMin.value = newValue
-}
-
-function onLeftThumbMouseup() {
-  document.removeEventListener('mousemove', onLeftThumbMousemove)
-  document.removeEventListener('mouseup', onLeftThumbMouseup)
-  document.removeEventListener('touchmove', onLeftThumbMousemove)
-  document.removeEventListener('touchend', onLeftThumbMouseup)
-}
-
-function onRightThumbMousedown(e: MouseEvent | TouchEvent) {
-  e.preventDefault()
-
-  startX.value = (e as MouseEvent).clientX
-
-  if (e.type === 'touchstart') {
-    if ((e as TouchEvent).touches.length === 1) {
-      startX.value = (e as TouchEvent).touches[0].clientX
-    } else {
-      return
-    }
-  }
-
-  barValue.value = valueMax.value
-  barBox.value =
-    (e.target as HTMLElement)?.parentElement?.getBoundingClientRect() ?? null
-
-  document.addEventListener('mousemove', onRightThumbMousemove)
-  document.addEventListener('mouseup', onRightThumbMouseup)
-  document.addEventListener('touchmove', onRightThumbMousemove)
-  document.addEventListener('touchend', onRightThumbMouseup)
-}
-
-function onRightThumbMousemove(e: MouseEvent | TouchEvent) {
-  let clientX = (e as MouseEvent).clientX
-
-  if (e.type === 'touchmove') {
-    clientX = (e as TouchEvent).touches[0].clientX
-  }
-
-  let newValue = getNewPosition(clientX)
-
-  if (newValue < valueMin.value + rangeMarginValue.value) {
-    newValue = valueMin.value + rangeMarginValue.value
-  } else if (newValue > props.max) {
-    newValue = props.max
-  }
-
-  valueMax.value = newValue
-}
-
-function onRightThumbMouseup() {
-  document.removeEventListener('mousemove', onRightThumbMousemove)
-  document.removeEventListener('mouseup', onRightThumbMouseup)
-  document.removeEventListener('touchmove', onRightThumbMousemove)
-  document.removeEventListener('touchend', onRightThumbMouseup)
-}
-
-const barMin = computed(() => {
-  return ((valueMin.value - props.min) / (props.max - props.min)) * 100
-})
-
-const barMax = computed(() => {
-  return 100 - ((valueMax.value - props.min) / (props.max - props.min)) * 100
-})
-
-const barMinVal = computed(() =>
-  (valueMin.value || 0).toFixed(props.step.toString().includes('.') ? 2 : 0),
-)
-
-const barMaxVal = computed(() =>
-  (valueMax.value || 100).toFixed(props.step.toString().includes('.') ? 2 : 0),
-)
-
-const value = defineModel<[number, number]>()
-
-watch([valueMin, valueMax], (v) => {
-  value.value = v
-})
+const _values = useVModel(props, 'values', emit, { passive: true })
 </script>
-
-<style scoped>
-.thumb::before {
-  @apply absolute -left-3 -top-2 z-10 h-6 w-6 cursor-pointer rounded-full bg-main;
-  content: '';
-}
-</style>

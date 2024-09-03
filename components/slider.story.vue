@@ -3,9 +3,8 @@ const state = reactive({
   label: 'Slider',
   min: 0,
   max: 20,
-  minValue: 3,
-  maxValue: 18,
   step: 1,
+  values: [3, 18],
 })
 </script>
 

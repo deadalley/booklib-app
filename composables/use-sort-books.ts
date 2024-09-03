@@ -21,7 +21,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
   )
 
   const defaultTableColumns = {
-    coverSrc: { label: 'Cover', checked: true },
+    coverSrc: { label: 'Cover', checked: false },
     publisher: { label: 'Publisher', checked: true },
     language: { label: 'Language', checked: true },
     year: { label: 'Year', checked: true },

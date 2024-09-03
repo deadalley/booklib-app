@@ -1,42 +1,64 @@
+<!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <Dialog :open="isOpen" class="relative z-50" @close="setIsOpen">
-    <!-- The backdrop, rendered as a fixed sibling to the panel container -->
-    <div class="fixed inset-0 bg-black/30" aria-hidden="true" />
-
-    <!-- Full-screen container to center the panel -->
-    <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
-      <!-- The actual dialog panel -->
-      <DialogPanel
-        class="relative flex size-4/5 flex-col rounded-lg bg-background p-9"
+  <DialogRoot>
+    <DialogTrigger>
+      <slot name="trigger" />
+    </DialogTrigger>
+    <DialogPortal>
+      <DialogOverlay
+        class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-black"
+      />
+      <DialogContent
+        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none"
       >
-        <DialogTitle as="h4" class="mb-4 font-medium"
-          ><slot name="title"
-        /></DialogTitle>
+        <DialogTitle as="div" class="flex w-full items-end justify-center">
+          <h4 class="flex-1">
+            <slot name="title" />
+          </h4>
+          <DialogClose>
+            <bl-icon-button variant="secondary">
+              <template #default="iconProps">
+                <IconX v-bind="iconProps" />
+              </template>
+            </bl-icon-button>
+          </DialogClose>
+        </DialogTitle>
         <div class="relative flex h-full flex-col overflow-auto">
           <slot />
         </div>
         <div class="flex items-baseline justify-end gap-2">
-          <bl-button
-            v-if="$slots['cancel-label']"
-            variant="secondary"
-            @click="_onCancel"
-          >
-            <slot name="cancel-label" />
-          </bl-button>
-          <FormKit v-if="$slots['action-label']" type="submit">
+          <DialogClose>
+            <bl-button
+              v-if="$slots['cancel-label']"
+              variant="secondary"
+              @click="_onCancel"
+            >
+              <slot name="cancel-label" />
+            </bl-button>
+          </DialogClose>
+          <DialogClose>
             <bl-button @click="_onConfirm">
               <slot name="action-label" />
             </bl-button>
-          </FormKit>
+          </DialogClose>
         </div>
-      </DialogPanel>
-    </div>
-  </Dialog>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'
+import {
+  DialogClose,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from 'radix-vue'
+import { IconX } from '@tabler/icons-vue'
 
 const props = defineProps<{
   onCancel?: () => void

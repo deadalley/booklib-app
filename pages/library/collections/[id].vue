@@ -1,5 +1,8 @@
 <template>
-  <div v-if="collection" class="flex flex-1 flex-col gap-10 lg:overflow-auto">
+  <div
+    v-if="collection"
+    class="flex flex-1 flex-col gap-10 lg:w-9/12 lg:overflow-auto"
+  >
     <header class="flex flex-col gap-2">
       <div class="flex items-end justify-between gap-3">
         <div class="flex gap-5">
@@ -7,8 +10,25 @@
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
         </div>
-        <div v-if="!isNew" class="flex gap-3">
-          <bl-button variant="secondary" @click="onEdit(true)">Edit</bl-button>
+        <div v-if="!isNew" class="flex items-end gap-3">
+          <bl-button v-if="!editing" variant="secondary" @click="onEdit(true)"
+            >Edit</bl-button
+          >
+          <bl-button
+            v-if="!managingBooks"
+            variant="secondary"
+            @click="managingBooks = true"
+            >Manage books</bl-button
+          >
+          <bl-button
+            v-if="managingBooks"
+            variant="secondary"
+            @click="onCancelBooks"
+            >Cancel</bl-button
+          >
+          <bl-button v-if="managingBooks" variant="primary" @click="onSaveBooks"
+            >Save</bl-button
+          >
           <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6>{{ formattedDate }}</h6>
@@ -49,26 +69,11 @@
             </FormKit>
           </ClientOnly>
         </section>
-        <section class="book-section flex flex-col items-end gap-4">
+        <section
+          v-if="!!booksDisplayed.length"
+          class="book-section flex flex-col items-end gap-4"
+        >
           <div class="flex justify-end gap-3">
-            <bl-button
-              v-if="!managingBooks"
-              variant="secondary"
-              @click="managingBooks = true"
-              >Manage books</bl-button
-            >
-            <bl-button
-              v-if="managingBooks"
-              variant="secondary"
-              @click="onCancelBooks"
-              >Cancel</bl-button
-            >
-            <bl-button
-              v-if="managingBooks"
-              variant="primary"
-              @click="onSaveBooks"
-              >Save</bl-button
-            >
             <bl-view-switch v-model:view="view" />
           </div>
           <bl-books-views
@@ -79,6 +84,15 @@
             :selected-table-columns="selectedTableColumns"
             @book-select="onSelectBook"
           />
+        </section>
+        <section
+          v-if="!booksDisplayed.length"
+          class="flex flex-col items-center gap-3 py-24"
+        >
+          <p>There are no books in this collection.</p>
+          <bl-button @click="managingBooks = true"
+            >Add books to {{ collection.name ?? 'this collection' }}</bl-button
+          >
         </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete collection</h5>
@@ -117,11 +131,11 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 const isNew = computed(() => route.params.id === 'new')
 
 const managingBooks = ref(false)
-const editing = ref(isNew)
+const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const allBooks = ref<(Book & { inCollection: boolean })[]>([])
+const allBooks = ref<(Book & { selected: boolean })[]>([])
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
@@ -130,7 +144,7 @@ const formattedDate = computed(() =>
 const booksDisplayed = computed(() => {
   return managingBooks.value
     ? allBooks.value
-    : allBooks.value.filter((book) => book.inCollection)
+    : allBooks.value.filter((book) => book.selected)
 })
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
@@ -149,12 +163,12 @@ async function fetchCollection() {
       {},
     )
     collection.value = data
-    allBooks.value = (books.value ?? []).map((book) => ({
-      ...book,
-      inCollection: !!collection.value?.books.includes(book.id),
-    }))
     loading.value = false
   }
+  allBooks.value = (books.value ?? []).map((book) => ({
+    ...book,
+    selected: !!collection.value?.books?.includes(book.id),
+  }))
 }
 
 async function deleteCollection() {
@@ -180,7 +194,7 @@ function onCancel() {
 async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
   try {
     const booksInCollection = allBooks.value
-      .filter(({ inCollection }) => !!inCollection)
+      .filter(({ selected }) => !!selected)
       .map(({ id }) => id)
 
     const updatedCollection = await $fetch<Collection>('/api/collections', {
@@ -209,7 +223,7 @@ function onSelectBook({
   selected: boolean
 }) {
   allBooks.value = allBooks.value.map((book) =>
-    book.id === bookId ? { ...book, inCollection: selected } : book,
+    book.id === bookId ? { ...book, selected: selected } : book,
   )
 }
 

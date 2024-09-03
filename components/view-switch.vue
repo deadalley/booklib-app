@@ -1,9 +1,9 @@
 <template>
-  <bl-switch v-slot="switchProps" v-model="_view">
+  <bl-switch v-model="_view">
     <bl-switch-option
       v-if="views.includes('cards')"
       value="cards"
-      v-bind="switchProps"
+      :selected-value="_view"
     >
       <template #icon="iconProps">
         <IconLayoutGrid v-bind="iconProps" />
@@ -12,7 +12,7 @@
     <bl-switch-option
       v-if="views.includes('expanded-cards')"
       value="expanded-cards"
-      v-bind="switchProps"
+      :selected-value="_view"
     >
       <template #icon="iconProps">
         <IconMist v-bind="iconProps" />
@@ -21,7 +21,7 @@
     <bl-switch-option
       v-if="views.includes('table')"
       value="table"
-      v-bind="switchProps"
+      :selected-value="_view"
     >
       <template #icon="iconProps">
         <IconList v-bind="iconProps" />
