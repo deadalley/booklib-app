@@ -10,8 +10,25 @@
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
         </div>
-        <div v-if="!isNew" class="flex gap-3">
-          <bl-button variant="secondary" @click="onEdit(true)">Edit</bl-button>
+        <div v-if="!isNew" class="flex items-end gap-3">
+          <bl-button v-if="!editing" variant="secondary" @click="onEdit(true)"
+            >Edit</bl-button
+          >
+          <bl-button
+            v-if="!managingBooks"
+            variant="secondary"
+            @click="managingBooks = true"
+            >Manage books</bl-button
+          >
+          <bl-button
+            v-if="managingBooks"
+            variant="secondary"
+            @click="onCancelBooks"
+            >Cancel</bl-button
+          >
+          <bl-button v-if="managingBooks" variant="primary" @click="onSaveBooks"
+            >Save</bl-button
+          >
           <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6>{{ formattedDate }}</h6>
@@ -52,27 +69,12 @@
             </FormKit>
           </ClientOnly>
         </section>
-        <section class="book-section flex flex-col items-end gap-4">
+        <section
+          v-if="!!sortedBooks.length"
+          class="book-section flex flex-col items-end gap-4"
+        >
           <div class="flex justify-end gap-3">
             <bl-view-switch v-model:view="view" />
-            <bl-button
-              v-if="!managingBooks"
-              variant="secondary"
-              @click="managingBooks = true"
-              >Manage books</bl-button
-            >
-            <bl-button
-              v-if="managingBooks"
-              variant="secondary"
-              @click="onCancelBooks"
-              >Cancel</bl-button
-            >
-            <bl-button
-              v-if="managingBooks"
-              variant="primary"
-              @click="onSaveBooks"
-              >Save</bl-button
-            >
           </div>
           <bl-books-views
             :view="view"
@@ -82,6 +84,15 @@
             :selected-table-columns="selectedTableColumns"
             @book-select="onSelectBook"
           />
+        </section>
+        <section
+          v-if="!sortedBooks.length"
+          class="flex flex-col items-center gap-3 py-24"
+        >
+          <p>There are no books in this collection.</p>
+          <bl-button @click="managingBooks = true"
+            >Add books to {{ collection.name }}</bl-button
+          >
         </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete collection</h5>
