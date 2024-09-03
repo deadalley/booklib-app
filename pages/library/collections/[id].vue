@@ -70,7 +70,7 @@
           </ClientOnly>
         </section>
         <section
-          v-if="!!sortedBooks.length"
+          v-if="!!booksDisplayed.length"
           class="book-section flex flex-col items-end gap-4"
         >
           <div class="flex justify-end gap-3">
@@ -86,12 +86,12 @@
           />
         </section>
         <section
-          v-if="!sortedBooks.length"
+          v-if="!booksDisplayed.length"
           class="flex flex-col items-center gap-3 py-24"
         >
           <p>There are no books in this collection.</p>
           <bl-button @click="managingBooks = true"
-            >Add books to {{ collection.name }}</bl-button
+            >Add books to {{ collection.name ?? 'this collection' }}</bl-button
           >
         </section>
         <section v-if="!isNew" class="book-section">
@@ -163,12 +163,12 @@ async function fetchCollection() {
       {},
     )
     collection.value = data
-    allBooks.value = (books.value ?? []).map((book) => ({
-      ...book,
-      selected: !!collection.value?.books.includes(book.id),
-    }))
     loading.value = false
   }
+  allBooks.value = (books.value ?? []).map((book) => ({
+    ...book,
+    selected: !!collection.value?.books?.includes(book.id),
+  }))
 }
 
 async function deleteCollection() {

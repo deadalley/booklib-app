@@ -3,7 +3,7 @@
     <DisclosureButton
       class="mb-2 flex items-center justify-between rounded-lg px-4 py-2 text-start hover:bg-accent-light"
     >
-      <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
+      <div class="flex flex-1 items-baseline gap-3 md:flex-col lg:flex-row">
         <NuxtLink :to="`/library/collections/${collection.id}`">
           <h4>
             {{ collection.name }}
@@ -22,7 +22,9 @@
       leave-from-class="transform opacity-100"
       leave-to-class="transform opacity-0"
     >
-      <DisclosurePanel class="flex gap-x-6 overflow-x-auto p-4">
+      <DisclosurePanel
+        class="flex h-max gap-x-6 overflow-x-auto p-4 transition duration-100 ease-out"
+      >
         <bl-book-card
           v-for="book in books"
           :key="book.title"

@@ -29,13 +29,15 @@
         :collection="collection"
       />
     </div>
-    <div v-if="view === 'expanded-cards'" class="flex flex-col">
-      <bl-expanded-collection
-        v-for="collection in sortedCollections"
-        :key="collection.id"
-        :collection="collection"
-        :books="booksByCollectionId[collection.id]"
-      />
+    <div class="h-full overflow-y-auto">
+      <div v-if="view === 'expanded-cards'" class="flex flex-col">
+        <bl-expanded-collection
+          v-for="collection in sortedCollections"
+          :key="collection.id"
+          :collection="collection"
+          :books="booksByCollectionId[collection.id]"
+        />
+      </div>
     </div>
   </NuxtLayout>
 </template>
