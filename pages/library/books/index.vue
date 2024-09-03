@@ -49,6 +49,7 @@
       :min-max-page-range="[minPages, maxPages]"
       :books="books ?? []"
       :on-reset="onResetFilter"
+      :on-apply="onCloseSidebar"
     />
   </bl-sidebar>
 </template>

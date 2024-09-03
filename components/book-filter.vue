@@ -53,9 +53,12 @@
         </bl-list-checkbox-option>
       </bl-list-checkbox>
     </div>
-    <bl-button expand variant="secondary" @click="onReset">
-      Reset Filters
-    </bl-button>
+    <div class="flex flex-col gap-2">
+      <bl-button expand variant="secondary" @click="onReset">
+        Reset filters
+      </bl-button>
+      <bl-button expand @click="onApply">Apply filters</bl-button>
+    </div>
   </div>
 </template>
 
@@ -85,6 +88,7 @@ const props = defineProps<{
   }
 
   onReset: () => void
+  onApply: () => void
 }>()
 
 const route = useRoute()
