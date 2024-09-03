@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
       .from('collection-book')
       .delete()
       .eq('user_id', user.id)
+      .eq('collection_id', collection.id)
     const { error: bookCollectionError } = await client
       .from('collection-book')
       .insert(
