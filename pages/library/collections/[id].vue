@@ -51,6 +51,7 @@
         </section>
         <section class="book-section flex flex-col items-end gap-4">
           <div class="flex justify-end gap-3">
+            <bl-view-switch v-model:view="view" />
             <bl-button
               v-if="!managingBooks"
               variant="secondary"
@@ -69,7 +70,6 @@
               @click="onSaveBooks"
               >Save</bl-button
             >
-            <bl-view-switch v-model:view="view" />
           </div>
           <bl-books-views
             :view="view"
@@ -121,7 +121,7 @@ const editing = ref(isNew)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const allBooks = ref<(Book & { inCollection: boolean })[]>([])
+const allBooks = ref<(Book & { selected: boolean })[]>([])
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
@@ -130,7 +130,7 @@ const formattedDate = computed(() =>
 const booksDisplayed = computed(() => {
   return managingBooks.value
     ? allBooks.value
-    : allBooks.value.filter((book) => book.inCollection)
+    : allBooks.value.filter((book) => book.selected)
 })
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
@@ -151,7 +151,7 @@ async function fetchCollection() {
     collection.value = data
     allBooks.value = (books.value ?? []).map((book) => ({
       ...book,
-      inCollection: !!collection.value?.books.includes(book.id),
+      selected: !!collection.value?.books.includes(book.id),
     }))
     loading.value = false
   }
@@ -180,7 +180,7 @@ function onCancel() {
 async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
   try {
     const booksInCollection = allBooks.value
-      .filter(({ inCollection }) => !!inCollection)
+      .filter(({ selected }) => !!selected)
       .map(({ id }) => id)
 
     const updatedCollection = await $fetch<Collection>('/api/collections', {
@@ -209,7 +209,7 @@ function onSelectBook({
   selected: boolean
 }) {
   allBooks.value = allBooks.value.map((book) =>
-    book.id === bookId ? { ...book, inCollection: selected } : book,
+    book.id === bookId ? { ...book, selected: selected } : book,
   )
 }
 

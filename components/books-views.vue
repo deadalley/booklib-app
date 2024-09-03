@@ -12,7 +12,7 @@
       :key="book.title"
       :book="book"
       :selectable="selectable"
-      :selected="book.inCollection"
+      :selected="book.selected"
       @selected="(selected) => onSelectBook(book.id, selected)"
     />
   </div>
@@ -30,7 +30,7 @@ import type { View } from '~/types/ui'
 
 defineProps<{
   view: View
-  books: (Book & { inCollection?: boolean })[]
+  books: (Book & { selected?: boolean })[]
   small?: boolean
   selectable?: boolean
   selectedTableColumns: {

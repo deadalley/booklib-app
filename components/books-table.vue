@@ -84,7 +84,7 @@ const columns = computed(
       columnHelper.accessor('originalLanguage', {
         header: 'Original Language',
         cell,
-        size: 12,
+        size: 16,
       }),
       columnHelper.accessor('isbn', {
         header: 'ISBN',
