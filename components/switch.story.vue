@@ -5,7 +5,7 @@ const value = ref()
 </script>
 
 <template>
-  <Story title="Molecules/Switch">
+  <Story title="Atom/Switch">
     <bl-switch v-model="value">
       <bl-switch-option value="cards" :selected-value="value">
         <template #icon="iconProps">
