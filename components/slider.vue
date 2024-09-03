@@ -49,6 +49,4 @@ const props = withDefaults(
 const emit = defineEmits(['update:values'])
 
 const _values = useVModel(props, 'values', emit, { passive: true })
-
-watch(_values, (v) => console.log(v))
 </script>
