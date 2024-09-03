@@ -3,16 +3,16 @@
     <div
       class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-lg transition duration-300 ease-in-out hover:scale-110"
     >
-      <template v-for="(book, index) in bookCovers" :key="book.id">
+      <template v-for="(book, index) in books" :key="book.id">
         <NuxtLink
           :to="`/library/collections/${collection.id}`"
           class="size-full"
           :class="{
-            'col-span-2': bookCovers?.length === 1,
+            'col-span-2': books?.length === 1,
             'row-span-2':
-              (bookCovers?.length === 3 && index === 0) ||
-              bookCovers?.length === 2 ||
-              bookCovers?.length === 1,
+              (books?.length === 3 && index === 0) ||
+              books?.length === 2 ||
+              books?.length === 1,
           }"
         >
           <NuxtImg
@@ -31,7 +31,7 @@
         </NuxtLink>
       </template>
       <bl-book-image-small
-        v-if="!bookCovers?.length"
+        v-if="!books?.length"
         :href="`/library/collections/${collection.id}`"
         :alt="collection.name"
         class="col-span-2 row-span-2"
@@ -48,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { keyBy } from 'lodash'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
@@ -56,31 +55,22 @@ const props = defineProps<{
   collection: Collection
 }>()
 
-// TODO: filter by book ids and only return title
-const { data: books } = await useAsyncData<Book[]>(
-  `${props.collection.id}-bookCovers`,
-  () => $fetch('/api/books') as Promise<Book[]>,
-)
-
-const booksById = computed(() => keyBy(books.value, 'id'))
-
-const { data: bookCovers } = await useAsyncData<
-  {
-    id: Book['id']
-    title?: Book['title']
-    coverSrc: Book['coverSrc']
-  }[]
->(`${props.collection.id}-bookCovers`, () =>
-  Promise.all(
-    props.collection.books.slice(0, 4).map((id) =>
-      $fetch(`/api/books/${id}/cover`)
-        .catch()
-        .then((coverSrc) => ({
-          id,
-          title: booksById.value[id]?.title,
-          coverSrc,
-        })),
+const { data: books, refresh } = await useAsyncData(
+  `${props.collection.id}-books`,
+  async () =>
+    Promise.all<Book>(
+      props.collection.books
+        .slice(0, 4)
+        .map((id) => $fetch(`/api/books/${id}`)),
     ),
-  ),
+  {
+    lazy: true,
+    immediate: true,
+    watch: [props.collection.books],
+    transform: (books) =>
+      books.map(({ id, title, coverSrc }) => ({ id, title, coverSrc })),
+  },
 )
+
+onMounted(refresh)
 </script>
