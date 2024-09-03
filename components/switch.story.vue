@@ -1,21 +1,23 @@
 <script setup>
 import { IconLayoutDashboard, IconMist, IconTable } from '@tabler/icons-vue'
+
+const value = ref()
 </script>
 
 <template>
   <Story title="Molecules/Switch">
-    <bl-switch v-slot="switchProps" v-model="_view">
-      <bl-switch-option value="cards" v-bind="switchProps">
+    <bl-switch v-model="value">
+      <bl-switch-option value="cards" :selected-value="value">
         <template #icon="iconProps">
           <IconLayoutDashboard v-bind="iconProps" />
         </template>
       </bl-switch-option>
-      <bl-switch-option value="expanded-cards" v-bind="switchProps">
+      <bl-switch-option value="expanded-cards" :selected-value="value">
         <template #icon="iconProps">
           <IconMist v-bind="iconProps" />
         </template>
       </bl-switch-option>
-      <bl-switch-option value="table" v-bind="switchProps">
+      <bl-switch-option value="table" :selected-value="value">
         <template #icon="iconProps">
           <IconTable v-bind="iconProps" />
         </template>
