@@ -28,12 +28,12 @@
     "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
     "nuxt": "^3.13.0",
+    "radix-vue": "^1.9.5",
     "vue": "^3.4.38",
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@headlessui/vue": "^1.7.22",
     "@histoire/plugin-nuxt": "^0.17.17",
     "@histoire/plugin-vue": "^0.17.17",
     "@nuxt/eslint-config": "^0.5.5",

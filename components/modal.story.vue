@@ -10,8 +10,10 @@ function openModal() {
 
 <template>
   <Story title="Organisms/Modal">
-    <bl-button @click="openModal">Open</bl-button>
     <bl-modal ref="modalRef">
+      <template #trigger>
+        <bl-button @click="openModal">Open</bl-button>
+      </template>
       <template #title>Modal Title</template>
       This is modal content.
       <template #cancel-label>Cancel</template>
