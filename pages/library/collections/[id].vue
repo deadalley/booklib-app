@@ -1,5 +1,8 @@
 <template>
-  <div v-if="collection" class="flex flex-1 flex-col gap-10 lg:overflow-auto">
+  <div
+    v-if="collection"
+    class="flex flex-1 flex-col gap-10 lg:w-9/12 lg:overflow-auto"
+  >
     <header class="flex flex-col gap-2">
       <div class="flex items-end justify-between gap-3">
         <div class="flex gap-5">
@@ -117,7 +120,7 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 const isNew = computed(() => route.params.id === 'new')
 
 const managingBooks = ref(false)
-const editing = ref(isNew)
+const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
