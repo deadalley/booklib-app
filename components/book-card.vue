@@ -12,7 +12,14 @@
     />
     <div class="w-full flex-col">
       <NuxtLink :to="href">
-        <h5 class="truncate">
+        <h5
+          class="overflow-hidden"
+          :style="{
+            display: '-webkit-box',
+            '-webkit-line-clamp': 2,
+            '-webkit-box-orient': 'vertical',
+          }"
+        >
           {{ book.title }}
         </h5>
       </NuxtLink>

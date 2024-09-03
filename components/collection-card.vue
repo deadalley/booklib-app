@@ -39,7 +39,14 @@
     </div>
     <div class="w-full flex-col">
       <NuxtLink :to="`/library/collections/${collection.id}`">
-        <h5 class="truncate">
+        <h5
+          class="overflow-hidden"
+          :style="{
+            display: '-webkit-box',
+            '-webkit-line-clamp': 2,
+            '-webkit-box-orient': 'vertical',
+          }"
+        >
           {{ collection.name }}
         </h5>
       </NuxtLink>
