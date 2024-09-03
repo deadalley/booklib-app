@@ -4,7 +4,7 @@
     v-bind="$attrs"
   >
     <div
-      class="flex size-full w-full flex-col items-center justify-center gap-3 rounded-[inherit] border-2 border-dashed border-accent-dark text-accent-dark"
+      class="flex size-full w-full flex-col items-center justify-center gap-3 rounded-[inherit] border-2 border-dashed border-accent-dark p-2 text-accent-dark"
     >
       <IconPhoto :size="iconSize" stroke="1.5" />
       <span
