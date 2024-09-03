@@ -5,6 +5,11 @@
     :total="collections?.length ?? 0"
   >
     <template #navbar>
+      <bl-search-bar @input="onSearch" />
+      <bl-view-switch
+        v-model:view="view"
+        :views="['cards', 'expanded-cards']"
+      />
       <NuxtLink class="flex md:inline-flex" to="/library/collections/new">
         <bl-button expand>
           <template #prependIcon="prependIcon">
@@ -13,14 +18,6 @@
           Collection
         </bl-button>
       </NuxtLink>
-      <bl-search-bar @input="onSearch" />
-
-      <div class="flex gap-3">
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
     </template>
     <div
       v-if="view === 'cards'"
