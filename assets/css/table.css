@@ -1,0 +1,33 @@
+.bl-table {
+  @apply relative w-full overflow-x-auto md:w-full;
+  table-layout: fixed;
+}
+
+.bl-table th {
+  @apply px-8 py-4 text-base;
+}
+
+.bl-table td {
+  @apply px-8 py-3 text-base;
+}
+
+.bl-table thead th {
+  @apply bg-accent-light text-left font-semibold;
+  position: sticky;
+}
+
+.bl-table thead th > span {
+  @apply flex items-center gap-3;
+}
+
+.bl-table th:first-child {
+  @apply rounded-l-lg;
+}
+
+.bl-table th:last-child {
+  @apply rounded-r-lg;
+}
+
+.bl-table td {
+  @apply border-b border-accent-light text-base;
+}

@@ -18,6 +18,7 @@ export default {
     fontFamily: {
       RadioCanada: ['Radio Canada', 'sans-serif'],
       Sarala: ['Sarala', 'sans-serif'],
+      ReemKufi: ['Reem Kufi', 'Sarala', 'sans-serif'],
     },
     extend: {
       borderRadius: {

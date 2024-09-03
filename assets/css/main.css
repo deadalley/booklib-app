@@ -1,7 +1,6 @@
-/* @/assets/css/main.css */
-
 @import url('https://fonts.googleapis.com/css2?family=Radio+Canada:ital,wght@0,300..700;1,300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Sarala:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -21,64 +20,30 @@
   }
 
   h1 {
-    @apply text-[2.986rem] font-bold;
+    @apply font-ReemKufi text-[2.986rem] font-bold;
   }
 
   h2 {
-    @apply text-[2.488rem] font-semibold;
+    @apply font-ReemKufi text-[2.488rem] font-semibold;
   }
 
   h3 {
-    @apply text-[2.074rem] font-semibold;
+    @apply font-ReemKufi text-[2.074rem] font-semibold;
   }
 
   h4 {
-    @apply text-[1.728rem] font-semibold;
+    @apply font-ReemKufi text-[1.728rem] font-semibold;
   }
 
   h5 {
-    @apply text-[1.44rem] font-medium;
+    @apply font-ReemKufi text-[1.44rem] font-medium;
   }
 
   h6 {
-    @apply text-[1.2rem] font-medium;
+    @apply font-ReemKufi text-[1.2rem] font-medium;
   }
 
   p {
     @apply font-normal text-black;
-  }
-
-  .bl-table {
-    @apply relative w-full overflow-x-auto md:w-full;
-    table-layout: fixed;
-  }
-
-  .bl-table th {
-    @apply px-8 py-4 text-base;
-  }
-
-  .bl-table td {
-    @apply px-8 py-3 text-base;
-  }
-
-  .bl-table thead th {
-    @apply bg-accent-light text-left font-semibold;
-    position: sticky;
-  }
-
-  .bl-table thead th > span {
-    @apply flex items-center gap-3;
-  }
-
-  .bl-table th:first-child {
-    @apply rounded-l-lg;
-  }
-
-  .bl-table th:last-child {
-    @apply rounded-r-lg;
-  }
-
-  .bl-table td {
-    @apply border-b border-accent-light text-base;
   }
 }
