@@ -36,6 +36,7 @@
     />
     <bl-empty-book-image
       v-if="!coverSrc && !loading"
+      :label="book.title"
       class="!lg:h-[600px] h-[400px]"
     />
   </div>

@@ -4,6 +4,7 @@
       :alt="book.title"
       :href="href"
       :cover-src="book.coverSrc"
+      :title="book.title"
       :selectable="selectable"
       :selected="book.selected"
       class="transition duration-300 ease-in-out hover:scale-110"

@@ -39,6 +39,7 @@
     "@nuxt/eslint-config": "^0.5.5",
     "@nuxtjs/supabase": "^1.4.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.2",
     "eslint": "^9.9.1",
     "eslint-plugin-tailwindcss": "^3.17.4",

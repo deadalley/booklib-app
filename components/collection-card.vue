@@ -6,6 +6,7 @@
       <template v-for="(book, index) in bookCovers" :key="book.id">
         <NuxtLink
           :to="`/library/collections/${collection.id}`"
+          class="size-full"
           :class="{
             'col-span-2': bookCovers?.length === 1,
             'row-span-2':
@@ -15,9 +16,17 @@
           }"
         >
           <NuxtImg
+            v-if="!!book.coverSrc"
             :src="book.coverSrc ?? undefined"
             :alt="book.title"
             class="size-full object-cover object-center"
+          />
+          <bl-empty-book-image
+            v-if="!book.coverSrc"
+            :alt="book.title"
+            :label="book.title!"
+            :icon-size="20"
+            class="!p-2 !text-xs"
           />
         </NuxtLink>
       </template>
@@ -39,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import { keyBy } from 'lodash'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
@@ -46,19 +56,31 @@ const props = defineProps<{
   collection: Collection
 }>()
 
+// TODO: filter by book ids and only return title
+const { data: books } = await useAsyncData<Book[]>(
+  `${props.collection.id}-bookCovers`,
+  () => $fetch('/api/books') as Promise<Book[]>,
+)
+
+const booksById = computed(() => keyBy(books.value, 'id'))
+
 const { data: bookCovers } = await useAsyncData<
   {
     id: Book['id']
     title?: Book['title']
     coverSrc: Book['coverSrc']
   }[]
->(`${props.collection.id}`, () =>
+>(`${props.collection.id}-bookCovers`, () =>
   Promise.all(
-    props.collection.books
-      .slice(0, 4)
-      .map((id) =>
-        $fetch(`/api/books/${id}/cover`).then((coverSrc) => ({ id, coverSrc })),
-      ),
+    props.collection.books.slice(0, 4).map((id) =>
+      $fetch(`/api/books/${id}/cover`)
+        .catch()
+        .then((coverSrc) => ({
+          id,
+          title: booksById.value[id]?.title,
+          coverSrc,
+        })),
+    ),
   ),
 )
 </script>

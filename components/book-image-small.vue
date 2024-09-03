@@ -1,12 +1,13 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="w-full cursor-pointer"
+    class="relative w-full cursor-pointer"
     @click="$emit('click')"
   >
     <bl-empty-book-image
       v-if="!coverSrc"
       class="!h-48 !rounded-lg !p-5"
+      :label="title"
       :class="{
         '!ring-2 !ring-main': selectable && selected,
       }"
@@ -27,6 +28,7 @@
 defineProps<{
   href?: string
   alt?: string
+  title?: string
   coverSrc?: string
   selectable?: boolean
   selected?: boolean
