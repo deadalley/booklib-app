@@ -1,6 +1,5 @@
 <template>
-  <TransitionRoot
-    :show="!!isOpen"
+  <transition
     enter="transition ease-in-out duration-300 transform"
     enter-from="translate-x-full"
     enter-to="-translate-x-0"
@@ -10,7 +9,7 @@
     as="div"
     class="absolute right-0 top-0 flex h-full flex-col gap-12 overflow-auto border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
   >
-    <div class="flex justify-between">
+    <div v-if="isOpen" class="flex justify-between">
       <h4 v-if="!!title">{{ title }}</h4>
 
       <bl-icon-button variant="tertiary" @click="onClose">
@@ -22,11 +21,10 @@
     <div>
       <slot />
     </div>
-  </TransitionRoot>
+  </transition>
 </template>
 
 <script setup lang="ts">
-import { TransitionRoot } from '@headlessui/vue'
 import { IconX } from '@tabler/icons-vue'
 
 defineProps<{ title?: string; isOpen: boolean; onClose: () => void }>()
