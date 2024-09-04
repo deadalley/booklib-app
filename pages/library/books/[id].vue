@@ -224,9 +224,11 @@ const genres = ref(book.value?.genres ?? [])
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
 const bookCollections = computed(() =>
-  collections.value
-    ?.filter(({ id }) => book.value?.collections.includes(id))
-    .sort((b1, b2) => b1.name.localeCompare(b2.name)),
+  isNew
+    ? []
+    : collections.value
+        ?.filter(({ id }) => book.value?.collections.includes(id))
+        .sort((b1, b2) => b1.name.localeCompare(b2.name)),
 )
 
 watch(book, () => {

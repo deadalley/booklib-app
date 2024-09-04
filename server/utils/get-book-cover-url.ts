@@ -6,7 +6,7 @@ import { logger } from '~/utils'
 export async function getBookCoverUrl(
   client: SupabaseClient<Database>,
   userId: string,
-  bookId: BookDB['id'],
+  bookId: string | number,
 ): Promise<string | undefined> {
   try {
     const { data, error } = await client.storage

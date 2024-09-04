@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const formData = await readFormData(event)
 
-  const fileName = (formData.get('img') as File).name
+  const bookId = (formData.get('bookId') as File).name
 
   if (!user?.id) {
     throw createError('Unauthenticated')
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     try {
       const { error } = await client.storage
         .from(`book-covers/${user.id}`)
-        .upload(fileName, formData, {
+        .upload(bookId, formData, {
           cacheControl: '3600',
           upsert: true,
         })
@@ -26,8 +26,7 @@ export default defineEventHandler(async (event) => {
         throw createError(error.message)
       }
 
-      // TODO: check
-      return getBookCoverUrl(client, user.id, 0)
+      return getBookCoverUrl(client, user.id, bookId)
     } catch (error) {
       throw createError(error as Error)
     }

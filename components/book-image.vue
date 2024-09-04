@@ -71,11 +71,11 @@ async function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement)?.files?.[0] as File
 
   const formData = new FormData()
-  formData.append('img', file, `${props.book.id ?? props.tempCoverSrc}`)
+  formData.append('bookId', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
     const newCoverSrc = await $fetch(
-      `/api/books/${props.book?.id ?? props.tempCoverSrc}/cover`,
+      `/api/books/${props.book.id ?? props.tempCoverSrc}/cover`,
       {
         method: 'post',
         body: formData,
