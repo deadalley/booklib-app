@@ -165,11 +165,21 @@
         <section class="book-section">
           <div class="flex gap-3">
             <h4>Collections</h4>
-            <bl-button compact variant="secondary" @click="onManageCollections"
-              >Manage</bl-button
+            <bl-button compact variant="secondary" @click="onManageCollections">
+              Manage</bl-button
             >
           </div>
           <div
+            v-if="!bookCollections.length"
+            class="flex max-w-screen-md flex-col items-center gap-3"
+          >
+            <p>This book is not assigned any collections.</p>
+            <bl-button @click="onManageCollections"
+              >Add book to collections</bl-button
+            >
+          </div>
+          <div
+            v-if="!!bookCollections.length"
             class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
           >
             <bl-collection-card
@@ -224,10 +234,10 @@ const genres = ref(book.value?.genres ?? [])
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
 const bookCollections = computed(() =>
-  isNew
+  isNew || !collections.value
     ? []
     : collections.value
-        ?.filter(({ id }) => book.value?.collections.includes(id))
+        .filter(({ id }) => book.value?.collections.includes(id))
         .sort((b1, b2) => b1.name.localeCompare(b2.name)),
 )
 
