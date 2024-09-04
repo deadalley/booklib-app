@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)
 
-  const { data } = await client.from('books').select('*')
+  const { data } = await client.from('books').select('*, collections(id)')
 
   let bookCovers: (string | undefined)[] = []
   if (!user?.id) {
@@ -18,6 +18,6 @@ export default defineEventHandler(async (event) => {
   }
 
   return data?.map((b, index) =>
-    dbBookToBook({ ...b, cover_src: bookCovers[index] ?? null }),
+    dbBookToBook({ ...b, cover_src: bookCovers[index] ?? null }, b.collections),
   )
 })

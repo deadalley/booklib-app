@@ -3,7 +3,10 @@ import type { BookDB, CollectionDB } from '~/types/database'
 import languageOptions from '../public/languages-2.json'
 import type { Collection } from '~/types/collection'
 
-export function dbBookToBook(dbBook: BookDB): Book {
+export function dbBookToBook(
+  dbBook: BookDB,
+  collections: Pick<CollectionDB, 'id'>[],
+): Book {
   return {
     id: dbBook.id ?? undefined,
     title: dbBook.title ?? undefined,
@@ -19,6 +22,7 @@ export function dbBookToBook(dbBook: BookDB): Book {
     summary: dbBook.summary ?? undefined,
     year: dbBook.year ?? undefined,
     genres: dbBook.genres ?? [],
+    collections: collections.map(({ id }) => id),
   }
 }
 

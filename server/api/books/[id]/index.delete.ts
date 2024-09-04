@@ -18,7 +18,7 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
     }
 
     if (data) {
-      return dbBookToBook(data[0])
+      return dbBookToBook(data[0], [])
     }
   }
 })

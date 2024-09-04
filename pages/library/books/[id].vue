@@ -172,6 +172,18 @@
             />
           </div>
         </section>
+        <section class="book-section">
+          <h4>Collections</h4>
+          <div
+            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+          >
+            <bl-collection-card
+              v-for="collection in bookCollections"
+              :key="collection.id"
+              :collection="collection"
+            />
+          </div>
+        </section>
         <section v-if="!isNew" class="book-section">
           <h5>Delete book</h5>
           <div class="flex justify-between gap-3">
@@ -200,6 +212,7 @@
 import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book } from '~/types/book'
+import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 
 const route = useRoute()
@@ -212,6 +225,14 @@ const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const genres = ref(book.value?.genres ?? [])
+
+const { data: collections } = await useFetch<Collection[]>('/api/collections')
+
+const bookCollections = computed(() =>
+  collections.value
+    ?.filter(({ id }) => book.value?.collections.includes(id))
+    .sort((b1, b2) => b1.name.localeCompare(b2.name)),
+)
 
 watch(book, () => {
   genres.value = book.value?.genres ?? []

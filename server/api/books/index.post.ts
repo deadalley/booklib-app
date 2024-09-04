@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
         onConflict: 'id',
         defaultToNull: true,
       })
-      .select('*')
+      .select('*, collections(id)')
 
     if (error) {
       logger.error(error)
@@ -35,6 +35,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    return dbBookToBook(data[0])
+    return dbBookToBook(data[0], data[0].collections)
   }
 })

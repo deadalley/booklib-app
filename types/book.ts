@@ -1,3 +1,5 @@
+import type { Collection } from './collection'
+
 export type Book = {
   id: number
   title: string
@@ -13,4 +15,5 @@ export type Book = {
   summary?: string
   year?: number
   genres?: string[]
+  collections: Collection['id'][]
 }

@@ -16,7 +16,10 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
   if (!id) {
     throw createError('No id provided')
   } else {
-    const { data, error } = await client.from('books').select('*').eq('id', id)
+    const { data, error } = await client
+      .from('books')
+      .select('*, collections(id)')
+      .eq('id', id)
 
     if (error) {
       throw createError(error.message)
@@ -25,7 +28,10 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
     const coverSrc = await getBookCoverUrl(client, user?.id, data[0].id)
 
     if (data) {
-      return dbBookToBook({ ...data[0], cover_src: coverSrc ?? '' })
+      return dbBookToBook(
+        { ...data[0], cover_src: coverSrc ?? '' },
+        data[0].collections,
+      )
     }
   }
 })
