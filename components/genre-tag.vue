@@ -33,10 +33,11 @@
   </div>
   <div
     v-if="newGenre && !editing"
-    class="flex aspect-square h-[35px] cursor-pointer items-center justify-center rounded-full bg-main py-2 text-white hover:bg-main/90"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-lg bg-main px-4 py-2 text-base text-white"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />
+    Add genre
   </div>
 </template>
 

@@ -2,7 +2,7 @@
   <div v-if="!editing" class="formkit-wrapper flex-1">
     <label class="formkit-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel">{{ displayValue }}</h5>
-    <p v-if="!inputModel" class="text-black">Empty</p>
+    <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
   <FormKit
     v-if="editing"
@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconCircleOff } from '@tabler/icons-vue'
 import { useFormKitContext } from '@formkit/vue'
 
 const attrs = useAttrs()

@@ -28,21 +28,14 @@
         :book="book"
         :temp-cover-src="tempCoverSrc"
       />
-      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[4]">
-        <section v-if="!editing" class="book-section">
-          <bl-input id="id" type="hidden" name="id" />
-          <div class="col-span-12 flex w-full justify-between">
-            <h4>Summary</h4>
+      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[8]">
+        <section class="book-section max-w-screen-md">
+          <div class="flex gap-3">
+            <h4>Overview</h4>
             <bl-button compact variant="secondary" @click="onEdit(true)"
               >Edit</bl-button
             >
           </div>
-          <p class="col-span-12 text-black">
-            {{ book?.summary ?? 'No summary available' }}
-          </p>
-        </section>
-        <section class="book-section">
-          <h4>Overview</h4>
           <ClientOnly>
             <FormKit
               type="form"
@@ -149,10 +142,7 @@
               </div>
             </FormKit>
           </ClientOnly>
-        </section>
-        <section class="book-section">
-          <h4>Genres</h4>
-          <div class="flex flex-wrap gap-3">
+          <div class="mt-5 flex flex-wrap gap-3">
             <bl-genre-tag
               v-for="(genre, index) in genres"
               :key="genre"
@@ -173,7 +163,12 @@
           </div>
         </section>
         <section class="book-section">
-          <h4>Collections</h4>
+          <div class="flex gap-3">
+            <h4>Collections</h4>
+            <bl-button compact variant="secondary" @click="onManageCollections"
+              >Manage</bl-button
+            >
+          </div>
           <div
             class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
           >
@@ -264,6 +259,8 @@ async function deleteBook() {
 
   navigateTo('/library/books')
 }
+
+function onManageCollections() {}
 
 function onEdit(value: boolean) {
   editing.value = value
