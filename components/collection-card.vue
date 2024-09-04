@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-start gap-3">
     <div
-      class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-lg transition duration-300 ease-in-out hover:scale-110"
+      class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-xl transition duration-300 ease-in-out hover:scale-110"
     >
       <template v-for="(book, index) in books" :key="book.id">
         <NuxtLink
@@ -26,7 +26,7 @@
             :alt="book.title"
             :label="book.title!"
             :icon-size="20"
-            class="!p-2 !text-xs"
+            class="!rounded-none !p-2 !text-xs"
           />
         </NuxtLink>
       </template>

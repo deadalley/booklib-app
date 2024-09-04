@@ -3,7 +3,7 @@
     class="relative flex size-full flex-col gap-8 overflow-hidden"
     v-bind="$attrs"
   >
-    <div class="flex flex-col justify-between gap-5 lg:flex-row">
+    <div class="flex flex-col items-baseline justify-between gap-5 lg:flex-row">
       <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
           <h3>{{ title }}</h3>

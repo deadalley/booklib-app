@@ -1,6 +1,6 @@
 <template>
   <div
-    class="size-full rounded-lg bg-accent-light p-10 text-lg"
+    class="size-full rounded-xl bg-accent-light p-10 text-lg"
     v-bind="$attrs"
   >
     <div

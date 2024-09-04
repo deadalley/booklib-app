@@ -7,7 +7,7 @@
       :title="book.title"
       :selectable="selectable"
       :selected="book.selected"
-      class="transition duration-300 ease-in-out hover:scale-110"
+      class="!w-6/12 transition duration-300 ease-in-out hover:scale-110"
       @click="onSelect"
     />
     <div class="w-full flex-col">

@@ -2,7 +2,7 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-lg bg-main px-4 py-2 text-base text-white"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white"
     :class="{
       'cursor-pointer hover:bg-main/90': !!attrs.onClick,
       'bg-main-dark': !!selected,
@@ -33,7 +33,7 @@
   </div>
   <div
     v-if="newGenre && !editing"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-lg bg-main px-4 py-2 text-base text-white"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />

@@ -25,7 +25,7 @@
   }
 
   .formkit-inner {
-    @apply flex h-min w-full items-center gap-3 rounded-lg border border-accent bg-white px-5 py-3 text-base outline-none transition-all duration-100 ease-in placeholder:text-accent;
+    @apply flex h-min w-full items-center gap-3 rounded-xl border border-accent bg-white px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in placeholder:text-accent;
   }
 
   select.formkit-input {
