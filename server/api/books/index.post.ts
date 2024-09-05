@@ -37,7 +37,6 @@ export default defineEventHandler(async (event) => {
 
     const bookId = data?.[0].id ?? book.id
 
-    console.log({ bookId, c: book.collections })
     const { error: deleteBookCollectionError } = await client
       .from('collection-book')
       .delete()

@@ -321,7 +321,6 @@ function onSelectCollection({
   collectionId: Collection['id']
   selected: boolean
 }) {
-  console.log({ collectionId, selected })
   allCollections.value = allCollections.value.map((collection) =>
     collection.id === collectionId
       ? { ...collection, selected: selected }
