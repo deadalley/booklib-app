@@ -5,11 +5,13 @@
     :total="collections?.length ?? 0"
   >
     <template #navbar>
-      <bl-search-bar @input="onSearch" />
-      <bl-view-switch
-        v-model:view="view"
-        :views="['cards', 'expanded-cards']"
-      />
+      <div class="flex w-full items-start gap-3 xl:flex-row">
+        <bl-search-bar @input="onSearch" />
+        <bl-view-switch
+          v-model:view="view"
+          :views="['cards', 'expanded-cards']"
+        />
+      </div>
       <NuxtLink class="flex md:inline-flex" to="/library/collections/new">
         <bl-button expand>
           <template #prependIcon="prependIcon">
@@ -29,8 +31,8 @@
         :collection="collection"
       />
     </div>
-    <div class="h-full overflow-y-auto">
-      <div v-if="view === 'expanded-cards'" class="flex flex-col">
+    <div v-if="view === 'expanded-cards'" class="h-full overflow-y-auto">
+      <div class="flex flex-col">
         <bl-expanded-collection
           v-for="collection in sortedCollections"
           :key="collection.id"

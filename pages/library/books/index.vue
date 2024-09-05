@@ -6,21 +6,21 @@
     :sidebar-content="sidebarContent"
   >
     <template #navbar>
-      <div class="flex gap-3">
+      <div class="flex w-full items-start gap-3 xl:flex-row">
         <bl-search-bar @input="onSearch" />
         <bl-button expand variant="secondary" @click="onFilterOpen">
           Filter {{ filterCount ? `(${filterCount})` : '' }}
         </bl-button>
         <bl-view-switch v-model:view="view" />
-        <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-          <bl-button expand>
-            <template #prependIcon="prependIcon">
-              <IconPlus v-bind="prependIcon" />
-            </template>
-            Book
-          </bl-button>
-        </NuxtLink>
       </div>
+      <NuxtLink class="flex md:inline-flex" to="/library/books/new">
+        <bl-button expand>
+          <template #prependIcon="prependIcon">
+            <IconPlus v-bind="prependIcon" />
+          </template>
+          Book
+        </bl-button>
+      </NuxtLink>
     </template>
     <bl-books-views
       :view="view"

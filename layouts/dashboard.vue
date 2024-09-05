@@ -1,9 +1,9 @@
 <template>
-  <div class="flex h-screen">
+  <div class="relative flex h-screen w-screen">
     <aside class="hidden h-full w-min md:block md:w-[255px]">
       <bl-nav-sidebar />
     </aside>
-    <main class="flex h-screen flex-1 flex-col">
+    <main class="relative flex h-screen w-1/2 flex-1 flex-col">
       <nav class="flex items-center gap-16 border-b border-b-accent px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
           <h5>{{ title }}</h5>
@@ -28,7 +28,7 @@
         </div>
       </nav>
       <div
-        class="relative flex w-screen flex-1 flex-col overflow-auto p-16 pt-10 md:w-[unset]"
+        class="relative flex w-full flex-1 flex-col overflow-auto p-16 pt-10"
       >
         <slot />
         <NuxtLoadingIndicator color="#985858" />

@@ -4,7 +4,7 @@
     default-value="items"
     type="single"
     :collapsible="true"
-    class="w-full"
+    class="!w-[calc(100% - 255px)]"
   >
     <AccordionItem value="items">
       <AccordionHeader as="div" class="flex w-full">
@@ -27,15 +27,17 @@
           />
         </AccordionTrigger>
       </AccordionHeader>
-      <AccordionContent
-        class="accordion-content flex h-max gap-x-6 overflow-x-auto p-4 transition duration-100 ease-out"
-      >
-        <bl-book-card
-          v-for="book in books"
-          :key="book.title"
-          :book="book"
-          class="w-1/12"
-        />
+      <AccordionContent class="relative overflow-x-auto">
+        <div
+          class="accordion-content relative flex h-max w-max gap-x-6 p-4 transition duration-100 ease-out"
+        >
+          <bl-book-card
+            v-for="book in books"
+            :key="book.title"
+            :book="book"
+            class="!w-36"
+          />
+        </div>
       </AccordionContent>
     </AccordionItem>
   </AccordionRoot>

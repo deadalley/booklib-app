@@ -1,10 +1,12 @@
 <template>
   <div
     v-if="book"
-    class="flex flex-1 flex-col gap-10 lg:w-9/12 lg:overflow-auto"
+    class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
   >
     <header class="flex flex-col gap-2">
-      <div class="flex items-end justify-between gap-3">
+      <div
+        class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
+      >
         <div class="flex gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Book' : book.title }}
@@ -17,24 +19,26 @@
         </div>
         <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
           <p>Added on</p>
-          <h6>{{ formattedDate }}</h6>
+          <h6 class="w-max">{{ formattedDate }}</h6>
         </div>
       </div>
       <!-- <h5>{{ book.author }}</h5> -->
     </header>
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
-      <bl-book-image
-        :editing="true"
-        :book="book"
-        :temp-cover-src="tempCoverSrc"
-      />
-      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[8]">
+      <div class="lg:w-80">
+        <bl-book-image
+          :editing="true"
+          :book="book"
+          :temp-cover-src="tempCoverSrc"
+        />
+      </div>
+      <div class="flex flex-1 flex-col gap-16 overflow-y-auto">
         <section class="book-section max-w-screen-md">
           <div class="flex gap-3">
             <h4>Overview</h4>
-            <bl-button compact variant="secondary" @click="onEdit(true)"
-              >Edit</bl-button
-            >
+            <bl-button compact variant="secondary" @click="onEdit(true)">
+              Edit
+            </bl-button>
           </div>
           <ClientOnly>
             <FormKit
@@ -133,9 +137,9 @@
                 </div>
               </div>
               <div v-if="editing" class="flex justify-end gap-2">
-                <bl-button compact variant="secondary" @click="onCancel"
-                  >Discard</bl-button
-                >
+                <bl-button compact variant="secondary" @click="onCancel">
+                  Discard
+                </bl-button>
                 <FormKit type="submit">
                   <bl-button type="submit" compact>Save</bl-button>
                 </FormKit>
@@ -199,7 +203,7 @@
           </div>
           <div
             v-if="!!collectionsDisplayed.length"
-            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto px-1 pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
+            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto px-1 pt-1 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8"
           >
             <bl-collection-card
               v-for="collection in collectionsDisplayed"

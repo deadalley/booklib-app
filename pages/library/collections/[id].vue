@@ -1,37 +1,62 @@
 <template>
   <div
     v-if="collection"
-    class="flex flex-1 flex-col gap-10 lg:w-9/12 lg:overflow-auto"
+    class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
   >
     <header class="flex flex-col gap-2">
-      <div class="flex items-end justify-between gap-3">
+      <div
+        class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
+      >
         <div class="flex gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
         </div>
-        <div v-if="!isNew" class="flex items-end gap-3">
-          <bl-button v-if="!editing" variant="secondary" @click="onEdit(true)"
-            >Edit</bl-button
+        <div
+          v-if="!isNew"
+          class="flex flex-col items-start gap-3 md:flex-row md:items-end"
+        >
+          <div
+            class="flex w-full flex-col items-start gap-3 md:flex-row md:items-end"
           >
-          <bl-button
-            v-if="!managingBooks"
-            variant="secondary"
-            @click="managingBooks = true"
-            >Manage books</bl-button
+            <bl-button
+              v-if="!editing"
+              variant="secondary"
+              @click="onEdit(true)"
+              class="w-full"
+            >
+              Edit
+            </bl-button>
+            <bl-button
+              v-if="!managingBooks"
+              variant="secondary"
+              @click="managingBooks = true"
+              class="w-full"
+            >
+              Manage books
+            </bl-button>
+            <bl-button
+              v-if="managingBooks"
+              variant="secondary"
+              @click="onCancelBooks"
+              class="w-full"
+            >
+              Cancel
+            </bl-button>
+            <bl-button
+              v-if="managingBooks"
+              variant="primary"
+              @click="onSaveBooks"
+              class="w-full"
+            >
+              Save
+            </bl-button>
+          </div>
+          <div
+            class="order-0 flex flex-col justify-end leading-tight md:order-3"
           >
-          <bl-button
-            v-if="managingBooks"
-            variant="secondary"
-            @click="onCancelBooks"
-            >Cancel</bl-button
-          >
-          <bl-button v-if="managingBooks" variant="primary" @click="onSaveBooks"
-            >Save</bl-button
-          >
-          <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
-            <h6>{{ formattedDate }}</h6>
+            <h6 class="w-max">{{ formattedDate }}</h6>
           </div>
         </div>
       </div>

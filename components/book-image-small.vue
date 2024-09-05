@@ -6,7 +6,7 @@
   >
     <bl-empty-book-image
       v-if="!coverSrc"
-      class="!h-48 !rounded-xl !p-5"
+      class="!h-48 !p-5"
       :label="title"
       :class="{
         '!ring-2 !ring-main': selectable && selected,

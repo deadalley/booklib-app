@@ -4,7 +4,7 @@
     v-bind="$attrs"
   >
     <div class="flex flex-col items-baseline justify-between gap-5 lg:flex-row">
-      <div class="flex items-baseline gap-3 lg:flex-col xl:flex-row">
+      <div class="flex w-full items-baseline gap-3 lg:flex-col xl:flex-row">
         <NuxtLink to="/library/books">
           <h3>{{ title }}</h3>
         </NuxtLink>
@@ -13,7 +13,7 @@
         </h6>
       </div>
       <div
-        class="flex flex-1 flex-col justify-end gap-3 transition-all duration-300 ease-in-out lg:flex-row"
+        class="flex w-full flex-1 flex-col justify-end gap-3 transition-all duration-300 ease-in-out lg:flex-row"
         :class="{ 'md:mr-[355px]': !!sidebarContent }"
       >
         <slot name="navbar" />
