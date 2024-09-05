@@ -147,6 +147,7 @@
               v-for="(genre, index) in genres"
               :key="genre"
               removable
+              editable
               :value="genre"
               :index="index"
               :on-commit="onSubmitGenre"

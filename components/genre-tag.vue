@@ -2,10 +2,12 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-2 text-base"
     :class="{
       'cursor-pointer hover:bg-main/90': !!attrs.onClick,
       'bg-main-dark': !!selected,
+      'bg-white text-main ring-1 ring-inset ring-main': editing,
+      'bg-main text-white': !editing,
     }"
     @click="onClick"
     @mouseenter="setHovered(true)"
@@ -13,10 +15,16 @@
     @keydown.enter="_onCommit"
     @keydown.escape="onCancel"
   >
-    <span ref="inputRef" :contenteditable="editing" @input="onChange">{{
-      initialContent
-    }}</span>
-    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-white" />
+    <span v-if="!editing">{{ initialContent }}</span>
+    <input
+      ref="genre-input"
+      v-model="content"
+      class="max-w-24 text-black"
+      :class="{
+        'w-0 opacity-0': !editing,
+      }"
+    />
+    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-main" />
     <IconCircleXFilled
       v-if="!loading && removable && hovered"
       :size="18"
@@ -33,7 +41,7 @@
   </div>
   <div
     v-if="newGenre && !editing"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white hover:bg-main/90"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />
@@ -42,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+import { useTemplateRef } from 'vue'
 import { IconCircleXFilled, IconPlus, IconTagFilled } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
@@ -61,29 +70,26 @@ const props = defineProps<{
 const loading = ref(false)
 const hovered = ref(false)
 const editing = ref(false)
-const focused = ref(false)
 const target = ref(null)
-const inputRef = ref<HTMLSpanElement | null>(null)
 const initialContent = ref(props.value)
 const content = ref(props.value)
 
+const inputRef = useTemplateRef('genre-input')
+
 onClickOutside(target, () => {
-  if (props.editable && focused.value) {
+  if (props.editable) {
     onCancel()
   }
 })
 
 function onCancel() {
-  focused.value = false
   inputRef.value?.blur()
   editing.value = false
-  initialContent.value = undefined
-  content.value = undefined
+  content.value = initialContent.value
 }
 
 async function _onCommit() {
   loading.value = true
-  focused.value = false
   inputRef.value?.blur()
 
   await props.onCommit?.(content.value, props.index)
@@ -97,7 +103,9 @@ async function _onCommit() {
   }
 }
 
-async function _onRemove() {
+async function _onRemove(event: Event) {
+  event.preventDefault()
+  event.stopPropagation()
   loading.value = true
   await props.onRemove?.(props.index)
   loading.value = false
@@ -105,9 +113,8 @@ async function _onRemove() {
 
 function onNew() {
   editing.value = true
-  content.value = 'New Genre'
-  initialContent.value = 'New Genre'
-  focused.value = true
+  content.value = 'New genre'
+  initialContent.value = 'New genre'
   inputRef.value?.focus()
 }
 
@@ -116,15 +123,9 @@ function onClick() {
   attrs.onClick?.()
 
   if (props.editable) {
-    focused.value = true
     editing.value = true
     inputRef.value?.focus()
   }
-}
-
-function onChange($event: Event) {
-  const value = ($event.target as HTMLSpanElement)?.innerHTML
-  content.value = value
 }
 
 function setHovered(value: boolean) {
