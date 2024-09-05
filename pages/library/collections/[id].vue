@@ -101,18 +101,24 @@
               Are you sure you want to delete this collection? This action
               cannot be undone.
             </p>
-            <bl-button compact @click="openDeleteModal">Delete</bl-button>
-          </div>
-          <bl-modal ref="deleteModalRef" :on-confirm="deleteCollection">
-            <template #title
-              >Are you sure you want to delete
-              <strong>{{ collection.name }}</strong
-              >?</template
+            <bl-modal
+              ref="deleteModalRef"
+              :on-confirm="deleteCollection"
+              size="sm"
             >
-            This action cannot be undone.
-            <template #cancel-label> Cancel </template>
-            <template #action-label> Delete </template>
-          </bl-modal>
+              <template #trigger>
+                <bl-button compact @click="openDeleteModal">Delete</bl-button>
+              </template>
+              <template #title
+                >Are you sure you want to delete
+                <strong>{{ collection.name }}</strong
+                >?</template
+              >
+              This action cannot be undone.
+              <template #cancel-label> Cancel </template>
+              <template #action-label> Delete </template>
+            </bl-modal>
+          </div>
         </section>
       </div>
     </div>

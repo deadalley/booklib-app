@@ -9,9 +9,16 @@
         class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-black"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none"
+        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-white p-[25px] focus:outline-none"
+        :class="{
+          'max-w-screen-sm': size === 'sm',
+          'max-w-screen-md': size === 'md',
+          'max-w-screen-lg': size === 'lg',
+          'max-w-screen-xl': size === 'xl',
+          'max-w-screen-2xl': size === '2xl',
+        }"
       >
-        <DialogTitle as="div" class="flex w-full items-end justify-center">
+        <DialogTitle as="div" class="items-top flex w-full items-start">
           <h4 class="flex-1">
             <slot name="title" />
           </h4>
@@ -60,10 +67,14 @@ import {
 } from 'radix-vue'
 import { IconX } from '@tabler/icons-vue'
 
-const props = defineProps<{
-  onCancel?: () => void
-  onConfirm?: () => void
-}>()
+const props = withDefaults(
+  defineProps<{
+    size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    onCancel?: () => void
+    onConfirm?: () => void
+  }>(),
+  { size: 'lg' },
+)
 
 const isOpen = ref(false)
 

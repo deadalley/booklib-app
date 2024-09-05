@@ -217,17 +217,20 @@
               Are you sure you want to delete this book? This action cannot be
               undone.
             </p>
-            <bl-button compact @click="openDeleteModal">Delete</bl-button>
+            <bl-modal ref="deleteModalRef" :on-confirm="deleteBook" size="sm">
+              <template #trigger>
+                <bl-button compact @click="openDeleteModal">Delete</bl-button>
+              </template>
+              <template #title
+                >Are you sure you want to delete
+                <strong>{{ book.title }}</strong
+                >?</template
+              >
+              This action cannot be undone.
+              <template #cancel-label> Cancel </template>
+              <template #action-label> Delete </template>
+            </bl-modal>
           </div>
-          <bl-modal ref="deleteModalRef" :on-confirm="deleteBook">
-            <template #title
-              >Are you sure you want to delete <strong>{{ book.title }}</strong
-              >?</template
-            >
-            This action cannot be undone.
-            <template #cancel-label> Cancel </template>
-            <template #action-label> Delete </template>
-          </bl-modal>
         </section>
       </div>
     </div>
