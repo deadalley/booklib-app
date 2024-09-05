@@ -35,6 +35,35 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    const bookId = data?.[0].id ?? book.id
+
+    console.log({ bookId, c: book.collections })
+    const { error: deleteBookCollectionError } = await client
+      .from('collection-book')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('book_id', bookId)
+
+    if (deleteBookCollectionError) {
+      logger.error(deleteBookCollectionError)
+      throw createError({ statusMessage: deleteBookCollectionError.message })
+    }
+
+    const { error: bookCollectionError } = await client
+      .from('collection-book')
+      .insert(
+        book.collections.map((collectionId) => ({
+          book_id: bookId,
+          collection_id: collectionId,
+          user_id: user.id,
+        })),
+      )
+
+    if (bookCollectionError) {
+      logger.error(bookCollectionError)
+      throw createError({ statusMessage: bookCollectionError.message })
+    }
+
     return dbBookToBook(data[0], data[0].collections)
   }
 })

@@ -13,7 +13,7 @@
       :book="book"
       :selectable="selectable"
       :selected="book.selected"
-      @selected="(selected) => onSelectBook(book.id, selected)"
+      @selected="(selected: boolean) => onSelectBook(book.id, selected)"
     />
   </div>
   <div v-if="view === 'table'" class="overflow-x-auto">

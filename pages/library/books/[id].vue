@@ -165,12 +165,30 @@
         <section class="book-section">
           <div class="flex gap-3">
             <h4>Collections</h4>
-            <bl-button compact variant="secondary" @click="onManageCollections">
-              Manage</bl-button
+            <bl-button
+              v-if="!managingCollections"
+              variant="secondary"
+              @click="managingCollections = true"
             >
+              Manage
+            </bl-button>
+            <bl-button
+              v-if="managingCollections"
+              variant="secondary"
+              @click="managingCollections = false"
+            >
+              Cancel
+            </bl-button>
+            <bl-button
+              v-if="managingCollections"
+              variant="primary"
+              @click="onSaveCollections"
+            >
+              Save
+            </bl-button>
           </div>
           <div
-            v-if="!bookCollections.length"
+            v-if="!collectionsDisplayed.length"
             class="flex max-w-screen-md flex-col items-center gap-3"
           >
             <p>This book is not assigned any collections.</p>
@@ -179,13 +197,15 @@
             >
           </div>
           <div
-            v-if="!!bookCollections.length"
-            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+            v-if="!!collectionsDisplayed.length"
+            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto px-1 pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
           >
             <bl-collection-card
-              v-for="collection in bookCollections"
+              v-for="collection in collectionsDisplayed"
               :key="collection.id"
               :collection="collection"
+              :selectable="managingCollections"
+              @select="onSelectCollection"
             />
           </div>
         </section>
@@ -224,22 +244,22 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
+const managingCollections = ref(false)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const genres = ref(book.value?.genres ?? [])
+const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
-const bookCollections = computed(() =>
-  isNew || !collections.value
-    ? []
-    : collections.value
-        .filter(({ id }) => book.value?.collections.includes(id))
-        .sort((b1, b2) => b1.name.localeCompare(b2.name)),
-)
+const collectionsDisplayed = computed(() => {
+  return managingCollections.value
+    ? allCollections.value
+    : allCollections.value.filter((collection) => collection.selected)
+})
 
 watch(book, () => {
   genres.value = book.value?.genres ?? []
@@ -262,6 +282,12 @@ async function fetchBook() {
     book.value = data
     loading.value = false
   }
+  allCollections.value = (collections.value ?? [])
+    .map((collection) => ({
+      ...collection,
+      selected: !!book.value?.collections.includes(collection.id),
+    }))
+    .sort((b1, b2) => b1.name.localeCompare(b2.name))
 }
 
 async function deleteBook() {
@@ -272,7 +298,9 @@ async function deleteBook() {
   navigateTo('/library/books')
 }
 
-function onManageCollections() {}
+function onManageCollections() {
+  managingCollections.value = true
+}
 
 function onEdit(value: boolean) {
   editing.value = value
@@ -286,12 +314,37 @@ function onCancel() {
   }
 }
 
+function onSelectCollection({
+  collectionId,
+  selected,
+}: {
+  collectionId: Collection['id']
+  selected: boolean
+}) {
+  console.log({ collectionId, selected })
+  allCollections.value = allCollections.value.map((collection) =>
+    collection.id === collectionId
+      ? { ...collection, selected: selected }
+      : collection,
+  )
+}
+
+async function onSaveCollections() {
+  if (book.value) {
+    await onSubmit(book.value)
+    managingCollections.value = false
+  }
+}
+
 async function onSubmit(book: Book) {
   try {
     const updatedBook = await $fetch<Book>('/api/books', {
       method: 'post',
       body: {
         ...book,
+        collections: allCollections.value
+          .filter(({ selected }) => !!selected)
+          .map(({ id }) => id),
         tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
       },
     })

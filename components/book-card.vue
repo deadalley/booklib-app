@@ -7,11 +7,11 @@
       :title="book.title"
       :selectable="selectable"
       :selected="book.selected"
-      class="!w-6/12 transition duration-300 ease-in-out hover:scale-110"
+      class="transition duration-300 ease-in-out hover:scale-110"
       @click="onSelect"
     />
     <div class="w-full flex-col">
-      <NuxtLink :to="href">
+      <NuxtLink :to="selectable ? undefined : href">
         <h5
           class="overflow-hidden"
           :style="{

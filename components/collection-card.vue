@@ -2,10 +2,14 @@
   <div class="flex flex-col items-start gap-3">
     <div
       class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-xl transition duration-300 ease-in-out hover:scale-110"
+      :class="{
+        '!ring-2 !ring-main': selectable && collection.selected,
+      }"
+      @click="onSelect"
     >
       <template v-for="(book, index) in books" :key="book.id">
         <NuxtLink
-          :to="`/library/collections/${collection.id}`"
+          :to="selectable ? undefined : `/library/collections/${collection.id}`"
           class="size-full"
           :class="{
             'col-span-2': books?.length === 1,
@@ -32,13 +36,15 @@
       </template>
       <bl-book-image-small
         v-if="!books?.length"
-        :href="`/library/collections/${collection.id}`"
+        :href="selectable ? undefined : `/library/collections/${collection.id}`"
         :alt="collection.name"
         class="col-span-2 row-span-2"
       />
     </div>
     <div class="w-full flex-col">
-      <NuxtLink :to="`/library/collections/${collection.id}`">
+      <NuxtLink
+        :to="selectable ? undefined : `/library/collections/${collection.id}`"
+      >
         <h5
           class="overflow-hidden"
           :style="{
@@ -59,7 +65,8 @@ import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 const props = defineProps<{
-  collection: Collection
+  collection: Collection & { selected?: boolean }
+  selectable?: boolean
 }>()
 
 const { data: books, refresh } = await useAsyncData(
@@ -80,4 +87,15 @@ const { data: books, refresh } = await useAsyncData(
 )
 
 onMounted(refresh)
+
+const emit = defineEmits(['select'])
+
+function onSelect() {
+  if (props.selectable) {
+    emit('select', {
+      collectionId: props.collection.id,
+      selected: !props.collection.selected,
+    })
+  }
+}
 </script>
