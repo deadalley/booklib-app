@@ -93,7 +93,7 @@ const props = defineProps<{
 
 const route = useRoute()
 
-const isTableView = ref(route.query.view === 'table')
+const isTableView = computed(() => route.query.view === 'table')
 
 const emit = defineEmits([
   'update:selectedPublishers',
