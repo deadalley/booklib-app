@@ -6,15 +6,21 @@ export function getUniqueElements<
 >(elements: T[], key: K): Exclude<T[K], null | undefined>[] {
   return elements
     .reduce<T[K][]>((uniqueKeys, element) => {
-      const value = element[key]
-
-      if (Array.isArray(value)) {
-        value.forEach((v) => {
-          uniqueKeys.push(v)
+      if (Array.isArray(element[key])) {
+        element[key].forEach((value) => {
+          if (
+            !uniqueKeys.map(standardizeValue).includes(standardizeValue(value))
+          ) {
+            uniqueKeys.push(value)
+          }
         })
       } else {
-        if (!uniqueKeys.includes(value)) {
-          uniqueKeys.push(value)
+        if (
+          !uniqueKeys
+            .map(standardizeValue)
+            .includes(standardizeValue(element[key]))
+        ) {
+          uniqueKeys.push(element[key])
         }
       }
 
@@ -76,4 +82,8 @@ export function mergeAndFilter<T extends object, K extends keyof T>(
   ...elements: T[][]
 ) {
   return uniqBy(flatten(elements), key)
+}
+
+function standardizeValue<K>(value: K) {
+  return typeof value === 'string' ? (value.trim().toLowerCase() as K) : value
 }
