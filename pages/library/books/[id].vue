@@ -167,7 +167,7 @@
             />
           </div>
         </section>
-        <section class="book-section">
+        <section class="book-section overflow-hidden">
           <div class="flex gap-3">
             <h4>Collections</h4>
             <bl-button
@@ -203,7 +203,7 @@
           </div>
           <div
             v-if="!!collectionsDisplayed.length"
-            class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto px-1 pt-1 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8"
+            class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
           >
             <bl-collection-card
               v-for="collection in collectionsDisplayed"

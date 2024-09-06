@@ -14,47 +14,49 @@
         </div>
         <div
           v-if="!isNew"
-          class="flex flex-col items-start gap-3 md:flex-row md:items-end"
+          class="flex w-full flex-col items-start gap-3 md:w-[unset] md:flex-row md:items-end"
         >
           <div
-            class="flex w-full flex-col items-start gap-3 md:flex-row md:items-end"
+            class="order-3 flex w-full flex-col items-start gap-3 md:order-[0] md:flex-row md:items-end"
           >
             <bl-button
               v-if="!editing"
               variant="secondary"
-              @click="onEdit(true)"
               class="w-full"
+              @click="onEdit(true)"
             >
               Edit
             </bl-button>
-            <bl-button
-              v-if="!managingBooks"
-              variant="secondary"
-              @click="managingBooks = true"
-              class="w-full"
-            >
-              Manage books
-            </bl-button>
-            <bl-button
-              v-if="managingBooks"
-              variant="secondary"
-              @click="onCancelBooks"
-              class="w-full"
-            >
-              Cancel
-            </bl-button>
-            <bl-button
-              v-if="managingBooks"
-              variant="primary"
-              @click="onSaveBooks"
-              class="w-full"
-            >
-              Save
-            </bl-button>
+            <div class="flex w-full gap-3">
+              <bl-button
+                v-if="!managingBooks"
+                variant="secondary"
+                class="w-full"
+                @click="managingBooks = true"
+              >
+                Manage books
+              </bl-button>
+              <bl-button
+                v-if="managingBooks"
+                variant="secondary"
+                class="w-full"
+                @click="onCancelBooks"
+              >
+                Cancel
+              </bl-button>
+
+              <bl-button
+                v-if="managingBooks"
+                variant="primary"
+                class="w-full"
+                @click="onSaveBooks"
+              >
+                Save
+              </bl-button>
+              <bl-view-switch v-model:view="view" />
+            </div>
           </div>
-          <div
-            class="order-0 flex flex-col justify-end leading-tight md:order-3"
-          >
+          <div class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6 class="w-max">{{ formattedDate }}</h6>
           </div>
@@ -84,9 +86,9 @@
                 </div>
               </div>
               <div v-if="editing" class="flex justify-end gap-2">
-                <bl-button compact variant="secondary" @click="onCancel"
-                  >Discard</bl-button
-                >
+                <bl-button compact variant="secondary" @click="onCancel">
+                  Discard
+                </bl-button>
                 <FormKit type="submit">
                   <bl-button type="submit" compact>Save</bl-button>
                 </FormKit>
@@ -98,13 +100,10 @@
           v-if="!!booksDisplayed.length"
           class="book-section flex flex-col items-end gap-4"
         >
-          <div class="flex justify-end gap-3">
-            <bl-view-switch v-model:view="view" />
-          </div>
+          <div class="flex justify-end gap-3"></div>
           <bl-books-views
             :view="view"
             :books="sortedBooks"
-            :small="true"
             :selectable="managingBooks"
             :selected-table-columns="selectedTableColumns"
             @book-select="onSelectBook"

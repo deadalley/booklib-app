@@ -23,7 +23,7 @@
     </template>
     <div
       v-if="view === 'cards'"
-      class="grid size-full grid-cols-1 gap-x-6 gap-y-8 overflow-auto pt-1 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-auto p-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
       <bl-collection-card
         v-for="collection in sortedCollections"

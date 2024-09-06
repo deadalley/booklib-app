@@ -29,7 +29,7 @@
       </AccordionHeader>
       <AccordionContent class="relative overflow-x-auto">
         <div
-          class="accordion-content relative flex h-max w-max gap-x-6 p-4 transition duration-100 ease-out"
+          class="accordion-content relative flex size-max gap-x-6 p-4 transition duration-100 ease-out"
         >
           <bl-book-card
             v-for="book in books"
