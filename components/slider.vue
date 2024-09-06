@@ -11,7 +11,7 @@
         :max="max"
         :min="min"
         :step="step"
-        class="relative mt-16 flex h-5 w-[200px] touch-none select-none items-center"
+        class="relative mt-16 flex h-5 w-full touch-none select-none items-center"
       >
         <SliderTrack
           class="relative h-[5px] grow cursor-pointer rounded-full bg-accent"
