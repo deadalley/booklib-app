@@ -21,15 +21,15 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
   )
 
   const defaultTableColumns = {
-    coverSrc: { label: 'Cover', checked: false },
-    publisher: { label: 'Publisher', checked: true },
+    coverSrc: { label: 'Cover', checked: true },
+    publisher: { label: 'Publisher', checked: false },
     language: { label: 'Language', checked: true },
-    year: { label: 'Year', checked: true },
+    year: { label: 'Year', checked: false },
     pages: { label: 'Pages', checked: true },
     rating: { label: 'Rating', checked: true },
-    originalTitle: { label: 'Original Title', checked: true },
-    originalLanguage: { label: 'Original Language', checked: true },
-    isbn: { label: 'ISBN', checked: true },
+    originalTitle: { label: 'Original Title', checked: false },
+    originalLanguage: { label: 'Original Language', checked: false },
+    isbn: { label: 'ISBN', checked: false },
   }
 
   const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))

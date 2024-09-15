@@ -37,7 +37,7 @@ const columns = computed(
           })
         },
         enableSorting: false,
-        size: 10,
+        size: 12,
       }),
       columnHelper.accessor('title', {
         header: 'Title',
