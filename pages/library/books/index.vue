@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout
     name="library"
-    title="All Books"
+    title="Books"
     :total="books?.length ?? 0"
     :sidebar-content="sidebarContent"
   >

@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout
     name="library"
-    title="All Collections"
+    title="Collections"
     :total="collections?.length ?? 0"
   >
     <template #navbar>
