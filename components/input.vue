@@ -11,7 +11,7 @@
     :classes="{
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'flex-1',
-      label: 'ml-5',
+      label: 'ml-4',
       inner: `${focused ? '!border-main' : 'border-accent'}`,
     }"
     @focus="onFocus"

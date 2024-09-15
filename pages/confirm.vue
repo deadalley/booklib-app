@@ -1,6 +1,9 @@
 <template>
-  <div class="flex h-screen w-screen items-center justify-center">
-    Waiting for login...
+  <div
+    class="flex h-screen w-screen flex-col items-center justify-center gap-4"
+  >
+    <bl-loading class="size-16" />
+    <h6>Signing in...</h6>
   </div>
 </template>
 

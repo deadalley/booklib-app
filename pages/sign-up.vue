@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen w-screen items-center p-16">
     <NuxtImg
-      src="/books-1.jpg"
+      src="/books-2.jpg"
       alt="Books"
       class="h-full max-w-4xl rounded-3xl border-8 border-main object-cover object-center"
     />
@@ -11,25 +11,18 @@
       <ClientOnly>
         <div class="flex flex-1 flex-col justify-center gap-12">
           <div>
-            <h1>Welcome to your library!</h1>
-            <p>Sign in to start managing your books with BookLib.</p>
+            <h1>Create your account</h1>
+            <p>Create your BookLib account and start managing your books.</p>
           </div>
 
           <div class="flex flex-col justify-center gap-8 md:w-[400px]">
-            <bl-button
-              type="button"
-              expand
-              variant="tertiary"
-              :disabled="loading"
-              @click="handleGoogleLogin"
-            >
-              <bl-loading v-if="loading" class="size-4" />
+            <bl-button expand variant="tertiary" @click="handleGoogleLogin">
               <NuxtImg
                 src="/google.svg"
                 alt="Books"
                 class="h-6 object-cover object-center"
               />
-              {{ loading ? 'Signing in...' : 'Sign in with Google' }}
+              Sign up with Google
             </bl-button>
 
             <div class="flex items-center gap-4">
@@ -42,8 +35,9 @@
               type="form"
               :value="{}"
               :actions="false"
-              @submit="handleEmailLogin"
+              @submit="handleEmailSignup"
             >
+              <bl-input id="name" name="name" label="Name" placeholder="Name" />
               <bl-input
                 id="email"
                 name="email"
@@ -57,25 +51,20 @@
                 placeholder="Password"
                 type="password"
               />
-              <NuxtLink
-                class="w-full cursor-pointer text-right text-accent-dark underline hover:text-main"
-                >Forgot your password?</NuxtLink
-              >
 
               <FormKit type="submit" class="w-full">
-                <bl-button expand type="submit" :disabled="loading">
-                  <bl-loading v-if="loading" class="size-4" />
-                  {{ loading ? 'Signing in...' : 'Sign in' }}
-                </bl-button>
+                <bl-button expand type="submit" compact
+                  >Create account</bl-button
+                >
               </FormKit>
             </FormKit>
 
             <p class="text-center">
-              Don't have an account?
+              Already have an account?
               <NuxtLink
-                to="/sign-up"
+                to="/login"
                 class="cursor-pointer text-main hover:text-main/80"
-                >Create an account.</NuxtLink
+                >Sign in.</NuxtLink
               >
             </p>
           </div>
@@ -97,27 +86,38 @@ async function handleGoogleLogin() {
     provider: 'google',
     options: {
       redirectTo: 'http://localhost:3000/confirm',
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     },
   })
 
   if (error) throw error
 }
 
-async function handleEmailLogin({
+async function handleEmailSignup({
+  name,
   email,
   password,
 }: {
+  name: string
   email: string
   password: string
 }) {
   loading.value = true
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: 'http://localhost:3000/account-verified',
+      data: {
+        first_name: name,
+      },
+    },
   })
 
   if (error) throw error
-  else navigateTo('/home')
 }
 </script>
