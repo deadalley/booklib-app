@@ -5,7 +5,7 @@
   .formkit-form,
   .formkit-form section,
   .form-section {
-    @apply flex flex-col gap-3;
+    @apply relative flex flex-col gap-3;
   }
 
   .book-section h4 {

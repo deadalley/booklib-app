@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="collection"
-    class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
+    class="flex flex-1 flex-col gap-10 overflow-visible 2xl:w-9/12"
   >
     <header class="flex flex-col gap-2">
       <div
@@ -27,105 +27,9 @@
             >
               Edit
             </bl-button>
-            <div class="flex w-full gap-3">
-              <bl-button
-                v-if="!managingBooks"
-                variant="secondary"
-                class="w-full"
-                @click="managingBooks = true"
-              >
-                Manage books
-              </bl-button>
-              <bl-button
-                v-if="managingBooks"
-                variant="secondary"
-                class="w-full"
-                @click="onCancelBooks"
-              >
-                Cancel
-              </bl-button>
 
-              <bl-button
-                v-if="managingBooks"
-                variant="primary"
-                class="w-full"
-                @click="onSaveBooks"
-              >
-                Save
-              </bl-button>
-              <bl-view-switch v-model:view="view" />
-            </div>
-          </div>
-          <div class="flex flex-col justify-end leading-tight">
-            <p>Added on</p>
-            <h6 class="w-max">{{ formattedDate }}</h6>
-          </div>
-        </div>
-      </div>
-    </header>
-    <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
-      <div class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2]">
-        <section v-if="editing" class="book-section">
-          <ClientOnly>
-            <FormKit
-              type="form"
-              :value="collection ?? {}"
-              :actions="false"
-              @submit="onSubmit"
-            >
-              <bl-input id="id" type="hidden" name="id" />
-              <div class="form-section">
-                <div class="form-row">
-                  <bl-input
-                    id="name"
-                    :editing="editing"
-                    name="name"
-                    label="Name"
-                    placeholder="Name"
-                  />
-                </div>
-              </div>
-              <div v-if="editing" class="flex justify-end gap-2">
-                <bl-button compact variant="secondary" @click="onCancel">
-                  Discard
-                </bl-button>
-                <FormKit type="submit">
-                  <bl-button type="submit" compact>Save</bl-button>
-                </FormKit>
-              </div>
-            </FormKit>
-          </ClientOnly>
-        </section>
-        <section
-          v-if="!!booksDisplayed.length"
-          class="book-section flex flex-col items-end gap-4"
-        >
-          <div class="flex justify-end gap-3"></div>
-          <bl-books-views
-            :view="view"
-            :books="sortedBooks"
-            :selectable="managingBooks"
-            :selected-table-columns="selectedTableColumns"
-            @book-select="onSelectBook"
-          />
-        </section>
-        <section
-          v-if="!booksDisplayed.length"
-          class="flex flex-col items-center gap-3 py-24"
-        >
-          <p>There are no books in this collection.</p>
-          <bl-button variant="tertiary" @click="managingBooks = true"
-            >Add books to {{ collection.name ?? 'this collection' }}</bl-button
-          >
-        </section>
-        <section v-if="!isNew" class="book-section">
-          <h5>Delete collection</h5>
-          <div class="flex justify-between gap-3">
-            <p>
-              Are you sure you want to delete this collection? This action
-              cannot be undone.
-            </p>
             <bl-modal
+              v-if="!isNew"
               ref="deleteModalRef"
               :on-confirm="deleteCollection"
               size="sm"
@@ -138,13 +42,69 @@
                 <strong>{{ collection.name }}</strong
                 >?</template
               >
-              This action cannot be undone.
+              Your books will <strong>not</strong> be deleted. This action
+              cannot be undone.
               <template #cancel-label> Cancel </template>
               <template #action-label> Delete </template>
             </bl-modal>
+            <bl-view-switch v-model:view="view" />
           </div>
-        </section>
+          <div class="flex flex-col justify-end leading-tight">
+            <p>Added on</p>
+            <h6 class="w-max">{{ formattedDate }}</h6>
+          </div>
+        </div>
       </div>
+    </header>
+    <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
+      <ClientOnly>
+        <div
+          class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2] [&>.formkit-form]:h-full"
+        >
+          <FormKit
+            type="form"
+            :value="collection ?? {}"
+            :actions="false"
+            @submit="onSubmit"
+          >
+            <div v-if="editing" class="form-section">
+              <bl-input id="id" type="hidden" name="id" />
+              <div class="form-row">
+                <bl-input
+                  id="name"
+                  :editing="editing"
+                  name="name"
+                  label="Name"
+                  placeholder="Name"
+                />
+              </div>
+            </div>
+
+            <bl-books-views
+              v-if="!!booksDisplayed.length"
+              :view="view"
+              :books="sortedBooks"
+              :selectable="managingBooks"
+              :selected-table-columns="selectedTableColumns"
+              @book-select="onSelectBook"
+            />
+            <section
+              v-if="!booksDisplayed.length"
+              class="flex flex-col items-center gap-3 py-24"
+            >
+              <p>There are no books in this collection.</p>
+            </section>
+            <div v-if="editing" class="flex justify-end gap-2">
+              <bl-button compact variant="secondary" @click="onCancel">
+                Discard
+              </bl-button>
+              <FormKit type="submit">
+                <bl-button type="submit" compact>Save</bl-button>
+              </FormKit>
+            </div>
+          </FormKit>
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -215,6 +175,7 @@ async function deleteCollection() {
 
 function onEdit(value: boolean) {
   editing.value = value
+  managingBooks.value = value
 }
 
 function onCancel() {
@@ -259,18 +220,6 @@ function onSelectBook({
   allBooks.value = allBooks.value.map((book) =>
     book.id === bookId ? { ...book, selected: selected } : book,
   )
-}
-
-function onCancelBooks() {
-  managingBooks.value = false
-}
-
-async function onSaveBooks() {
-  if (collection.value) {
-    const { id, name } = collection.value
-    await onSubmit({ id, name })
-    managingBooks.value = false
-  }
 }
 
 onMounted(() => {
