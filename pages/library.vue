@@ -18,7 +18,6 @@
 <script setup lang="ts">
 import { IconPlus } from '@tabler/icons-vue'
 
-const route = useRoute()
 const navItems = [
   {
     to: '/library/books',
@@ -29,10 +28,6 @@ const navItems = [
     label: 'Collections',
   },
 ]
-
-if (route.path === '/library' || route.path === '/library/') {
-  navigateTo('/library/books')
-}
 
 useHead({
   title: 'BookLib | Library',

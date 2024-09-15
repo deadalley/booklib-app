@@ -39,5 +39,9 @@ export default defineNuxtConfig({
     strict: true,
   },
 
+  routeRules: {
+    '/library': { redirect: '/library/books' },
+  },
+
   compatibilityDate: '2024-08-14',
 })
