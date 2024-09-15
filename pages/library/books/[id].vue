@@ -7,15 +7,42 @@
       <div
         class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
       >
-        <div class="flex gap-5">
+        <div class="flex flex-1 gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Book' : book.title }}
           </h2>
           <bl-rating
-            :editing="true"
+            :editing="editing"
             :rating="book.rating ?? 0"
             :on-commit="onSubmitRating"
           />
+        </div>
+        <div class="flex gap-3">
+          <bl-button
+            v-if="!editing"
+            compact
+            variant="secondary"
+            @click="onEdit(true)"
+          >
+            Edit
+          </bl-button>
+          <bl-modal
+            v-if="!isNew"
+            ref="deleteModalRef"
+            :on-confirm="deleteBook"
+            size="sm"
+          >
+            <template #trigger>
+              <bl-button compact @click="openDeleteModal">Delete</bl-button>
+            </template>
+            <template #title
+              >Are you sure you want to delete <strong>{{ book.title }}</strong
+              >?</template
+            >
+            This action cannot be undone.
+            <template #cancel-label> Cancel </template>
+            <template #action-label> Delete </template>
+          </bl-modal>
         </div>
         <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
           <p>Added on</p>
@@ -27,26 +54,23 @@
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <div class="lg:w-80">
         <bl-book-image
-          :editing="true"
+          :editing="editing"
           :book="book"
           :temp-cover-src="tempCoverSrc"
         />
       </div>
-      <div class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto">
-        <section class="book-section max-w-screen-md">
-          <div class="flex gap-3">
-            <h4>Overview</h4>
-            <bl-button compact variant="secondary" @click="onEdit(true)">
-              Edit
-            </bl-button>
-          </div>
-          <ClientOnly>
-            <FormKit
-              type="form"
-              :value="book ?? {}"
-              :actions="false"
-              @submit="onSubmit"
-            >
+
+      <ClientOnly>
+        <div
+          class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto"
+        >
+          <FormKit
+            type="form"
+            :value="book ?? {}"
+            :actions="false"
+            @submit="onSubmit"
+          >
+            <section class="book-section max-w-screen-md">
               <div class="form-section">
                 <div class="form-row">
                   <bl-input
@@ -124,7 +148,7 @@
                     placeholder="ISBN"
                   />
                 </div>
-                <div v-if="editing" class="form-row">
+                <div class="form-row">
                   <bl-input
                     id="summary"
                     type="textarea"
@@ -136,109 +160,65 @@
                   />
                 </div>
               </div>
-              <div v-if="editing" class="flex justify-end gap-2">
-                <bl-button compact variant="secondary" @click="onCancel">
-                  Discard
-                </bl-button>
-                <FormKit type="submit">
-                  <bl-button type="submit" compact>{{
-                    isNew ? 'Create book' : 'Save'
-                  }}</bl-button>
-                </FormKit>
-              </div>
-            </FormKit>
-          </ClientOnly>
-          <div class="mt-5 flex flex-wrap gap-3">
-            <bl-genre-tag
-              v-for="(genre, index) in genres"
-              :key="genre"
-              removable
-              editable
-              :value="genre"
-              :index="index"
-              :on-commit="onSubmitGenre"
-              :on-remove="onRemoveGenre"
-            />
-            <bl-genre-tag
-              key="new"
-              removable
-              :new-genre="true"
-              :index="genres.length"
-              :on-commit="onSubmitGenre"
-              :on-remove="onRemoveGenre"
-            />
-          </div>
-        </section>
-        <section class="book-section overflow-visible">
-          <div class="flex gap-3">
-            <h4>Collections</h4>
-            <bl-button
-              v-if="!isNew && !managingCollections"
-              variant="secondary"
-              @click="managingCollections = true"
-            >
-              Manage
-            </bl-button>
-            <bl-button
-              v-if="!isNew && managingCollections"
-              variant="secondary"
-              @click="managingCollections = false"
-            >
-              Cancel
-            </bl-button>
-            <bl-button
-              v-if="!isNew && managingCollections"
-              variant="primary"
-              @click="onSaveCollections"
-            >
-              Save
-            </bl-button>
-          </div>
-          <div
-            v-if="!collectionsDisplayed.length"
-            class="flex max-w-screen-md flex-col items-center gap-3"
-          >
-            <p>This book is not assigned any collections.</p>
-            <bl-button variant="tertiary" @click="onManageCollections"
-              >Add book to collections</bl-button
-            >
-          </div>
-          <div
-            v-if="!!collectionsDisplayed.length"
-            class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
-          >
-            <bl-collection-card
-              v-for="collection in collectionsDisplayed"
-              :key="collection.id"
-              :collection="collection"
-              :selectable="managingCollections"
-              @select="onSelectCollection"
-            />
-          </div>
-        </section>
-        <section v-if="!isNew" class="book-section">
-          <h5>Delete book</h5>
-          <div class="flex justify-between gap-3">
-            <p>
-              Are you sure you want to delete this book? This action cannot be
-              undone.
-            </p>
-            <bl-modal ref="deleteModalRef" :on-confirm="deleteBook" size="sm">
-              <template #trigger>
-                <bl-button compact @click="openDeleteModal">Delete</bl-button>
-              </template>
-              <template #title
-                >Are you sure you want to delete
-                <strong>{{ book.title }}</strong
-                >?</template
+              <div
+                v-if="!!genres.length || editing"
+                class="mt-5 flex flex-wrap gap-3"
               >
-              This action cannot be undone.
-              <template #cancel-label> Cancel </template>
-              <template #action-label> Delete </template>
-            </bl-modal>
-          </div>
-        </section>
-      </div>
+                <bl-genre-tag
+                  v-for="(genre, index) in genres"
+                  :key="genre"
+                  removable
+                  editable
+                  :value="genre"
+                  :index="index"
+                  :on-commit="onSubmitGenre"
+                  :on-remove="onRemoveGenre"
+                />
+                <bl-genre-tag
+                  v-if="editing"
+                  key="new"
+                  removable
+                  :new-genre="true"
+                  :index="genres.length"
+                  :on-commit="onSubmitGenre"
+                  :on-remove="onRemoveGenre"
+                />
+              </div>
+            </section>
+            <section class="book-section overflow-visible">
+              <h4>Collections</h4>
+              <div
+                v-if="!collectionsDisplayed.length"
+                class="flex max-w-screen-md flex-col items-center gap-3"
+              >
+                <p>This book is not assigned any collections.</p>
+              </div>
+              <div
+                v-if="!!collectionsDisplayed.length"
+                class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+              >
+                <bl-collection-card
+                  v-for="collection in collectionsDisplayed"
+                  :key="collection.id"
+                  :collection="collection"
+                  :selectable="managingCollections"
+                  @select="onSelectCollection"
+                />
+              </div>
+            </section>
+            <div v-if="editing" class="flex justify-end gap-2">
+              <bl-button compact variant="secondary" @click="onCancel">
+                Discard
+              </bl-button>
+              <FormKit type="submit">
+                <bl-button type="submit" compact>{{
+                  isNew ? 'Create book' : 'Save'
+                }}</bl-button>
+              </FormKit>
+            </div>
+          </FormKit>
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -313,12 +293,9 @@ async function deleteBook() {
   navigateTo('/library/books')
 }
 
-function onManageCollections() {
-  managingCollections.value = true
-}
-
 function onEdit(value: boolean) {
   editing.value = value
+  managingCollections.value = value
 }
 
 function onCancel() {
@@ -341,13 +318,6 @@ function onSelectCollection({
       ? { ...collection, selected: selected }
       : collection,
   )
-}
-
-async function onSaveCollections() {
-  if (book.value) {
-    await onSubmit(book.value)
-    managingCollections.value = false
-  }
 }
 
 async function onSubmit(book: Book) {

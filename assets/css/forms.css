@@ -9,7 +9,7 @@
   }
 
   .book-section h4 {
-    @apply mb-5 pb-4;
+    @apply pb-4;
   }
 
   .book-section:not(:first-child) {
