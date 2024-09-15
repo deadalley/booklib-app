@@ -13,7 +13,7 @@
     <div class="w-full flex-col">
       <NuxtLink :to="selectable ? undefined : href">
         <h5
-          class="overflow-hidden"
+          class="overflow-hidden leading-tight"
           :style="{
             display: '-webkit-box',
             '-webkit-line-clamp': 2,

@@ -4,7 +4,7 @@
       <bl-nav-sidebar />
     </aside>
     <main class="relative flex h-screen w-1/2 flex-1 flex-col">
-      <nav class="flex items-center gap-16 border-b border-b-accent px-8 py-4">
+      <nav class="flex items-center gap-8 border-b border-b-accent px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
           <h5>{{ title }}</h5>
         </NuxtLink>
@@ -15,6 +15,7 @@
           </li>
         </ul>
 
+        <slot name="action-btn" />
         <div
           class="flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full"
         >

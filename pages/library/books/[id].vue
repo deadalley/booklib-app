@@ -32,7 +32,7 @@
           :temp-cover-src="tempCoverSrc"
         />
       </div>
-      <div class="flex flex-1 flex-col gap-16 overflow-y-auto">
+      <div class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto">
         <section class="book-section max-w-screen-md">
           <div class="flex gap-3">
             <h4>Overview</h4>
@@ -43,7 +43,7 @@
           <ClientOnly>
             <FormKit
               type="form"
-              :value="book"
+              :value="book ?? {}"
               :actions="false"
               @submit="onSubmit"
             >
@@ -141,7 +141,9 @@
                   Discard
                 </bl-button>
                 <FormKit type="submit">
-                  <bl-button type="submit" compact>Save</bl-button>
+                  <bl-button type="submit" compact>{{
+                    isNew ? 'Create book' : 'Save'
+                  }}</bl-button>
                 </FormKit>
               </div>
             </FormKit>
@@ -167,25 +169,25 @@
             />
           </div>
         </section>
-        <section class="book-section overflow-hidden">
+        <section class="book-section overflow-visible">
           <div class="flex gap-3">
             <h4>Collections</h4>
             <bl-button
-              v-if="!managingCollections"
+              v-if="!isNew && !managingCollections"
               variant="secondary"
               @click="managingCollections = true"
             >
               Manage
             </bl-button>
             <bl-button
-              v-if="managingCollections"
+              v-if="!isNew && managingCollections"
               variant="secondary"
               @click="managingCollections = false"
             >
               Cancel
             </bl-button>
             <bl-button
-              v-if="managingCollections"
+              v-if="!isNew && managingCollections"
               variant="primary"
               @click="onSaveCollections"
             >
@@ -197,7 +199,7 @@
             class="flex max-w-screen-md flex-col items-center gap-3"
           >
             <p>This book is not assigned any collections.</p>
-            <bl-button @click="onManageCollections"
+            <bl-button variant="tertiary" @click="onManageCollections"
               >Add book to collections</bl-button
             >
           </div>
@@ -252,7 +254,7 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const managingCollections = ref(false)
+const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const book = ref<Book>()
@@ -273,6 +275,10 @@ watch(book, () => {
   genres.value = book.value?.genres ?? []
 })
 
+watch(isNew, () => {
+  managingCollections.value = isNew.value
+})
+
 const formattedDate = computed(() =>
   format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
@@ -282,7 +288,7 @@ function openDeleteModal() {
 }
 
 async function fetchBook() {
-  if (route.params.id === 'new') {
+  if (isNew.value) {
     book.value = {} as Book
   } else {
     loading.value = true
@@ -290,10 +296,11 @@ async function fetchBook() {
     book.value = data
     loading.value = false
   }
+  console.log(collections.value)
   allCollections.value = (collections.value ?? [])
     .map((collection) => ({
       ...collection,
-      selected: !!book.value?.collections.includes(collection.id),
+      selected: !!book.value?.collections?.includes(collection.id),
     }))
     .sort((b1, b2) => b1.name.localeCompare(b2.name))
 }

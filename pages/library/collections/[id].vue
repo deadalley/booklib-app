@@ -17,7 +17,7 @@
           class="flex w-full flex-col items-start gap-3 md:w-[unset] md:flex-row md:items-end"
         >
           <div
-            class="order-3 flex w-full flex-col items-start gap-3 md:order-[0] md:flex-row md:items-end"
+            class="order-3 flex w-full flex-col items-start gap-3 md:order-none md:flex-row md:items-end"
           >
             <bl-button
               v-if="!editing"
@@ -69,7 +69,7 @@
           <ClientOnly>
             <FormKit
               type="form"
-              :value="collection"
+              :value="collection ?? {}"
               :actions="false"
               @submit="onSubmit"
             >
@@ -114,7 +114,7 @@
           class="flex flex-col items-center gap-3 py-24"
         >
           <p>There are no books in this collection.</p>
-          <bl-button @click="managingBooks = true"
+          <bl-button variant="tertiary" @click="managingBooks = true"
             >Add books to {{ collection.name ?? 'this collection' }}</bl-button
           >
         </section>
@@ -160,7 +160,7 @@ const { data: books } = await useFetch<Book[]>('/api/books')
 
 const isNew = computed(() => route.params.id === 'new')
 
-const managingBooks = ref(false)
+const managingBooks = ref(isNew.value)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
@@ -178,6 +178,10 @@ const booksDisplayed = computed(() => {
 })
 
 const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
+
+watch(isNew, () => {
+  managingBooks.value = isNew.value
+})
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
