@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex size-full flex-col gap-8 overflow-hidden"
+    class="relative flex size-full flex-col gap-8 overflow-y-hidden overflow-x-visible"
     v-bind="$attrs"
   >
     <div class="flex flex-col items-baseline justify-between gap-5 lg:flex-row">

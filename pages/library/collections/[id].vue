@@ -84,6 +84,7 @@
 
             <bl-books-views
               v-if="!!booksDisplayed.length"
+              :class="{ 'mt-4': editing }"
               :view="view"
               :books="sortedBooks"
               :selectable="managingBooks"
