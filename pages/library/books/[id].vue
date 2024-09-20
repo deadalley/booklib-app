@@ -161,11 +161,11 @@
                 </div>
               </div>
               <div
-                v-if="!!genres.length || editing"
+                v-if="!!(book.genres ?? []).length || editing"
                 class="mt-5 flex flex-wrap gap-3"
               >
                 <bl-genre-tag
-                  v-for="(genre, index) in genres"
+                  v-for="(genre, index) in book.genres"
                   :key="genre"
                   removable
                   editable
@@ -179,7 +179,7 @@
                   key="new"
                   removable
                   :new-genre="true"
-                  :index="genres.length"
+                  :index="book.genres?.length ?? -1"
                   :on-commit="onSubmitGenre"
                   :on-remove="onRemoveGenre"
                 />
@@ -240,7 +240,6 @@ const deleteModalRef = ref()
 const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
-const genres = ref(book.value?.genres ?? [])
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
@@ -249,10 +248,6 @@ const collectionsDisplayed = computed(() => {
   return managingCollections.value
     ? allCollections.value
     : allCollections.value.filter((collection) => collection.selected)
-})
-
-watch(book, () => {
-  genres.value = book.value?.genres ?? []
 })
 
 watch(isNew, () => {
@@ -276,7 +271,7 @@ async function fetchBook() {
     book.value = data
     loading.value = false
   }
-  console.log(collections.value)
+
   allCollections.value = (collections.value ?? [])
     .map((collection) => ({
       ...collection,
@@ -320,16 +315,18 @@ function onSelectCollection({
   )
 }
 
-async function onSubmit(book: Book) {
+async function onSubmit(bookValues: Book) {
   try {
     const updatedBook = await $fetch<Book>('/api/books', {
       method: 'post',
       body: {
-        ...book,
+        ...bookValues,
         collections: allCollections.value
           .filter(({ selected }) => !!selected)
           .map(({ id }) => id),
         tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
+        genres: book.value?.genres ?? [],
+        rating: book.value?.rating,
       },
     })
 
@@ -348,23 +345,23 @@ async function onSubmit(book: Book) {
 
 async function onSubmitRating(rating: number) {
   if (book.value) {
-    onSubmit({ ...book.value, rating })
+    book.value.rating = rating
   }
 }
 
 async function onSubmitGenre(genre: string | undefined, index: number) {
   if (book.value && genre) {
-    const _genres: string[] = (genres.value ?? []).concat()
+    const _genres: string[] = (book.value.genres ?? []).concat()
     _genres.splice(index, 1, genre)
-    return onSubmit({ ...book.value, genres: _genres })
+    book.value.genres = _genres
   }
 }
 
 async function onRemoveGenre(index: number) {
-  if (book.value) {
-    const _genres: string[] = (genres.value ?? []).concat()
+  if (book.value && index !== -1 && index !== book.value.genres?.length) {
+    const _genres: string[] = (book.value.genres ?? []).concat()
     _genres.splice(index, 1)
-    return onSubmit({ ...book.value, genres: _genres })
+    book.value.genres = _genres
   }
 }
 

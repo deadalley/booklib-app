@@ -106,8 +106,15 @@ async function _onCommit() {
 async function _onRemove(event: Event) {
   event.preventDefault()
   event.stopPropagation()
+
   loading.value = true
-  await props.onRemove?.(props.index)
+
+  if (props.newGenre && inputRef.value) {
+    onCancel()
+  } else {
+    await props.onRemove?.(props.index)
+  }
+
   loading.value = false
 }
 
