@@ -44,7 +44,7 @@ useFormKitContext((form) => {
   const name = attrs.name as string
   const formValues = form._value as Record<string, unknown>
 
-  inputModel.value = formValues[name]
+  inputModel.value = formValues[name] ?? ''
 })
 
 const displayValue = computed(() => {

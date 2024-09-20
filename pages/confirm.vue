@@ -27,4 +27,8 @@ watch(
   },
   { immediate: true },
 )
+
+useHead({
+  title: 'BookLib',
+})
 </script>

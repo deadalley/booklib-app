@@ -3,7 +3,7 @@
     <NuxtImg
       src="/books-2.jpg"
       alt="Books"
-      class="h-full max-w-4xl rounded-3xl border-8 border-main object-cover object-center"
+      class="h-full max-w-4xl rounded-3xl border-2 border-main object-cover object-center"
     />
     <div class="flex h-full flex-col px-28 py-12">
       <h2>BOOKLIB</h2>
@@ -64,8 +64,9 @@
               <NuxtLink
                 to="/login"
                 class="cursor-pointer text-main hover:text-main/80"
-                >Sign in.</NuxtLink
               >
+                Sign in.
+              </NuxtLink>
             </p>
           </div>
         </div>
@@ -120,4 +121,8 @@ async function handleEmailSignup({
 
   if (error) throw error
 }
+
+useHead({
+  title: 'BookLib',
+})
 </script>
