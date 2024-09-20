@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!editing" class="formkit-wrapper flex-1">
+  <div v-if="!editing && !hidden" class="formkit-wrapper flex-1">
     <label class="formkit-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel && $attrs.type !== 'textarea'">{{ displayValue }}</h5>
     <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
@@ -8,7 +8,7 @@
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
   <FormKit
-    v-if="editing"
+    v-if="editing && !hidden"
     v-model="inputModel"
     v-bind="$attrs"
     :classes="{
@@ -35,7 +35,10 @@ const attrs = useAttrs()
 const inputModel = ref()
 const focused = ref(false)
 
-withDefaults(defineProps<{ editing?: boolean }>(), { editing: true })
+withDefaults(defineProps<{ editing?: boolean; hidden?: boolean }>(), {
+  editing: true,
+  hidden: false,
+})
 
 useFormKitContext((form) => {
   const name = attrs.name as string

@@ -56,6 +56,7 @@
         </div>
       </div>
     </header>
+
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <ClientOnly>
         <div
@@ -67,12 +68,13 @@
             :actions="false"
             @submit="onSubmit"
           >
-            <div v-if="editing" class="form-section">
+            <div class="form-section">
               <bl-input id="id" type="hidden" name="id" />
               <div class="form-row">
                 <bl-input
                   id="name"
                   :editing="editing"
+                  :hidden="!editing"
                   name="name"
                   label="Name"
                   placeholder="Name"
@@ -88,12 +90,14 @@
               :selected-table-columns="selectedTableColumns"
               @book-select="onSelectBook"
             />
+
             <section
               v-if="!booksDisplayed.length"
               class="flex flex-col items-center gap-3 py-24"
             >
               <p>There are no books in this collection.</p>
             </section>
+
             <div v-if="editing" class="flex justify-end gap-2">
               <bl-button compact variant="secondary" @click="onCancel">
                 Discard
@@ -159,6 +163,7 @@ async function fetchCollection() {
     collection.value = data
     loading.value = false
   }
+
   allBooks.value = (books.value ?? []).map((book) => ({
     ...book,
     selected: !!collection.value?.books?.includes(book.id),
@@ -227,7 +232,7 @@ onMounted(() => {
 })
 
 useHead({
-  title: 'CollectionLib | My Library',
+  title: 'BookLib | My Library',
 })
 
 definePageMeta({
