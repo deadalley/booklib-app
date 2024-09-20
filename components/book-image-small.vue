@@ -1,30 +1,50 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative w-full cursor-pointer"
+    class="relative cursor-pointer"
+    :class="{ 'w-full': !coverSrc }"
     @click="$emit('click')"
+    @mouseenter="setHovered(true)"
+    @mouseleave="setHovered(false)"
   >
-    <bl-empty-book-image
-      v-if="!coverSrc"
-      class="!h-48 !p-5"
-      :label="title"
+    <bl-icon-button
+      v-if="selectable"
+      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       :class="{
-        '!ring-2 !ring-main': selectable && selected,
+        'opacity-0': !selected,
+        'opacity-100': selected || hovered,
+      }"
+    >
+      <template #default="iconProps">
+        <IconCheckbox v-if="selected && !hovered" v-bind="iconProps" />
+        <IconX v-if="selected && hovered" v-bind="iconProps" />
+        <IconPlus v-if="!selected && hovered" v-bind="iconProps" />
+      </template>
+    </bl-icon-button>
+    <div
+      v-if="selectable"
+      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-black transition-opacity duration-300"
+      :class="{
+        'opacity-0': !selected,
+        'opacity-30': selected && !hovered,
+        'opacity-60': hovered,
       }"
     />
+
+    <bl-empty-book-image v-if="!coverSrc" class="!h-48 !p-5" :label="title" />
     <NuxtImg
       v-if="coverSrc"
       :src="coverSrc ?? undefined"
       :alt="alt"
       class="h-auto w-full max-w-full rounded-xl object-cover object-center md:h-48 md:w-auto"
-      :class="{
-        '!ring-2 !ring-main': selectable && selected,
-      }"
-    />
+    >
+    </NuxtImg>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
+import { IconCheckbox, IconX, IconPlus } from '@tabler/icons-vue'
+
 defineProps<{
   href?: string
   alt?: string
@@ -35,4 +55,10 @@ defineProps<{
 }>()
 
 defineEmits(['click'])
+
+const hovered = ref(false)
+
+function setHovered(value: boolean) {
+  hovered.value = value
+}
 </script>
