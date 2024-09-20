@@ -12,8 +12,11 @@
           class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-xl px-4 py-2 text-start hover:bg-accent-light"
         >
           <div class="flex flex-1 items-baseline gap-3 md:flex-col lg:flex-row">
-            <NuxtLink :to="`/library/collections/${collection.id}`">
-              <h4>
+            <NuxtLink
+              :to="`/library/collections/${collection.id}`"
+              @click="(event: Event) => event.stopPropagation()"
+            >
+              <h4 class="hover:text-main">
                 {{ collection.name }}
               </h4>
             </NuxtLink>
