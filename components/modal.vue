@@ -18,7 +18,7 @@
           'max-w-screen-2xl': size === '2xl',
         }"
       >
-        <DialogTitle as="div" class="items-top flex w-full items-start">
+        <DialogTitle as="div" class="items-top mb-4 flex w-full items-start">
           <h4 class="flex-1">
             <slot name="title" />
           </h4>
@@ -30,7 +30,7 @@
             </bl-icon-button>
           </DialogClose>
         </DialogTitle>
-        <div class="relative flex h-full flex-col overflow-auto">
+        <div class="relative">
           <slot />
         </div>
         <div class="flex items-baseline justify-end gap-2">

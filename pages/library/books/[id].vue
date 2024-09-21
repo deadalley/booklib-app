@@ -35,10 +35,10 @@
             <template #trigger>
               <bl-button compact @click="openDeleteModal">Delete</bl-button>
             </template>
-            <template #title
-              >Are you sure you want to delete <strong>{{ book.title }}</strong
-              >?</template
-            >
+            <template #title>
+              Are you sure you want to delete <strong>{{ book.title }}</strong>
+              ?
+            </template>
             This action cannot be undone.
             <template #cancel-label> Cancel </template>
             <template #action-label> Delete </template>
@@ -207,12 +207,12 @@
               </div>
             </section>
             <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button compact variant="secondary" @click="onCancel">
-                Discard
+              <bl-button variant="secondary" @click="onCancel">
+                {{ isNew ? 'Cancel' : 'Discard changes' }}
               </bl-button>
               <FormKit type="submit">
-                <bl-button type="submit" compact>{{
-                  isNew ? 'Create book' : 'Save'
+                <bl-button type="submit">{{
+                  isNew ? 'Create book' : 'Save changes'
                 }}</bl-button>
               </FormKit>
             </div>

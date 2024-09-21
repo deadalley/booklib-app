@@ -100,11 +100,13 @@
             </section>
 
             <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button compact variant="secondary" @click="onCancel">
-                Discard
+              <bl-button variant="secondary" @click="onCancel">
+                {{ isNew ? 'Cancel' : 'Discard changes' }}
               </bl-button>
               <FormKit type="submit">
-                <bl-button type="submit" compact>Save</bl-button>
+                <bl-button type="submit">{{
+                  isNew ? 'Create collection' : 'Save changes'
+                }}</bl-button>
               </FormKit>
             </div>
           </FormKit>
