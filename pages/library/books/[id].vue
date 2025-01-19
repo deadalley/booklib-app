@@ -52,12 +52,17 @@
       <!-- <h5>{{ book.author }}</h5> -->
     </header>
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
-      <div class="lg:w-80">
-        <bl-book-image
-          :editing="editing"
-          :book="book"
-          :temp-cover-src="tempCoverSrc"
-        />
+      <div class="flex flex-col gap-2">
+        <div class="lg:w-80">
+          <bl-book-image
+            :editing="editing"
+            :book="book"
+            :temp-cover-src="tempCoverSrc"
+          />
+        </div>
+        <div class="mt-4 flex flex-col gap-2">
+          <bl-stepper :steps="progressSteps" :current-step="currentStep" />
+        </div>
       </div>
 
       <ClientOnly>
@@ -234,6 +239,29 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
+const progressSteps = [
+  {
+    step: 1,
+    description: 'Not read',
+    icon: 'IconBook2',
+  },
+  {
+    step: 2,
+    description: 'Queued',
+    icon: 'IconStackPush',
+  },
+  {
+    step: 3,
+    description: 'Reading',
+    icon: 'IconEyeglass2',
+  },
+  {
+    step: 4,
+    description: 'Read',
+    icon: 'IconBook',
+  },
+]
+
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
@@ -250,13 +278,25 @@ const collectionsDisplayed = computed(() => {
     : allCollections.value.filter((collection) => collection.selected)
 })
 
-watch(isNew, () => {
-  managingCollections.value = isNew.value
-})
-
 const formattedDate = computed(() =>
   format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
+
+const currentStep = computed(() =>
+  book.value?.progressStatus
+    ? {
+        queued: 2,
+        reading: 3,
+        paused: 3,
+        read: 4,
+        'not-finished': 4,
+      }[book.value.progressStatus]
+    : 1,
+)
+
+watch(isNew, () => {
+  managingCollections.value = isNew.value
+})
 
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)

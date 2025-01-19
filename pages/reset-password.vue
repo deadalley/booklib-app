@@ -55,7 +55,7 @@
           <template v-if="success">
             <div class="flex flex-col justify-center gap-12">
               <div>
-                <h4>Email sent!</h4>
+                <h4>E-mail sent!</h4>
                 <p>
                   We've sent you an e-mail for resetting your password. Check
                   your mailbox.
