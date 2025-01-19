@@ -62,7 +62,7 @@ type Step = {
   step: number
   title?: string
   description?: string
-  icon?: string
+  icon?: keyof typeof icons
 }
 
 const props = withDefaults(
