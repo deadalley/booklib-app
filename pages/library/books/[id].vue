@@ -186,8 +186,8 @@
                 <bl-genre-tag
                   v-for="(genre, index) in book.genres"
                   :key="genre"
-                  removable
-                  editable
+                  :removable="editing"
+                  :editable="editing"
                   :value="genre"
                   :index="index"
                   :on-commit="onSubmitGenre"
@@ -196,7 +196,7 @@
                 <bl-genre-tag
                   v-if="editing"
                   key="new"
-                  removable
+                  :removable="editing"
                   :new-genre="true"
                   :index="book.genres?.length ?? -1"
                   :on-commit="onSubmitGenre"
