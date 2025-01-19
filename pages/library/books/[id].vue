@@ -64,7 +64,7 @@
           <bl-stepper :steps="progressSteps" :current-step="currentStep" />
           <bl-raw-select
             v-model="progressStatusSelectOption"
-            :options="progressStatusOptions"
+            :groups="progressStatusOptions"
           />
         </div>
       </div>
@@ -279,16 +279,31 @@ const PROGRESS_STATUS_MAP: Record<
   },
 }
 
-const progressSteps = [
-  PROGRESS_STATUS_MAP.unread,
-  PROGRESS_STATUS_MAP.queued,
-  PROGRESS_STATUS_MAP.reading,
-  PROGRESS_STATUS_MAP['not-finished'],
+const progressStatusOptions = [
+  {
+    options: [
+      { label: PROGRESS_STATUS_MAP.unread.description, value: 'unread' },
+      { label: PROGRESS_STATUS_MAP.queued.description, value: 'queued' },
+    ],
+  },
+  {
+    label: 'Reading',
+    options: [
+      { label: PROGRESS_STATUS_MAP.reading.description, value: 'reading' },
+      { label: PROGRESS_STATUS_MAP.paused.description, value: 'paused' },
+    ],
+  },
+  {
+    label: 'Finished',
+    options: [
+      { label: PROGRESS_STATUS_MAP.read.description, value: 'read' },
+      {
+        label: PROGRESS_STATUS_MAP['not-finished'].description,
+        value: 'not-finished',
+      },
+    ],
+  },
 ]
-
-const progressStatusOptions = Object.entries(PROGRESS_STATUS_MAP).map(
-  ([value, { description: label }]) => ({ value, label }),
-)
 
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
@@ -312,7 +327,6 @@ const formattedDate = computed(() =>
 )
 
 const currentStep = computed(() => {
-  console.log(progressStatusSelectOption.value)
   return progressStatusSelectOption.value
     ? PROGRESS_STATUS_MAP[progressStatusSelectOption.value].step
     : 1
@@ -321,6 +335,17 @@ const currentStep = computed(() => {
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
 )
+
+const progressSteps = computed(() => [
+  PROGRESS_STATUS_MAP.unread,
+  PROGRESS_STATUS_MAP.queued,
+  progressStatusSelectOption.value === 'paused'
+    ? PROGRESS_STATUS_MAP.paused
+    : PROGRESS_STATUS_MAP.reading,
+  progressStatusSelectOption.value === 'not-finished'
+    ? PROGRESS_STATUS_MAP['not-finished']
+    : PROGRESS_STATUS_MAP.read,
+])
 
 watch(isNew, () => {
   managingCollections.value = isNew.value

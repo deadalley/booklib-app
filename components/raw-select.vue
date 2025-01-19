@@ -16,9 +16,9 @@
       <SelectPortal disabled>
         <SelectContent position="popper">
           <SelectViewport
-            class="formkit-inner z-10 max-h-96 max-w-full flex-col items-start overflow-y-auto overflow-x-hidden !p-[0.35rem]"
+            class="formkit-inner z-10 max-h-96 max-w-full flex-col items-start !gap-1 overflow-y-auto overflow-x-hidden !p-[0.35rem]"
           >
-            <SelectGroup class="flex w-full flex-col gap-1">
+            <SelectGroup v-if="options" class="flex w-full flex-col gap-1">
               <SelectItem
                 v-for="(option, index) in options"
                 :key="index"
@@ -30,6 +30,31 @@
                 </SelectItemText>
               </SelectItem>
             </SelectGroup>
+
+            <template v-for="(group, index) in groups" :key="group.label">
+              <SelectLabel
+                v-if="group.label"
+                class="mt-2 w-full uppercase text-accent-dark"
+              >
+                {{ group.label }}
+              </SelectLabel>
+              <SelectGroup class="flex w-full flex-col gap-1">
+                <SelectItem
+                  v-for="option in group.options"
+                  :key="option.value"
+                  class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+                  :value="option.value"
+                >
+                  <SelectItemText>
+                    {{ option.label }}
+                  </SelectItemText>
+                </SelectItem>
+              </SelectGroup>
+              <SelectSeparator
+                v-if="index < (groups?.length ?? 0) - 1"
+                class="mt-0 h-px w-full bg-accent"
+              />
+            </template>
           </SelectViewport>
         </SelectContent>
       </SelectPortal>
@@ -51,9 +76,12 @@ import {
   SelectViewport,
 } from 'radix-vue'
 
+type SelectOption = { label: string; value: string }
+
 withDefaults(
   defineProps<{
-    options: { label: string; value: string }[]
+    options?: SelectOption[]
+    groups?: { label?: string; options: SelectOption[] }[]
     placeholder?: string
     withWrapper?: boolean
   }>(),
