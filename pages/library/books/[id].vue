@@ -17,7 +17,18 @@
             :on-commit="onSubmitRating"
           />
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-2">
+          <div v-if="editing" class="flex justify-end gap-2">
+            <bl-button variant="secondary" @click="onCancel">
+              {{ isNew ? 'Cancel' : 'Discard changes' }}
+            </bl-button>
+            <FormKit type="submit">
+              <bl-button type="submit">{{
+                isNew ? 'Create book' : 'Save changes'
+              }}</bl-button>
+            </FormKit>
+          </div>
+
           <bl-button
             v-if="!editing"
             compact
@@ -27,7 +38,7 @@
             Edit
           </bl-button>
           <bl-modal
-            v-if="!isNew"
+            v-if="!isNew && !editing"
             ref="deleteModalRef"
             :on-confirm="deleteBook"
             size="sm"
@@ -193,7 +204,10 @@
                 />
               </div>
             </section>
-            <section class="book-section overflow-visible">
+            <section
+              v-if="!!collectionsDisplayed.length"
+              class="book-section overflow-visible"
+            >
               <h4>Collections</h4>
               <div
                 v-if="!collectionsDisplayed.length"

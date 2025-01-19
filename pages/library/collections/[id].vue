@@ -17,7 +17,7 @@
           class="flex w-full flex-col items-start gap-3 md:w-[unset] md:flex-row md:items-end"
         >
           <div
-            class="order-3 flex w-full flex-col items-start gap-3 md:order-none md:flex-row md:items-end"
+            class="order-3 flex w-full flex-col items-start gap-2 md:order-none md:flex-row md:items-end"
           >
             <bl-button
               v-if="!editing"
@@ -28,8 +28,19 @@
               Edit
             </bl-button>
 
+            <div v-if="editing" class="flex justify-end gap-2">
+              <bl-button variant="secondary" @click="onCancel">
+                {{ isNew ? 'Cancel' : 'Discard changes' }}
+              </bl-button>
+              <FormKit type="submit">
+                <bl-button type="submit">{{
+                  isNew ? 'Create collection' : 'Save changes'
+                }}</bl-button>
+              </FormKit>
+            </div>
+
             <bl-modal
-              v-if="!isNew"
+              v-if="!isNew && !editing"
               ref="deleteModalRef"
               :on-confirm="deleteCollection"
               size="sm"
