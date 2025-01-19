@@ -17,8 +17,9 @@
       <StepperTrigger
         class="relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-white hover:bg-accent/80 active:bg-main-dark group-data-[state=active]:bg-main group-data-[state=completed]:bg-main group-data-[disabled]:text-white group-data-[state=active]:text-white group-data-[state=completed]:text-white"
       >
-        <StepperIndicator>
-          <IconGift :size="20" stroke="1.5" />
+        <StepperIndicator as="h5">
+          <component :is="icons[item.icon]" v-if="item.icon" :size="20" />
+          {{ icons[item.icon] ? '' : item.step }}
         </StepperIndicator>
       </StepperTrigger>
 
@@ -54,14 +55,14 @@ import {
   StepperTitle,
   StepperTrigger,
 } from 'radix-vue'
-import { IconGift } from '@tabler/icons-vue'
+import { icons } from '@tabler/icons-vue'
 import { useVModel } from '@vueuse/core'
 
 type Step = {
   step: number
   title?: string
   description?: string
-  icon: string
+  icon?: string
 }
 
 const props = withDefaults(
