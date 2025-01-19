@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     const { error: bookCollectionError } = await client
       .from('collection-book')
       .insert(
-        book.collections.map((collectionId) => ({
+        book.collections.map((collectionId: string) => ({
           book_id: bookId,
           collection_id: collectionId,
           user_id: user.id,

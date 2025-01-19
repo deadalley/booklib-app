@@ -3,6 +3,10 @@ import type { BookDB, CollectionDB } from '~/types/database'
 import languageOptions from '../public/languages-2.json'
 import type { Collection } from '~/types/collection'
 
+export function nullify<T>(value: T) {
+  return value === undefined || value === null || value === '' ? null : value
+}
+
 export function dbBookToBook(
   dbBook: BookDB,
   collections: Pick<CollectionDB, 'id'>[],
@@ -39,12 +43,12 @@ export function bookToDbBook(
     original_language: book.originalLanguage ?? null,
     isbn: book.isbn ?? null,
     language: book.language ?? null,
-    pages: book.pages ?? null,
+    pages: nullify(book.pages),
     publisher: book.publisher ?? null,
-    rating: book.rating ?? null,
+    rating: nullify(book.rating),
     summary: book.summary ?? null,
     title: book.title,
-    year: book.year ?? null,
+    year: nullify(book.year),
     genres: book.genres ?? null,
   }
 }
