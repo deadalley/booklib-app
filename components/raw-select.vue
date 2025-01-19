@@ -49,7 +49,7 @@ const props = withDefaults(
     context: {
       options: { label: string; value: string | number }[]
       placeholder?: string
-      node: { input?: (value: string) => void }
+      node: { input?: (value: string) => void; _value?: string }
     }
   }>(),
   {},
@@ -58,10 +58,12 @@ const props = withDefaults(
 const options = props.context.options
 const placeholder = props.context.placeholder
 
-const selectValue = ref()
+const selectValue = ref(props.context.node._value)
 
 watch(selectValue, (value) => {
-  props.context.node.input?.(value)
+  if (value) {
+    props.context.node.input?.(value)
+  }
 })
 </script>
 
