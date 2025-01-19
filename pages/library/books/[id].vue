@@ -94,14 +94,14 @@
                     label="Publisher"
                     placeholder="Publisher"
                   />
-                  <bl-input
+                  <bl-select
                     id="language"
                     type="select"
                     :editing="editing"
                     name="language"
                     label="Language"
                     placeholder="Language"
-                    :options="languageOptions"
+                    :options="languageSelectOptions"
                     :value="book.language"
                   />
                 </div>
@@ -133,14 +133,13 @@
                     label="Original Title"
                     placeholder="Original Title"
                   />
-                  <bl-input
+                  <bl-select
                     id="originalLanguage"
-                    type="select"
                     :editing="editing"
                     name="originalLanguage"
                     label="Original Language"
                     placeholder="Original Language"
-                    :options="languageOptions"
+                    :options="languageSelectOptions"
                     :value="book.originalLanguage"
                   />
                 </div>
@@ -292,6 +291,10 @@ const currentStep = computed(() =>
         'not-finished': 4,
       }[book.value.progressStatus]
     : 1,
+)
+
+const languageSelectOptions = computed(() =>
+  Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
 )
 
 watch(isNew, () => {
