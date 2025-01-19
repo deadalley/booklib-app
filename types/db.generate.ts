@@ -32,6 +32,7 @@ export type Database = {
           author_id: number | null
           cover_src: string | null
           created_at: string
+          finished_at: string | null
           genres: string[] | null
           id: number
           isbn: string | null
@@ -39,8 +40,10 @@ export type Database = {
           original_language: string | null
           original_title: string | null
           pages: number | null
+          progress_status: Database['public']['Enums']['BookProgress'] | null
           publisher: string | null
           rating: number | null
+          started_at: string | null
           summary: string | null
           title: string
           user_id: string
@@ -50,6 +53,7 @@ export type Database = {
           author_id?: number | null
           cover_src?: string | null
           created_at?: string
+          finished_at?: string | null
           genres?: string[] | null
           id?: number
           isbn?: string | null
@@ -57,8 +61,10 @@ export type Database = {
           original_language?: string | null
           original_title?: string | null
           pages?: number | null
+          progress_status?: Database['public']['Enums']['BookProgress'] | null
           publisher?: string | null
           rating?: number | null
+          started_at?: string | null
           summary?: string | null
           title: string
           user_id: string
@@ -68,6 +74,7 @@ export type Database = {
           author_id?: number | null
           cover_src?: string | null
           created_at?: string
+          finished_at?: string | null
           genres?: string[] | null
           id?: number
           isbn?: string | null
@@ -75,8 +82,10 @@ export type Database = {
           original_language?: string | null
           original_title?: string | null
           pages?: number | null
+          progress_status?: Database['public']['Enums']['BookProgress'] | null
           publisher?: string | null
           rating?: number | null
+          started_at?: string | null
           summary?: string | null
           title?: string
           user_id?: string
@@ -88,13 +97,6 @@ export type Database = {
             columns: ['author_id']
             isOneToOne: false
             referencedRelation: 'authors'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'public_books_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
             referencedColumns: ['id']
           },
         ]
@@ -130,13 +132,6 @@ export type Database = {
             referencedRelation: 'collections'
             referencedColumns: ['id']
           },
-          {
-            foreignKeyName: 'collection-book_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
         ]
       }
       collections: {
@@ -158,15 +153,7 @@ export type Database = {
           name?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'collections_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -176,7 +163,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      BookProgress: 'queued' | 'reading' | 'paused' | 'read' | 'not-finished'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -264,4 +251,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
     ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema['CompositeTypes']
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
+    ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
