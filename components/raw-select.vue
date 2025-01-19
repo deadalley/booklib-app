@@ -53,7 +53,7 @@ import {
 
 withDefaults(
   defineProps<{
-    options: { label: string; value: string | number }[]
+    options: { label: string; value: string }[]
     placeholder?: string
     withWrapper?: boolean
   }>(),

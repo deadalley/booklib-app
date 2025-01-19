@@ -7,6 +7,7 @@
     </p>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
+  <!-- @ts-expect-error options is used by the underlying select component -->
   <FormKit
     v-if="editing && !hidden"
     v-model="inputModel"

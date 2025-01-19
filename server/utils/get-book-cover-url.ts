@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { BookDB } from '~/types/database'
 import type { Database } from '~/types/db.generate'
 import { logger } from '~/utils'
 

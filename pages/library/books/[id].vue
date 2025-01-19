@@ -314,7 +314,7 @@ const formattedDate = computed(() =>
 const currentStep = computed(() => {
   console.log(progressStatusSelectOption.value)
   return progressStatusSelectOption.value
-    ? PROGRESS_STATUS_MAP[progressStatusSelectOption.value]
+    ? PROGRESS_STATUS_MAP[progressStatusSelectOption.value].step
     : 1
 })
 
