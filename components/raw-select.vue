@@ -1,33 +1,40 @@
 <template>
-  <SelectRoot v-model="selectValue">
-    <SelectTrigger class="flex size-full items-center gap-3">
-      <SelectValue class="flex size-full" :placeholder="placeholder" />
-      <input class="w-0 opacity-0" />
-      <!--  eslint-disable-next-line tailwindcss/no-custom-classname -->
-      <IconChevronDown class="chevron" size="1.2em" />
-    </SelectTrigger>
+  <div class="relative w-full">
+    <SelectRoot v-model="selectValue" class="relative">
+      <SelectTrigger
+        :class="{
+          'flex size-full items-center gap-3': !withWrapper,
+          'formkit-inner': withWrapper,
+        }"
+      >
+        <SelectValue class="flex size-full" :placeholder="placeholder" />
+        <input class="w-0 opacity-0" />
+        <!--  eslint-disable-next-line tailwindcss/no-custom-classname -->
+        <IconChevronDown class="chevron" size="1.2em" />
+      </SelectTrigger>
 
-    <SelectPortal disabled>
-      <SelectContent position="popper">
-        <SelectViewport
-          class="formkit-inner z-10 max-h-96 max-w-full flex-col items-start overflow-y-auto overflow-x-hidden !p-[0.35rem]"
-        >
-          <SelectGroup class="flex w-full flex-col gap-1">
-            <SelectItem
-              v-for="(option, index) in options"
-              :key="index"
-              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
-              :value="option.value"
-            >
-              <SelectItemText>
-                {{ option.label }}
-              </SelectItemText>
-            </SelectItem>
-          </SelectGroup>
-        </SelectViewport>
-      </SelectContent>
-    </SelectPortal>
-  </SelectRoot>
+      <SelectPortal disabled>
+        <SelectContent position="popper">
+          <SelectViewport
+            class="formkit-inner z-10 max-h-96 max-w-full flex-col items-start overflow-y-auto overflow-x-hidden !p-[0.35rem]"
+          >
+            <SelectGroup class="flex w-full flex-col gap-1">
+              <SelectItem
+                v-for="(option, index) in options"
+                :key="index"
+                class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+                :value="option.value"
+              >
+                <SelectItemText>
+                  {{ option.label }}
+                </SelectItemText>
+              </SelectItem>
+            </SelectGroup>
+          </SelectViewport>
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -44,27 +51,16 @@ import {
   SelectViewport,
 } from 'radix-vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    context: {
-      options: { label: string; value: string | number }[]
-      placeholder?: string
-      node: { input?: (value: string) => void; _value?: string }
-    }
+    options: { label: string; value: string | number }[]
+    placeholder?: string
+    withWrapper?: boolean
   }>(),
-  {},
+  { withWrapper: true },
 )
 
-const options = props.context.options
-const placeholder = props.context.placeholder
-
-const selectValue = ref(props.context.node._value)
-
-watch(selectValue, (value) => {
-  if (value) {
-    props.context.node.input?.(value)
-  }
-})
+const selectValue = defineModel<string>()
 </script>
 
 <style scoped>
@@ -73,7 +69,7 @@ watch(selectValue, (value) => {
   width: 100%;
   transform: none !important;
   top: var(--radix-popper-anchor-height) !important;
-  margin-top: 16px;
+  margin-top: 4px;
 }
 
 [data-state='open'] .chevron {

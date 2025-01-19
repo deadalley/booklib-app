@@ -27,9 +27,9 @@
 import { IconCircleOff } from '@tabler/icons-vue'
 import { useFormKitContext, createInput } from '@formkit/vue'
 
-import RawSelect from '../components/raw-select.vue'
+import SelectForInput from '../components/select-for-input.vue'
 
-const rawSelect = createInput(RawSelect, {
+const rawSelect = createInput(SelectForInput, {
   props: ['options', 'placeholder'],
 })
 

@@ -62,6 +62,10 @@
         </div>
         <div class="mt-4 flex flex-col gap-2">
           <bl-stepper :steps="progressSteps" :current-step="currentStep" />
+          <bl-raw-select
+            v-model="progressStatusSelectOption"
+            :options="progressStatusOptions"
+          />
         </div>
       </div>
 
@@ -94,7 +98,7 @@
                     label="Publisher"
                     placeholder="Publisher"
                   />
-                  <bl-select
+                  <bl-select-input
                     id="language"
                     type="select"
                     :editing="editing"
@@ -133,7 +137,7 @@
                     label="Original Title"
                     placeholder="Original Title"
                   />
-                  <bl-select
+                  <bl-select-input
                     id="originalLanguage"
                     :editing="editing"
                     name="originalLanguage"
@@ -230,36 +234,61 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
-import type { Book } from '~/types/book'
+import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
+import type { icons } from '@tabler/icons-vue'
 
 const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const progressSteps = [
-  {
+const PROGRESS_STATUS_MAP: Record<
+  BookProgressStatus,
+  { description: string; step: number; icon: keyof typeof icons }
+> = {
+  unread: {
     step: 1,
     description: 'Not read',
     icon: 'IconBook2',
   },
-  {
+  queued: {
     step: 2,
     description: 'Queued',
     icon: 'IconStackPush',
   },
-  {
+  reading: {
     step: 3,
     description: 'Reading',
     icon: 'IconEyeglass2',
   },
-  {
+  paused: {
+    step: 3,
+    description: 'Paused',
+    icon: 'IconEyeglass2',
+  },
+  read: {
     step: 4,
     description: 'Read',
     icon: 'IconBook',
   },
+  'not-finished': {
+    step: 4,
+    description: 'Not finished',
+    icon: 'IconBookOff',
+  },
+}
+
+const progressSteps = [
+  PROGRESS_STATUS_MAP.unread,
+  PROGRESS_STATUS_MAP.queued,
+  PROGRESS_STATUS_MAP.reading,
+  PROGRESS_STATUS_MAP['not-finished'],
 ]
+
+const progressStatusOptions = Object.entries(PROGRESS_STATUS_MAP).map(
+  ([value, { description: label }]) => ({ value, label }),
+)
 
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
@@ -268,6 +297,7 @@ const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
+const progressStatusSelectOption = ref<BookProgressStatus>()
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
@@ -281,17 +311,12 @@ const formattedDate = computed(() =>
   format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
-const currentStep = computed(() =>
-  book.value?.progressStatus
-    ? {
-        queued: 2,
-        reading: 3,
-        paused: 3,
-        read: 4,
-        'not-finished': 4,
-      }[book.value.progressStatus]
-    : 1,
-)
+const currentStep = computed(() => {
+  console.log(progressStatusSelectOption.value)
+  return progressStatusSelectOption.value
+    ? PROGRESS_STATUS_MAP[progressStatusSelectOption.value]
+    : 1
+})
 
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
@@ -299,6 +324,13 @@ const languageSelectOptions = computed(() =>
 
 watch(isNew, () => {
   managingCollections.value = isNew.value
+})
+
+watch(progressStatusSelectOption, (progressStatus) => {
+  if (book.value) {
+    book.value.progressStatus = progressStatus
+    onSubmit(book.value)
+  }
 })
 
 function openDeleteModal() {
@@ -321,6 +353,8 @@ async function fetchBook() {
       selected: !!book.value?.collections?.includes(collection.id),
     }))
     .sort((b1, b2) => b1.name.localeCompare(b2.name))
+
+  progressStatusSelectOption.value = book.value?.progressStatus ?? 'unread'
 }
 
 async function deleteBook() {

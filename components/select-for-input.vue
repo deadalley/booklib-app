@@ -1,0 +1,28 @@
+<template>
+  <bl-raw-select
+    v-model="selectValue"
+    :options="context.options"
+    :with-wrapper="false"
+  />
+</template>
+
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    context: {
+      options: { label: string; value: string | number }[]
+      placeholder?: string
+      node: { input: (value: string) => void; _value: string }
+    }
+  }>(),
+  {},
+)
+
+const selectValue = ref(props.context.node?._value)
+
+watch(selectValue, (value) => {
+  if (value) {
+    props.context.node?.input?.(value)
+  }
+})
+</script>

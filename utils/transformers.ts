@@ -27,6 +27,9 @@ export function dbBookToBook(
     year: dbBook.year ?? undefined,
     genres: dbBook.genres ?? [],
     collections: collections.map(({ id }) => id),
+    progressStatus: dbBook.progress_status ?? undefined,
+    startedAt: dbBook.started_at ?? undefined,
+    finishedAt: dbBook.finished_at ?? undefined,
   }
 }
 
@@ -50,6 +53,12 @@ export function bookToDbBook(
     title: book.title,
     year: nullify(book.year),
     genres: book.genres ?? null,
+    progress_status:
+      book.progressStatus === 'unread' || book.progressStatus === undefined
+        ? null
+        : book.progressStatus,
+    started_at: book.startedAt ?? null,
+    finished_at: book.finishedAt ?? null,
   }
 }
 
