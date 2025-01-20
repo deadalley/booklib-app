@@ -402,7 +402,7 @@ const PROGRESS_STATUS_MAP: Record<
 }
 
 const managingCollections = ref(isNew.value)
-const editing = ref(false)
+const editing = ref(isNew.value)
 const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)
@@ -560,7 +560,10 @@ async function onRemoveGenre(index: number) {
 function onSelectProgress(progressStatus: BookProgressStatus) {
   if (book.value) {
     book.value.progressStatus = progressStatus
-    onSubmit(book.value)
+
+    if (!isNew.value) {
+      onSubmit(book.value)
+    }
   }
   stepperModalOpen.value = false
 }
@@ -579,7 +582,10 @@ function onProgressChange(progressStatusStep: number) {
       stepperModalOpen.value = true
     } else if (book.value) {
       book.value.progressStatus = progressStatus.id
-      onSubmit(book.value)
+
+      if (!isNew.value) {
+        onSubmit(book.value)
+      }
     }
   }
 }
