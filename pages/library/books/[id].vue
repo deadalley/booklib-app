@@ -44,7 +44,7 @@
             size="sm"
           >
             <template #trigger>
-              <bl-button compact @click="openDeleteModal">Delete</bl-button>
+              <bl-button compact>Delete</bl-button>
             </template>
             <template #title>
               Are you sure you want to delete <strong>{{ book.title }}</strong>
@@ -72,11 +72,7 @@
           />
         </div>
         <div class="mt-4 flex flex-col gap-2">
-          <bl-stepper :steps="progressSteps" :current-step="currentStep" />
-          <bl-raw-select
-            v-model="progressStatusSelectOption"
-            :groups="progressStatusOptions"
-          />
+          <bl-stepper v-model="currentStep" :steps="progressSteps" />
         </div>
       </div>
 
@@ -204,6 +200,15 @@
                 />
               </div>
             </section>
+            <section v-if="editing" class="book-section">
+              <h4>Progress</h4>
+              <bl-stepper
+                v-model="currentStep"
+                :steps="progressSteps"
+                :interactive="true"
+                @change="onProgressChange"
+              />
+            </section>
             <section
               v-if="!!collectionsDisplayed.length"
               class="book-section overflow-visible"
@@ -243,6 +248,43 @@
       </ClientOnly>
     </div>
   </div>
+
+  <bl-modal v-model="stepperModalOpen" :with-close-button="false">
+    <div class="flex justify-center gap-3">
+      <div
+        v-if="currentStep === PROGRESS_STATUS_MAP.reading.step"
+        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+        @click="onSelectProgress(PROGRESS_STATUS_MAP.reading.id)"
+      >
+        <IconEyeglass2 :size="32" class="text-main" />
+        {{ PROGRESS_STATUS_MAP.reading.description }}
+      </div>
+      <div
+        v-if="currentStep === PROGRESS_STATUS_MAP.paused.step"
+        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+        @click="onSelectProgress(PROGRESS_STATUS_MAP.paused.id)"
+      >
+        <IconPlayerPause :size="32" class="text-main" />
+        {{ PROGRESS_STATUS_MAP.paused.description }}
+      </div>
+      <div
+        v-if="currentStep === PROGRESS_STATUS_MAP.read.step"
+        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+        @click="onSelectProgress(PROGRESS_STATUS_MAP.read.id)"
+      >
+        <IconBook :size="32" class="text-main" />
+        {{ PROGRESS_STATUS_MAP.read.description }}
+      </div>
+      <div
+        v-if="currentStep === PROGRESS_STATUS_MAP['not-finished'].step"
+        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+        @click="onSelectProgress(PROGRESS_STATUS_MAP['not-finished'].id)"
+      >
+        <IconBookOff :size="32" class="text-main" />
+        {{ PROGRESS_STATUS_MAP['not-finished'].description }}
+      </div>
+    </div>
+  </bl-modal>
 </template>
 
 <script setup lang="ts">
@@ -251,7 +293,13 @@ import { faker } from '@faker-js/faker'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
-import type { icons } from '@tabler/icons-vue'
+import {
+  type icons,
+  IconEyeglass2,
+  IconBook,
+  IconBookOff,
+  IconPlayerPause,
+} from '@tabler/icons-vue'
 
 const route = useRoute()
 
@@ -259,74 +307,59 @@ const isNew = computed(() => route.params.id === 'new')
 
 const PROGRESS_STATUS_MAP: Record<
   BookProgressStatus,
-  { description: string; step: number; icon: keyof typeof icons }
+  {
+    id: BookProgressStatus
+    description: string
+    step: number
+    icon: keyof typeof icons
+  }
 > = {
   unread: {
+    id: 'unread',
     step: 1,
     description: 'Not read',
     icon: 'IconBook2',
   },
   queued: {
+    id: 'queued',
     step: 2,
     description: 'Queued',
     icon: 'IconStackPush',
   },
   reading: {
+    id: 'reading',
     step: 3,
     description: 'Reading',
     icon: 'IconEyeglass2',
   },
   paused: {
+    id: 'paused',
     step: 3,
     description: 'Paused',
-    icon: 'IconEyeglass2',
+    icon: 'IconPlayerPause',
   },
   read: {
+    id: 'read',
     step: 4,
     description: 'Read',
     icon: 'IconBook',
   },
   'not-finished': {
+    id: 'not-finished',
     step: 4,
     description: 'Not finished',
     icon: 'IconBookOff',
   },
 }
 
-const progressStatusOptions = [
-  {
-    options: [
-      { label: PROGRESS_STATUS_MAP.unread.description, value: 'unread' },
-      { label: PROGRESS_STATUS_MAP.queued.description, value: 'queued' },
-    ],
-  },
-  {
-    label: 'Reading',
-    options: [
-      { label: PROGRESS_STATUS_MAP.reading.description, value: 'reading' },
-      { label: PROGRESS_STATUS_MAP.paused.description, value: 'paused' },
-    ],
-  },
-  {
-    label: 'Finished',
-    options: [
-      { label: PROGRESS_STATUS_MAP.read.description, value: 'read' },
-      {
-        label: PROGRESS_STATUS_MAP['not-finished'].description,
-        value: 'not-finished',
-      },
-    ],
-  },
-]
-
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const deleteModalRef = ref()
+const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
-const progressStatusSelectOption = ref<BookProgressStatus>()
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
@@ -340,11 +373,11 @@ const formattedDate = computed(() =>
   format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
-const currentStep = computed(() => {
-  return progressStatusSelectOption.value
-    ? PROGRESS_STATUS_MAP[progressStatusSelectOption.value].step
-    : 1
-})
+const currentStep = ref<number | undefined>(
+  book.value
+    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'unread'].step
+    : undefined,
+)
 
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
@@ -353,10 +386,10 @@ const languageSelectOptions = computed(() =>
 const progressSteps = computed(() => [
   PROGRESS_STATUS_MAP.unread,
   PROGRESS_STATUS_MAP.queued,
-  progressStatusSelectOption.value === 'paused'
+  book.value?.progressStatus === 'paused'
     ? PROGRESS_STATUS_MAP.paused
     : PROGRESS_STATUS_MAP.reading,
-  progressStatusSelectOption.value === 'not-finished'
+  book.value?.progressStatus === 'not-finished'
     ? PROGRESS_STATUS_MAP['not-finished']
     : PROGRESS_STATUS_MAP.read,
 ])
@@ -364,17 +397,6 @@ const progressSteps = computed(() => [
 watch(isNew, () => {
   managingCollections.value = isNew.value
 })
-
-watch(progressStatusSelectOption, (progressStatus) => {
-  if (book.value) {
-    book.value.progressStatus = progressStatus
-    onSubmit(book.value)
-  }
-})
-
-function openDeleteModal() {
-  deleteModalRef.value.setIsOpen(true)
-}
 
 async function fetchBook() {
   if (isNew.value) {
@@ -393,7 +415,8 @@ async function fetchBook() {
     }))
     .sort((b1, b2) => b1.name.localeCompare(b2.name))
 
-  progressStatusSelectOption.value = book.value?.progressStatus ?? 'unread'
+  currentStep.value =
+    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'unread'].step
 }
 
 async function deleteBook() {
@@ -443,6 +466,7 @@ async function onSubmit(bookValues: Book) {
         tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
         genres: book.value?.genres ?? [],
         rating: book.value?.rating,
+        progressStatus: book.value?.progressStatus,
       },
     })
 
@@ -478,6 +502,27 @@ async function onRemoveGenre(index: number) {
     const _genres: string[] = (book.value.genres ?? []).concat()
     _genres.splice(index, 1)
     book.value.genres = _genres
+  }
+}
+
+function onSelectProgress(progressStatus: BookProgressStatus) {
+  if (book.value) {
+    book.value.progressStatus = progressStatus
+  }
+  stepperModalOpen.value = false
+}
+
+function onProgressChange(progressStatusStep: number) {
+  const progressStatus = progressSteps.value.find(
+    ({ step }) => progressStatusStep === step,
+  )
+
+  if (progressStatus) {
+    if (progressStatus.step === 3 || progressStatus.step === 4) {
+      stepperModalOpen.value = true
+    } else if (book.value) {
+      book.value.progressStatus = progressStatus.id
+    }
   }
 }
 

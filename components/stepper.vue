@@ -1,6 +1,6 @@
 <template>
   <StepperRoot
-    v-model:model-value="_currentStep"
+    v-model:model-value="currentStep"
     class="mb-16 flex w-full pt-2"
     :linear="linear"
   >
@@ -24,6 +24,7 @@
           'size-10': !small,
           'size-8': small,
         }"
+        @click="$emit('change', item.step)"
       >
         <StepperIndicator as="h5">
           <component
@@ -31,7 +32,7 @@
             v-if="item.icon"
             :size="small ? 18 : 20"
           />
-          {{ icons[item.icon] ? '' : item.step }}
+          {{ item.icon && icons[item.icon] ? '' : item.step }}
         </StepperIndicator>
       </StepperTrigger>
 
@@ -68,7 +69,6 @@ import {
   StepperTrigger,
 } from 'radix-vue'
 import { icons } from '@tabler/icons-vue'
-import { useVModel } from '@vueuse/core'
 
 type Step = {
   step: number
@@ -77,10 +77,9 @@ type Step = {
   icon?: keyof typeof icons
 }
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     steps: Step[]
-    currentStep?: number
     linear?: boolean
     interactive?: boolean
     small?: boolean
@@ -88,7 +87,9 @@ const props = withDefaults(
   { linear: false, interactive: false },
 )
 
-const emit = defineEmits(['update:currentStep'])
+defineEmits<{
+  (e: 'change', step: number): void
+}>()
 
-const _currentStep = useVModel(props, 'currentStep', emit, { passive: true })
+const currentStep = defineModel<number>()
 </script>

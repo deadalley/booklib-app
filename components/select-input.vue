@@ -42,7 +42,7 @@ withDefaults(
   defineProps<{
     editing?: boolean
     hidden?: boolean
-    options: { label: string; value: string | number }[]
+    options: { label: string; value: string }[]
   }>(),
   {
     editing: true,

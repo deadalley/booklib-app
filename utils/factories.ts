@@ -18,6 +18,10 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     summary: faker.lorem.lines(5),
     year: faker.date.past().getFullYear(),
     genres: faker.helpers.multiple(faker.color.human, { count: 5 }),
+    progressStatus: 'unread',
+    startedAt: faker.date.past().toISOString(),
+    finishedAt: faker.date.past().toISOString(),
+    collections: [],
     ...overwrite,
   }
 }

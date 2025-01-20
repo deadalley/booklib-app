@@ -10,7 +10,7 @@
 const props = withDefaults(
   defineProps<{
     context: {
-      options: { label: string; value: string | number }[]
+      options: { label: string; value: string }[]
       placeholder?: string
       node: { input: (value: string) => void; _value: string }
     }
