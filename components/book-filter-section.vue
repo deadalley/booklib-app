@@ -25,6 +25,8 @@
 </template>
 
 <script setup lang="ts">
+import languageOptions from '~/public/languages-2.json'
+
 defineProps<{
   title: string
   elements: string[]
@@ -37,7 +39,7 @@ const selectedElements = defineModel({
 })
 
 function getDisplayValue(element: string) {
-  return getDisplayLanguage(element)
+  return languageOptions[element as keyof typeof languageOptions] ?? element
 }
 
 function onSelect(element: string) {
