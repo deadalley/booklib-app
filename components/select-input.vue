@@ -1,10 +1,7 @@
 <template>
   <div v-if="!editing && !hidden" class="formkit-wrapper flex-1">
     <label class="formkit-label">{{ $attrs.label }}</label>
-    <h5 v-if="inputModel && $attrs.type !== 'textarea'">{{ displayValue }}</h5>
-    <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
-      {{ displayValue }}
-    </p>
+    <h5 v-if="inputModel">{{ displayValue }}</h5>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
   <!-- @ts-expect-error options is used by the underlying select component -->
@@ -38,7 +35,7 @@ const attrs = useAttrs()
 const inputModel = ref()
 const focused = ref(false)
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     editing?: boolean
     hidden?: boolean
@@ -58,10 +55,7 @@ useFormKitContext((form) => {
 })
 
 const displayValue = computed(() => {
-  if ((attrs.name as string).toLowerCase().includes('language')) {
-    return getDisplayLanguage(attrs.value as string)
-  }
-  return inputModel.value
+  return props.options.find(({ value }) => value === inputModel.value)?.label
 })
 
 function onFocus() {
