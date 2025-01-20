@@ -2,6 +2,7 @@ import type { Book } from '~/types/book'
 import type { BookDB, CollectionDB } from '~/types/database'
 import languageOptions from '../public/languages-2.json'
 import type { Collection } from '~/types/collection'
+import { toSimpleDate } from './date'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
@@ -28,8 +29,8 @@ export function dbBookToBook(
     genres: dbBook.genres ?? [],
     collections: collections.map(({ id }) => id),
     progressStatus: dbBook.progress_status ?? undefined,
-    startedAt: dbBook.started_at ?? undefined,
-    finishedAt: dbBook.finished_at ?? undefined,
+    startedAt: toSimpleDate(dbBook.started_at) ?? undefined,
+    finishedAt: toSimpleDate(dbBook.finished_at) ?? undefined,
   }
 }
 
@@ -83,8 +84,4 @@ export function collectionToDbCollection(
     user_id: userId,
     name: collection.name,
   }
-}
-
-export function getDisplayLanguage(langCode: string) {
-  return languageOptions[langCode as keyof typeof languageOptions] ?? langCode
 }

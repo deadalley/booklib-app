@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full">
+  <div class="relative w-full" :class="$props.class">
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
         :class="{

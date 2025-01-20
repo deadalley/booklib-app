@@ -1,6 +1,7 @@
 <template>
   <bl-raw-select
     v-model="selectValue"
+    :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
     :with-wrapper="false"
@@ -11,6 +12,7 @@
 const props = withDefaults(
   defineProps<{
     context: {
+      attrs?: { class?: string }
       options: { label: string; value: string }[]
       placeholder?: string
       node: { input: (value: string) => void; _value: string }

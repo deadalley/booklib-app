@@ -66,10 +66,79 @@
         </div>
         <div class="mt-4 flex flex-col gap-2">
           <bl-stepper
-            v-if="!editing"
             v-model="currentStep"
+            :interactive="true"
             :steps="progressSteps"
+            @change="onProgressChange"
           />
+          <bl-modal v-model="stepperModalOpen" :with-close-button="false">
+            <div class="flex flex-col gap-3">
+              <div class="flex justify-center gap-3">
+                <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP.reading.step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP.reading.id)"
+                >
+                  <IconEyeglass2 :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP.reading.description }}
+                </div>
+                <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP.paused.step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP.paused.id)"
+                >
+                  <IconPlayerPause :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP.paused.description }}
+                </div>
+                <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP.read.step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP.read.id)"
+                >
+                  <IconBook :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP.read.description }}
+                </div>
+                <div
+                  v-if="
+                    currentStep === PROGRESS_STATUS_MAP['not-finished'].step
+                  "
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="
+                    onSelectProgress(PROGRESS_STATUS_MAP['not-finished'].id)
+                  "
+                >
+                  <IconBookOff :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP['not-finished'].description }}
+                </div>
+              </div>
+              <bl-input
+                v-if="
+                  currentStep === PROGRESS_STATUS_MAP.reading.step ||
+                  currentStep === PROGRESS_STATUS_MAP.paused.step
+                "
+                id="startedAt"
+                v-model="book.startedAt"
+                :editing="true"
+                type="date"
+                label="Started reading on"
+                placeholder="Start date"
+                :formatter="dateFormatter"
+              />
+              <bl-input
+                v-if="
+                  currentStep === PROGRESS_STATUS_MAP.read.step ||
+                  currentStep === PROGRESS_STATUS_MAP['not-finished'].step
+                "
+                id="finishedAt"
+                :editing="true"
+                :value="book.finishedAt"
+                type="date"
+                label="Finished reading on"
+                placeholder="End date"
+                :formatter="dateFormatter"
+              />
+            </div>
+          </bl-modal>
         </div>
       </div>
 
@@ -78,8 +147,8 @@
           class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto"
         >
           <FormKit
+            v-model="book"
             type="form"
-            :value="book ?? {}"
             :actions="false"
             @submit="onSubmit"
           >
@@ -110,7 +179,6 @@
                     label="Language"
                     placeholder="Language"
                     :options="languageSelectOptions"
-                    :value="book.language"
                   />
                 </div>
                 <div class="form-row">
@@ -148,7 +216,6 @@
                     label="Original Language"
                     placeholder="Original Language"
                     :options="languageSelectOptions"
-                    :value="book.originalLanguage"
                   />
                 </div>
                 <div class="form-row">
@@ -169,6 +236,26 @@
                     label="Summary"
                     placeholder="Summary"
                     :rows="4"
+                  />
+                </div>
+                <div class="form-row">
+                  <bl-input
+                    id="startedAt"
+                    type="date"
+                    :editing="editing"
+                    name="startedAt"
+                    label="Started reading on"
+                    placeholder="Start date"
+                    :formatter="dateFormatter"
+                  />
+                  <bl-input
+                    id="finishedAt"
+                    :editing="editing"
+                    type="date"
+                    name="finishedAt"
+                    label="Finished reading on"
+                    placeholder="End date"
+                    :formatter="dateFormatter"
                   />
                 </div>
               </div>
@@ -196,15 +283,6 @@
                   :on-remove="onRemoveGenre"
                 />
               </div>
-            </section>
-            <section v-if="editing" class="book-section">
-              <h4>Progress</h4>
-              <bl-stepper
-                v-model="currentStep"
-                :steps="progressSteps"
-                :interactive="true"
-                @change="onProgressChange"
-              />
             </section>
             <section
               v-if="!!collectionsDisplayed.length"
@@ -245,43 +323,6 @@
       </ClientOnly>
     </div>
   </div>
-
-  <bl-modal v-model="stepperModalOpen" :with-close-button="false">
-    <div class="flex justify-center gap-3">
-      <div
-        v-if="currentStep === PROGRESS_STATUS_MAP.reading.step"
-        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-        @click="onSelectProgress(PROGRESS_STATUS_MAP.reading.id)"
-      >
-        <IconEyeglass2 :size="32" class="text-main" />
-        {{ PROGRESS_STATUS_MAP.reading.description }}
-      </div>
-      <div
-        v-if="currentStep === PROGRESS_STATUS_MAP.paused.step"
-        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-        @click="onSelectProgress(PROGRESS_STATUS_MAP.paused.id)"
-      >
-        <IconPlayerPause :size="32" class="text-main" />
-        {{ PROGRESS_STATUS_MAP.paused.description }}
-      </div>
-      <div
-        v-if="currentStep === PROGRESS_STATUS_MAP.read.step"
-        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-        @click="onSelectProgress(PROGRESS_STATUS_MAP.read.id)"
-      >
-        <IconBook :size="32" class="text-main" />
-        {{ PROGRESS_STATUS_MAP.read.description }}
-      </div>
-      <div
-        v-if="currentStep === PROGRESS_STATUS_MAP['not-finished'].step"
-        class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-        @click="onSelectProgress(PROGRESS_STATUS_MAP['not-finished'].id)"
-      >
-        <IconBookOff :size="32" class="text-main" />
-        {{ PROGRESS_STATUS_MAP['not-finished'].description }}
-      </div>
-    </div>
-  </bl-modal>
 </template>
 
 <script setup lang="ts">
@@ -297,6 +338,7 @@ import {
   IconBookOff,
   IconPlayerPause,
 } from '@tabler/icons-vue'
+import { toDefaultDate } from '../../../utils/date'
 
 const route = useRoute()
 
@@ -350,7 +392,7 @@ const PROGRESS_STATUS_MAP: Record<
 }
 
 const managingCollections = ref(isNew.value)
-const editing = ref(isNew.value)
+const editing = ref(false)
 const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)
@@ -504,6 +546,7 @@ async function onRemoveGenre(index: number) {
 function onSelectProgress(progressStatus: BookProgressStatus) {
   if (book.value) {
     book.value.progressStatus = progressStatus
+    onSubmit(book.value)
   }
   stepperModalOpen.value = false
 }
@@ -518,8 +561,13 @@ function onProgressChange(progressStatusStep: number) {
       stepperModalOpen.value = true
     } else if (book.value) {
       book.value.progressStatus = progressStatus.id
+      onSubmit(book.value)
     }
   }
+}
+
+function dateFormatter(date: Date | undefined): string | undefined {
+  return date && toDefaultDate(date)
 }
 
 onMounted(() => {

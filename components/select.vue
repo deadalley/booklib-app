@@ -6,11 +6,11 @@
   </div>
   <!-- @ts-expect-error options is used by the underlying select component -->
   <FormKit
-    v-if="editing && !hidden"
     v-model="inputModel"
     v-bind="$attrs"
+    :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: 'flex-1',
+      outer: `flex-1 ${editing ? '' : '!hidden'}`,
       label: 'ml-4',
       inner: '!gap-0 relative',
     }"
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { IconCircleOff } from '@tabler/icons-vue'
-import { useFormKitContext, createInput } from '@formkit/vue'
+import { createInput } from '@formkit/vue'
 
 import SelectForInput from '../components/select-for-input.vue'
 
@@ -31,7 +31,6 @@ const rawSelect = createInput(SelectForInput, {
   props: ['options', 'placeholder'],
 })
 
-const attrs = useAttrs()
 const inputModel = ref()
 const focused = ref(false)
 
@@ -46,13 +45,6 @@ const props = withDefaults(
     hidden: false,
   },
 )
-
-useFormKitContext((form) => {
-  const name = attrs.name as string
-  const formValues = form._value as Record<string, unknown>
-
-  inputModel.value = formValues[name] ?? ''
-})
 
 const displayValue = computed(() => {
   return props.options.find(({ value }) => value === inputModel.value)?.label

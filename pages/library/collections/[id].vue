@@ -72,8 +72,8 @@
           class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2] [&>.formkit-form]:h-full"
         >
           <FormKit
+            v-model="collection"
             type="form"
-            :value="collection ?? {}"
             :actions="false"
             @submit="onSubmit"
           >

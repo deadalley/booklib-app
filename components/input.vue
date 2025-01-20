@@ -7,10 +7,11 @@
     </p>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
+  <!-- @vue-skip -->
   <FormKit
-    v-if="editing && !hidden"
     v-model="inputModel"
     v-bind="$attrs"
+    :class="{ hidden: !(editing && !hidden) }"
     :classes="{
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'flex-1',
@@ -29,29 +30,28 @@
 
 <script setup lang="ts">
 import { IconCircleOff } from '@tabler/icons-vue'
-import { useFormKitContext } from '@formkit/vue'
 
-const attrs = useAttrs()
 const inputModel = ref()
 const focused = ref(false)
 
-withDefaults(defineProps<{ editing?: boolean; hidden?: boolean }>(), {
-  editing: true,
-  hidden: false,
-})
-
-useFormKitContext((form) => {
-  const name = attrs.name as string
-  const formValues = form._value as Record<string, unknown>
-
-  inputModel.value = formValues[name] ?? ''
-})
+const props = withDefaults(
+  defineProps<{
+    editing?: boolean
+    hidden?: boolean
+    defaultValue?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    formatter?: (value: any) => string | undefined
+  }>(),
+  {
+    editing: true,
+    hidden: false,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    formatter: (value: any) => value && `${value}`,
+  },
+)
 
 const displayValue = computed(() => {
-  if ((attrs.name as string).toLowerCase().includes('language')) {
-    return getDisplayLanguage(attrs.value as string)
-  }
-  return inputModel.value
+  return props.formatter(inputModel.value)
 })
 
 function onFocus() {
