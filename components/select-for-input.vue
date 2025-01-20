@@ -2,6 +2,7 @@
   <bl-raw-select
     v-model="selectValue"
     :options="context.options"
+    :placeholder="context.placeholder"
     :with-wrapper="false"
   />
 </template>
