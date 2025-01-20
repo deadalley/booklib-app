@@ -22,11 +22,9 @@
             <bl-button variant="secondary" @click="onCancel">
               {{ isNew ? 'Cancel' : 'Discard changes' }}
             </bl-button>
-            <FormKit type="submit">
-              <bl-button type="submit">{{
-                isNew ? 'Create book' : 'Save changes'
-              }}</bl-button>
-            </FormKit>
+            <bl-button @click="onSubmit(book)">
+              {{ isNew ? 'Create book' : 'Save changes' }}
+            </bl-button>
           </div>
 
           <bl-button
