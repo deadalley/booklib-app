@@ -65,7 +65,11 @@
           />
         </div>
         <div class="mt-4 flex flex-col gap-2">
-          <bl-stepper v-model="currentStep" :steps="progressSteps" />
+          <bl-stepper
+            v-if="!editing"
+            v-model="currentStep"
+            :steps="progressSteps"
+          />
         </div>
       </div>
 
