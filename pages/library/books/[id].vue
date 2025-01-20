@@ -98,7 +98,7 @@
                     label="Publisher"
                     placeholder="Publisher"
                   />
-                  <bl-select-input
+                  <bl-select
                     id="language"
                     type="select"
                     :editing="editing"
@@ -137,7 +137,7 @@
                     label="Original Title"
                     placeholder="Original Title"
                   />
-                  <bl-select-input
+                  <bl-select
                     id="originalLanguage"
                     :editing="editing"
                     name="originalLanguage"
