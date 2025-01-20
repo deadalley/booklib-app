@@ -44,7 +44,7 @@
               @confirm="deleteCollection"
             >
               <template #trigger>
-                <bl-button compact @click="openDeleteModal">Delete</bl-button>
+                <bl-button @click="openDeleteModal">Delete</bl-button>
               </template>
               <template #title
                 >Are you sure you want to delete

@@ -7,7 +7,6 @@
     </p>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
-  <!-- @vue-skip -->
   <FormKit
     v-model="inputModel"
     v-bind="$attrs"
@@ -25,11 +24,14 @@
     <template v-for="(_, name) in $slots" #[name]="slotData"
       ><slot :name="name" v-bind="slotData"
     /></template>
+    <template v-if="clearable && !$slots['suffixIcon']" #suffixIcon>
+      <IconX class="cursor-pointer" :size="14" @click="onClear" />
+    </template>
   </FormKit>
 </template>
 
 <script setup lang="ts">
-import { IconCircleOff } from '@tabler/icons-vue'
+import { IconCircleOff, IconX } from '@tabler/icons-vue'
 
 const inputModel = ref()
 const focused = ref(false)
@@ -38,7 +40,7 @@ const props = withDefaults(
   defineProps<{
     editing?: boolean
     hidden?: boolean
-    defaultValue?: string
+    clearable?: boolean
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formatter?: (value: any) => string | undefined
   }>(),
@@ -60,5 +62,9 @@ function onFocus() {
 
 function onBlur() {
   focused.value = false
+}
+
+function onClear() {
+  inputModel.value = undefined
 }
 </script>

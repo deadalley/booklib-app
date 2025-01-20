@@ -27,17 +27,12 @@
             </bl-button>
           </div>
 
-          <bl-button
-            v-if="!editing"
-            compact
-            variant="secondary"
-            @click="onEdit(true)"
-          >
+          <bl-button v-if="!editing" variant="secondary" @click="onEdit(true)">
             Edit
           </bl-button>
           <bl-modal v-if="!isNew && !editing" size="sm" @confirm="deleteBook">
             <template #trigger>
-              <bl-button compact>Delete</bl-button>
+              <bl-button>Delete</bl-button>
             </template>
             <template #title>
               Are you sure you want to delete <strong>{{ book.title }}</strong>
@@ -111,32 +106,6 @@
                   {{ PROGRESS_STATUS_MAP['not-finished'].description }}
                 </div>
               </div>
-              <bl-input
-                v-if="
-                  currentStep === PROGRESS_STATUS_MAP.reading.step ||
-                  currentStep === PROGRESS_STATUS_MAP.paused.step
-                "
-                id="startedAt"
-                v-model="book.startedAt"
-                :editing="true"
-                type="date"
-                label="Started reading on"
-                placeholder="Start date"
-                :formatter="dateFormatter"
-              />
-              <bl-input
-                v-if="
-                  currentStep === PROGRESS_STATUS_MAP.read.step ||
-                  currentStep === PROGRESS_STATUS_MAP['not-finished'].step
-                "
-                id="finishedAt"
-                :editing="true"
-                :value="book.finishedAt"
-                type="date"
-                label="Finished reading on"
-                placeholder="End date"
-                :formatter="dateFormatter"
-              />
             </div>
           </bl-modal>
         </div>
@@ -246,6 +215,7 @@
                     name="startedAt"
                     label="Started reading on"
                     placeholder="Start date"
+                    clearable
                     :formatter="dateFormatter"
                   />
                   <bl-input
@@ -255,6 +225,7 @@
                     name="finishedAt"
                     label="Finished reading on"
                     placeholder="End date"
+                    clearable
                     :formatter="dateFormatter"
                   />
                 </div>

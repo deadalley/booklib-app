@@ -53,9 +53,7 @@
               />
 
               <FormKit type="submit" class="w-full">
-                <bl-button expand type="submit" compact
-                  >Create account</bl-button
-                >
+                <bl-button expand type="submit">Create account</bl-button>
               </FormKit>
             </FormKit>
 

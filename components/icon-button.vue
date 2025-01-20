@@ -20,7 +20,6 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    compact?: boolean
     disabled?: boolean
     variant?: 'primary' | 'secondary' | 'tertiary'
   }>(),

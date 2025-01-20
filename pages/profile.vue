@@ -55,11 +55,11 @@
             </section>
 
             <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button compact variant="secondary" @click="onCancel">
+              <bl-button variant="secondary" @click="onCancel">
                 Discard changes
               </bl-button>
               <FormKit type="submit">
-                <bl-button type="submit" compact>Save changes</bl-button>
+                <bl-button type="submit">Save changes</bl-button>
               </FormKit>
             </div>
           </FormKit>

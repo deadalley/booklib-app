@@ -29,8 +29,10 @@ export function dbBookToBook(
     genres: dbBook.genres ?? [],
     collections: collections.map(({ id }) => id),
     progressStatus: dbBook.progress_status ?? undefined,
-    startedAt: toSimpleDate(dbBook.started_at) ?? undefined,
-    finishedAt: toSimpleDate(dbBook.finished_at) ?? undefined,
+    startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : undefined,
+    finishedAt: dbBook.finished_at
+      ? toSimpleDate(dbBook.finished_at)
+      : undefined,
   }
 }
 
