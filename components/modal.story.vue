@@ -1,18 +1,8 @@
-<script setup>
-import { ref } from 'vue'
-
-const modalRef = ref()
-
-function openModal() {
-  modalRef.value.setIsOpen(true)
-}
-</script>
-
 <template>
   <Story title="Organisms/Modal">
-    <bl-modal ref="modalRef">
+    <bl-modal>
       <template #trigger>
-        <bl-button @click="openModal">Open</bl-button>
+        <bl-button>Open</bl-button>
       </template>
       <template #title>Modal Title</template>
       This is modal content.

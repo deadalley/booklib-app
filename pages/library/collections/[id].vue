@@ -42,8 +42,8 @@
             <bl-modal
               v-if="!isNew && !editing"
               ref="deleteModalRef"
-              :on-confirm="deleteCollection"
               size="sm"
+              @confirm="deleteCollection"
             >
               <template #trigger>
                 <bl-button compact @click="openDeleteModal">Delete</bl-button>

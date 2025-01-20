@@ -37,12 +37,7 @@
           >
             Edit
           </bl-button>
-          <bl-modal
-            v-if="!isNew && !editing"
-            ref="deleteModalRef"
-            :on-confirm="deleteBook"
-            size="sm"
-          >
+          <bl-modal v-if="!isNew && !editing" size="sm" @confirm="deleteBook">
             <template #trigger>
               <bl-button compact>Delete</bl-button>
             </template>
@@ -354,7 +349,6 @@ const PROGRESS_STATUS_MAP: Record<
 
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
-const deleteModalRef = ref()
 const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)

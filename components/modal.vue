@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <DialogRoot :open="open">
-    <DialogTrigger>
+    <DialogTrigger @click="open = true">
       <slot name="trigger" />
     </DialogTrigger>
     <DialogPortal>
@@ -71,7 +71,7 @@ import {
 } from 'radix-vue'
 import { IconX } from '@tabler/icons-vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
     withCloseButton?: boolean
@@ -83,13 +83,17 @@ const props = withDefaults(
 
 const open = defineModel<boolean>({ default: false })
 
+const emit = defineEmits<{ (e: 'cancel' | 'confirm'): void }>()
+
 function _onCancel() {
-  props.onCancel?.()
+  // props.onCancel?.()
+  emit('cancel')
   open.value = false
 }
 
 function _onConfirm() {
-  props.onConfirm?.()
+  // props.onConfirm?.()
+  emit('confirm')
   open.value = false
 }
 </script>

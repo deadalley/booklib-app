@@ -72,7 +72,7 @@
             collections. You won't be able to track your books or see any
             statistics anymore. This action cannot be undone.
           </p>
-          <bl-modal :on-confirm="deleteAccount" size="sm">
+          <bl-modal size="sm" @confirm="deleteAccount">
             <template #trigger>
               <bl-button class="mt-4">Delete account</bl-button>
             </template>
