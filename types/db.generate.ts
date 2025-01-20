@@ -163,7 +163,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      BookProgress: 'queued' | 'reading' | 'paused' | 'read' | 'not-finished'
+      BookProgress:
+        | 'wishlist'
+        | 'owned'
+        | 'not-read'
+        | 'queued'
+        | 'reading'
+        | 'paused'
+        | 'read'
+        | 'not-finished'
     }
     CompositeTypes: {
       [_ in never]: never

@@ -70,6 +70,30 @@
             <div class="flex flex-col gap-3">
               <div class="flex justify-center gap-3">
                 <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP['not-read'].step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP['not-read'].id)"
+                >
+                  <IconBook2 :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP['not-read'].description }}
+                </div>
+                <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP['wishlist'].step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP['wishlist'].id)"
+                >
+                  <IconGift :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP['wishlist'].description }}
+                </div>
+                <div
+                  v-if="currentStep === PROGRESS_STATUS_MAP.owned.step"
+                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                  @click="onSelectProgress(PROGRESS_STATUS_MAP.owned.id)"
+                >
+                  <IconArchive :size="32" class="text-main" />
+                  {{ PROGRESS_STATUS_MAP.owned.description }}
+                </div>
+                <div
                   v-if="currentStep === PROGRESS_STATUS_MAP.reading.step"
                   class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
                   @click="onSelectProgress(PROGRESS_STATUS_MAP.reading.id)"
@@ -306,8 +330,11 @@ import {
   type icons,
   IconEyeglass2,
   IconBook,
+  IconBook2,
   IconBookOff,
   IconPlayerPause,
+  IconGift,
+  IconArchive,
 } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 
@@ -324,8 +351,20 @@ const PROGRESS_STATUS_MAP: Record<
     icon: keyof typeof icons
   }
 > = {
-  unread: {
-    id: 'unread',
+  wishlist: {
+    id: 'wishlist',
+    step: 1,
+    description: 'Wishlist',
+    icon: 'IconGift',
+  },
+  owned: {
+    id: 'owned',
+    step: 1,
+    description: 'Owned',
+    icon: 'IconArchive',
+  },
+  'not-read': {
+    id: 'not-read',
     step: 1,
     description: 'Not read',
     icon: 'IconBook2',
@@ -384,7 +423,7 @@ const formattedDate = computed(() =>
 
 const currentStep = ref<number | undefined>(
   book.value
-    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'unread'].step
+    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'not-read'].step
     : undefined,
 )
 
@@ -393,7 +432,11 @@ const languageSelectOptions = computed(() =>
 )
 
 const progressSteps = computed(() => [
-  PROGRESS_STATUS_MAP.unread,
+  book.value?.progressStatus === 'wishlist'
+    ? PROGRESS_STATUS_MAP.wishlist
+    : book.value?.progressStatus === 'owned'
+      ? PROGRESS_STATUS_MAP.owned
+      : PROGRESS_STATUS_MAP['not-read'],
   PROGRESS_STATUS_MAP.queued,
   book.value?.progressStatus === 'paused'
     ? PROGRESS_STATUS_MAP.paused
@@ -425,7 +468,7 @@ async function fetchBook() {
     .sort((b1, b2) => b1.name.localeCompare(b2.name))
 
   currentStep.value =
-    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'unread'].step
+    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-read'].step
 }
 
 async function deleteBook() {
@@ -528,7 +571,11 @@ function onProgressChange(progressStatusStep: number) {
   )
 
   if (progressStatus) {
-    if (progressStatus.step === 3 || progressStatus.step === 4) {
+    if (
+      progressStatus.step === PROGRESS_STATUS_MAP.owned.step ||
+      progressStatus.step === PROGRESS_STATUS_MAP.reading.step ||
+      progressStatus.step === PROGRESS_STATUS_MAP.read.step
+    ) {
       stepperModalOpen.value = true
     } else if (book.value) {
       book.value.progressStatus = progressStatus.id
