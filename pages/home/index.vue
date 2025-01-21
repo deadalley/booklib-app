@@ -26,15 +26,35 @@
         </NuxtLink>
       </div>
     </div>
+    <div>
+      <div class="flex w-full flex-col gap-4 overflow-x-auto">
+        <h4>Your latest books</h4>
+        <div
+          class="relative flex size-max gap-x-2 transition duration-100 ease-out"
+        >
+          <bl-book-card
+            v-for="book in latestBooks"
+            :key="book.title"
+            :book="book"
+            class="!w-36"
+          />
+        </div>
+      </div>
+    </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { IconPlus } from '@tabler/icons-vue'
+import type { Book } from '~/types/book'
 const user = useSupabaseUser()
 
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+const { data: latestBooks } = await useFetch<
+  Pick<Book, 'id' | 'title' | 'coverSrc'>[]
+>('/api/library/latest-books')
 
+console.log(latestBooks)
 useHead({
   title: 'BookLib | Home',
 })

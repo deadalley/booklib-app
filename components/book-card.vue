@@ -42,6 +42,7 @@ const props = defineProps<{
 const href = `/library/books/${props.book.id}`
 
 const emit = defineEmits(['selected'])
+console.log(props.book)
 
 function onSelect() {
   if (props.selectable) {

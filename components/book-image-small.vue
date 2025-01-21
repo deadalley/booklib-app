@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { IconCheckbox, IconX, IconPlus } from '@tabler/icons-vue'
 
-defineProps<{
+const props = defineProps<{
   href?: string
   alt?: string
   title?: string
@@ -53,6 +53,8 @@ defineProps<{
   selectable?: boolean
   selected?: boolean
 }>()
+
+console.log(props.coverSrc)
 
 defineEmits(['click'])
 
