@@ -26,7 +26,7 @@
         </NuxtLink>
       </div>
     </div>
-    <div>
+    <div v-if="!isEmpty" class="flex flex-col gap-20">
       <div class="flex w-full flex-col gap-4 overflow-x-auto">
         <h4>Your latest books</h4>
         <div
@@ -40,12 +40,17 @@
           />
         </div>
       </div>
+      <div class="flex w-2/3 flex-col gap-4 overflow-x-auto">
+        <h4>Your longest books</h4>
+        <bl-ranking :items="rankedBooks" />
+      </div>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { IconPlus } from '@tabler/icons-vue'
+import type { RankingItem } from '~/components/ranking.client.vue'
 import type { Book } from '~/types/book'
 const user = useSupabaseUser()
 
@@ -54,7 +59,13 @@ const { data: latestBooks } = await useFetch<
   Pick<Book, 'id' | 'title' | 'coverSrc'>[]
 >('/api/library/latest-books')
 
-console.log(latestBooks)
+const rankedBooks = computed<RankingItem[]>(() =>
+  (latestBooks.value ?? []).map((book) => ({
+    label: `${book.title}`,
+    value: book.title.length,
+  })),
+)
+
 useHead({
   title: 'BookLib | Home',
 })
