@@ -42,7 +42,7 @@
       </div>
       <div class="flex w-1/2 flex-col gap-4 overflow-x-auto">
         <h4>Your longest books</h4>
-        <bl-ranking :items="rankedBooks" />
+        <bl-ranking :items="rankedBooks" unit="Pages" />
       </div>
     </div>
   </NuxtLayout>

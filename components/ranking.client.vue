@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-4">
     <apexchart
       type="rangeBar"
-      :height="height ?? _items.length * 36"
+      :height="height ?? _items.length * 64"
       :options="chartOptions"
       :series="series"
     ></apexchart>
@@ -26,6 +26,7 @@ const props = withDefaults(
     max?: number
     scaleFactor?: number
     maxItems?: number
+    unit?: string
   }>(),
   { scaleFactor: 1 },
 )
@@ -46,7 +47,7 @@ const chartWidthAdjust = computed<number>(() => {
   const magnitude = getMagnitude(maxValue.value / props.scaleFactor)
   return (
     props.max ??
-    maxValue.value / props.scaleFactor + magnitude + (magnitude * 5) / 10
+    maxValue.value / props.scaleFactor + magnitude + (magnitude * 7) / 10
   )
 })
 
@@ -58,7 +59,7 @@ const series = computed(() => [
   {
     name: 'highlight',
     data: _items.value.slice(0, 1).map(({ label, value }) => ({
-      x: formatLabel(label, value),
+      x: label,
       y: [chartMin.value, value / props.scaleFactor],
     })),
     color: tailwind.theme.colors.main,
@@ -66,7 +67,7 @@ const series = computed(() => [
   {
     name: 'data',
     data: _items.value.slice(1).map(({ label, value }) => ({
-      x: formatLabel(label, value),
+      x: label,
       y: [chartMin.value, value / props.scaleFactor],
     })),
     color: tailwind.theme.colors['accent-dark'],
@@ -100,9 +101,10 @@ const chartOptions = computed<ApexOptions>(() => ({
   dataLabels: {
     enabled: true,
     textAnchor: 'start',
-    offsetX: 10,
+    offsetX: 20,
+    offsetY: -6,
     style: {
-      fontSize: '18px',
+      fontSize: '20px',
       fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
       colors: [
         tailwind.theme.colors.main,
@@ -113,6 +115,16 @@ const chartOptions = computed<ApexOptions>(() => ({
       const label = series[seriesIndex]?.data[dataPointIndex]?.x
       return label
     },
+  },
+  annotations: {
+    points: [
+      ..._items.value
+        .slice(0, 1)
+        .map(({ label, value }) => getValueAnnotation(label, value, 0)),
+      ..._items.value
+        .slice(1)
+        .map(({ label, value }) => getValueAnnotation(label, value, 1)),
+    ],
   },
   grid: {
     show: false,
@@ -127,33 +139,38 @@ const chartOptions = computed<ApexOptions>(() => ({
   xaxis: {
     min: chartMin.value,
     max: chartWidthAdjust.value,
-    labels: {
-      show: false,
-    },
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
   },
-  yaxis: {
-    labels: {
-      show: false,
-    },
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-  },
+
   tooltip: {
     enabled: false,
   },
 }))
 
-function formatLabel(label: string, value: number) {
-  return `${label} (${value})`
+function getValueAnnotation(
+  label: string,
+  value: number,
+  seriesIndex: number,
+): PointAnnotations {
+  return {
+    y: label as unknown as number, // type does not correspond with expected value
+    x: value,
+    marker: { size: 0, strokeWidth: 0 },
+    label: {
+      borderColor: 'none',
+      textAnchor: 'start',
+      offsetX: 20,
+      offsetY: seriesIndex === 0 ? 8 : 10,
+      style: {
+        background: 'none',
+        color:
+          seriesIndex === 0
+            ? tailwind.theme.colors.black
+            : tailwind.theme.colors['accent-dark'],
+        fontSize: '18px',
+        fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+      },
+      text: `${value} ${props.unit ?? ''}`,
+    },
+  }
 }
 </script>
