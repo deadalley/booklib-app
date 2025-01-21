@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-4">
     <apexchart
       type="rangeBar"
-      :height="height ?? maxItems * 36"
+      :height="height ?? _items.length * 36"
       :options="chartOptions"
       :series="series"
     ></apexchart>
@@ -19,10 +19,15 @@ export type RankingItem = {
 }
 
 const props = withDefaults(
-  defineProps<{ items: RankingItem[]; height?: number; maxItems?: number }>(),
-  {
-    maxItems: 5,
-  },
+  defineProps<{
+    items: RankingItem[]
+    height?: number
+    min?: number
+    max?: number
+    scaleFactor?: number
+    maxItems?: number
+  }>(),
+  { scaleFactor: 1 },
 )
 
 const _items = computed(() => {
@@ -33,16 +38,28 @@ const _items = computed(() => {
   return sortedItems
 })
 
-const chartWidthAdjust = computed<number>(
-  () => Math.max(..._items.value.map(({ value }) => value)) + 28,
+const maxValue = computed<number>(() =>
+  Math.max(..._items.value.map(({ value }) => value)),
 )
+
+const chartWidthAdjust = computed<number>(() => {
+  const magnitude = getMagnitude(maxValue.value / props.scaleFactor)
+  return (
+    props.max ??
+    maxValue.value / props.scaleFactor + magnitude + (magnitude * 5) / 10
+  )
+})
+
+const chartMin = computed<number>(() => {
+  return props.min ?? 0
+})
 
 const series = computed(() => [
   {
     name: 'highlight',
     data: _items.value.slice(0, 1).map(({ label, value }) => ({
       x: formatLabel(label, value),
-      y: [0, value],
+      y: [chartMin.value, value / props.scaleFactor],
     })),
     color: tailwind.theme.colors.main,
   },
@@ -50,7 +67,7 @@ const series = computed(() => [
     name: 'data',
     data: _items.value.slice(1).map(({ label, value }) => ({
       x: formatLabel(label, value),
-      y: [0, value],
+      y: [chartMin.value, value / props.scaleFactor],
     })),
     color: tailwind.theme.colors['accent-dark'],
   },
@@ -108,7 +125,7 @@ const chartOptions = computed<ApexOptions>(() => ({
     },
   },
   xaxis: {
-    min: 0,
+    min: chartMin.value,
     max: chartWidthAdjust.value,
     labels: {
       show: false,

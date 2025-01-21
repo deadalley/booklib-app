@@ -40,7 +40,7 @@
           />
         </div>
       </div>
-      <div class="flex w-2/3 flex-col gap-4 overflow-x-auto">
+      <div class="flex w-1/2 flex-col gap-4 overflow-x-auto">
         <h4>Your longest books</h4>
         <bl-ranking :items="rankedBooks" />
       </div>
@@ -58,11 +58,14 @@ const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
 const { data: latestBooks } = await useFetch<
   Pick<Book, 'id' | 'title' | 'coverSrc'>[]
 >('/api/library/latest-books')
+const { data: rankedBooksByPages } = await useFetch<
+  Required<Pick<Book, 'id' | 'title' | 'pages'>>[]
+>('/api/library/ordered-books?property=pages&count=8')
 
 const rankedBooks = computed<RankingItem[]>(() =>
-  (latestBooks.value ?? []).map((book) => ({
-    label: `${book.title}`,
-    value: book.title.length,
+  (rankedBooksByPages.value ?? []).map((book) => ({
+    label: book.title,
+    value: book.pages,
   })),
 )
 
