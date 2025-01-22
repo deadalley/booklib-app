@@ -78,7 +78,7 @@ import {
   SelectViewport,
 } from 'radix-vue'
 
-type SelectOption = { label: string; value: string }
+export type SelectOption = { label: string; value: string }
 
 withDefaults(
   defineProps<{
