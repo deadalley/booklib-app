@@ -29,7 +29,11 @@
                 upload it to BookLib.
               </p>
             </div>
-            <bl-button class="ml-4" :disabled="!importType">
+            <bl-button
+              class="ml-4"
+              :disabled="!importType"
+              @click="downloadFile"
+            >
               <template #prependIcon="prependIcon">
                 <IconDownload v-bind="prependIcon" />
               </template>
@@ -68,6 +72,17 @@ type ImportType = '.csv'
 
 const importType = ref<ImportType>()
 const importOptions: SelectOption[] = [{ label: '.CSV', value: '.csv' }]
+
+function downloadFile() {
+  console.log(importType.value)
+  if (importType.value) {
+    const link = document.createElement('a')
+    link.href = `/templates/template${importType.value}`
+    link.download = `template${importType.value}`
+    link.target = '_blank'
+    link.click()
+  }
+}
 
 useHead({
   title: 'BookLib | Import',
