@@ -1,12 +1,8 @@
 <template>
   <li
-    class="border-b border-b-accent first:rounded-t-2xl last:rounded-b-2xl last:border-b-0 hover:bg-accent-light"
+    class="border-b border-b-accent px-4 py-2 first:rounded-t-2xl last:rounded-b-2xl last:border-b-0 hover:bg-accent-light"
   >
-    <bl-checkbox
-      v-model="_checked"
-      v-bind="$attrs"
-      class="cursor-pointer px-4 py-2"
-    >
+    <bl-checkbox v-model="_checked" :checked="checked" v-bind="$attrs">
       <slot />
     </bl-checkbox>
   </li>
