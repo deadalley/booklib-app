@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-16">
+  <div class="flex flex-col gap-10">
     <bl-book-filter-section
       v-model="_selectedPublishers"
       title="Publisher"
@@ -22,7 +22,7 @@
       :genre="true"
     />
     <div>
-      <h5 class="mb-4">Year</h5>
+      <h6>Year</h6>
       <bl-slider
         v-model:values="_selectedYearRange"
         :min="minMaxYearRange[0]"
@@ -31,7 +31,7 @@
       />
     </div>
     <div>
-      <h5 class="mb-4">Page</h5>
+      <h6>Page</h6>
       <bl-slider
         v-model:values="_selectedPageRange"
         :min="minMaxPageRange[0]"
@@ -40,7 +40,7 @@
       />
     </div>
     <div v-if="isTableView">
-      <h5 class="mb-4">Table columns</h5>
+      <h6>Table columns</h6>
       <bl-list-checkbox>
         <bl-list-checkbox-option
           v-for="column in tableColumns"

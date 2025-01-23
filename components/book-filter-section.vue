@@ -1,6 +1,6 @@
 <template>
   <div v-if="!!elements.length">
-    <h5 class="mb-4">{{ title }}</h5>
+    <h6 class="mb-4">{{ title }}</h6>
     <div class="flex w-full flex-wrap gap-3">
       <bl-pill
         v-for="element in elements"

@@ -2,7 +2,7 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-2 text-base"
+    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-1 text-base"
     :class="{
       'cursor-pointer hover:bg-main/90': !!attrs.onClick,
       'bg-main-dark': !!selected,
