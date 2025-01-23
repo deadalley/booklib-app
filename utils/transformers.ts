@@ -1,6 +1,5 @@
 import type { Book } from '~/types/book'
 import type { BookDB, CollectionDB } from '~/types/database'
-import languageOptions from '../public/languages-2.json'
 import type { Collection } from '~/types/collection'
 import { toSimpleDate } from './date'
 
@@ -57,11 +56,11 @@ export function bookToDbBook(
     year: nullify(book.year),
     genres: book.genres ?? null,
     progress_status:
-      book.progressStatus === 'unread' || book.progressStatus === undefined
+      book.progressStatus === 'not-read' || book.progressStatus === undefined
         ? null
         : book.progressStatus,
-    started_at: book.startedAt ?? null,
-    finished_at: book.finishedAt ?? null,
+    started_at: nullify(book.startedAt),
+    finished_at: nullify(book.finishedAt),
   }
 }
 

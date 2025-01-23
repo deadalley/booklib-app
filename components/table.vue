@@ -6,9 +6,10 @@
           v-for="header in headerGroup.headers"
           :key="header.id"
           :colSpan="header.colSpan"
-          :class="
-            header.column.getCanSort() ? 'cursor-pointer select-none' : ''
-          "
+          :class="{
+            'cursor-pointer select-none': header.column.getCanSort(),
+            '!p-0 text-center align-middle': header.column.id === 'checked',
+          }"
           :style="{
             width:
               header.column.getSize() === 0
@@ -54,11 +55,14 @@
         :class="{
           'cursor-pointer hover:bg-accent-light/40': !!onRowClick,
         }"
-        @click="onRowClick(row.original)"
+        @click="onRowClick?.(row.original)"
       >
         <td
           v-for="cell in row.getVisibleCells()"
           :key="cell.id"
+          :class="{
+            '!p-0 text-center align-middle': cell.column.id === 'checked',
+          }"
           :style="{
             width:
               cell.column.getSize() === 0
@@ -91,7 +95,7 @@
   </table>
 </template>
 
-<script setup lang="ts" generic="T">
+<script setup lang="ts" generic="T extends { id: string | number }">
 import {
   useVueTable,
   type ColumnDef,
@@ -99,23 +103,71 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   FlexRender,
+  type RowSelectionState,
+  type CellContext,
+  type HeaderContext,
 } from '@tanstack/vue-table'
 import { IconSelector, IconChevronUp, IconChevronDown } from '@tabler/icons-vue'
+import { BlCheckbox } from '#components'
 
 const props = defineProps<{
   data: T[]
   columns: ColumnDef<T, unknown>[]
-  onRowClick: (row: T) => void
+  withCheck?: boolean
+  onRowClick?: (row: T) => void
 }>()
 
 const columnVisibility = ref({})
 const columnOrder = ref<ColumnOrderState>([])
+const rowSelection = ref<RowSelectionState>(
+  props.data.reduce((acc, { id }) => ({ ...acc, [id]: true }), {}),
+)
+
+const emit = defineEmits<{
+  (e: 'select', val: { id: T['id']; selected: boolean }): void
+  (e: 'selected-rows', val: typeof rowSelection.value): void
+}>()
 
 const table = useVueTable({
   get data(): T[] {
     return props.data
   },
   get columns() {
+    if (props.withCheck) {
+      return [
+        {
+          id: 'checked',
+          header: (info: HeaderContext<T, string | undefined>) => {
+            return h(BlCheckbox, {
+              id: 'all-checked',
+              checked: info.table.getIsAllRowsSelected(),
+              onChange: info.table.getToggleAllRowsSelectedHandler(),
+            })
+          },
+          cell: (info: CellContext<T, string | undefined>) => {
+            if (!info.row.getCanSelect()) {
+              return null
+            }
+
+            return h(BlCheckbox, {
+              id: `${info.row.original.id}-checked`,
+              checked: info.row.getIsSelected(),
+              onChange: (event: Event) => {
+                emit('select', {
+                  id: info.row.original.id,
+                  selected: (event.target as HTMLInputElement).checked,
+                })
+                return info.row.getToggleSelectedHandler()(event)
+              },
+            })
+          },
+          enableSorting: false,
+          size: 4,
+        },
+
+        ...props.columns,
+      ]
+    }
     return props.columns
   },
   state: {
@@ -125,6 +177,22 @@ const table = useVueTable({
     get columnOrder() {
       return columnOrder.value
     },
+    get rowSelection() {
+      return rowSelection.value
+    },
+  },
+  enableRowSelection: props.withCheck,
+
+  getRowId: (row) => String(row.id),
+
+  onRowSelectionChange: (updateOrValue) => {
+    const newValue =
+      typeof updateOrValue === 'function'
+        ? updateOrValue(rowSelection.value)
+        : updateOrValue
+
+    emit('selected-rows', newValue)
+    rowSelection.value = newValue
   },
 
   onColumnOrderChange: (order) => {

@@ -18,6 +18,7 @@
     <bl-books-table
       :books="books"
       :selected-table-columns="selectedTableColumns"
+      interactive
     />
   </div>
 </template>

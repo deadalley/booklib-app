@@ -1,17 +1,19 @@
 <template>
   <label
-    :for="value"
+    :for="$attrs.id as string"
     class="flex size-full cursor-pointer items-center gap-3 text-lg text-black"
+    :class="{
+      'justify-center': !$slots['default'],
+    }"
+    @click="onClick"
   >
-    <span class="size-full">
+    <span v-if="$slots['default']" class="size-full">
       <slot />
     </span>
 
     <input
-      :id="value"
-      v-model="checked"
-      :checked="checked"
-      :value="value"
+      v-bind="$attrs"
+      v-model="_checked"
       type="checkbox"
       class="peer relative aspect-square size-5 cursor-pointer appearance-none rounded-lg border border-accent-dark transition-all before:absolute before:left-2/4 before:top-2/4 before:block before:size-12 before:-translate-x-2/4 before:-translate-y-2/4 before:rounded-lg before:opacity-0 before:transition-opacity checked:border-main checked:bg-main checked:before:bg-main"
     />
@@ -37,9 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import type { InputHTMLAttributes } from 'vue'
+import { useVModel } from '@vueuse/core'
 
-defineProps<{ value?: InputHTMLAttributes['value'] }>()
+const props = defineProps<{ checked?: boolean }>()
 
-const checked = defineModel<boolean>()
+const emit = defineEmits(['update:checked'])
+
+const _checked = useVModel(props, 'checked', emit)
+
+function onClick(event: Event) {
+  event.stopPropagation()
+}
 </script>

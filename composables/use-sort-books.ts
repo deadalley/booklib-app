@@ -30,6 +30,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
     originalTitle: { label: 'Original Title', checked: false },
     originalLanguage: { label: 'Original Language', checked: false },
     isbn: { label: 'ISBN', checked: false },
+    progressStatus: { label: 'Progress Status', checked: false },
   }
 
   const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))

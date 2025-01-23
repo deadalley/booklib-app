@@ -1,5 +1,11 @@
 <template>
-  <bl-table :data="books" :columns="columns" :on-row-click="onRowClick" />
+  <bl-table
+    v-bind="$attrs"
+    :data="books"
+    :columns="columns"
+    :on-row-click="interactive ? onRowClick : undefined"
+    :with-check="withCheck"
+  />
 </template>
 
 <script setup lang="ts">
@@ -11,19 +17,24 @@ import {
 import type { Book } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
 import BlRating from './rating.vue'
+import languageOptions from '~/public/languages-2.json'
+
+type DataType = Book & { checked?: boolean }
 
 const props = defineProps<{
-  books: Book[]
+  books: DataType[]
   selectedTableColumns: {
     [key in keyof Book]?: { label: string; checked: boolean }
   }
+  interactive?: boolean
+  withCheck?: boolean
 }>()
 
-const cell = <U,>(info: CellContext<Book, U | null>) => info.getValue()
+const cell = <U,>(info: CellContext<DataType, U | null>) => info.getValue()
 
-const columnHelper = createColumnHelper<Book>()
+const columnHelper = createColumnHelper<DataType>()
 
-const columns = computed(
+const columns = computed<ColumnDef<DataType, unknown>[]>(
   () =>
     [
       columnHelper.accessor('coverSrc', {
@@ -49,7 +60,9 @@ const columns = computed(
       }),
       columnHelper.accessor('language', {
         header: 'Language',
-        cell,
+        cell: (info) =>
+          languageOptions[info.getValue() as keyof typeof languageOptions] ??
+          info.getValue(),
       }),
       columnHelper.accessor('year', {
         header: 'Year',
@@ -59,7 +72,7 @@ const columns = computed(
       columnHelper.accessor('pages', {
         header: 'Pages',
         cell,
-        size: 8,
+        size: 10,
       }),
       columnHelper.accessor('rating', {
         header: 'Rating',
@@ -79,28 +92,37 @@ const columns = computed(
       }),
       columnHelper.accessor('originalTitle', {
         header: 'Original Title',
-        cell,
       }),
       columnHelper.accessor('originalLanguage', {
         header: 'Original Language',
-        cell,
+        cell: (info) =>
+          languageOptions[info.getValue() as keyof typeof languageOptions] ??
+          info.getValue(),
         size: 16,
       }),
       columnHelper.accessor('isbn', {
         header: 'ISBN',
         cell,
       }),
+      columnHelper.accessor('progressStatus', {
+        header: 'Progress Status',
+        cell,
+      }),
     ].filter((column) => {
+      if (!column) {
+        return false
+      }
+
       const key = column.accessorKey as keyof typeof props.selectedTableColumns
 
       return (
         !props.selectedTableColumns[key] ||
         props.selectedTableColumns[key]?.checked
       )
-    }) as ColumnDef<Book, unknown>[],
+    }) as ColumnDef<DataType, unknown>[],
 )
 
-function onRowClick(row: Book) {
+function onRowClick(row: DataType) {
   navigateTo(`/library/books/${row.id}`)
 }
 </script>
