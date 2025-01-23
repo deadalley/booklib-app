@@ -18,6 +18,10 @@
 <script setup lang="ts">
 import { IconPlus } from '@tabler/icons-vue'
 
+const route = useRoute()
+
+const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+
 const navItems = [
   {
     to: '/library/books',
@@ -28,6 +32,10 @@ const navItems = [
     label: 'Collections',
   },
 ]
+
+if (isEmpty.value && !route.path.includes('/new')) {
+  navigateTo('/home')
+}
 
 useHead({
   title: 'BookLib | Library',
