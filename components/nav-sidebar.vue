@@ -12,6 +12,7 @@
           :key="button.label"
           :active="activeItemIndex === index"
           :to="button.to"
+          :disabled="button.disabled"
         >
           <template #icon="iconProps">
             <component v-bind="iconProps" :is="button.icon" />
@@ -44,12 +45,29 @@ import {
 const route = useRoute()
 const supabase = useSupabaseClient()
 
+const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+
 const buttons = [
-  { label: 'Home', icon: IconHome, to: '/home' },
-  { label: 'Library', icon: IconBooks, to: '/library' },
-  { label: 'Statistics', icon: IconChartLine, to: '/stats' },
-  { label: 'Tracking', icon: IconClockHour3, to: '/tracking' },
-  { label: 'Import', icon: IconBookUpload, to: '/import' },
+  { label: 'Home', icon: IconHome, to: '/home', disabled: false },
+  {
+    label: 'Library',
+    icon: IconBooks,
+    to: '/library',
+    disabled: !!isEmpty.value,
+  },
+  {
+    label: 'Statistics',
+    icon: IconChartLine,
+    to: '/stats',
+    disabled: !!isEmpty.value,
+  },
+  {
+    label: 'Tracking',
+    icon: IconClockHour3,
+    to: '/tracking',
+    disabled: !!isEmpty.value,
+  },
+  { label: 'Import', icon: IconBookUpload, to: '/import', disabled: false },
 ]
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),
