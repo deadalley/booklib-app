@@ -24,6 +24,21 @@
             Add first book to library
           </bl-button>
         </NuxtLink>
+        <div
+          class="flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full [&_hr]:text-accent"
+        >
+          <hr />
+          <h6>OR</h6>
+          <hr />
+        </div>
+        <NuxtLink to="/import">
+          <bl-button expand>
+            <template #prependIcon="prependIcon">
+              <IconUpload v-bind="prependIcon" />
+            </template>
+            Import books from file
+          </bl-button>
+        </NuxtLink>
       </div>
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-20">
@@ -49,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconPlus } from '@tabler/icons-vue'
+import { IconPlus, IconUpload } from '@tabler/icons-vue'
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { Book } from '~/types/book'
 const user = useSupabaseUser()
