@@ -327,7 +327,6 @@ import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 import {
-  type icons,
   IconEyeglass2,
   IconBook,
   IconBook2,
@@ -341,65 +340,6 @@ import { toDefaultDate } from '../../../utils/date'
 const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
-
-const PROGRESS_STATUS_MAP: Record<
-  BookProgressStatus,
-  {
-    id: BookProgressStatus
-    description: string
-    step: number
-    icon: keyof typeof icons
-  }
-> = {
-  wishlist: {
-    id: 'wishlist',
-    step: 1,
-    description: 'Wishlist',
-    icon: 'IconGift',
-  },
-  owned: {
-    id: 'owned',
-    step: 1,
-    description: 'Owned',
-    icon: 'IconArchive',
-  },
-  'not-read': {
-    id: 'not-read',
-    step: 1,
-    description: 'Not read',
-    icon: 'IconBook2',
-  },
-  queued: {
-    id: 'queued',
-    step: 2,
-    description: 'Queued',
-    icon: 'IconStackPush',
-  },
-  reading: {
-    id: 'reading',
-    step: 3,
-    description: 'Reading',
-    icon: 'IconEyeglass2',
-  },
-  paused: {
-    id: 'paused',
-    step: 3,
-    description: 'Paused',
-    icon: 'IconPlayerPause',
-  },
-  read: {
-    id: 'read',
-    step: 4,
-    description: 'Read',
-    icon: 'IconBook',
-  },
-  'not-finished': {
-    id: 'not-finished',
-    step: 4,
-    description: 'Not finished',
-    icon: 'IconBookOff',
-  },
-}
 
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)

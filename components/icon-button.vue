@@ -8,7 +8,7 @@
         variant === 'secondary',
       'border border-accent p-2 text-black hover:bg-accent-light active:bg-accent':
         variant === 'tertiary',
-      '!bg-accent-light !text-accent-dark': !!disabled,
+      '!bg-accent-light !text-accent-dark': !!disabled && !keepStyle,
       'cursor-pointer': !disabled,
     }"
     :disabled="disabled"
@@ -22,6 +22,7 @@ withDefaults(
   defineProps<{
     disabled?: boolean
     variant?: 'primary' | 'secondary' | 'tertiary'
+    keepStyle?: boolean // when button is disabled but is displayed in the same style
   }>(),
   { variant: 'primary' },
 )

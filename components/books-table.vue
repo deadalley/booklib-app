@@ -18,6 +18,7 @@ import type { Book } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
 import BlRating from './rating.vue'
 import languageOptions from '~/public/languages-2.json'
+import { BlProgressStatusIcon } from '#components'
 
 type DataType = Book & { checked?: boolean }
 
@@ -105,8 +106,18 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
         cell,
       }),
       columnHelper.accessor('progressStatus', {
-        header: 'Progress Status',
-        cell,
+        header: 'Status',
+        cell: (info) => {
+          const status = info.getValue()
+
+          if (status) {
+            return h(BlProgressStatusIcon, {
+              status,
+            })
+          } else {
+            return null
+          }
+        },
       }),
     ].filter((column) => {
       if (!column) {
