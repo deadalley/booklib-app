@@ -1,19 +1,17 @@
 <template>
-  <div
+  <bl-books-grid
     v-if="view === 'cards'"
-    class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
-    v-bind="$attrs"
-  >
-    <bl-book-card
-      v-for="book in books"
-      :key="book.title"
-      :book="book"
-      :selectable="selectable"
-      :selected="book.selected"
-      class="md:!w-36"
-      @selected="(selected: boolean) => onSelectBook(book.id, selected)"
-    />
-  </div>
+    :books="selectedBooks"
+    :selectable="selectable"
+    @select="(args) => $emit('book-select', args)"
+  />
+  <hr v-if="selectable" class="my-8 text-main" />
+  <bl-books-grid
+    v-if="view === 'cards' && selectable"
+    :books="notSelectedBooks"
+    :selectable="selectable"
+    @select="(args) => $emit('book-select', args)"
+  />
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
       :books="books"
@@ -27,7 +25,7 @@
 import type { Book } from '~/types/book'
 import type { View } from '~/types/ui'
 
-defineProps<{
+const props = defineProps<{
   view: View
   books: (Book & { selected?: boolean })[]
   small?: boolean
@@ -37,11 +35,15 @@ defineProps<{
   }
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
 }>()
 
-function onSelectBook(bookId: Book['id'], selected: boolean) {
-  emit('book-select', { bookId, selected })
-}
+const selectedBooks = computed(() =>
+  props.books.concat().filter((book) => book.selected),
+)
+
+const notSelectedBooks = computed(() =>
+  props.books.concat().filter((book) => !book.selected),
+)
 </script>
