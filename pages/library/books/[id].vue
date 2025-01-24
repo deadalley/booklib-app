@@ -400,12 +400,10 @@ async function fetchBook() {
     loading.value = false
   }
 
-  allCollections.value = (collections.value ?? [])
-    .map((collection) => ({
-      ...collection,
-      selected: !!book.value?.collections?.includes(collection.id),
-    }))
-    .sort((b1, b2) => b1.name.localeCompare(b2.name))
+  allCollections.value = (collections.value ?? []).map((collection) => ({
+    ...collection,
+    selected: !!book.value?.collections?.includes(collection.id),
+  }))
 
   currentStep.value =
     PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-read'].step
@@ -422,6 +420,10 @@ async function deleteBook() {
 function onEdit(value: boolean) {
   editing.value = value
   managingCollections.value = value
+  allCollections.value = allCollections.value.map((collection) => ({
+    ...collection,
+    selected: !!book.value?.collections?.includes(collection.id),
+  }))
 }
 
 function onCancel() {
