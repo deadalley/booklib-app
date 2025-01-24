@@ -1,0 +1,15 @@
+.switch {
+  @apply inline-flex h-min items-center rounded-3xl;
+}
+
+.switch-option {
+  @apply flex cursor-pointer items-center justify-center border border-accent bg-white text-black ring-inset transition-all first:rounded-l-xl last:rounded-r-xl hover:bg-accent-light active:bg-accent-dark lg:w-full;
+}
+
+.switch-option-inner {
+  @apply flex items-center rounded-[inherit] p-2 lg:w-full;
+}
+
+.switch-option.selected {
+  @apply w-full border-accent-dark bg-accent hover:bg-accent-light;
+}

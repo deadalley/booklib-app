@@ -1,4 +1,4 @@
-import type { Book } from '~/types/book'
+import type { Book, BookProgressStatus } from '~/types/book'
 import type { View } from '~/types/ui'
 
 export const useSortBooks = (books: Ref<Book[] | null>) => {
@@ -60,6 +60,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
   const selectedLanguages = ref<string[]>([])
   const selectedOriginalLanguages = ref<string[]>([])
   const selectedGenres = ref<string[]>([])
+  const selectedStatuses = ref<BookProgressStatus[]>([])
   const selectedYearRange = ref<[number, number]>([
     minYear.value,
     maxYear.value,
@@ -165,7 +166,14 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
       selectedPageRange.value,
     )
 
-    const sorted = filterByPages?.sort((b1, b2) =>
+    const filterByStatus = filterByPages.filter(({ progressStatus }) => {
+      return (
+        !selectedStatuses.value.length ||
+        (progressStatus && selectedStatuses.value.includes(progressStatus))
+      )
+    })
+
+    const sorted = filterByStatus.sort((b1, b2) =>
       b1.title.localeCompare(b2.title),
     )
 
@@ -189,6 +197,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
     selectedLanguages.value = []
     selectedOriginalLanguages.value = []
     selectedGenres.value = []
+    selectedStatuses.value = []
 
     selectedYearRange.value = [minYear.value, maxYear.value]
     selectedPageRange.value = [minPages.value, maxPages.value]
@@ -210,6 +219,7 @@ export const useSortBooks = (books: Ref<Book[] | null>) => {
     selectedLanguages,
     selectedOriginalLanguages,
     selectedGenres,
+    selectedStatuses,
     selectedYearRange,
     selectedPageRange,
     textSearch,

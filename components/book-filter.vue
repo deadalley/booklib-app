@@ -22,6 +22,23 @@
       :genre="true"
     />
     <div>
+      <h6 class="mb-4">Progress Status</h6>
+      <bl-multiselect class="w-full">
+        <bl-multiselect-option
+          v-for="item in Object.values(PROGRESS_STATUS_MAP)"
+          :key="item.id"
+          :value="item.id"
+          :selected="_selectedStatuses?.includes(item.id)"
+          @select="onSelectStatus"
+        >
+          <template #icon="iconProps">
+            <component :is="icons[item.icon]" v-bind="iconProps" />
+          </template>
+          <template #tooltip>{{ item.description }}</template>
+        </bl-multiselect-option>
+      </bl-multiselect>
+    </div>
+    <div>
       <h6>Year</h6>
       <bl-slider
         v-model:values="_selectedYearRange"
@@ -63,8 +80,11 @@
 </template>
 
 <script setup lang="ts">
+import { icons } from '@tabler/icons-vue'
 import { useVModels } from '@vueuse/core'
-import type { Book } from '~/types/book'
+import type { Book, BookProgressStatus } from '~/types/book'
+
+const route = useRoute()
 
 const props = defineProps<{
   books: Book[]
@@ -80,6 +100,7 @@ const props = defineProps<{
   selectedLanguages: string[]
   selectedOriginalLanguages: string[]
   selectedGenres: string[]
+  selectedStatuses: BookProgressStatus[]
   selectedYearRange: [number, number]
   selectedPageRange: [number, number]
 
@@ -91,8 +112,6 @@ const props = defineProps<{
   onApply: () => void
 }>()
 
-const route = useRoute()
-
 const isTableView = computed(() => route.query.view === 'table')
 
 const emit = defineEmits([
@@ -100,6 +119,7 @@ const emit = defineEmits([
   'update:selectedLanguages',
   'update:selectedOriginalLanguages',
   'update:selectedGenres',
+  'update:selectedStatuses',
   'update:selectedYearRange',
   'update:selectedPageRange',
   'update:selectedTableColumns',
@@ -110,6 +130,7 @@ const {
   selectedLanguages: _selectedLanguages,
   selectedOriginalLanguages: _selectedOriginalLanguages,
   selectedGenres: _selectedGenres,
+  selectedStatuses: _selectedStatuses,
   selectedYearRange: _selectedYearRange,
   selectedPageRange: _selectedPageRange,
 } = useVModels(props, emit)
@@ -131,5 +152,17 @@ function onColumnFilter(v: Event) {
     ...props.selectedTableColumns,
     [value]: { ...entry, checked },
   })
+}
+
+function onSelectStatus(value: BookProgressStatus) {
+  console.log({ _selectedStatuses: _selectedStatuses.value })
+  const newValues = _selectedStatuses.value.filter((status) => status !== value)
+  console.log(newValues)
+
+  if (newValues.length === _selectedStatuses.value.length) {
+    _selectedStatuses.value = _selectedStatuses.value.concat(value)
+  } else {
+    _selectedStatuses.value = newValues
+  }
 }
 </script>

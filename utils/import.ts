@@ -27,7 +27,6 @@ export async function parseCsvFile(file: File): Promise<Book[]> {
       },
       complete: ({ data, errors }) => {
         if (errors.length) {
-          console.log(errors)
           reject(errors[0].message)
         } else {
           resolve(data)

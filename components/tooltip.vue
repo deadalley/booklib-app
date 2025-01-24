@@ -1,12 +1,12 @@
 <template>
   <TooltipProvider>
-    <TooltipRoot>
+    <TooltipRoot :delay-duration="150">
       <TooltipTrigger>
         <slot />
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="rounded-lg bg-white px-3 py-2 drop-shadow-sm"
+          class="rounded-lg bg-white px-3 py-2 drop-shadow-md"
           :side-offset="5"
         >
           <slot name="tooltip-content" />

@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: [
     '@/assets/css/main.css',
+    '@/assets/css/components.css',
     '@/assets/css/forms.css',
     '@/assets/css/table.css',
   ],

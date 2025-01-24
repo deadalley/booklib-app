@@ -37,10 +37,11 @@
       v-model:selected-publishers="selectedPublishers"
       v-model:selected-languages="selectedLanguages"
       v-model:selected-original-languages="selectedOriginalLanguages"
+      v-model:selected-genres="selectedGenres"
+      v-model:selected-statuses="selectedStatuses"
       v-model:selected-year-range="selectedYearRange"
       v-model:selected-page-range="selectedPageRange"
       v-model:selected-table-columns="selectedTableColumns"
-      v-model:selected-genres="selectedGenres"
       :publishers="publishers"
       :languages="languages"
       :original-languages="originalLanguages"
@@ -74,6 +75,7 @@ const {
   selectedLanguages,
   selectedOriginalLanguages,
   selectedGenres,
+  selectedStatuses,
   selectedYearRange,
   selectedPageRange,
   publishers,

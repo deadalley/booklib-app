@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else if (books?.length) {
-    console.log(books.map((book) => bookToDbBook(book, user.id)))
     const { data, error } = await client
       .from('books')
       .upsert(

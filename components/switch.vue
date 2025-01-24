@@ -1,9 +1,5 @@
 <template>
-  <RadioGroupRoot
-    v-bind="$attrs"
-    as="ul"
-    class="inline-flex h-min items-center rounded-3xl"
-  >
+  <RadioGroupRoot v-bind="$attrs" as="ul" class="switch">
     <slot v-bind="$props" />
   </RadioGroupRoot>
 </template>

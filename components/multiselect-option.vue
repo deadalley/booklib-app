@@ -1,13 +1,19 @@
 <template>
-  <RadioGroupItem
-    :id="value"
-    :value="value"
-    as="li"
+  <li
     class="switch-option"
     :class="{
-      selected: selectedValue === value,
+      selected,
     }"
+    @click="onClick"
   >
+    <input
+      :id="value"
+      ref="input"
+      type="checkbox"
+      value="value"
+      class="hidden"
+      @change="$emit('select', value)"
+    />
     <bl-tooltip>
       <template #tooltip-content="tooltipProps">
         <slot name="tooltip" v-bind="tooltipProps" />
@@ -16,14 +22,20 @@
         <slot name="icon" :size="19" stroke="1.5" />
       </span>
     </bl-tooltip>
-  </RadioGroupItem>
+  </li>
 </template>
 
 <script setup lang="ts">
-import { RadioGroupItem } from 'radix-vue'
-
 defineProps<{
   value: string
-  selectedValue: string | undefined
+  selected: boolean
 }>()
+
+defineEmits(['select'])
+
+const input = ref()
+
+function onClick() {
+  input.value.click()
+}
 </script>
