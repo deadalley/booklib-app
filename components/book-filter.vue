@@ -155,9 +155,7 @@ function onColumnFilter(v: Event) {
 }
 
 function onSelectStatus(value: BookProgressStatus) {
-  console.log({ _selectedStatuses: _selectedStatuses.value })
   const newValues = _selectedStatuses.value.filter((status) => status !== value)
-  console.log(newValues)
 
   if (newValues.length === _selectedStatuses.value.length) {
     _selectedStatuses.value = _selectedStatuses.value.concat(value)
