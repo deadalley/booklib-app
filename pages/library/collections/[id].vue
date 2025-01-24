@@ -193,6 +193,10 @@ async function deleteCollection() {
 function onEdit(value: boolean) {
   editing.value = value
   managingBooks.value = value
+  allBooks.value = (books.value ?? []).map((book) => ({
+    ...book,
+    selected: !!collection.value?.books?.includes(book.id),
+  }))
 }
 
 function onCancel() {
