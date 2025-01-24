@@ -8,7 +8,7 @@
       selected: selectedValue === value,
     }"
   >
-    <bl-tooltip>
+    <bl-tooltip :disabled="!$slots['tooltip']">
       <template #tooltip-content="tooltipProps">
         <slot name="tooltip" v-bind="tooltipProps" />
       </template>
