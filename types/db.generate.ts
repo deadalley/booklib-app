@@ -105,16 +105,19 @@ export type Database = {
         Row: {
           book_id: number
           collection_id: number
+          order: number
           user_id: string
         }
         Insert: {
           book_id: number
           collection_id: number
+          order: number
           user_id: string
         }
         Update: {
           book_id?: number
           collection_id?: number
+          order?: number
           user_id?: string
         }
         Relationships: [

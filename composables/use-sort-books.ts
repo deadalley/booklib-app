@@ -1,7 +1,7 @@
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { View } from '~/types/ui'
 
-export const useSortBooks = (books: Ref<Book[] | null>) => {
+export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
   const router = useRouter()
   const route = useRoute()
 

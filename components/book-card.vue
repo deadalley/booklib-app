@@ -1,40 +1,61 @@
 <template>
-  <div class="flex flex-col items-start gap-3">
-    <bl-book-image-small
-      :alt="book.title"
-      :href="href"
-      :cover-src="book.coverSrc"
-      :title="book.title"
-      :selectable="selectable"
-      :selected="book.selected"
-      class="transition duration-300 ease-in-out hover:scale-110"
-      @click="onSelect"
-    />
-    <div class="w-full flex-col">
-      <NuxtLink :to="selectable ? undefined : href">
-        <h5
-          class="overflow-hidden leading-tight"
-          :style="{
-            display: '-webkit-box',
-            '-webkit-line-clamp': 2,
-            '-webkit-box-orient': 'vertical',
-          }"
-        >
-          {{ book.title }}
-        </h5>
-      </NuxtLink>
-      <h6 v-if="authorName" class="truncate">
-        {{ authorName }}
-      </h6>
+  <div class="flex flex-col justify-between gap-3">
+    <div class="relative flex flex-col items-start gap-3">
+      <bl-book-image-small
+        :alt="book.title"
+        :href="href"
+        :cover-src="book.coverSrc"
+        :title="book.title"
+        :selectable="selectable"
+        :selected="book.selected"
+        class="transition duration-300 ease-in-out hover:scale-110"
+        @click="onSelect"
+      />
+      <div class="w-full flex-col">
+        <NuxtLink :to="selectable ? undefined : href">
+          <h5
+            class="overflow-hidden leading-tight"
+            :style="{
+              display: '-webkit-box',
+              '-webkit-line-clamp': 2,
+              '-webkit-box-orient': 'vertical',
+            }"
+          >
+            {{ book.title }}
+          </h5>
+        </NuxtLink>
+        <h6 v-if="authorName" class="truncate">
+          {{ authorName }}
+        </h6>
+      </div>
+    </div>
+    <div
+      v-if="selectable"
+      class="relative flex w-full cursor-grab items-center gap-3 rounded-xl bg-accent px-4 py-1 text-black"
+    >
+      <span
+        v-if="book.order !== undefined"
+        class="w-full text-center text-lg"
+        >{{ book.order + 1 }}</span
+      >
+      <IconDirectionArrows
+        class="absolute right-4 top-1/2 -translate-y-1/2"
+        :size="ICON_SIZE_SMALL"
+        stroke="1.5"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { IconDirectionArrows } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 
 const props = defineProps<{
-  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & { selected?: boolean }
+  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & {
+    selected?: boolean
+    order?: number
+  }
   authorName?: string
   selectable?: boolean
 }>()

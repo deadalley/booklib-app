@@ -141,7 +141,7 @@ const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const allBooks = ref<(Book & { selected: boolean })[]>([])
+const allBooks = ref<(Book & { selected: boolean; order?: number })[]>([])
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
@@ -176,10 +176,7 @@ async function fetchCollection() {
     loading.value = false
   }
 
-  allBooks.value = (books.value ?? []).map((book) => ({
-    ...book,
-    selected: !!collection.value?.books?.includes(book.id),
-  }))
+  allBooks.value = getBooksFromCollection(collection.value)
 }
 
 async function deleteCollection() {
@@ -193,16 +190,15 @@ async function deleteCollection() {
 function onEdit(value: boolean) {
   editing.value = value
   managingBooks.value = value
-  allBooks.value = (books.value ?? []).map((book) => ({
-    ...book,
-    selected: !!collection.value?.books?.includes(book.id),
-  }))
 }
 
 function onCancel() {
   if (isNew.value) {
     navigateTo('/library/collections')
   } else {
+    if (collection.value) {
+      allBooks.value = getBooksFromCollection(collection.value)
+    }
     onEdit(false)
   }
 }
@@ -241,6 +237,14 @@ function onSelectBook({
   allBooks.value = allBooks.value.map((book) =>
     book.id === bookId ? { ...book, selected: selected } : book,
   )
+}
+
+function getBooksFromCollection(collection: Collection) {
+  return (books.value ?? []).map((book) => ({
+    ...book,
+    selected: !!collection?.books.some(({ id }) => id === book.id),
+    order: collection?.books.find(({ id }) => id === book.id)?.order,
+  }))
 }
 
 onMounted(() => {

@@ -19,15 +19,22 @@ export default defineEventHandler<Promise<Collection | undefined>>(
     } else {
       const { data, error } = await client
         .from('collections')
-        .select('*, books(id)')
-        .eq('id', id)
+        .select(
+          `*,
+          "collection-book" (
+            order,
+            book_id
+          )
+          `,
+        )
+        .eq('id', +id)
 
       if (error) {
         throw createError(error.message)
       }
 
       if (data) {
-        return dbCollectionToCollection(data[0], data[0].books)
+        return dbCollectionToCollection(data[0], data[0]['collection-book'])
       }
     }
   },

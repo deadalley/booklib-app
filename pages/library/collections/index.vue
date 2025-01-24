@@ -58,7 +58,7 @@ const booksByCollectionId = computed(
       (collectionBooks, collection) => ({
         ...collectionBooks,
         [collection.id]: (books.value ?? []).filter((book) =>
-          collection.books.includes(book.id),
+          collection.books.some(({ id }) => id === book.id),
         ),
       }),
       {},

@@ -4,5 +4,5 @@ export type Collection = {
   id: number
   name: string
   createdAt: string
-  books: Book['id'][]
+  books: { id: Book['id']; order: number }[]
 }

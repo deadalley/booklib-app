@@ -66,13 +66,15 @@ export function bookToDbBook(
 
 export function dbCollectionToCollection(
   dbCollection: CollectionDB,
-  books: Pick<BookDB, 'id'>[],
+  books: { book_id: Book['id']; order: number }[],
 ): Collection {
   return {
     id: dbCollection.id ?? undefined,
     name: dbCollection.name,
     createdAt: dbCollection.created_at,
-    books: books.map(({ id }) => id),
+    books: books
+      .map(({ book_id, order }) => ({ id: book_id, order }))
+      .sort(({ order: order1 }, { order: order2 }) => order1 - order2),
   }
 }
 

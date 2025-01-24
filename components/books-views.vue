@@ -5,7 +5,7 @@
     :selectable="selectable"
     @select="(args) => $emit('book-select', args)"
   />
-  <hr v-if="selectable" class="my-8 text-main" />
+  <hr v-if="selectable && view === 'cards'" class="my-8 text-main" />
   <bl-books-grid
     v-if="view === 'cards' && selectable"
     :books="notSelectedBooks"
@@ -27,7 +27,7 @@ import type { View } from '~/types/ui'
 
 const props = defineProps<{
   view: View
-  books: (Book & { selected?: boolean })[]
+  books: (Book & { selected?: boolean; order?: number })[]
   small?: boolean
   selectable?: boolean
   selectedTableColumns: {
@@ -40,10 +40,10 @@ defineEmits<{
 }>()
 
 const selectedBooks = computed(() =>
-  props.books.concat().filter((book) => book.selected),
+  props.books.filter((book) => !props.selectable || book.selected),
 )
 
 const notSelectedBooks = computed(() =>
-  props.books.concat().filter((book) => !book.selected),
+  props.books.filter((book) => !book.selected),
 )
 </script>

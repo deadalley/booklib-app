@@ -9,10 +9,16 @@ export default defineEventHandler(async (event) => {
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
-    const { data } = await client.from('collections').select('*, books(id)')
+    const { data } = await client.from('collections').select(`
+        *,
+        "collection-book" (
+          order,
+          book_id
+        )
+      `)
 
     return data?.map((collection) =>
-      dbCollectionToCollection(collection, collection.books),
+      dbCollectionToCollection(collection, collection['collection-book']),
     )
   }
 })

@@ -21,9 +21,10 @@
 import type { Book } from '~/types/book'
 
 const props = defineProps<{
-  books: (Book & { selected?: boolean })[]
+  books: (Book & { selected?: boolean; order?: number })[]
   small?: boolean
   selectable?: boolean
+  draggable?: boolean
 }>()
 
 defineEmits<{
@@ -31,8 +32,11 @@ defineEmits<{
 }>()
 
 const sortedBooks = computed(() =>
-  props.books
-    .concat()
-    .sort((book1, book2) => book1.title.localeCompare(book2.title)),
+  props.books.concat().sort((book1, book2) => {
+    if (book1.order !== undefined && book2.order !== undefined) {
+      return book1.order - book2.order
+    }
+    return book1.title.localeCompare(book2.title)
+  }),
 )
 </script>
