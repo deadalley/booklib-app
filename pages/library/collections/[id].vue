@@ -3,11 +3,15 @@
     v-if="collection"
     class="flex flex-1 flex-col gap-10 overflow-visible 2xl:w-9/12"
   >
-    <header class="flex flex-col gap-2">
+    <header class="flex flex-col gap-6">
+      <button @click="$router.back()" class="flex items-center gap-2">
+        <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
+        <h6>Back</h6>
+      </button>
       <div
         class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
       >
-        <div class="flex gap-5">
+        <div class="flex items-center gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Collection' : collection.name }}
           </h2>
@@ -128,6 +132,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconArrowLeft } from '@tabler/icons-vue'
 import { format } from 'date-fns'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'

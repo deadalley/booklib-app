@@ -3,11 +3,15 @@
     v-if="book"
     class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
   >
-    <header class="flex flex-col gap-2">
+    <header class="flex flex-col gap-6">
+      <button @click="$router.back()" class="flex items-center gap-2">
+        <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
+        <h6>Back</h6>
+      </button>
       <div
         class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
       >
-        <div class="flex flex-1 gap-5">
+        <div class="flex flex-1 items-center gap-5">
           <h2 class="flex items-end leading-none">
             {{ isNew ? 'New Book' : book.title }}
           </h2>
@@ -55,7 +59,7 @@
         <div class="lg:w-80">
           <bl-book-image
             :editing="editing"
-            :book="book"
+            :book="book!"
             :temp-cover-src="tempCoverSrc"
           />
         </div>
@@ -334,6 +338,7 @@ import {
   IconPlayerPause,
   IconGift,
   IconArchive,
+  IconArrowLeft,
 } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 
