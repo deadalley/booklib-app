@@ -75,7 +75,7 @@ const { data: books, refresh } = await useAsyncData(
     Promise.all<Book>(
       props.collection.books
         .slice(0, 4)
-        .map((id) => $fetch(`/api/books/${id}`)),
+        .map(({ id }) => $fetch(`/api/books/${id}`)),
     ),
   {
     lazy: true,
