@@ -5,6 +5,7 @@
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
   <!-- @ts-expect-error options is used by the underlying select component -->
+  <!-- @vue-skip -->
   <FormKit
     v-model="inputModel"
     v-bind="$attrs"

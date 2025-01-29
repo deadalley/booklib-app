@@ -18,7 +18,7 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     summary: faker.lorem.lines(5),
     year: faker.date.past().getFullYear(),
     genres: faker.helpers.multiple(faker.color.human, { count: 5 }),
-    progressStatus: 'unread',
+    progressStatus: 'not-read',
     startedAt: faker.date.past().toISOString(),
     finishedAt: faker.date.past().toISOString(),
     collections: [],
@@ -30,7 +30,11 @@ export function buildCollection(overwrite?: Partial<Collection>): Collection {
   return {
     id: faker.number.float(),
     name: faker.commerce.productName(),
-    books: [1, 2, 3],
+    books: [
+      { id: 1, order: 0 },
+      { id: 2, order: 1 },
+      { id: 3, order: 2 },
+    ],
     createdAt: faker.date.past().toISOString(),
     ...overwrite,
   }

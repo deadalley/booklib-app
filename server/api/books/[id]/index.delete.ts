@@ -11,7 +11,7 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
   if (!id) {
     throw createError('No id provided')
   } else {
-    const { data, error } = await client.from('books').delete().eq('id', id)
+    const { data, error } = await client.from('books').delete().eq('id', +id)
 
     if (error) {
       throw createError(error.message)

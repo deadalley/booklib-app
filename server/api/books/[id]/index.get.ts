@@ -19,7 +19,7 @@ export default defineEventHandler<Promise<Book | undefined>>(async (event) => {
     const { data, error } = await client
       .from('books')
       .select('*, collections(id)')
-      .eq('id', id)
+      .eq('id', +id)
 
     if (error) {
       throw createError(error.message)
