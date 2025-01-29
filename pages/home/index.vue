@@ -43,9 +43,9 @@
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-20">
       <div class="flex w-full flex-col gap-4 overflow-x-auto">
-        <h4>Your latest books</h4>
+        <h4>Last books added to library</h4>
         <div
-          class="relative flex size-max gap-x-2 transition duration-100 ease-out"
+          class="relative flex size-max gap-x-2 p-3 transition duration-100 ease-out"
         >
           <bl-book-card
             v-for="book in latestBooks"
