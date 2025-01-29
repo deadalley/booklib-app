@@ -9,7 +9,7 @@
         <h6>Back</h6>
       </button>
       <div
-        class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-end"
+        class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center"
       >
         <div class="flex items-center gap-5">
           <h2 class="flex items-end leading-none">
