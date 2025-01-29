@@ -23,8 +23,8 @@
       </NuxtLink>
     </template>
     <bl-books-views
+      v-model:books="sortedBooks"
       :view="view"
-      :books="sortedBooks"
       :selected-table-columns="selectedTableColumns"
     />
   </NuxtLayout>

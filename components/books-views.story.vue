@@ -30,8 +30,8 @@ const view = ref('cards')
   <Story title="Organisms/Books Views">
     <bl-view-switch v-model:view="view" />
     <bl-books-views
+      v-model:books="state.books"
       :view="view"
-      :books="state.books"
       :selected-table-columns="state.selectedTableColumns"
     />
   </Story>
