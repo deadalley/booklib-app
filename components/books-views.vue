@@ -1,17 +1,24 @@
 <template>
-  <bl-books-grid
-    v-if="view === 'cards'"
-    :books="selectedBooks"
-    :selectable="selectable"
-    @select="(args) => $emit('book-select', args)"
-  />
-  <hr v-if="selectable && view === 'cards'" class="my-8 text-main" />
-  <bl-books-grid
-    v-if="view === 'cards' && selectable"
-    :books="notSelectedBooks"
-    :selectable="selectable"
-    @select="(args) => $emit('book-select', args)"
-  />
+  <template v-if="interactive">
+    <bl-books-grid
+      v-if="view === 'cards'"
+      v-model="selectedBooks"
+      :selectable="editing"
+      :draggable="editing"
+      @drag="(args) => $emit('book-drag', args)"
+      @select="(args) => $emit('book-select', args)"
+    />
+    <hr v-if="editing" class="my-8 text-main" />
+    <bl-books-grid
+      v-if="view === 'cards' && editing"
+      v-model="notSelectedBooks"
+      :selectable="editing"
+      @select="(args) => $emit('book-select', args)"
+    />
+  </template>
+
+  <bl-books-grid v-if="!interactive && view === 'cards'" v-model="books" />
+
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
       :books="books"
@@ -22,28 +29,35 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
-const props = defineProps<{
+defineProps<{
   view: View
-  books: (Book & { selected?: boolean; order?: number })[]
-  small?: boolean
-  selectable?: boolean
+  interactive?: boolean
+  editing?: boolean
   selectedTableColumns: {
     [key in keyof Book]?: { label: string; checked: boolean }
   }
 }>()
 
+const selectedBooks = defineModel<ViewBook[]>('selectedBooks', {
+  default: [],
+})
+
+const notSelectedBooks = defineModel<ViewBook[]>('notSelectedBooks', {
+  default: [],
+})
+
+const books = defineModel<ViewBook[]>('books', {
+  default: [],
+})
+
 defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
+  (
+    e: 'book-drag',
+    val: { bookId: Book['id']; newOrder: number; oldOrder: number },
+  ): void
 }>()
-
-const selectedBooks = computed(() =>
-  props.books.filter((book) => !props.selectable || book.selected),
-)
-
-const notSelectedBooks = computed(() =>
-  props.books.filter((book) => !book.selected),
-)
 </script>

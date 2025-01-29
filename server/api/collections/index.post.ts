@@ -1,4 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { insertBooksInCollection } from '~/server/utils/insert-books-in-collection'
 import type { Collection } from '~/types/collection'
 import type { Database } from '~/types/db.generate'
 import {
@@ -21,8 +22,13 @@ export default defineEventHandler(async (event) => {
       .upsert([collectionToDbCollection(collection, user.id)], {
         onConflict: 'id',
         defaultToNull: true,
-      })
-      .select('*, books(id)')
+      }).select(`
+        *,
+        "collection-book" (
+          order,
+          book_id
+        )
+      `)
 
     if (error) {
       logger.error(error)
@@ -42,21 +48,34 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusMessage: deleteBookCollectionError.message })
     }
 
-    const { error: bookCollectionError } = await client
-      .from('collection-book')
-      .insert(
-        collection.books.map((bookId) => ({
-          book_id: bookId,
-          collection_id: collectionId,
-          user_id: user.id,
-        })),
-      )
+    const { error: bookCollectionError } = await insertBooksInCollection(
+      client,
+      user.id,
+      collectionId,
+      collection.books,
+    )
 
     if (bookCollectionError) {
       logger.error(bookCollectionError)
+
+      // revert the changes manually until Supabase supports transactions
+      const originalCollection = data.find(({ id }) => id === collectionId)
+
+      if (originalCollection) {
+        await insertBooksInCollection(
+          client,
+          user.id,
+          collectionId,
+          originalCollection['collection-book'].map(({ book_id, order }) => ({
+            id: book_id,
+            order,
+          })),
+        )
+      }
+
       throw createError({ statusMessage: bookCollectionError.message })
     }
 
-    return dbCollectionToCollection(data[0], data[0].books)
+    return dbCollectionToCollection(data[0], data[0]['collection-book'])
   }
 })

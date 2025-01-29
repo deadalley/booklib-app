@@ -29,17 +29,18 @@
         </h6>
       </div>
     </div>
+
     <div
-      v-if="selectable"
-      class="relative flex w-full cursor-grab items-center gap-3 rounded-xl bg-accent px-4 py-1 text-black"
+      v-if="draggable"
+      class="relative flex w-full cursor-grab items-center gap-3 rounded-xl border border-accent bg-accent-light px-4 py-1"
     >
       <span
         v-if="book.order !== undefined"
-        class="w-full text-center text-lg"
+        class="w-full text-center text-lg text-black"
         >{{ book.order + 1 }}</span
       >
       <IconDirectionArrows
-        class="absolute right-4 top-1/2 -translate-y-1/2"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-main"
         :size="ICON_SIZE_SMALL"
         stroke="1.5"
       />
@@ -49,15 +50,13 @@
 
 <script setup lang="ts">
 import { IconDirectionArrows } from '@tabler/icons-vue'
-import type { Book } from '~/types/book'
+import type { ViewBook } from '~/types/book'
 
 const props = defineProps<{
-  book: Pick<Book, 'id' | 'title' | 'coverSrc'> & {
-    selected?: boolean
-    order?: number
-  }
+  book: Pick<ViewBook, 'id' | 'title' | 'coverSrc' | 'selected' | 'order'>
   authorName?: string
   selectable?: boolean
+  draggable?: boolean
 }>()
 
 const href = `/library/books/${props.book.id}`

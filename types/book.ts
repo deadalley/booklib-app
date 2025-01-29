@@ -23,3 +23,5 @@ export type Book = {
   startedAt?: string
   finishedAt?: string
 }
+
+export type ViewBook = Book & { selected?: boolean; order?: number }

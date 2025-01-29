@@ -173,9 +173,7 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
       )
     })
 
-    const sorted = filterByStatus.sort((b1, b2) =>
-      b1.title.localeCompare(b2.title),
-    )
+    const sorted = sortBooks(filterByStatus)
 
     return sorted
   })

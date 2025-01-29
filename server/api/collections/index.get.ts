@@ -1,4 +1,5 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { getCollections } from '~/server/utils/get-collections'
 import type { Database } from '~/types/db.generate'
 import { dbCollectionToCollection } from '~/utils'
 
@@ -9,13 +10,11 @@ export default defineEventHandler(async (event) => {
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
-    const { data } = await client.from('collections').select(`
-        *,
-        "collection-book" (
-          order,
-          book_id
-        )
-      `)
+    const { data, error } = await getCollections(client)
+
+    if (error) {
+      throw createError(error.message)
+    }
 
     return data?.map((collection) =>
       dbCollectionToCollection(collection, collection['collection-book']),

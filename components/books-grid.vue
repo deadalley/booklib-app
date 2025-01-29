@@ -1,42 +1,55 @@
 <template>
-  <div
+  <draggable
+    :list="books"
+    item-key="book-grid"
     class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
-    v-bind="$attrs"
+    :animation="200"
+    :disabled="!props.draggable"
+    @change="
+      ({
+        moved: {
+          element: { id },
+          newIndex,
+          oldIndex,
+        },
+      }) => emit('drag', { bookId: id, newOrder: newIndex, oldOrder: oldIndex })
+    "
   >
-    <bl-book-card
-      v-for="book in sortedBooks"
-      :key="book.title"
-      :book="book"
-      :selectable="selectable"
-      :selected="book.selected"
-      class="md:!w-36"
-      @selected="
-        (selected: boolean) => $emit('select', { bookId: book.id, selected })
-      "
-    />
-  </div>
+    <template #item="{ element: book }">
+      <bl-book-card
+        :key="book.title"
+        :book="book"
+        class="md:!w-36"
+        :selectable="selectable"
+        :draggable="props.draggable"
+        @selected="
+          (selected: boolean) => $emit('select', { bookId: book.id, selected })
+        "
+      />
+    </template>
+  </draggable>
 </template>
 
 <script setup lang="ts">
-import type { Book } from '~/types/book'
+// eslint-disable-next-line vue/no-dupe-keys
+import draggable from 'vuedraggable'
+import type { Book, ViewBook } from '~/types/book'
 
 const props = defineProps<{
-  books: (Book & { selected?: boolean; order?: number })[]
   small?: boolean
   selectable?: boolean
   draggable?: boolean
 }>()
 
-defineEmits<{
-  (e: 'select', val: { bookId: Book['id']; selected: boolean }): void
-}>()
+const books = defineModel<ViewBook[]>({
+  default: [],
+})
 
-const sortedBooks = computed(() =>
-  props.books.concat().sort((book1, book2) => {
-    if (book1.order !== undefined && book2.order !== undefined) {
-      return book1.order - book2.order
-    }
-    return book1.title.localeCompare(book2.title)
-  }),
-)
+const emit = defineEmits<{
+  (e: 'select', val: { bookId: Book['id']; selected: boolean }): void
+  (
+    e: 'drag',
+    val: { bookId: Book['id']; newOrder: number; oldOrder: number },
+  ): void
+}>()
 </script>

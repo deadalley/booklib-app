@@ -92,17 +92,19 @@
             </div>
 
             <bl-books-views
-              v-if="!!booksDisplayed.length"
-              :class="{ 'mt-4': editing }"
+              v-if="!!selectedBooks.length || managingBooks"
+              v-model:selected-books="selectedBooks"
+              v-model:not-selected-books="notSelectedBooks"
               :view="view"
-              :books="sortedBooks"
-              :selectable="managingBooks"
+              interactive
+              :editing="managingBooks"
               :selected-table-columns="selectedTableColumns"
               @book-select="onSelectBook"
+              @book-drag="onDragBook"
             />
 
             <section
-              v-if="!booksDisplayed.length"
+              v-if="!selectedBooks.length"
               class="flex flex-col items-center gap-3 py-24"
             >
               <p>There are no books in this collection.</p>
@@ -127,7 +129,7 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns'
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 const route = useRoute()
@@ -147,13 +149,10 @@ const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
 )
 
-const booksDisplayed = computed(() => {
-  return managingBooks.value
-    ? allBooks.value
-    : allBooks.value.filter((book) => book.selected)
-})
+const { view, selectedBooks, notSelectedBooks, selectedTableColumns } =
+  useSortBooksByOrder(allBooks)
 
-const { view, sortedBooks, selectedTableColumns } = useSortBooks(booksDisplayed)
+console.log(allBooks)
 
 watch(isNew, () => {
   managingBooks.value = isNew.value
@@ -207,7 +206,7 @@ async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
   try {
     const booksInCollection = allBooks.value
       .filter(({ selected }) => !!selected)
-      .map(({ id }) => id)
+      .map(({ id, order }) => ({ id, order }))
 
     const updatedCollection = await $fetch<Collection>('/api/collections', {
       method: 'post',
@@ -234,9 +233,37 @@ function onSelectBook({
   bookId: Book['id']
   selected: boolean
 }) {
+  const selectedBookOrder = allBooks.value.find(
+    ({ id }) => id === bookId,
+  )?.order
   allBooks.value = allBooks.value.map((book) =>
-    book.id === bookId ? { ...book, selected: selected } : book,
+    book.id === bookId
+      ? {
+          ...book,
+          selected: selected,
+          order: selected ? selectedBooks.value.length : undefined,
+        }
+      : selected ||
+          selectedBookOrder === undefined ||
+          book.order === undefined ||
+          book.order < selectedBookOrder
+        ? book
+        : { ...book, order: book.order - 1 },
   )
+}
+
+function onDragBook({
+  newOrder,
+  oldOrder,
+}: {
+  bookId: Book['id']
+  newOrder: number
+  oldOrder: number
+}) {
+  allBooks.value = allBooks.value.map((book) => ({
+    ...book,
+    order: setBookOrder(book.order, newOrder, oldOrder),
+  }))
 }
 
 function getBooksFromCollection(collection: Collection) {
@@ -245,6 +272,34 @@ function getBooksFromCollection(collection: Collection) {
     selected: !!collection?.books.some(({ id }) => id === book.id),
     order: collection?.books.find(({ id }) => id === book.id)?.order,
   }))
+}
+
+function setBookOrder(
+  bookOrder: ViewBook['order'],
+  newOrder: number,
+  oldOrder: number,
+) {
+  // book is not ordered
+  if (bookOrder === undefined) {
+    return bookOrder
+  }
+
+  // book was moved
+  if (bookOrder === oldOrder) {
+    return newOrder
+  }
+
+  // book was pushed forward, all books in range must be pushed back
+  if (newOrder > oldOrder && bookOrder >= oldOrder && bookOrder <= newOrder) {
+    return bookOrder - 1
+  }
+
+  // book was pushed backward, all books in range must be pushed foward
+  if (newOrder < oldOrder && bookOrder >= newOrder && bookOrder <= oldOrder) {
+    return bookOrder + 1
+  }
+
+  return bookOrder
 }
 
 onMounted(() => {
