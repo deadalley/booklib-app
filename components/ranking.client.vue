@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[340px] w-full">
+  <div class="w-full" :style="{ height: `${height}px` }">
     <VChart :option="option" />
   </div>
 </template>
@@ -45,6 +45,7 @@ const props = withDefaults(
     items: RankingItem[]
     height?: number
     unit?: string | ((value: number) => string)
+    withLabel?: boolean
   }>(),
   { height: 340 },
 )
@@ -91,14 +92,8 @@ const option = computed<EChartsOption>(() => ({
       label: {
         show: true,
         position: 'right',
-        fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-        fontWeight: 500,
-        fontSize: 18,
-        padding: [0, 0, 4, 0],
-        align: 'left',
-        color: tailwind.theme.colors['accent-darker'],
         formatter: ({ value, name }) =>
-          `{label|${name}}\n{value|${value === 0.1 ? 0 : value} ${renderUnit(value as number)}}`,
+          `{label|${name}}${props.withLabel ? `\n{value|${value === 0.1 ? 0 : value} ${renderUnit(value as number)}}` : ''}`,
         verticalAlign: 'top',
         offset: [10, -10],
         rich: {

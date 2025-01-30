@@ -13,11 +13,11 @@
       </bl-tile>
       <bl-tile class="col-span-4">
         <template #title>Top rated books</template>
-        <bl-ranking :items="rankedBooks" :unit="getRatingUnit" />
+        <bl-ranking :items="rankedBooks" :unit="getRatingUnit" with-label />
       </bl-tile>
       <bl-tile class="col-span-3">
         <template #title>Lowest rated books</template>
-        <bl-ranking :items="lowRankedBooks" :unit="getRatingUnit" />
+        <bl-ranking :items="lowRankedBooks" :unit="getRatingUnit" with-label />
       </bl-tile>
       <bl-tile class="col-span-12">
         <template #title>Statistics</template>
@@ -43,11 +43,12 @@
           v-if="books"
           :books="books"
           book-property="progressStatus"
+          :height="200"
         />
       </bl-tile>
       <bl-tile class="col-span-4">
         <template #title>Not finished books</template>
-        <bl-ranking :items="notFinishedBooks" />
+        <bl-ranking :items="notFinishedBooks" :height="200" />
       </bl-tile>
     </div>
   </NuxtLayout>

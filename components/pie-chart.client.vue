@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[300px] w-full">
+  <div class="w-full" :style="{ height: `${height}px` }">
     <VChart :option="option" />
   </div>
 </template>

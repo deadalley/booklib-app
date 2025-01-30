@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[340px] w-full">
+  <div class="w-full" :style="{ height: `${height}px` }">
     <VChart :option="option" />
   </div>
 </template>
@@ -48,13 +48,8 @@ const props = withDefaults(
   defineProps<{
     items: BarChartItem[]
     height?: number
-    min?: number
-    max?: number
-    scaleFactor?: number
-    maxItems?: number
-    unit?: string
   }>(),
-  { scaleFactor: 1 },
+  { height: 340 },
 )
 
 const option = computed<EChartsOption>(() => ({
