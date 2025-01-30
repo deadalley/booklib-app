@@ -2,7 +2,11 @@
   <bl-bar-chart :height="height" :items="series" />
 </template>
 
-<script setup lang="ts" generic="T extends keyof Pick<Book, 'pages'>">
+<script
+  setup
+  lang="ts"
+  generic="T extends keyof Pick<Book, 'pages' | 'rating' | 'year'>"
+>
 import type { Book } from '~/types/book'
 import type { BarChartItem } from './bar-chart.client.vue'
 

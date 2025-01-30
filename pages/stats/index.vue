@@ -16,10 +16,20 @@
       </bl-tile>
       <bl-tile class="col-span-12">
         <template #title>Statistics</template>
+        <template #actions>
+          <div>
+            <bl-raw-select
+              v-model="barChartProperty"
+              :options="barChartPropertyOptions"
+              class="ml-4"
+              placeholder="Select file format"
+            />
+          </div>
+        </template>
         <bl-books-bar-chart
-          v-if="books"
+          v-if="books && barChartProperty"
           :books="books"
-          book-property="pages"
+          :book-property="barChartProperty"
           :show-percentages="false"
         />
       </bl-tile>
@@ -29,6 +39,7 @@
 
 <script setup lang="ts">
 import type { RankingItem } from '~/components/ranking.client.vue'
+import type { SelectOption } from '~/components/raw-select.vue'
 import type { Book } from '~/types/book'
 
 const { data: books } = await useFetch<Book[]>('/api/books')
@@ -39,6 +50,16 @@ const rankedBooks = computed<RankingItem[]>(() =>
     value: book.rating!,
   })),
 )
+
+const barChartPropertyOptions: SelectOption[] = [
+  { label: 'Pages', value: 'pages' },
+  { label: 'Rating', value: 'rating' },
+  { label: 'Year', value: 'year' },
+]
+const barChartProperty = ref<
+  keyof Pick<Book, 'pages' | 'rating' | 'year'> | undefined
+>()
+
 useHead({
   title: 'BookLib | Statistics',
 })

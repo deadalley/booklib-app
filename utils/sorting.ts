@@ -11,7 +11,7 @@ export function sortBooks(booksToBeSorted: ViewBook[]) {
 
 export function sortBooksBy<B extends Book>(
   books: B[],
-  bookProperty: keyof Pick<B, 'pages' | 'rating'>,
+  bookProperty: keyof Pick<B, 'pages' | 'rating' | 'year'>,
   direction: 'asc' | 'desc' = 'asc',
   count?: number,
 ) {
