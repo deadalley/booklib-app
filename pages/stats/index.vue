@@ -1,37 +1,19 @@
 <template>
   <NuxtLayout name="dashboard" title="Statistics">
-    <div class="flex">
-      <div class="flex flex-1 flex-col items-center gap-4 overflow-x-auto">
-        <h4>Book progress</h4>
+    <div class="grid grid-cols-12 gap-4">
+      <bl-tile class="col-span-5">
+        <template #title>Book status</template>
         <bl-books-pie-chart
           v-if="books"
           :books="books"
           book-property="progressStatus"
           :show-percentages="false"
         />
-      </div>
-      <div class="flex flex-1 flex-col items-center gap-4 overflow-x-auto">
-        <h4>Languages</h4>
-        <bl-books-pie-chart
-          v-if="books"
-          :books="books"
-          book-property="language"
-          :show-percentages="false"
-        />
-      </div>
-      <div class="flex flex-1 flex-col items-center gap-4 overflow-x-auto">
-        <h4>Original Languages</h4>
-        <bl-books-pie-chart
-          v-if="books"
-          :books="books"
-          book-property="originalLanguage"
-          :show-percentages="false"
-        />
-      </div>
-    </div>
-    <div class="flex w-1/2 flex-col gap-4 overflow-x-auto">
-      <h4>Your top rated books</h4>
-      <bl-ranking :items="rankedBooks" unit="★⯨" />
+      </bl-tile>
+      <bl-tile class="col-span-4">
+        <template #title>Top rated books</template>
+        <bl-ranking :items="rankedBooks" unit="★⯨" />
+      </bl-tile>
     </div>
   </NuxtLayout>
 </template>

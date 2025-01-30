@@ -105,7 +105,7 @@ const option = computed<EChartsOption>(() => ({
           label: {
             fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
             fontWeight: 500,
-            fontSize: 22,
+            fontSize: 18,
             padding: [0, 0, 4, 0],
             align: 'left',
           },
