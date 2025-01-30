@@ -111,7 +111,6 @@ const profile = ref<Profile>()
 
 onMounted(() => {
   if (user.value) {
-    console.log(user.value)
     profile.value = {
       username: user.value.user_metadata.username,
       name: user.value.user_metadata.full_name,
@@ -124,7 +123,18 @@ onMounted(() => {
 
 async function onSubmit() {}
 
-async function deleteAccount() {}
+async function deleteAccount() {
+  try {
+    console.log('SD')
+    await $fetch<string | undefined>('/api/users', {
+      method: 'delete',
+    })
+
+    navigateTo('/login')
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 function onCancel() {}
 
