@@ -7,6 +7,7 @@ export default {
     colors: {
       accent: '#E3E3E3',
       'accent-dark': '#C9C9C9',
+      'accent-darker': '#454545',
       'accent-light': '#F6F6F6',
       background: '#FFFFFF',
       black: '#202020',

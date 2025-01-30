@@ -8,17 +8,9 @@
 import { SVGRenderer } from 'echarts/renderers'
 import { type ComposeOption, use } from 'echarts/core'
 import { type PieSeriesOption, PieChart } from 'echarts/charts'
-import {
-  type TitleComponentOption,
-  type TooltipComponentOption,
-  type LegendComponentOption,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-} from 'echarts/components'
-
-import Color from 'color'
+import { type TitleComponentOption, TitleComponent } from 'echarts/components'
 import type { OptionDataValueNumeric } from 'echarts/types/src/util/types.js'
+import Color from 'color'
 
 export type PieChartItem<P> = {
   label: string
@@ -26,14 +18,9 @@ export type PieChartItem<P> = {
   value: P
 }
 
-type EChartsOption = ComposeOption<
-  | TitleComponentOption
-  | TooltipComponentOption
-  | LegendComponentOption
-  | PieSeriesOption
->
+type EChartsOption = ComposeOption<TitleComponentOption | PieSeriesOption>
 
-use([SVGRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent])
+use([SVGRenderer, PieChart, TitleComponent])
 
 const props = defineProps<{
   items: PieChartItem<T>[]
@@ -42,9 +29,6 @@ const props = defineProps<{
 }>()
 
 const option = computed<EChartsOption>(() => ({
-  tooltip: {
-    trigger: 'item',
-  },
   color: props.items.map((_, index) =>
     Color(tailwind.theme.colors.main)
       .lighten(index * 0.1)
@@ -68,9 +52,8 @@ const option = computed<EChartsOption>(() => ({
             fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
             fontWeight: 500,
             fontSize: 18,
-            color: '#4C5058',
+            color: tailwind.theme.colors['accent-darker'],
             verticalAlign: 'middle',
-            lineHeight: 33,
             padding: [0, 6, 0, 0],
           },
           value: {
@@ -80,9 +63,8 @@ const option = computed<EChartsOption>(() => ({
             color: tailwind.theme.colors.white,
             backgroundColor: tailwind.theme.colors.main,
             verticalAlign: 'middle',
-            padding: [3, 4],
+            padding: [4, 6],
             borderRadius: 4,
-            lineHeight: 33,
           },
         },
         color: tailwind.theme.colors.black,

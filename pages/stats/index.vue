@@ -31,7 +31,7 @@
     </div>
     <div class="flex w-1/2 flex-col gap-4 overflow-x-auto">
       <h4>Your top rated books</h4>
-      <bl-ranking :items="rankedBooks" unit="Stars" />
+      <bl-ranking :items="rankedBooks" unit="★⯨" />
     </div>
   </NuxtLayout>
 </template>
@@ -41,14 +41,11 @@ import type { RankingItem } from '~/components/ranking.client.vue'
 import type { Book } from '~/types/book'
 
 const { data: books } = await useFetch<Book[]>('/api/books')
-const { data: rankedBooksByRating } = await useFetch<
-  Required<Pick<Book, 'id' | 'title' | 'rating'>>[]
->('/api/library/ordered-books?property=rating&count=5')
 
 const rankedBooks = computed<RankingItem[]>(() =>
-  (rankedBooksByRating.value ?? []).map((book) => ({
+  sortBooksBy(books.value ?? [], 'rating', 5).map((book) => ({
     label: book.title,
-    value: book.rating,
+    value: book.rating!,
   })),
 )
 useHead({

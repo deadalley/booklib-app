@@ -1,22 +1,44 @@
 <template>
-  <div class="flex flex-col gap-4">
-    <apexchart
-      type="rangeBar"
-      :height="height ?? _items.length * 64"
-      :options="chartOptions"
-      :series="series"
-    ></apexchart>
+  <div class="h-[340px] w-full">
+    <VChart :option="option" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ApexOptions } from 'apexcharts'
+import { SVGRenderer } from 'echarts/renderers'
+import { type ComposeOption, use } from 'echarts/core'
+import { type BarSeriesOption, BarChart } from 'echarts/charts'
+import {
+  type DatasetComponentOption,
+  type VisualMapComponentOption,
+  type GridComponentOption,
+  type MarkPointComponentOption,
+  DatasetComponent,
+  GridComponent,
+  MarkPointComponent,
+} from 'echarts/components'
 
 export type RankingItem = {
   label: string
   description?: string
   value: number
 }
+
+type EChartsOption = ComposeOption<
+  | DatasetComponentOption
+  | VisualMapComponentOption
+  | GridComponentOption
+  | MarkPointComponentOption
+  | BarSeriesOption
+>
+
+use([
+  SVGRenderer,
+  BarChart,
+  DatasetComponent,
+  GridComponent,
+  MarkPointComponent,
+])
 
 const props = withDefaults(
   defineProps<{
@@ -34,143 +56,91 @@ const props = withDefaults(
 const _items = computed(() => {
   const sortedItems = props.items
     .slice(0, props.maxItems)
-    .sort(({ value: v1 }, { value: v2 }) => v2 - v1)
+    .sort(({ value: v1 }, { value: v2 }) => v1 - v2)
 
   return sortedItems
 })
 
-const maxValue = computed<number>(() =>
-  Math.max(..._items.value.map(({ value }) => value)),
-)
-
-const chartWidthAdjust = computed<number>(() => {
-  const magnitude = getMagnitude(maxValue.value / props.scaleFactor)
-  return (
-    props.max ??
-    maxValue.value / props.scaleFactor + magnitude + (magnitude * 7) / 10
-  )
-})
-
-const chartMin = computed<number>(() => {
-  return props.min ?? 0
-})
-
-const series = computed(() => [
-  {
-    name: 'highlight',
-    data: _items.value.slice(0, 1).map(({ label, value }) => ({
-      x: label,
-      y: [chartMin.value, value / props.scaleFactor],
-    })),
-    color: tailwind.theme.colors.main,
-  },
-  {
-    name: 'data',
-    data: _items.value.slice(1).map(({ label, value }) => ({
-      x: label,
-      y: [chartMin.value, value / props.scaleFactor],
-    })),
-    color: tailwind.theme.colors['accent-dark'],
-  },
-])
-
-const chartOptions = computed<ApexOptions>(() => ({
-  chart: {
-    zoom: {
-      enabled: false,
-    },
-    sparkline: {
-      enabled: true,
-    },
-  },
-  plotOptions: {
-    bar: {
-      barHeight: '3px',
-      horizontal: true,
-      isDumbbell: true,
-      dumbbellColors: [
-        ['transparent', tailwind.theme.colors.main],
-        ['transparent', tailwind.theme.colors['accent-dark']],
-      ],
-      dataLabels: {
-        position: 'top',
-        hideOverflowingLabels: false,
-      },
-    },
-  },
-  dataLabels: {
-    enabled: true,
-    textAnchor: 'start',
-    offsetX: 20,
-    offsetY: -6,
-    style: {
-      fontSize: '20px',
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-      colors: [
-        tailwind.theme.colors.main,
-        tailwind.theme.colors['accent-dark'],
-      ],
-    },
-    formatter: (_, { dataPointIndex, seriesIndex, config: { series } }) => {
-      const label = series[seriesIndex]?.data[dataPointIndex]?.x
-      return label
-    },
-  },
-  annotations: {
-    points: [
-      ..._items.value
-        .slice(0, 1)
-        .map(({ label, value }) => getValueAnnotation(label, value, 0)),
-      ..._items.value
-        .slice(1)
-        .map(({ label, value }) => getValueAnnotation(label, value, 1)),
-    ],
-  },
+const option = computed<EChartsOption>(() => ({
+  color: tailwind.theme.colors['accent-dark'],
   grid: {
+    left: 0,
+    right: '70%',
+    top: 0,
+    bottom: 8,
+  },
+  xAxis: {
     show: false,
   },
-  states: {
-    hover: {
-      filter: {
-        type: 'none',
+  yAxis: {
+    show: false,
+    data: _items.value.map(({ label }) => label),
+  },
+  series: [
+    {
+      data: _items.value.map(({ value }, index) =>
+        index === _items.value.length - 1
+          ? {
+              value,
+              itemStyle: {
+                color: tailwind.theme.colors.main,
+              },
+              label: {
+                color: tailwind.theme.colors.main,
+              },
+            }
+          : value,
+      ),
+      type: 'bar',
+      barWidth: 2,
+      label: {
+        show: true,
+        position: 'right',
+        fontSize: 20,
+        color: tailwind.theme.colors['accent-darker'],
+        formatter: `{label|{b}}\n{value|{c} ${props.unit}}`,
+        verticalAlign: 'top',
+        offset: [10, -10],
+        rich: {
+          label: {
+            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontWeight: 500,
+            fontSize: 22,
+            padding: [0, 0, 4, 0],
+            align: 'left',
+          },
+          value: {
+            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontWeight: 400,
+            fontSize: 14,
+            color: tailwind.theme.colors['accent-darker'],
+            backgroundColor: tailwind.theme.colors['accent'],
+            padding: [4, 6],
+            borderRadius: 6,
+            align: 'left',
+          },
+        },
+      },
+      markPoint: {
+        symbol: 'circle',
+        symbolSize: 12,
+        data: _items.value.map(({ label, value }, index) => ({
+          name: '',
+          value,
+          xAxis: value,
+          yAxis: label,
+          label: {
+            show: false,
+          },
+          itemStyle: {
+            color:
+              index === _items.value.length - 1
+                ? tailwind.theme.colors.main
+                : tailwind.theme.colors['accent-dark'],
+          },
+        })),
       },
     },
-  },
-  xaxis: {
-    min: chartMin.value,
-    max: chartWidthAdjust.value,
-  },
-
-  tooltip: {
-    enabled: false,
-  },
+  ],
 }))
-
-function getValueAnnotation(
-  label: string,
-  value: number,
-  seriesIndex: number,
-): PointAnnotations {
-  return {
-    y: label as unknown as number, // type does not correspond with expected value
-    x: value,
-    marker: { size: 0, strokeWidth: 0 },
-    label: {
-      borderColor: 'none',
-      textAnchor: 'start',
-      offsetX: 20,
-      offsetY: seriesIndex === 0 ? 8 : 10,
-      style: {
-        background: 'none',
-        color:
-          seriesIndex === 0
-            ? tailwind.theme.colors.black
-            : tailwind.theme.colors['accent-dark'],
-        fontSize: '18px',
-        fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-      },
-      text: `${value} ${props.unit ?? ''}`,
-    },
-  }
-}
 </script>
