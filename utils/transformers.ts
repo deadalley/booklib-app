@@ -36,7 +36,7 @@ export function dbBookToBook(
 }
 
 export function bookToDbBook(
-  book: Book,
+  book: Partial<Book>,
   userId: string,
 ): Omit<BookDB, 'created_at' | 'id'> {
   return {
@@ -52,7 +52,7 @@ export function bookToDbBook(
     publisher: book.publisher ?? null,
     rating: nullify(book.rating),
     summary: book.summary ?? null,
-    title: book.title,
+    title: book.title ?? '',
     year: nullify(book.year),
     genres: book.genres ?? null,
     progress_status:

@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await client
       .from('books')
       .upsert(
-        books.map((book) => bookToDbBook(book, user.id)),
+        books.map(({ id, ...book }) => bookToDbBook(book, user.id)),
         {
           onConflict: 'id',
           defaultToNull: true,
