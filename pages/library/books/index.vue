@@ -26,6 +26,8 @@
       v-model:books="sortedBooks"
       :view="view"
       :selected-table-columns="selectedTableColumns"
+      :total-book-count="bookCount ?? 0"
+      @update:page="onPageChange"
     />
   </NuxtLayout>
   <bl-sidebar
@@ -59,7 +61,15 @@
 import type { Book } from '~/types/book'
 import { IconPlus } from '@tabler/icons-vue'
 
-const { data: books } = await useFetch<Book[]>('/api/books')
+const currentPage = ref<number>(0)
+
+const { data: bookCount } = await useFetch<number>('/api/library/book-count')
+const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
+  query: {
+    pageSize: BOOKS_PAGE_SIZE,
+    page: currentPage,
+  },
+})
 
 const {
   view,
@@ -87,6 +97,14 @@ const {
   onCloseSidebar,
   onResetFilter,
 } = useSortBooks(books)
+
+watch(sortedBooks, (f) => console.log(f))
+watch(currentPage, (f) => console.log(f))
+
+function onPageChange(page: number) {
+  currentPage.value = page - 1
+  refresh()
+}
 
 definePageMeta({
   middleware: 'auth',

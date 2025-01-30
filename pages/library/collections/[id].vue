@@ -157,8 +157,6 @@ const formattedDate = computed(() =>
 const { view, selectedBooks, notSelectedBooks, selectedTableColumns } =
   useSortBooksByOrder(allBooks)
 
-console.log(allBooks)
-
 watch(isNew, () => {
   managingBooks.value = isNew.value
 })

@@ -41,16 +41,6 @@ export const useSortBooksByOrder = <T extends ViewBook>(
     sortBooks((books.value ?? []).filter(({ selected }) => !selected)),
   )
 
-  watch(selectedBooks, (a) => {
-    console.log({
-      selectedBooks: a.map(({ title, order }) => ({
-        title,
-        order,
-      })),
-    })
-  })
-
-  console.log(books.value)
   return {
     view,
     selectedBooks,

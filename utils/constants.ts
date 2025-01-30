@@ -1,6 +1,8 @@
 import type { icons } from '@tabler/icons-vue'
 import type { BookProgressStatus } from '~/types/book'
 
+export const BOOKS_PAGE_SIZE = 44
+
 export const ICON_SIZE_SMALL = 20
 export const ICON_SIZE_MEDIUM = 22
 

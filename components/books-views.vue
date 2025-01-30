@@ -26,6 +26,14 @@
       interactive
     />
   </div>
+
+  <div v-if="totalBookCount" class="flex justify-center py-2">
+    <bl-pagination
+      :total-item-count="totalBookCount"
+      :items-per-page="BOOKS_PAGE_SIZE"
+      @update:page="(args) => $emit('update:page', args)"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,6 +44,7 @@ defineProps<{
   view: View
   interactive?: boolean
   editing?: boolean
+  totalBookCount?: number
   selectedTableColumns: {
     [key in keyof Book]?: { label: string; checked: boolean }
   }
@@ -59,5 +68,6 @@ defineEmits<{
     e: 'book-drag',
     val: { bookId: Book['id']; newOrder: number; oldOrder: number },
   ): void
+  (e: 'update:page', val: number): void
 }>()
 </script>

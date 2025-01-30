@@ -6,7 +6,6 @@ export default defineEventHandler<Promise<string | undefined>>(
     const user = await serverSupabaseUser(event)
     const client = await serverSupabaseClient<Database>(event)
 
-    console.log(user?.id)
     if (!user?.id) {
       throw createError('Unauthenticated')
     } else {
