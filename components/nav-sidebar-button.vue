@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="disabled ? undefined : to"
-    class="flex items-center gap-3 rounded-xl px-5 py-3 text-base"
+    class="flex items-center gap-3 rounded-xl px-5 py-3 text-lg"
     :class="{
       'cursor-pointer transition-all hover:bg-accent/30 active:bg-accent-dark/20':
         !disabled,
