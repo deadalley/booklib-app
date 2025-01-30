@@ -20,6 +20,8 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     },
   )
 
+  const currentPage = ref<number>(1)
+
   const defaultTableColumns = {
     coverSrc: { label: 'Cover', checked: true },
     publisher: { label: 'Publisher', checked: false },
@@ -75,6 +77,8 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
 
   const filterCount = computed(() => {
     let count = 0
+
+    console.log(selectedPublishers.value.length)
 
     if (selectedPublishers.value.length) {
       count++
@@ -178,6 +182,19 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     return sorted
   })
 
+  const filteredBooksByPage = computed(() => {
+    if ((currentPage.value - 1) * BOOKS_PAGE_SIZE >= sortedBooks.value.length) {
+      currentPage.value = 1
+    }
+
+    const filteredByCurrentPage = sortedBooks.value.slice(
+      (currentPage.value - 1) * BOOKS_PAGE_SIZE,
+      currentPage.value * BOOKS_PAGE_SIZE,
+    )
+
+    return filteredByCurrentPage
+  })
+
   function onSearch($event: Event) {
     textSearch.value = ($event.target as HTMLInputElement)?.value
   }
@@ -205,7 +222,9 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
 
   return {
     view,
+    currentPage,
     sortedBooks,
+    filteredBooksByPage,
     filterCount,
     sidebarContent,
     selectedTableColumns,

@@ -1,5 +1,6 @@
 <template>
   <PaginationRoot
+    v-model:page="currentPage"
     show-edges
     :total="totalItemCount"
     :sibling-count="1"
@@ -73,4 +74,6 @@ defineProps<{ totalItemCount: number; itemsPerPage: number }>()
 defineEmits<{
   (e: 'update:page', val: number): void
 }>()
+
+const currentPage = defineModel<number>()
 </script>

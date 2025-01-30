@@ -2,7 +2,7 @@
   <NuxtLayout
     name="library"
     title="Books"
-    :total="books?.length ?? 0"
+    :total="bookCount"
     :sidebar-content="sidebarContent"
   >
     <template #navbar>
@@ -23,10 +23,11 @@
       </NuxtLink>
     </template>
     <bl-books-views
-      v-model:books="sortedBooks"
+      v-model:current-page="currentPage"
+      v-model:books="filteredBooksByPage"
       :view="view"
       :selected-table-columns="selectedTableColumns"
-      :total-book-count="bookCount ?? 0"
+      :total-book-count="sortedBooks.length"
       @update:page="onPageChange"
     />
   </NuxtLayout>
@@ -61,19 +62,14 @@
 import type { Book } from '~/types/book'
 import { IconPlus } from '@tabler/icons-vue'
 
-const currentPage = ref<number>(0)
-
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
-const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
-  query: {
-    pageSize: BOOKS_PAGE_SIZE,
-    page: currentPage,
-  },
-})
+const { data: books, refresh } = await useFetch<Book[]>('/api/books')
 
 const {
   view,
+  currentPage,
   sortedBooks,
+  filteredBooksByPage,
   filterCount,
   sidebarContent,
   selectedTableColumns,
@@ -98,11 +94,8 @@ const {
   onResetFilter,
 } = useSortBooks(books)
 
-watch(sortedBooks, (f) => console.log(f))
-watch(currentPage, (f) => console.log(f))
-
 function onPageChange(page: number) {
-  currentPage.value = page - 1
+  currentPage.value = page
   refresh()
 }
 

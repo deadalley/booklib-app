@@ -7,11 +7,6 @@ export function getPaginatedBooks(
   pageSize?: number,
 ) {
   if (page !== undefined && pageSize !== undefined) {
-    console.log({
-      page,
-      pageSize,
-      range: [page * pageSize, (page + 1) * pageSize - 1],
-    })
     return client
       .from('books')
       .select('*, collections(id)')

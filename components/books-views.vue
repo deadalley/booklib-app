@@ -29,6 +29,7 @@
 
   <div v-if="totalBookCount" class="flex justify-center py-2">
     <bl-pagination
+      v-model="currentPage"
       :total-item-count="totalBookCount"
       :items-per-page="BOOKS_PAGE_SIZE"
       @update:page="(args) => $emit('update:page', args)"
@@ -61,6 +62,8 @@ const notSelectedBooks = defineModel<ViewBook[]>('notSelectedBooks', {
 const books = defineModel<ViewBook[]>('books', {
   default: [],
 })
+
+const currentPage = defineModel<number>('currentPage')
 
 defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
