@@ -12,6 +12,7 @@ export function sortBooks(booksToBeSorted: ViewBook[]) {
 export function sortBooksBy<B extends Book>(
   books: B[],
   bookProperty: keyof Pick<B, 'pages' | 'rating'>,
+  direction: 'asc' | 'desc' = 'asc',
   count?: number,
 ) {
   const sortedBooks = books.concat().sort((book1, book2) => {
@@ -23,7 +24,9 @@ export function sortBooksBy<B extends Book>(
       return -1
     }
 
-    return book2[bookProperty] - book1[bookProperty]
+    return direction === 'desc'
+      ? book2[bookProperty] - book1[bookProperty]
+      : book1[bookProperty] - book2[bookProperty]
   })
 
   return count ? sortedBooks.slice(0, count) : sortedBooks

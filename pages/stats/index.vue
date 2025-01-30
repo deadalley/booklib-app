@@ -14,6 +14,15 @@
         <template #title>Top rated books</template>
         <bl-ranking :items="rankedBooks" unit="★⯨" />
       </bl-tile>
+      <bl-tile class="col-span-12">
+        <template #title>Statistics</template>
+        <bl-books-bar-chart
+          v-if="books"
+          :books="books"
+          book-property="pages"
+          :show-percentages="false"
+        />
+      </bl-tile>
     </div>
   </NuxtLayout>
 </template>
@@ -25,7 +34,7 @@ import type { Book } from '~/types/book'
 const { data: books } = await useFetch<Book[]>('/api/books')
 
 const rankedBooks = computed<RankingItem[]>(() =>
-  sortBooksBy(books.value ?? [], 'rating', 5).map((book) => ({
+  sortBooksBy(books.value ?? [], 'rating', 'desc', 5).map((book) => ({
     label: book.title,
     value: book.rating!,
   })),

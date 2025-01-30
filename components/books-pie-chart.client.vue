@@ -1,9 +1,5 @@
 <template>
-  <bl-pie-chart
-    :height="height"
-    :items="series"
-    :show-percentages="showPercentages"
-  />
+  <bl-pie-chart :height="height" :items="series" />
 </template>
 
 <script
@@ -25,9 +21,8 @@ const props = withDefaults(
     books: Book[]
     bookProperty: T
     height?: number
-    showPercentages?: boolean
   }>(),
-  { height: 340, showPercentages: true },
+  { height: 340 },
 )
 
 const series = computed(() => {

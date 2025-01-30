@@ -25,7 +25,6 @@ use([SVGRenderer, PieChart, TitleComponent])
 const props = defineProps<{
   items: PieChartItem<T>[]
   height?: number
-  showPercentages?: boolean
 }>()
 
 const option = computed<EChartsOption>(() => ({
