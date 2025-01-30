@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@formkit/nuxt',
     '@nuxt/image',
     '@nuxt/eslint',
+    'nuxt-echarts',
   ],
 
   components: {
