@@ -1,5 +1,5 @@
 <template>
-  <bl-pie-chart :height="height" :items="series" />
+  <bl-pie-chart :height="height" :unit="unit" :items="series" />
 </template>
 
 <script
@@ -8,7 +8,7 @@
   generic="
     T extends keyof Pick<
       Book,
-      'progressStatus' | 'language' | 'originalLanguage'
+      'progressStatus' | 'language' | 'originalLanguage' | 'rating'
     >
   "
 >
@@ -21,6 +21,7 @@ const props = withDefaults(
     books: Book[]
     bookProperty: T
     height?: number
+    unit?: string
   }>(),
   { height: 340 },
 )
@@ -30,10 +31,14 @@ const series = computed(() => {
     props.books.filter((book) => !!book[props.bookProperty]),
     props.bookProperty,
   )
-  return Object.entries(groupedBooks).map(([label, items]) => ({
-    label: getChartLabel(label as NonNullable<T>),
-    value: items.length,
-  }))
+  return Object.entries(groupedBooks)
+    .map(([label, items]) => ({
+      label: getChartLabel(label as NonNullable<T>),
+      value: items.length,
+    }))
+    .sort(({ label: label1 }, { label: label2 }) =>
+      label2.localeCompare(label1),
+    )
 })
 
 function getChartLabel(label: NonNullable<T>) {

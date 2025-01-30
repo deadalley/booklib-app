@@ -44,22 +44,17 @@ const props = withDefaults(
   defineProps<{
     items: RankingItem[]
     height?: number
-    min?: number
-    max?: number
-    scaleFactor?: number
-    maxItems?: number
-    unit?: string
+    unit?: string | ((value: number) => string)
   }>(),
-  { scaleFactor: 1 },
+  { height: 340 },
 )
 
-const _items = computed(() => {
-  const sortedItems = props.items
-    .slice(0, props.maxItems)
-    .sort(({ value: v1 }, { value: v2 }) => v1 - v2)
-
-  return sortedItems
-})
+const _items = computed(() =>
+  props.items.map((item) => ({
+    ...item,
+    value: item.value === 0 ? 0.1 : item.value,
+  })),
+)
 
 const option = computed<EChartsOption>(() => ({
   color: tailwind.theme.colors['accent-dark'],
@@ -96,9 +91,14 @@ const option = computed<EChartsOption>(() => ({
       label: {
         show: true,
         position: 'right',
-        fontSize: 20,
+        fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+        fontWeight: 500,
+        fontSize: 18,
+        padding: [0, 0, 4, 0],
+        align: 'left',
         color: tailwind.theme.colors['accent-darker'],
-        formatter: `{label|{b}}\n{value|{c} ${props.unit}}`,
+        formatter: ({ value, name }) =>
+          `{label|${name}}\n{value|${value === 0.1 ? 0 : value} ${renderUnit(value as number)}}`,
         verticalAlign: 'top',
         offset: [10, -10],
         rich: {
@@ -143,4 +143,16 @@ const option = computed<EChartsOption>(() => ({
     },
   ],
 }))
+
+function renderUnit(value: number) {
+  if (props.unit !== undefined) {
+    if (typeof props.unit === 'function') {
+      return props.unit(value)
+    } else {
+      return props.unit
+    }
+  }
+
+  return ''
+}
 </script>

@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends OptionDataValueNumeric[]">
+<script setup lang="ts" generic="T extends OptionDataValueNumeric">
 import { SVGRenderer } from 'echarts/renderers'
 import { type ComposeOption, use } from 'echarts/core'
 import { type PieSeriesOption, PieChart } from 'echarts/charts'
@@ -25,6 +25,7 @@ use([SVGRenderer, PieChart, TitleComponent])
 const props = defineProps<{
   items: PieChartItem<T>[]
   height?: number
+  unit?: string
 }>()
 
 const option = computed<EChartsOption>(() => ({
@@ -45,7 +46,7 @@ const option = computed<EChartsOption>(() => ({
         borderRadius: 6,
       },
       label: {
-        formatter: '{label|{b}} {value|{c}}',
+        formatter: `{label|{b} ${props.unit ?? ''}} {value|{c}}`,
         rich: {
           label: {
             fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
