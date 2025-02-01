@@ -95,7 +95,6 @@ const selectValue = defineModel<string>()
 
 <style scoped>
 [data-radix-popper-content-wrapper] {
-  background-color: green !important ;
   position: absolute !important;
   width: 100%;
   transform: none !important;

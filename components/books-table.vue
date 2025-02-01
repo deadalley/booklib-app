@@ -1,10 +1,11 @@
 <template>
   <bl-table
-    v-bind="$attrs"
+    v-bind="$props"
     :data="books"
     :columns="columns"
-    :on-row-click="interactive ? onRowClick : undefined"
-    :with-check="withCheck"
+    @click:row="interactive ? onRowClick : undefined"
+    @select:row="(args) => $emit('select:row', args)"
+    @select:rows="(args) => $emit('select:rows', args)"
   />
 </template>
 
@@ -13,6 +14,7 @@ import {
   createColumnHelper,
   type CellContext,
   type ColumnDef,
+  type RowSelectionState,
 } from '@tanstack/vue-table'
 import type { Book } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
@@ -29,6 +31,13 @@ const props = defineProps<{
   }
   interactive?: boolean
   withCheck?: boolean
+  defaultSelected?: boolean
+  rowClickable?: boolean
+}>()
+
+defineEmits<{
+  (e: 'select:row', val: { id: Book['id']; selected: boolean }): void
+  (e: 'select:rows', val: RowSelectionState): void
 }>()
 
 const cell = <U,>(info: CellContext<DataType, U | null>) => info.getValue()

@@ -17,13 +17,24 @@
     />
   </template>
 
-  <bl-books-grid v-if="!interactive && view === 'cards'" v-model="books" />
+  <bl-books-grid
+    v-if="!interactive && view === 'cards'"
+    v-model="books"
+    :selectable="editing"
+    @select="(args) => $emit('book-select', args)"
+  />
 
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
       :books="books"
       :selected-table-columns="selectedTableColumns"
+      :with-check="editing"
+      :row-clickable="!editing"
       interactive
+      @select:row="
+        (args) =>
+          $emit('book-select', { bookId: args.id, selected: args.selected })
+      "
     />
   </div>
 

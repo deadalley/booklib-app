@@ -148,7 +148,7 @@ const editing = ref(isNew.value)
 const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
-const allBooks = ref<(Book & { selected: boolean; order?: number })[]>([])
+const allBooks = ref<ViewBook[]>([])
 
 const formattedDate = computed(() =>
   format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),

@@ -29,8 +29,6 @@ const tableColumns = computed(() =>
   })),
 )
 
-watch(selectedTableColumns, (v) => console.log(v))
-
 function onColumnFilter(v: Event) {
   const { value, checked } = v.target as HTMLInputElement
 

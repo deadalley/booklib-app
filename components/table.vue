@@ -53,9 +53,9 @@
         v-for="row in table.getRowModel().rows"
         :key="row.id"
         :class="{
-          'cursor-pointer hover:bg-accent-light/40': !!onRowClick,
+          'cursor-pointer hover:bg-accent-light/40': !!rowClickable,
         }"
-        @click="onRowClick?.(row.original)"
+        @click="rowClickable ? $emit('click:row', row.original) : undefined"
       >
         <td
           v-for="cell in row.getVisibleCells()"
@@ -95,7 +95,11 @@
   </table>
 </template>
 
-<script setup lang="ts" generic="T extends { id: string | number }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { id: string | number; selected?: boolean }"
+>
 import {
   useVueTable,
   type ColumnDef,
@@ -114,18 +118,26 @@ const props = defineProps<{
   data: T[]
   columns: ColumnDef<T, unknown>[]
   withCheck?: boolean
-  onRowClick?: (row: T) => void
+  defaultSelected?: boolean
+  rowClickable?: boolean
 }>()
 
 const columnVisibility = ref({})
 const columnOrder = ref<ColumnOrderState>([])
 const rowSelection = ref<RowSelectionState>(
-  props.data.reduce((acc, { id }) => ({ ...acc, [id]: true }), {}),
+  props.data.reduce(
+    (acc, { id, selected }) => ({
+      ...acc,
+      [id]: selected === undefined ? props.defaultSelected : selected,
+    }),
+    {},
+  ),
 )
 
 const emit = defineEmits<{
-  (e: 'select', val: { id: T['id']; selected: boolean }): void
-  (e: 'selected-rows', val: typeof rowSelection.value): void
+  (e: 'click:row', val: T): void
+  (e: 'select:row', val: { id: T['id']; selected: boolean }): void
+  (e: 'select:rows', val: typeof rowSelection.value): void
 }>()
 
 const table = useVueTable({
@@ -153,7 +165,7 @@ const table = useVueTable({
               id: `${info.row.original.id}-checked`,
               checked: info.row.getIsSelected(),
               onChange: (event: Event) => {
-                emit('select', {
+                emit('select:row', {
                   id: info.row.original.id,
                   selected: (event.target as HTMLInputElement).checked,
                 })
@@ -181,7 +193,7 @@ const table = useVueTable({
       return rowSelection.value
     },
   },
-  enableRowSelection: props.withCheck,
+  enableRowSelection: true,
 
   getRowId: (row) => String(row.id),
 
@@ -191,7 +203,7 @@ const table = useVueTable({
         ? updateOrValue(rowSelection.value)
         : updateOrValue
 
-    emit('selected-rows', newValue)
+    emit('select:rows', newValue)
     rowSelection.value = newValue
   },
 

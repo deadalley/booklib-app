@@ -112,6 +112,7 @@
         :books="importedBooks"
         :selected-table-columns="selectedTableColumns"
         with-check
+        default-selected
         @selected-rows="onSelectBook"
       />
     </div>

@@ -21,8 +21,14 @@
     </div>
     <slot />
   </div>
+  <bl-loading-overlay v-if="loading" />
 </template>
 
 <script setup lang="ts">
-defineProps<{ title: string; total: number; sidebarContent?: string }>()
+defineProps<{
+  title: string
+  total: number
+  sidebarContent?: string
+  loading?: boolean
+}>()
 </script>

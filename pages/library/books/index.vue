@@ -4,6 +4,7 @@
     title="Books"
     :total="bookCount"
     :sidebar-content="sidebarContent"
+    :loading="loading"
   >
     <template #navbar>
       <div class="flex w-full items-start gap-3 xl:flex-row">
@@ -19,12 +20,7 @@
         >
           Manage
         </bl-button>
-        <bl-button
-          v-if="editing"
-          expand
-          variant="secondary"
-          @click="editing = false"
-        >
+        <bl-button v-if="editing" expand variant="secondary" @click="onCancel">
           Cancel
         </bl-button>
         <bl-dropdown
@@ -59,10 +55,12 @@
     <bl-books-views
       v-model:current-page="currentPage"
       v-model:books="filteredBooksByPage"
+      :editing="editing"
       :view="view"
       :selected-table-columns="selectedTableColumns"
       :total-book-count="sortedBooks.length"
       @update:page="onPageChange"
+      @book-select="onBookSelect"
     />
   </NuxtLayout>
   <bl-sidebar
@@ -98,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import { IconPlus, IconSettings } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 
@@ -109,7 +107,14 @@ const dropdownItems: DropdownItem[] = [
   { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
 ]
 
+const viewBooks = ref<ViewBook[]>(books.value ?? [])
+
 const editing = ref(false)
+const loading = ref(false)
+
+watch(books, (newBooks) => {
+  viewBooks.value = newBooks ?? []
+})
 
 const {
   view,
@@ -139,17 +144,53 @@ const {
   onTableSettingsOpen,
   onCloseSidebar,
   onResetFilter,
-} = useSortBooks(books)
+} = useSortBooks(viewBooks)
 
 function onPageChange(page: number) {
   currentPage.value = page
   refresh()
 }
 
-function onActionSelect(action: string) {
-  if (action === 'delete') {
-    console.log('bruh')
+async function onActionSelect(action: string) {
+  try {
+    loading.value = true
+    if (action === 'delete') {
+      await $fetch<Book['id']>('/api/books', {
+        method: 'delete',
+        body: viewBooks.value
+          .filter(({ selected }) => selected)
+          .map(({ id }) => id),
+      })
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    await refresh()
+    editing.value = false
+    onResetFilter()
+    loading.value = false
   }
+}
+
+function onBookSelect({
+  bookId,
+  selected,
+}: {
+  bookId: Book['id']
+  selected: boolean
+}) {
+  viewBooks.value = viewBooks.value.map((book) => ({
+    ...book,
+    selected: book.id === bookId ? selected : book.selected,
+  }))
+}
+
+function onCancel() {
+  editing.value = false
+  viewBooks.value = viewBooks.value.map((book) => ({
+    ...book,
+    selected: false,
+  }))
 }
 
 definePageMeta({
