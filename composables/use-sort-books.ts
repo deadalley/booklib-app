@@ -203,6 +203,10 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     sidebarContent.value = 'Filter'
   }
 
+  function onTableSettingsOpen() {
+    sidebarContent.value = 'Table'
+  }
+
   function onCloseSidebar() {
     sidebarContent.value = undefined
   }
@@ -248,6 +252,7 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     genres,
     onSearch,
     onFilterOpen,
+    onTableSettingsOpen,
     onCloseSidebar,
     onResetFilter,
   }

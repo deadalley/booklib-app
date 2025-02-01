@@ -11,6 +11,17 @@
         <bl-button expand variant="secondary" @click="onFilterOpen">
           Filter {{ filterCount ? `(${filterCount})` : '' }}
         </bl-button>
+        <bl-button
+          v-if="view === 'table'"
+          expand
+          variant="secondary"
+          @click="onTableSettingsOpen"
+        >
+          Table
+          <template #appendIcon="iconProps">
+            <IconSettings v-bind="iconProps" />
+          </template>
+        </bl-button>
         <bl-view-switch v-model:view="view" />
       </div>
       <NuxtLink class="flex md:inline-flex" to="/library/books/new">
@@ -36,7 +47,12 @@
     :is-open="!!sidebarContent"
     :on-close="onCloseSidebar"
   >
+    <bl-book-table-columns-selector
+      v-if="sidebarContent === 'Table'"
+      v-model:selected-table-columns="selectedTableColumns"
+    />
     <bl-book-filter
+      v-if="sidebarContent === 'Filter'"
       v-model:selected-publishers="selectedPublishers"
       v-model:selected-languages="selectedLanguages"
       v-model:selected-original-languages="selectedOriginalLanguages"
@@ -52,15 +68,15 @@
       :min-max-year-range="[minYear, maxYear]"
       :min-max-page-range="[minPages, maxPages]"
       :books="books ?? []"
-      :on-reset="onResetFilter"
-      :on-apply="onCloseSidebar"
+      @reset="onResetFilter"
+      @apply="onCloseSidebar"
     />
   </bl-sidebar>
 </template>
 
 <script setup lang="ts">
 import type { Book } from '~/types/book'
-import { IconPlus } from '@tabler/icons-vue'
+import { IconPlus, IconSettings } from '@tabler/icons-vue'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
 const { data: books, refresh } = await useFetch<Book[]>('/api/books')
@@ -90,6 +106,7 @@ const {
   genres,
   onSearch,
   onFilterOpen,
+  onTableSettingsOpen,
   onCloseSidebar,
   onResetFilter,
 } = useSortBooks(books)
