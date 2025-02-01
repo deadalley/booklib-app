@@ -2,7 +2,12 @@
   <NuxtLink
     :to="selectable ? undefined : href"
     class="relative cursor-pointer"
-    :class="{ 'w-full': !coverSrc }"
+    :class="{
+      'w-full': !coverSrc,
+      'rounded-xl ring-1 ring-main transition-all duration-300 ease-in-out':
+        selectable,
+      'ring-main': !!selected,
+    }"
     @click="$emit('click')"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
