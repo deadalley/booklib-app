@@ -12,6 +12,29 @@
           Filter {{ filterCount ? `(${filterCount})` : '' }}
         </bl-button>
         <bl-button
+          v-if="!editing"
+          expand
+          variant="secondary"
+          @click="editing = true"
+        >
+          Manage
+        </bl-button>
+        <bl-button
+          v-if="editing"
+          expand
+          variant="secondary"
+          @click="editing = false"
+        >
+          Cancel
+        </bl-button>
+        <bl-dropdown
+          v-if="editing"
+          :items="dropdownItems"
+          @click="onActionSelect"
+        >
+          Select action
+        </bl-dropdown>
+        <bl-button
           v-if="view === 'table'"
           expand
           variant="secondary"
@@ -77,9 +100,16 @@
 <script setup lang="ts">
 import type { Book } from '~/types/book'
 import { IconPlus, IconSettings } from '@tabler/icons-vue'
+import type { DropdownItem } from '~/components/dropdown.vue'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
 const { data: books, refresh } = await useFetch<Book[]>('/api/books')
+
+const dropdownItems: DropdownItem[] = [
+  { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
+]
+
+const editing = ref(false)
 
 const {
   view,
@@ -114,6 +144,12 @@ const {
 function onPageChange(page: number) {
   currentPage.value = page
   refresh()
+}
+
+function onActionSelect(action: string) {
+  if (action === 'delete') {
+    console.log('bruh')
+  }
 }
 
 definePageMeta({

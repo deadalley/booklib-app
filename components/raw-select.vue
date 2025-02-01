@@ -16,7 +16,7 @@
       <SelectPortal disabled>
         <SelectContent position="popper">
           <SelectViewport
-            class="formkit-inner z-10 max-h-96 max-w-full flex-col items-start !gap-1 overflow-y-auto overflow-x-hidden !p-[0.35rem]"
+            class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
           >
             <SelectGroup v-if="options" class="flex w-full flex-col gap-1">
               <SelectItem
@@ -95,6 +95,7 @@ const selectValue = defineModel<string>()
 
 <style scoped>
 [data-radix-popper-content-wrapper] {
+  background-color: green !important ;
   position: absolute !important;
   width: 100%;
   transform: none !important;

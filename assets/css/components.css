@@ -13,3 +13,7 @@
 .switch-option.selected {
   @apply w-full border-accent-dark bg-accent hover:bg-accent-light;
 }
+
+.base-container {
+  @apply flex flex-col items-start gap-1 rounded-xl border border-accent bg-white p-[0.35rem] text-base transition-all duration-100 ease-in;
+}

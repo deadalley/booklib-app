@@ -78,8 +78,6 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
   const filterCount = computed(() => {
     let count = 0
 
-    console.log(selectedPublishers.value.length)
-
     if (selectedPublishers.value.length) {
       count++
     }
