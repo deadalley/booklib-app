@@ -75,6 +75,7 @@ const { data: books, refresh } = await useAsyncData(
     Promise.all<Book>(
       props.collection.books
         .slice(0, 4)
+        // @ts-expect-error throws depth error
         .map(({ id }) => $fetch(`/api/books/${id}`)),
     ),
   {
