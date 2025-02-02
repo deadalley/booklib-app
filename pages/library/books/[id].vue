@@ -309,10 +309,10 @@
             </section>
 
             <section class="book-section">
-              <!-- <template v-if="!externalBooks.length">
+              <template v-if="!externalBooks.length && false">
                 <h4>Find books</h4>
                 <bl-button @click="fetchBooksFromGoogle">Fetch</bl-button>
-              </template> -->
+              </template>
               <div
                 v-if="externalBooks.length"
                 class="relative flex size-max gap-x-6 p-3 transition duration-100 ease-out"

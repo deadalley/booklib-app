@@ -7,7 +7,6 @@ async function getByParams(
   route: string,
   queryParams: object,
 ): Promise<{ kind: string; totalItems: number; items: GoogleBook[] }> {
-  // @ts-expect-error stack
   return $fetch(`${url}/${route}`, {
     query: {
       printType: 'books',
