@@ -307,6 +307,24 @@
                 />
               </div>
             </section>
+
+            <section class="book-section">
+              <!-- <template v-if="!externalBooks.length">
+                <h4>Find books</h4>
+                <bl-button @click="fetchBooksFromGoogle">Fetch</bl-button>
+              </template> -->
+              <div
+                v-if="externalBooks.length"
+                class="relative flex size-max gap-x-6 p-3 transition duration-100 ease-out"
+              >
+                <bl-book-card
+                  v-for="b in externalBooks"
+                  :key="b.title"
+                  :book="b"
+                  class="!w-36"
+                />
+              </div>
+            </section>
             <div v-if="editing" class="flex justify-end gap-2">
               <bl-button variant="secondary" @click="onCancel">
                 {{ isNew ? 'Cancel' : 'Discard changes' }}
@@ -346,6 +364,7 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
+const externalBooks = ref<Book[]>([])
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const stepperModalOpen = ref()
@@ -539,6 +558,21 @@ function onProgressChange(progressStatusStep: number) {
 
 function dateFormatter(date: Date | undefined): string | undefined {
   return date && toDefaultDate(date)
+}
+
+async function fetchBooksFromGoogle() {
+  try {
+    if (book.value) {
+      const books = await $fetch('/api/external/google', {
+        query: { title: book.value.title, pageSize: 10 },
+      })
+
+      console.log(books)
+      externalBooks.value = books
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 onMounted(() => {

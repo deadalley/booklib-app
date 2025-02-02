@@ -2,6 +2,7 @@ import type { Book } from '~/types/book'
 import type { BookDB, CollectionDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
 import { toSimpleDate } from './date'
+import type { GoogleBook } from '~/types/google'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
@@ -84,5 +85,28 @@ export function collectionToDbCollection(
     ...(collection.id ? { id: collection.id } : {}),
     user_id: userId,
     name: collection.name,
+  }
+}
+
+export function googleBookToBook(googleBook: GoogleBook): Book {
+  return {
+    id: 0,
+    title: googleBook.volumeInfo.title ?? undefined,
+    coverSrc: googleBook.volumeInfo.imageLinks.thumbnail ?? undefined,
+    createdAt: '',
+    isbn: undefined,
+    language: googleBook.volumeInfo.language ?? undefined,
+    originalTitle: undefined,
+    originalLanguage: undefined,
+    pages: googleBook.volumeInfo.pageCount ?? undefined,
+    publisher: googleBook.volumeInfo.publisher ?? undefined,
+    rating: 0,
+    summary: googleBook.volumeInfo.description ?? undefined,
+    year: new Date(googleBook.volumeInfo.publishedDate).getFullYear(),
+    genres: googleBook.volumeInfo.categories ?? [],
+    collections: [],
+    progressStatus: undefined,
+    startedAt: undefined,
+    finishedAt: undefined,
   }
 }
