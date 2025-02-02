@@ -14,7 +14,6 @@ export default defineEventHandler<Promise<Book[]>>(async (event) => {
     bookProgress?: BookProgressStatus
   }>(event)
 
-  console.log(query)
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
@@ -24,8 +23,6 @@ export default defineEventHandler<Promise<Book[]>>(async (event) => {
       query.pageSize && +query.pageSize,
       query.bookProgress,
     )
-
-    console.log(data)
 
     if (error) {
       logger.error(error)
