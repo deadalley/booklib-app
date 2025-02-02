@@ -1,14 +1,20 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import type { Database } from '~/types/db.generate'
-import { dbBookToBook, executePromisesInChunks } from '~/utils'
+import { dbBookToBook, executePromisesInChunks, logger } from '~/utils'
 import { getPaginatedBooks } from '~/server/utils/get-paginated-books'
+import type { Book, BookProgressStatus } from '~/types/book'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler<Promise<Book[]>>(async (event) => {
   const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)
 
-  const query = getQuery<{ page?: number; pageSize?: number }>(event)
+  const query = getQuery<{
+    page?: number
+    pageSize?: number
+    bookProgress?: BookProgressStatus
+  }>(event)
 
+  console.log(query)
   if (!user?.id) {
     throw createError('Unauthenticated')
   } else {
@@ -16,7 +22,10 @@ export default defineEventHandler(async (event) => {
       client,
       query.page && +query.page,
       query.pageSize && +query.pageSize,
+      query.bookProgress,
     )
+
+    console.log(data)
 
     if (error) {
       logger.error(error)
@@ -27,7 +36,7 @@ export default defineEventHandler(async (event) => {
       (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),
     )
 
-    return data?.map((b, index) =>
+    return (data ?? [])?.map((b, index) =>
       dbBookToBook(
         { ...b, cover_src: bookCovers[index] ?? null },
         b.collections,

@@ -51,10 +51,12 @@ const props = withDefaults(
 )
 
 const _items = computed(() =>
-  props.items.map((item) => ({
-    ...item,
-    value: item.value === 0 ? 0.1 : item.value,
-  })),
+  props.items
+    .map((item) => ({
+      ...item,
+      value: item.value === 0 ? 0.1 : item.value,
+    }))
+    .reverse(),
 )
 
 const option = computed<EChartsOption>(() => ({

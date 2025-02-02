@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-3xl lg:flex-1"
+    class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl lg:flex-1"
     :class="{ 'justify-center': loading }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
@@ -20,7 +20,7 @@
     </bl-icon-button>
     <div
       v-if="editing"
-      class="absolute inset-0 z-10 size-full cursor-pointer rounded-3xl bg-black transition-opacity duration-300"
+      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-black transition-opacity duration-300"
       :class="{
         'opacity-0': !hovered,
         'opacity-60': hovered,
@@ -32,7 +32,7 @@
       v-if="coverSrc && !loading"
       :src="coverSrc"
       :alt="book.title"
-      class="size-full rounded-3xl object-cover object-center"
+      class="size-full rounded-xl object-cover object-center"
     />
     <bl-empty-book-image
       v-if="!coverSrc && !loading"
@@ -50,7 +50,7 @@ const fileInput = ref()
 
 const props = defineProps<{
   book: Book
-  editing: boolean
+  editing?: boolean
   tempCoverSrc?: string
 }>()
 

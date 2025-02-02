@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       .from('books')
       .select('id, title, cover_src')
       .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(8)
 
     const bookCovers: (string | undefined)[] = await executePromisesInChunks(
       (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),

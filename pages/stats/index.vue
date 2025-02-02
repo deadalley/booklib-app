@@ -93,13 +93,6 @@ const barChartProperty = ref<
   keyof Pick<Book, 'pages' | 'rating' | 'year'> | undefined
 >('pages')
 
-function getRatingUnit(value: number): string {
-  return Array(Math.floor(value))
-    .fill('★')
-    .concat(value % Math.floor(value) === 0.5 ? ['⯨'] : [])
-    .join('')
-}
-
 useHead({
   title: 'BookLib | Statistics',
 })
