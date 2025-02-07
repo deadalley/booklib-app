@@ -283,6 +283,18 @@
                 />
               </div>
             </section>
+
+            <section class="book-section">
+              <bl-input
+                id="authorName"
+                :editing="editing"
+                name="authorName"
+                label="Author"
+                placeholder="Author"
+                @input="(value) => debounce(onAuthorNameChange, 500)(value)"
+              />
+            </section>
+
             <section
               v-if="!!collectionsDisplayed.length"
               class="book-section overflow-visible"
@@ -357,8 +369,11 @@ import {
   IconGift,
   IconArchive,
   IconArrowLeft,
+  IconSearch,
 } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
+import { getAuthorByName } from '~/services/open-library.service'
+import { debounce } from 'lodash'
 
 const route = useRoute()
 
@@ -458,18 +473,11 @@ function onCancel() {
   }
 }
 
-function onSelectCollection({
-  collectionId,
-  selected,
-}: {
-  collectionId: Collection['id']
-  selected: boolean
-}) {
-  allCollections.value = allCollections.value.map((collection) =>
-    collection.id === collectionId
-      ? { ...collection, selected: selected }
-      : collection,
-  )
+async function onAuthorNameChange(authorName: string) {
+  if (authorName) {
+    const authors = await getAuthorByName(authorName, { limit: 5 })
+    console.log(authors)
+  }
 }
 
 async function onSubmit(bookValues: Book) {
@@ -521,6 +529,20 @@ async function onRemoveGenre(index: number) {
     _genres.splice(index, 1)
     book.value.genres = _genres
   }
+}
+
+function onSelectCollection({
+  collectionId,
+  selected,
+}: {
+  collectionId: Collection['id']
+  selected: boolean
+}) {
+  allCollections.value = allCollections.value.map((collection) =>
+    collection.id === collectionId
+      ? { ...collection, selected: selected }
+      : collection,
+  )
 }
 
 function onSelectProgress(progressStatus: BookProgressStatus) {
