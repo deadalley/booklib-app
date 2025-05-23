@@ -12,6 +12,7 @@ export default defineEventHandler<Promise<Book[]>>(async (event) => {
     page?: number
     pageSize?: number
     bookProgress?: BookProgressStatus
+    withBookCovers?: boolean
   }>(event)
 
   if (!user?.id) {
@@ -29,9 +30,11 @@ export default defineEventHandler<Promise<Book[]>>(async (event) => {
       throw createError(error)
     }
 
-    const bookCovers: (string | undefined)[] = await executePromisesInChunks(
-      (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),
-    )
+    const bookCovers: (string | undefined)[] = query.withBookCovers
+      ? await executePromisesInChunks(
+          (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),
+        )
+      : []
 
     return (data ?? [])?.map((b, index) =>
       dbBookToBook(

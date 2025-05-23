@@ -40,6 +40,7 @@ import {
   IconClockHour3,
   IconChartLine,
   IconBookUpload,
+  IconBookDownload,
 } from '@tabler/icons-vue'
 
 const route = useRoute()
@@ -68,6 +69,7 @@ const buttons = [
     disabled: !!isEmpty.value,
   },
   { label: 'Import', icon: IconBookUpload, to: '/import', disabled: false },
+  { label: 'Export', icon: IconBookDownload, to: '/export', disabled: false },
 ]
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),

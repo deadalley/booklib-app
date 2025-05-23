@@ -127,7 +127,7 @@ import { parseCsvFile } from '~/utils/import'
 
 type ImportType = '.csv'
 
-const importOptions: SelectOption[] = [{ label: '.CSV', value: '.csv' }]
+const importOptions: SelectOption[] = [{ label: 'CSV', value: '.csv' }]
 const selectedTableColumns = {
   coverSrc: { label: 'Cover', checked: false },
   publisher: { label: 'Publisher', checked: true },
