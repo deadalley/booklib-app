@@ -184,6 +184,32 @@ export async function deleteBooks(
   return data.map(({ id }) => id)
 }
 
+export async function getBookCover(
+  event: H3Event<EventHandlerRequest>,
+  id: string,
+): Promise<string | null> {
+  const { user, client } = await authenticate(event)
+
+  try {
+    const { data, error } = await client.storage
+      .from(`book-covers/${user.id}`)
+      .createSignedUrl(id, 24 * 60 * 60)
+
+    if (error) {
+      logger.error(error)
+      if (error.message === 'Object not found') {
+        return null
+      }
+      throw createError(error.message)
+    }
+
+    return data.signedUrl
+  } catch (error) {
+    logger.error(error)
+    throw createError(error as Error)
+  }
+}
+
 export async function getCollection(
   event: H3Event<EventHandlerRequest>,
   id: number,
