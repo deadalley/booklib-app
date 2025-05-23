@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/eslint',
     'nuxt-echarts',
+    'nuxt-electron',
   ],
 
   components: {
@@ -45,6 +46,15 @@ export default defineNuxtConfig({
       cookieRedirect: false,
     },
   },
+
+  electron: {
+    build: [
+      {
+        entry: 'electron/main.ts',
+      },
+    ],
+  },
+  ssr: false,
 
   typescript: {
     strict: true,

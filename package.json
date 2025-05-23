@@ -2,6 +2,7 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --open --dotenv .env.local",
@@ -52,9 +53,12 @@
     "@types/lodash": "^4.17.15",
     "@types/node": "^22.13.0",
     "@types/papaparse": "^5.3.15",
+    "electron": "^36.3.1",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.19.0",
     "eslint-plugin-tailwindcss": "^3.18.0",
     "histoire": "^0.17.17",
+    "nuxt-electron": "^0.7.0",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "prettier": "^3.4.2",
@@ -63,6 +67,8 @@
     "typescript": "^5.7.3",
     "unplugin-auto-import": "^19.0.0",
     "unplugin-vue-components": "^28.0.0",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6",
     "vue-tsc": "^2"
   },
   "resolutions": {
