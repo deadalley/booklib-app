@@ -53,6 +53,7 @@ export default defineNuxtConfig({
         entry: 'electron/main.ts',
       },
     ],
+    disableDefaultOptions: true,
   },
   ssr: false,
 
