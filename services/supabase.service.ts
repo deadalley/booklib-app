@@ -302,11 +302,11 @@ export async function createCollection(
 
 export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
-  id: BookDB['id'],
-): Promise<BookDB['id'] | null> {
+  id: CollectionDB['id'],
+): Promise<CollectionDB['id'] | null> {
   const { client } = await authenticate(event)
 
-  const { error } = await client.from('books').delete().eq('id', +id)
+  const { error } = await client.from('collections').delete().eq('id', +id)
 
   if (error) {
     logger.error(error)
