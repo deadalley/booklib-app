@@ -184,6 +184,18 @@ export async function deleteBooks(
   return data.map(({ id }) => id)
 }
 
+export async function getBookCount(
+  event: H3Event<EventHandlerRequest>,
+): Promise<number | null> {
+  const { client } = await authenticate(event)
+
+  const { count } = await client
+    .from('books')
+    .select('*', { count: 'exact', head: true })
+
+  return count
+}
+
 export async function getBookCover(
   event: H3Event<EventHandlerRequest>,
   id: string,
