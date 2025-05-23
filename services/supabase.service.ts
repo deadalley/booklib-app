@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import type {
+  DBClient,
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
@@ -29,7 +30,7 @@ async function authenticate(event: H3Event<EventHandlerRequest>) {
 export async function getBook(
   event: H3Event<EventHandlerRequest>,
   id: number,
-): Promise<(BookDB & { collections: Pick<CollectionDB, 'id'>[] }) | null> {
+): ReturnType<DBClient['getBook']> {
   const { user, client } = await authenticate(event)
 
   const { data, error } = await client
@@ -50,7 +51,7 @@ export async function getBook(
 export async function getBooks(
   event: H3Event<EventHandlerRequest>,
   { page, pageSize, bookProgress, withBookCovers }: GetBooksQuerySearchParams,
-): Promise<(BookDB & { collections: Pick<CollectionDB, 'id'>[] })[]> {
+): ReturnType<DBClient['getBooks']> {
   const { user, client } = await authenticate(event)
 
   let query = client.from('books').select('*, collections(id)')
@@ -92,7 +93,7 @@ export async function createBook(
   book: Book,
   collections: CollectionDB[],
   tempCoverSrc?: string,
-): Promise<(BookDB & { collections: Pick<CollectionDB, 'id'>[] }) | null> {
+): ReturnType<DBClient['createBook']> {
   const { user, client } = await authenticate(event)
 
   const { data, error } = await client
@@ -154,7 +155,7 @@ export async function createBook(
 export async function deleteBook(
   event: H3Event<EventHandlerRequest>,
   id: BookDB['id'],
-): Promise<BookDB['id'] | null> {
+): ReturnType<DBClient['deleteBook']> {
   const { client } = await authenticate(event)
 
   const { error } = await client.from('books').delete().eq('id', +id)
@@ -170,7 +171,7 @@ export async function deleteBook(
 export async function deleteBooks(
   event: H3Event<EventHandlerRequest>,
   ids: BookDB['id'][],
-): Promise<BookDB['id'][]> {
+): ReturnType<DBClient['deleteBooks']> {
   const { client } = await authenticate(event)
 
   const { data, error } = await client
@@ -189,7 +190,7 @@ export async function deleteBooks(
 
 export async function getBookCount(
   event: H3Event<EventHandlerRequest>,
-): Promise<number | null> {
+): ReturnType<DBClient['getBookCount']> {
   const { client } = await authenticate(event)
 
   const { count } = await client
@@ -201,7 +202,7 @@ export async function getBookCount(
 
 export async function getLatestBooks(
   event: H3Event<EventHandlerRequest>,
-): Promise<Pick<BookDB, 'id' | 'title' | 'cover_src'>[]> {
+): ReturnType<DBClient['getLatestBooks']> {
   const { user, client } = await authenticate(event)
 
   const { data, error } = await client
@@ -230,7 +231,7 @@ export async function getLatestBooks(
 export async function getOrderedBooks(
   event: H3Event<EventHandlerRequest>,
   { property, count }: GetOrderedBooksQuerySearchParams,
-): Promise<Pick<BookDB, 'id' | 'title'>[]> {
+): ReturnType<DBClient['getOrderedBooks']> {
   const { client } = await authenticate(event)
 
   const { data, error } = await client
@@ -251,7 +252,7 @@ export async function getOrderedBooks(
 export async function getBookCover(
   event: H3Event<EventHandlerRequest>,
   id: string,
-): Promise<string | null> {
+): ReturnType<DBClient['getBookCover']> {
   const { user, client } = await authenticate(event)
 
   try {
@@ -278,7 +279,7 @@ export async function updateBookCover(
   event: H3Event<EventHandlerRequest>,
   bookId: string,
   formData: FormData,
-): Promise<string | null> {
+): ReturnType<DBClient['updateBookCover']> {
   const { user, client } = await authenticate(event)
 
   try {
@@ -304,12 +305,7 @@ export async function updateBookCover(
 export async function getCollection(
   event: H3Event<EventHandlerRequest>,
   id: number,
-): Promise<
-  | (CollectionDB & {
-      'collection-book': { book_id: BookDB['id']; order: number }[]
-    })
-  | null
-> {
+): ReturnType<DBClient['getCollection']> {
   const { client } = await authenticate(event)
 
   const { data, error } = await client
@@ -335,11 +331,7 @@ export async function getCollection(
 
 export async function getCollections(
   event: H3Event<EventHandlerRequest>,
-): Promise<
-  (CollectionDB & {
-    'collection-book': { book_id: BookDB['id']; order: number }[]
-  })[]
-> {
+): ReturnType<DBClient['getCollections']> {
   const { client } = await authenticate(event)
 
   const { data, error } = await client.from('collections').select(
@@ -363,12 +355,7 @@ export async function getCollections(
 export async function createCollection(
   event: H3Event<EventHandlerRequest>,
   collection: Collection,
-): Promise<
-  | (CollectionDB & {
-      'collection-book': { book_id: Book['id']; order: number }[]
-    })
-  | null
-> {
+): ReturnType<DBClient['createCollection']> {
   const { user, client } = await authenticate(event)
 
   const { data, error } = await client
@@ -440,7 +427,7 @@ export async function createCollection(
 export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
   id: CollectionDB['id'],
-): Promise<CollectionDB['id'] | null> {
+): ReturnType<DBClient['deleteCollection']> {
   const { client } = await authenticate(event)
 
   const { error } = await client.from('collections').delete().eq('id', +id)
@@ -455,7 +442,7 @@ export async function deleteCollection(
 
 export async function deleteUser(
   event: H3Event<EventHandlerRequest>,
-): Promise<string | null> {
+): ReturnType<DBClient['deleteUser']> {
   const { user, client } = await authenticate(event)
 
   const { data, error } = await client.auth.admin.deleteUser(user.id)
@@ -474,7 +461,7 @@ export async function deleteUser(
 
 export async function isLibraryEmpty(
   event: H3Event<EventHandlerRequest>,
-): Promise<boolean> {
+): ReturnType<DBClient['isLibraryEmpty']> {
   const { client } = await authenticate(event)
 
   const { count } = await client
@@ -486,7 +473,7 @@ export async function isLibraryEmpty(
 
 export async function resetLibrary(
   event: H3Event<EventHandlerRequest>,
-): Promise<boolean> {
+): ReturnType<DBClient['resetLibrary']> {
   const { user, client } = await authenticate(event)
 
   const { error: booksDeletionError } = await client
