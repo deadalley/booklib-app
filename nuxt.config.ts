@@ -56,6 +56,11 @@ export default defineNuxtConfig({
     disableDefaultOptions: true,
   },
   ssr: false,
+  router: {
+    options: {
+      hashMode: true,
+    },
+  },
 
   typescript: {
     strict: true,
