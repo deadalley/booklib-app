@@ -86,7 +86,7 @@ const exportType = ref<ExportType>()
 const exportCollection = ref<ExportCollectionType>()
 
 async function fetchLibrary(): Promise<LibraryData> {
-  const books = await $fetch<Book[]>('/api/books', {})
+  const books = await $fetch<Book[]>('/api/books')
   const collections = await $fetch<Collection[]>('/api/collections', {
     query: { withBookCovers: false },
   })

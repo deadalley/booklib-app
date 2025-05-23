@@ -13,26 +13,24 @@ export function dbBookToBook(
   collections: Pick<CollectionDB, 'id'>[],
 ): Book {
   return {
-    id: dbBook.id ?? undefined,
-    title: dbBook.title ?? undefined,
-    coverSrc: dbBook.cover_src ?? undefined,
-    createdAt: dbBook.created_at ?? undefined,
-    isbn: dbBook.isbn ?? undefined,
-    language: dbBook.language ?? undefined,
-    originalTitle: dbBook.original_title ?? undefined,
-    originalLanguage: dbBook.original_language ?? undefined,
-    pages: dbBook.pages ?? undefined,
-    publisher: dbBook.publisher ?? undefined,
+    id: dbBook.id,
+    title: dbBook.title,
+    coverSrc: dbBook.cover_src,
+    createdAt: dbBook.created_at,
+    isbn: dbBook.isbn,
+    language: dbBook.language,
+    originalTitle: dbBook.original_title,
+    originalLanguage: dbBook.original_language,
+    pages: dbBook.pages,
+    publisher: dbBook.publisher,
     rating: dbBook.rating ?? 0,
-    summary: dbBook.summary ?? undefined,
-    year: dbBook.year ?? undefined,
+    summary: dbBook.summary,
+    year: dbBook.year,
     genres: dbBook.genres ?? [],
     collections: collections.map(({ id }) => id),
-    progressStatus: dbBook.progress_status ?? undefined,
-    startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : undefined,
-    finishedAt: dbBook.finished_at
-      ? toSimpleDate(dbBook.finished_at)
-      : undefined,
+    progressStatus: dbBook.progress_status,
+    startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : null,
+    finishedAt: dbBook.finished_at ? toSimpleDate(dbBook.finished_at) : null,
   }
 }
 
@@ -68,7 +66,7 @@ export function dbCollectionToCollection(
   books: { book_id: Book['id']; order: number }[],
 ): Collection {
   return {
-    id: dbCollection.id ?? undefined,
+    id: dbCollection.id,
     name: dbCollection.name,
     createdAt: dbCollection.created_at,
     books: books
@@ -91,22 +89,22 @@ export function collectionToDbCollection(
 export function googleBookToBook(googleBook: GoogleBook): Book {
   return {
     id: 0,
-    title: googleBook.volumeInfo.title ?? undefined,
-    coverSrc: googleBook.volumeInfo.imageLinks.thumbnail ?? undefined,
+    title: googleBook.volumeInfo.title,
+    coverSrc: googleBook.volumeInfo.imageLinks.thumbnail,
     createdAt: '',
-    isbn: undefined,
-    language: googleBook.volumeInfo.language ?? undefined,
-    originalTitle: undefined,
-    originalLanguage: undefined,
-    pages: googleBook.volumeInfo.pageCount ?? undefined,
-    publisher: googleBook.volumeInfo.publisher ?? undefined,
+    isbn: null,
+    language: googleBook.volumeInfo.language,
+    originalTitle: null,
+    originalLanguage: null,
+    pages: googleBook.volumeInfo.pageCount,
+    publisher: googleBook.volumeInfo.publisher,
     rating: 0,
-    summary: googleBook.volumeInfo.description ?? undefined,
+    summary: googleBook.volumeInfo.description,
     year: new Date(googleBook.volumeInfo.publishedDate).getFullYear(),
     genres: googleBook.volumeInfo.categories ?? [],
     collections: [],
-    progressStatus: undefined,
-    startedAt: undefined,
-    finishedAt: undefined,
+    progressStatus: null,
+    startedAt: null,
+    finishedAt: null,
   }
 }

@@ -6,22 +6,22 @@ export type BookProgressStatus = Database['public']['Enums']['BookProgress']
 export type Book = {
   id: number
   title: string
-  coverSrc?: string
+  coverSrc: string | null
   createdAt: string
-  isbn?: string
-  language?: string
-  originalTitle?: string
-  originalLanguage?: string
-  pages?: number
-  publisher?: string
-  rating?: number
-  summary?: string
-  year?: number
-  genres?: string[]
+  isbn: string | null
+  language: string | null
+  originalTitle: string | null
+  originalLanguage: string | null
+  pages: number | null
+  publisher: string | null
+  rating: number | null
+  summary: string | null
+  year: number | null
+  genres: string[] | null
   collections: Collection['id'][]
-  progressStatus?: BookProgressStatus
-  startedAt?: string
-  finishedAt?: string
+  progressStatus: BookProgressStatus | null
+  startedAt: string | null
+  finishedAt: string | null
 }
 
 export type ViewBook = Book & { selected?: boolean; order?: number }
