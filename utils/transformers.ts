@@ -83,7 +83,6 @@ export function collectionToDbCollection<T extends number | string>(
     ...(collection.id ? { id: collection.id } : {}),
     user_id: userId,
     name: collection.name,
-    'collection-book': [],
   }
 }
 

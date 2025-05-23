@@ -82,7 +82,8 @@ export async function createBook(
     data['collection-book'] = data['collection-book'].filter(
       (cb) => cb.book_id !== bookDb.id,
     )
-    data['collection-book'].concat(
+
+    data['collection-book'] = data['collection-book'].concat(
       collections.map((collection) => ({
         book_id: bookDb.id,
         collection_id: collection.id,
@@ -199,37 +200,42 @@ export async function createCollection(
   event: H3Event<EventHandlerRequest>,
   collection: Collection<string>,
 ): ReturnType<DBClient<string>['createCollection']> {
+  await client.read()
+
+  console.log(collection)
   const collectionDb: CollectionDB<string> = {
     ...collectionToDbCollection(collection, user.id),
     id: collection.id ?? uuidv4(),
     created_at: new Date().toISOString(),
   }
 
-  await client.update((data) => {
-    const bookIndex = data.collections.findIndex(
-      (b) => b.id === collectionDb.id,
-    )
+  const bookIndex = client.data.collections.findIndex(
+    (b) => b.id === collectionDb.id,
+  )
 
-    if (bookIndex !== -1) {
-      data.collections.splice(bookIndex, 1, collectionDb)
-    } else {
-      data.collections.push(collectionDb)
-    }
+  if (bookIndex !== -1) {
+    client.data.collections.splice(bookIndex, 1, collectionDb)
+  } else {
+    client.data.collections.push(collectionDb)
+  }
 
-    data['collection-book'] = data['collection-book'].filter(
-      (cb) => cb.collection_id !== collectionDb.id,
-    )
-    data['collection-book'].concat(
-      collection.books.map((book) => ({
-        book_id: book.id,
-        collection_id: collectionDb.id,
-        order: -1, // TODO: fix
-        user_id: user.id,
-      })),
-    )
-  })
+  client.data['collection-book'] = client.data['collection-book'].filter(
+    (cb) => cb.collection_id !== collectionDb.id,
+  )
 
-  return collectionDb
+  const collectionBooks = collection.books.map((book) => ({
+    book_id: book.id,
+    collection_id: collectionDb.id,
+    order: book.order,
+    user_id: user.id,
+  }))
+
+  client.data['collection-book'] =
+    client.data['collection-book'].concat(collectionBooks)
+
+  await client.write()
+
+  return { ...collectionDb, 'collection-book': collectionBooks }
 }
 
 export async function deleteCollection(
