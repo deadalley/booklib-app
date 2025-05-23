@@ -210,6 +210,33 @@ export async function getBookCover(
   }
 }
 
+export async function updateBookCover(
+  event: H3Event<EventHandlerRequest>,
+  bookId: string,
+  formData: FormData,
+): Promise<string | null> {
+  const { user, client } = await authenticate(event)
+
+  try {
+    const { error } = await client.storage
+      .from(`book-covers/${user.id}`)
+      .upload(bookId, formData, {
+        cacheControl: '3600',
+        upsert: true,
+      })
+
+    if (error) {
+      logger.error(error)
+      throw createError(error.message)
+    }
+
+    return getBookCoverUrl(client, user.id, bookId)
+  } catch (error) {
+    logger.error(error)
+    throw createError(error as Error)
+  }
+}
+
 export async function getCollection(
   event: H3Event<EventHandlerRequest>,
   id: number,
