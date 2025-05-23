@@ -88,4 +88,8 @@ export type DBClient<ID extends number | string = number> = {
   deleteUser: (event: H3Event<EventHandlerRequest>) => Promise<string | null>
   isLibraryEmpty: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
   resetLibrary: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
+  importLibrary: (
+    event: H3Event<EventHandlerRequest>,
+    books: Book<ID>[],
+  ) => Promise<boolean>
 }

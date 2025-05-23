@@ -272,3 +272,22 @@ export async function resetLibrary(): ReturnType<
 
   return true
 }
+
+export async function importLibrary(
+  event: H3Event<EventHandlerRequest>,
+  books: Book<string>[],
+): ReturnType<DBClient<string>['importLibrary']> {
+  await client.read()
+
+  client.data.books = client.data.books.concat(
+    books.map(({ id, ...book }) => ({
+      ...bookToDbBook(book, user.id),
+      id: uuidv4(),
+      created_at: new Date().toISOString(),
+    })),
+  )
+
+  await client.write()
+
+  return true
+}

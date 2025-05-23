@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   ],
 
   modules: [
-    '@nuxtjs/supabase',
+    // '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@formkit/nuxt',
     '@nuxt/image',
@@ -36,16 +36,16 @@ export default defineNuxtConfig({
     ],
   },
 
-  supabase: {
-    redirect: false,
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      include: undefined,
-      exclude: [],
-      cookieRedirect: false,
-    },
-  },
+  // supabase: {
+  //   redirect: false,
+  //   redirectOptions: {
+  //     login: '/login',
+  //     callback: '/confirm',
+  //     include: undefined,
+  //     exclude: [],
+  //     cookieRedirect: false,
+  //   },
+  // },
 
   electron: {
     build: [

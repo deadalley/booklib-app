@@ -20,21 +20,12 @@
           {{ button.label }}
         </bl-nav-sidebar-button>
       </div>
-      <div class="flex flex-col gap-3" @click="onLogout">
-        <bl-nav-sidebar-button>
-          <template #icon="iconProps">
-            <IconLogout v-bind="iconProps" />
-          </template>
-          Logout
-        </bl-nav-sidebar-button>
-      </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import {
-  IconLogout,
   IconBooks,
   IconHome,
   IconClockHour3,
@@ -44,7 +35,6 @@ import {
 } from '@tabler/icons-vue'
 
 const route = useRoute()
-const supabase = useSupabaseClient()
 
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
 
@@ -74,10 +64,4 @@ const buttons = [
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),
 )
-
-async function onLogout() {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
-  else navigateTo('/login')
-}
 </script>

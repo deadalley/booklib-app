@@ -16,17 +16,6 @@
         </ul>
 
         <slot name="action-btn" />
-        <div
-          class="flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full"
-        >
-          <NuxtLink to="/profile">
-            <NuxtImg
-              :src="profileUrl"
-              alt="Profile"
-              class="size-full object-cover"
-            />
-          </NuxtLink>
-        </div>
       </nav>
       <div
         class="relative flex w-full flex-1 flex-col overflow-y-auto p-16 pt-10"
@@ -39,9 +28,5 @@
 </template>
 
 <script setup lang="ts">
-const user = useSupabaseUser()
-
-const profileUrl = computed(() => user.value?.user_metadata.avatar_url)
-
 defineProps<{ title: string; navItems?: { to?: string; label: string }[] }>()
 </script>

@@ -3,11 +3,5 @@ useHead({
   title: 'BookLib',
 })
 
-const user = useSupabaseUser()
-
-if (user.value) {
-  navigateTo('/home')
-} else {
-  navigateTo('/login')
-}
+navigateTo('/home')
 </script>

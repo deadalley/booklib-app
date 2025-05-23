@@ -15,6 +15,31 @@ import {
 } from '../utils'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+export async function getBookCoverUrl(
+  client: SupabaseClient<Database>,
+  userId: string,
+  bookId: string | number,
+): Promise<string | null> {
+  try {
+    const { data, error } = await client.storage
+      .from(`book-covers/${userId}`)
+      .createSignedUrl(`${bookId}`, 24 * 60 * 60)
+
+    if (error) {
+      if (error.message === 'Object not found') {
+        return null
+      }
+      logger.error(error)
+      throw createError(error.message)
+    }
+
+    return data.signedUrl
+  } catch (error) {
+    throw createError(error as Error)
+  }
+}
 
 async function authenticate(event: H3Event<EventHandlerRequest>) {
   const user = await serverSupabaseUser(event)
@@ -407,12 +432,11 @@ export async function createCollection(
     const originalCollection = data.find(({ id }) => id === collectionId)
 
     if (originalCollection) {
-      await insertBooksInCollection(
-        client,
-        user.id,
-        collectionId,
+      await client.from('collection-book').insert(
         originalCollection['collection-book'].map(({ book_id, order }) => ({
-          id: book_id,
+          book_id: book_id,
+          collection_id: collectionId,
+          user_id: user.id,
           order,
         })),
       )
@@ -494,6 +518,31 @@ export async function resetLibrary(
   if (collectionsDeletionError) {
     logger.error(collectionsDeletionError)
     throw createError(collectionsDeletionError)
+  }
+
+  return true
+}
+
+export async function importLibrary(
+  event: H3Event<EventHandlerRequest>,
+  books: Book[],
+): ReturnType<DBClient['importLibrary']> {
+  const { user, client } = await authenticate(event)
+
+  const { error } = await client
+    .from('books')
+    .upsert(
+      books.map(({ id, ...book }) => bookToDbBook(book, user.id)),
+      {
+        onConflict: 'id',
+        defaultToNull: true,
+      },
+    )
+    .select('*, collections(id)')
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
   }
 
   return true

@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout name="dashboard" title="Home">
     <div v-if="isEmpty" class="flex flex-col">
-      <h1 class="mb-8">Welcome to your new library, {{ userName }}!</h1>
+      <h1 class="mb-8">Welcome to your new library!</h1>
       <div class="flex flex-col items-center gap-4">
         <NuxtImg
           src="/book-graphics.svg"
@@ -40,7 +40,7 @@
       </div>
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-10">
-      <h1>Welcome to your library, {{ userName }}!</h1>
+      <h1>Welcome to your library!</h1>
       <div class="flex flex-col gap-8">
         <bl-tile>
           <template #title>Last books added to library</template>
@@ -125,8 +125,6 @@ import { IconPlus, icons, IconUpload } from '@tabler/icons-vue'
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { Book } from '~/types/book'
 
-const user = useSupabaseUser()
-
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
 
 const { data: latestBooks } = await useFetch<
@@ -183,14 +181,14 @@ const bookListTileChance = computed(() => {
 const ratedBooks = computed<RankingItem[]>(() =>
   (rankedBooksByRating.value ?? []).map((book) => ({
     label: book.title,
-    value: book.rating,
+    value: book.rating ?? 0,
   })),
 )
 
 const longestBooks = computed<RankingItem[]>(() =>
   (rankedBooksByPages.value ?? []).map((book) => ({
     label: book.title,
-    value: book.pages,
+    value: book.pages ?? 0,
   })),
 )
 
@@ -222,19 +220,7 @@ const randomReadingBook = computed(
     readingBooks.value[randomInt(0, readingBooks.value.length - 1)],
 )
 
-const userName = computed(
-  () =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (user as any)?.user_metadata?.name ??
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (user as any)?.user_metadata?.first_name,
-)
-
 useHead({
   title: 'BookLib | Home',
-})
-
-definePageMeta({
-  middleware: 'auth',
 })
 </script>

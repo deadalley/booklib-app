@@ -119,7 +119,17 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns'
-const user = useSupabaseUser()
+const user = {
+  value: {
+    user_metadata: {
+      username: '',
+      full_name: '',
+      avatar_url: '',
+    },
+    email: '',
+    created_at: '',
+  },
+}
 
 type Profile = {
   username: string
@@ -163,8 +173,6 @@ async function deleteAccount() {
     await $fetch<string | undefined>('/api/users', {
       method: 'delete',
     })
-
-    navigateTo('/login')
   } catch (error) {
     console.error(error)
   }
@@ -174,9 +182,5 @@ function onCancel() {}
 
 useHead({
   title: 'BookLib | Profile',
-})
-
-definePageMeta({
-  middleware: 'auth',
 })
 </script>
