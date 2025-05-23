@@ -388,3 +388,22 @@ export async function deleteCollection(
 
   return id
 }
+
+export async function deleteUser(
+  event: H3Event<EventHandlerRequest>,
+): Promise<string | null> {
+  const { user, client } = await authenticate(event)
+
+  const { data, error } = await client.auth.admin.deleteUser(user.id)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error.message)
+  }
+
+  if (data) {
+    return data.user.id
+  }
+
+  return null
+}

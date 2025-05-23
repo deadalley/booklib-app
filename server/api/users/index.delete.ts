@@ -1,23 +1,5 @@
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
-import type { Database } from '~/types/db.generate'
+import { db } from '~/services/db.service'
 
-export default defineEventHandler<Promise<string | undefined>>(
-  async (event) => {
-    const user = await serverSupabaseUser(event)
-    const client = await serverSupabaseClient<Database>(event)
-
-    if (!user?.id) {
-      throw createError('Unauthenticated')
-    } else {
-      const { data, error } = await client.auth.admin.deleteUser(user.id)
-
-      if (error) {
-        throw createError(error.message)
-      }
-
-      if (data) {
-        return data.user.id
-      }
-    }
-  },
-)
+export default defineEventHandler<Promise<string | null>>(async (event) => {
+  return db.deleteUser(event)
+})
