@@ -37,9 +37,6 @@
           @click="onTableSettingsOpen"
         >
           Table
-          <template #appendIcon="iconProps">
-            <IconSettings v-bind="iconProps" />
-          </template>
         </bl-button>
         <bl-view-switch v-model:view="view" />
       </div>
@@ -97,7 +94,7 @@
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import { IconPlus, IconSettings } from '@tabler/icons-vue'
+import { IconPlus } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
