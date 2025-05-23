@@ -1,0 +1,55 @@
+{
+  "books": [
+    {
+      "id": 1,
+      "title": "Book Title",
+      "isbn": "",
+      "language": "",
+      "originalTitle": "",
+      "originalLanguage": "",
+      "pages": "",
+      "publisher": "",
+      "rating": 0,
+      "summary": "",
+      "year": 0,
+      "genres": ["", "", ""],
+      "progressStatus": "not-read",
+      "startedAt": "2020-01-01T00:00:00Z",
+      "finishedAt": "2020-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Book Title",
+      "isbn": "",
+      "language": "",
+      "originalTitle": "",
+      "originalLanguage": "",
+      "pages": "",
+      "publisher": "",
+      "rating": 0,
+      "summary": "",
+      "year": 0,
+      "genres": ["", "", ""],
+      "progressStatus": "not-read",
+      "startedAt": "2020-01-01T00:00:00Z",
+      "finishedAt": "2020-01-01T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Book Title",
+      "isbn": "",
+      "language": "",
+      "originalTitle": "",
+      "originalLanguage": "",
+      "pages": "",
+      "publisher": "",
+      "rating": 0,
+      "summary": "",
+      "year": 0,
+      "genres": ["", "", ""],
+      "progressStatus": "not-read",
+      "startedAt": "2020-01-01T00:00:00Z",
+      "finishedAt": "2020-01-01T00:00:00Z"
+    }
+  ]
+}

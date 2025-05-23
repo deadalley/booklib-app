@@ -125,9 +125,12 @@ import type { SelectOption } from '~/components/raw-select.vue'
 import type { Book } from '~/types/book'
 import { parseCsvFile } from '~/utils/import'
 
-type ImportType = '.csv'
+type ImportType = '.csv' | '.json'
 
-const importOptions: SelectOption[] = [{ label: 'CSV', value: '.csv' }]
+const importOptions: SelectOption[] = [
+  { label: 'CSV', value: '.csv' },
+  { label: 'JSON', value: '.json' },
+]
 const selectedTableColumns = {
   coverSrc: { label: 'Cover', checked: false },
   publisher: { label: 'Publisher', checked: true },
@@ -164,10 +167,22 @@ function onUploadClick() {
   fileInput.value.click()
 }
 
+async function parseFile(file: File) {
+  console.log(importType.value)
+  switch (importType.value) {
+    case '.csv':
+      return parseCsvFile(file)
+    case '.json':
+      return parseJsonFile(file)
+    default:
+      throw Error('Unknown file type')
+  }
+}
+
 async function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement)?.files?.[0] as File
 
-  const books = await parseCsvFile(file)
+  const books = await parseFile(file)
 
   const booksWithIds = books.map((book, index) => ({
     ...book,

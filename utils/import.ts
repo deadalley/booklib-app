@@ -35,3 +35,19 @@ export async function parseCsvFile(file: File): Promise<Book[]> {
     })
   })
 }
+
+export function parseJsonFile(file: File): Promise<Book[]> {
+  const fileReader = new FileReader()
+
+  fileReader.readAsText(file)
+
+  return new Promise((resolve, reject) => {
+    fileReader.onload = (e) => {
+      if (e.target?.result) {
+        resolve(JSON.parse(e.target.result as string).books)
+      } else {
+        reject('Could not parse data')
+      }
+    }
+  })
+}
