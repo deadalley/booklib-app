@@ -66,7 +66,7 @@ export async function createBook(
 ): ReturnType<DBClient<string>['createBook']> {
   const bookDb: BookDB<string> = {
     ...bookToDbBook(book, user.id),
-    id: uuidv4(),
+    id: book.id ?? uuidv4(),
     created_at: new Date().toISOString(),
   }
 
@@ -201,7 +201,7 @@ export async function createCollection(
 ): ReturnType<DBClient<string>['createCollection']> {
   const collectionDb: CollectionDB<string> = {
     ...collectionToDbCollection(collection, user.id),
-    id: uuidv4(),
+    id: collection.id ?? uuidv4(),
     created_at: new Date().toISOString(),
   }
 
