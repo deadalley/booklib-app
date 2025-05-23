@@ -91,7 +91,7 @@ export async function getBooks(
 export async function createBook(
   event: H3Event<EventHandlerRequest>,
   book: Book,
-  collections: CollectionDB[],
+  collections: Pick<CollectionDB, 'id'>[],
   tempCoverSrc?: string,
 ): ReturnType<DBClient['createBook']> {
   const { user, client } = await authenticate(event)

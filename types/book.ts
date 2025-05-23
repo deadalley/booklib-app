@@ -3,8 +3,8 @@ import type { Database } from './db.generate'
 
 export type BookProgressStatus = Database['public']['Enums']['BookProgress']
 
-export type Book = {
-  id: number
+export type Book<ID extends number | string = number> = {
+  id: ID
   title: string
   coverSrc: string | null
   createdAt: string

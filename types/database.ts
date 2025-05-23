@@ -1,6 +1,10 @@
 import type { Database } from './db.generate'
 
-export type BookDB = Database['public']['Tables']['books']['Row'] & {
+export type BookDB<ID extends number | string = number> = Omit<
+  Database['public']['Tables']['books']['Row'],
+  'id'
+> & {
+  id: ID
   collections: Pick<CollectionDB, 'id'>[]
   cover_src: string | null
 }

@@ -34,10 +34,10 @@ export function dbBookToBook(
   }
 }
 
-export function bookToDbBook(
-  book: Partial<Book>,
+export function bookToDbBook<T extends number | string>(
+  book: Partial<Book<T>>,
   userId: string,
-): Omit<BookDB, 'created_at' | 'id'> {
+): Omit<BookDB<T>, 'created_at' | 'id'> {
   return {
     author_id: 1,
     user_id: userId,
@@ -57,6 +57,7 @@ export function bookToDbBook(
     progress_status: book.progressStatus ?? 'not-read',
     started_at: nullify(book.startedAt),
     finished_at: nullify(book.finishedAt),
+    collections: [],
   }
 }
 
@@ -82,6 +83,7 @@ export function collectionToDbCollection(
     ...(collection.id ? { id: collection.id } : {}),
     user_id: userId,
     name: collection.name,
+    'collection-book': [],
   }
 }
 
