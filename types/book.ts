@@ -18,7 +18,7 @@ export type Book<ID extends number | string = number> = {
   summary: string | null
   year: number | null
   genres: string[] | null
-  collections: Collection['id'][]
+  collections: Collection<ID>['id'][]
   progressStatus: BookProgressStatus | null
   startedAt: string | null
   finishedAt: string | null

@@ -8,10 +8,10 @@ export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
 }
 
-export function dbBookToBook(
-  dbBook: BookDB,
-  collections: Pick<CollectionDB, 'id'>[],
-): Book {
+export function dbBookToBook<T extends number | string>(
+  dbBook: BookDB<T>,
+  collections: Pick<CollectionDB<T>, 'id'>[],
+): Book<T> {
   return {
     id: dbBook.id,
     title: dbBook.title,
@@ -61,10 +61,10 @@ export function bookToDbBook<T extends number | string>(
   }
 }
 
-export function dbCollectionToCollection(
-  dbCollection: CollectionDB,
-  books: { book_id: Book['id']; order: number }[],
-): Collection {
+export function dbCollectionToCollection<T extends number | string>(
+  dbCollection: CollectionDB<T>,
+  books: { book_id: Book<T>['id']; order: number }[],
+): Collection<T> {
   return {
     id: dbCollection.id,
     name: dbCollection.name,
@@ -75,10 +75,10 @@ export function dbCollectionToCollection(
   }
 }
 
-export function collectionToDbCollection(
-  collection: Collection,
+export function collectionToDbCollection<T extends number | string>(
+  collection: Collection<T>,
   userId: string,
-): Omit<CollectionDB, 'created_at' | 'id'> {
+): Omit<CollectionDB<T>, 'created_at' | 'id'> {
   return {
     ...(collection.id ? { id: collection.id } : {}),
     user_id: userId,

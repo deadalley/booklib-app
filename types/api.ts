@@ -28,10 +28,10 @@ export type DBClient<ID extends number | string = number> = {
   createBook: (
     event: H3Event<EventHandlerRequest>,
     book: Book,
-    collections: Pick<CollectionDB, 'id'>[],
+    collections: Pick<CollectionDB<ID>, 'id'>[],
     tempCoverSrc?: string,
   ) => Promise<
-    (BookDB<ID> & { collections: Pick<CollectionDB, 'id'>[] }) | null
+    (BookDB<ID> & { collections: Pick<CollectionDB<ID>, 'id'>[] }) | null
   >
   deleteBook: (
     event: H3Event<EventHandlerRequest>,
@@ -62,23 +62,23 @@ export type DBClient<ID extends number | string = number> = {
   getCollection: (
     event: H3Event<EventHandlerRequest>,
     id: number,
-  ) => Promise<CollectionDB | null>
+  ) => Promise<CollectionDB<ID> | null>
   getCollections: (
     event: H3Event<EventHandlerRequest>,
-  ) => Promise<CollectionDB[]>
+  ) => Promise<CollectionDB<ID>[]>
   createCollection: (
     event: H3Event<EventHandlerRequest>,
     collection: Collection,
   ) => Promise<
-    | (CollectionDB & {
-        'collection-book': { book_id: Book['id']; order: number }[]
+    | (CollectionDB<ID> & {
+        'collection-book': { book_id: Book<ID>['id']; order: number }[]
       })
     | null
   >
   deleteCollection: (
     event: H3Event<EventHandlerRequest>,
-    id: CollectionDB['id'],
-  ) => Promise<CollectionDB['id'] | null>
+    id: CollectionDB<ID>['id'],
+  ) => Promise<CollectionDB<ID>['id'] | null>
 
   deleteUser: (event: H3Event<EventHandlerRequest>) => Promise<string | null>
   isLibraryEmpty: (event: H3Event<EventHandlerRequest>) => Promise<boolean>

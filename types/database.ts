@@ -5,10 +5,14 @@ export type BookDB<ID extends number | string = number> = Omit<
   'id'
 > & {
   id: ID
-  collections: Pick<CollectionDB, 'id'>[]
+  collections: Pick<CollectionDB<ID>, 'id'>[]
   cover_src: string | null
 }
-export type CollectionDB =
-  Database['public']['Tables']['collections']['Row'] & {
-    'collection-book': { book_id: BookDB['id']; order: number }[]
-  }
+export type CollectionDB<ID extends number | string = number> = Omit<
+  Database['public']['Tables']['collections']['Row'],
+  'id'
+> & {
+  'collection-book': { book_id: BookDB<ID>['id']; order: number }[]
+} & {
+  id: ID
+}
