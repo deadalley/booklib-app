@@ -6,7 +6,7 @@ export async function getBookCoverUrl(
   client: SupabaseClient<Database>,
   userId: string,
   bookId: string | number,
-): Promise<string | undefined> {
+): Promise<string | null> {
   try {
     const { data, error } = await client.storage
       .from(`book-covers/${userId}`)
@@ -14,7 +14,7 @@ export async function getBookCoverUrl(
 
     if (error) {
       if (error.message === 'Object not found') {
-        return undefined
+        return null
       }
       logger.error(error)
       throw createError(error.message)

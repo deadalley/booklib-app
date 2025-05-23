@@ -101,7 +101,9 @@ import { IconPlus, IconSettings } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
-const { data: books, refresh } = await useFetch<Book[]>('/api/books')
+const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
+  query: { withBookCovers: true },
+})
 
 const dropdownItems: DropdownItem[] = [
   { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
