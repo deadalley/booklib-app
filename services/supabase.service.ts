@@ -142,6 +142,22 @@ export async function createBook(
   return data[0]
 }
 
+export async function deleteBook(
+  event: H3Event<EventHandlerRequest>,
+  id: BookDB['id'],
+): Promise<BookDB['id'] | null> {
+  const { client } = await authenticate(event)
+
+  const { error } = await client.from('books').delete().eq('id', +id)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  return id
+}
+
 export async function getCollection(
   event: H3Event<EventHandlerRequest>,
   id: number,
