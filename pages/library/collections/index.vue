@@ -50,7 +50,9 @@ import { IconPlus } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
-const { data: books } = await useFetch<Book[]>('/api/books')
+const { data: books } = await useFetch<Book[]>('/api/books', {
+  query: { withBookCovers: true },
+})
 
 const booksByCollectionId = computed(
   () =>

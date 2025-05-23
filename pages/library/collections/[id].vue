@@ -139,7 +139,9 @@ import type { Collection } from '~/types/collection'
 
 const route = useRoute()
 
-const { data: books } = await useFetch<Book[]>('/api/books')
+const { data: books } = await useFetch<Book[]>('/api/books', {
+  query: { withBookCovers: true },
+})
 
 const isNew = computed(() => route.params.id === 'new')
 
