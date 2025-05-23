@@ -16,11 +16,11 @@ export function sortBooksBy<B extends Book>(
   count?: number,
 ) {
   const sortedBooks = books.concat().sort((book1, book2) => {
-    if (book1[bookProperty] === undefined) {
+    if (book1[bookProperty] === null) {
       return 1
     }
 
-    if (book2[bookProperty] === undefined) {
+    if (book2[bookProperty] === null) {
       return -1
     }
 

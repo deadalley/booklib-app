@@ -369,7 +369,6 @@ import {
   IconGift,
   IconArchive,
   IconArrowLeft,
-  IconSearch,
 } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 import { getAuthorByName } from '~/services/open-library.service'

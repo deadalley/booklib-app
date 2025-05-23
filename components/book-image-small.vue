@@ -54,7 +54,7 @@ defineProps<{
   href?: string
   alt?: string
   title?: string
-  coverSrc?: string
+  coverSrc?: string | null
   selectable?: boolean
   selected?: boolean
 }>()

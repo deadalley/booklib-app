@@ -1,7 +1,6 @@
 import { db } from '~/services/db.service'
-import type { Book } from '~/types/book'
 
-export default defineEventHandler<Promise<Book['id'][]>>(async (event) => {
+export default defineEventHandler(async (event) => {
   const bookIds = await readBody(event)
 
   if (!bookIds.length) {

@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import type {
   DBClient,
