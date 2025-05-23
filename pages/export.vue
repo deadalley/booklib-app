@@ -162,8 +162,4 @@ watch(exportType, (value) => {
 useHead({
   title: 'BookLib | Export',
 })
-
-definePageMeta({
-  middleware: 'auth',
-})
 </script>

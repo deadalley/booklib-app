@@ -96,8 +96,4 @@ const barChartProperty = ref<
 useHead({
   title: 'BookLib | Statistics',
 })
-
-definePageMeta({
-  middleware: 'auth',
-})
 </script>

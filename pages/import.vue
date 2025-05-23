@@ -209,8 +209,4 @@ function onSelectBook(value: typeof selectedBooks.value) {
 useHead({
   title: 'BookLib | Import',
 })
-
-definePageMeta({
-  middleware: 'auth',
-})
 </script>

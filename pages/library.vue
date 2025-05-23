@@ -40,8 +40,4 @@ if (isEmpty.value && !route.path.includes('/new')) {
 useHead({
   title: 'BookLib | Library',
 })
-
-definePageMeta({
-  middleware: 'auth',
-})
 </script>

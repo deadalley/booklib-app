@@ -194,8 +194,4 @@ function onCancel() {
     selected: false,
   }))
 }
-
-definePageMeta({
-  middleware: 'auth',
-})
 </script>
