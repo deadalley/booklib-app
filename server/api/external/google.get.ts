@@ -19,7 +19,6 @@ export default defineEventHandler<Promise<Book[]>>(async (event) => {
         const { items: googleBooks } = await getByTitle(query.title, {
           maxResults: query.pageSize,
         })
-        console.log({ googleBooks })
 
         return googleBooks.map((book) => googleBookToBook(book))
       } else {
