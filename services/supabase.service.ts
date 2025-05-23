@@ -419,3 +419,15 @@ export async function deleteUser(
 
   return null
 }
+
+export async function isLibraryEmpty(
+  event: H3Event<EventHandlerRequest>,
+): Promise<boolean> {
+  const { client } = await authenticate(event)
+
+  const { count } = await client
+    .from('books')
+    .select('*', { count: 'exact', head: true })
+
+  return count === 0 || count === null || count === undefined
+}
