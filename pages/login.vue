@@ -23,7 +23,7 @@
               :disabled="!!loading"
               @click="handleGoogleLogin"
             >
-              <bl-loading v-if="loading === 'google'" class="size-4" />
+              <bl-loading v-if="loading === 'google'" class="!size-4" />
               <NuxtImg
                 src="/google.svg"
                 alt="Books"
