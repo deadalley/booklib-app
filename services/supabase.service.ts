@@ -1,5 +1,8 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
-import type { GetBooksQuerySearchParams } from '~/types/api'
+import type {
+  GetBooksQuerySearchParams,
+  GetOrderedBooksQuerySearchParams,
+} from '~/types/api'
 import type { Database } from '~/types/db.generate'
 import type { BookDB, CollectionDB } from '~/types/database'
 import type { H3Event, EventHandlerRequest } from 'h3'
@@ -194,6 +197,55 @@ export async function getBookCount(
     .select('*', { count: 'exact', head: true })
 
   return count
+}
+
+export async function getLatestBooks(
+  event: H3Event<EventHandlerRequest>,
+): Promise<Pick<BookDB, 'id' | 'title' | 'cover_src'>[]> {
+  const { user, client } = await authenticate(event)
+
+  const { data, error } = await client
+    .from('books')
+    .select('id, title, cover_src')
+    .order('created_at', { ascending: false })
+    .limit(8)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  const bookCovers: (string | null)[] = await executePromisesInChunks(
+    (data ?? []).map((book) => getBookCoverUrl(client, user.id, book.id)),
+  )
+
+  return (
+    data.map((book, index) => ({
+      ...book,
+      cover_src: bookCovers[index],
+    })) ?? []
+  )
+}
+
+export async function getOrderedBooks(
+  event: H3Event<EventHandlerRequest>,
+  { property, count }: GetOrderedBooksQuerySearchParams,
+): Promise<Pick<BookDB, 'id' | 'title'>[]> {
+  const { client } = await authenticate(event)
+
+  const { data, error } = await client
+    .from('books')
+    .select(`id, title, ${property}`)
+    .not(property, 'is', null)
+    .order(property, { ascending: false })
+    .limit(count ?? 10)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  return data
 }
 
 export async function getBookCover(

@@ -1,4 +1,5 @@
 import type { BookProgressStatus } from './book'
+import type { BookDB } from './database'
 
 export type ApiResponseError = {
   name: string
@@ -16,4 +17,10 @@ export type GetBooksQuerySearchParams = {
   pageSize?: number
   bookProgress?: BookProgressStatus
   withBookCovers?: boolean
+}
+
+type Property = keyof Pick<BookDB, 'pages' | 'year'>
+export type GetOrderedBooksQuerySearchParams = {
+  property: Property
+  count?: number
 }
