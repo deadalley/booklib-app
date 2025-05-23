@@ -77,6 +77,38 @@ export async function getBooks(
   )
 }
 
+export async function getCollection(
+  event: H3Event<EventHandlerRequest>,
+  id: number,
+): Promise<
+  | (CollectionDB & {
+      'collection-book': { book_id: BookDB['id']; order: number }[]
+    })
+  | null
+> {
+  const { client } = await authenticate(event)
+
+  const { data, error } = await client
+    .from('collections')
+    .select(
+      `
+      *,
+      "collection-book" (
+        order,
+        book_id
+      )
+    `,
+    )
+    .eq('id', +id)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  return data[0]
+}
+
 export async function getCollections(
   event: H3Event<EventHandlerRequest>,
 ): Promise<

@@ -7,9 +7,9 @@ export default defineEventHandler<Promise<Book | null>>(async (event) => {
 
   if (!id) {
     throw createError('No id provided')
-  } else {
-    const data = await db.getBook(event, +id)
-
-    return data && dbBookToBook(data, data.collections)
   }
+
+  const data = await db.getBook(event, +id)
+
+  return data && dbBookToBook(data, data.collections)
 })
