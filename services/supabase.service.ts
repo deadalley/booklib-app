@@ -16,6 +16,27 @@ async function authenticate(event: H3Event<EventHandlerRequest>) {
   return { user, client }
 }
 
+export async function getBook(
+  event: H3Event<EventHandlerRequest>,
+  id: number,
+): Promise<(BookDB & { collections: Pick<CollectionDB, 'id'>[] }) | null> {
+  const { user, client } = await authenticate(event)
+
+  const { data, error } = await client
+    .from('books')
+    .select('*, collections(id)')
+    .eq('id', id)
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  const coverSrc = await getBookCoverUrl(client, user.id, data[0].id)
+
+  return data ? { ...data[0], cover_src: coverSrc ?? '' } : null
+}
+
 export async function getBooks(
   event: H3Event<EventHandlerRequest>,
   { page, pageSize, bookProgress, withBookCovers }: GetBooksQuerySearchParams,
