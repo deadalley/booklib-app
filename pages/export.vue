@@ -39,17 +39,18 @@
             <h6>3. Export your library</h6>
             <bl-button
               class="ml-4"
-              :disabled="!exportType"
+              :disabled="!exportType || !exportCollection || loading"
               @click="downloadFile"
             >
               <template #prependIcon="prependIcon">
                 <IconDownload v-bind="prependIcon" />
               </template>
               {{
-                exportType
+                exportType && exportCollection
                   ? `Export ${exportCollection === 'all' ? 'library' : exportCollection} as ${exportType}`
                   : 'Choose file format'
               }}
+              <bl-loading v-if="loading" class="!size-4" />
             </bl-button>
           </div>
         </div>
@@ -80,6 +81,7 @@ const exportCollectionOptions: SelectOption[] = [
   { label: 'Collections', value: 'collections' },
 ]
 
+const loading = ref<boolean>(false)
 const exportType = ref<ExportType>()
 const exportCollection = ref<ExportCollectionType>()
 
@@ -92,20 +94,18 @@ async function fetchLibrary(): Promise<LibraryData> {
   return { books, collections }
 }
 
-function createDownloadLink(
-  userName: string,
-  collectionType: ExportCollectionType,
-  exportType: ExportType,
-  data: string,
-) {
-  const blob = new Blob([data], { type: 'text/plain' })
-
-  const link = document.createElement('a')
-  link.href = window.URL.createObjectURL(blob)
-  link.download = `${userName}_book_lib_${collectionType}_export${exportType}`
-  link.dataset.downloadurl = ['text/json', link.download, link.href].join(':')
-  link.target = '_blank'
-  link.click()
+async function downloadFile() {
+  if (exportType.value && exportCollection.value) {
+    loading.value = true
+    switch (exportType.value) {
+      case '.json':
+        return downloadAsJson(exportCollection.value)
+      case '.csv':
+        return downloadAsCsv(exportCollection.value as keyof LibraryData)
+      default:
+        return
+    }
+  }
 }
 
 async function downloadAsJson(collectionType: ExportCollectionType) {
@@ -135,17 +135,22 @@ async function downloadAsCsv(collectionType: keyof LibraryData) {
   createDownloadLink(userName, collectionType, '.csv', data)
 }
 
-async function downloadFile() {
-  if (exportType.value && exportCollection.value) {
-    switch (exportType.value) {
-      case '.json':
-        return downloadAsJson(exportCollection.value)
-      case '.csv':
-        return downloadAsCsv(exportCollection.value as keyof LibraryData)
-      default:
-        return
-    }
-  }
+function createDownloadLink(
+  userName: string,
+  collectionType: ExportCollectionType,
+  exportType: ExportType,
+  data: string,
+) {
+  const blob = new Blob([data], { type: 'text/plain' })
+
+  const link = document.createElement('a')
+  link.href = window.URL.createObjectURL(blob)
+  link.download = `${userName}_book_lib_${collectionType}_export${exportType}`
+  link.dataset.downloadurl = ['text/json', link.download, link.href].join(':')
+  link.target = '_blank'
+  link.click()
+
+  loading.value = false
 }
 
 watch(exportType, (value) => {
