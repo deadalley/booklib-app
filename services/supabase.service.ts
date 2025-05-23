@@ -483,3 +483,31 @@ export async function isLibraryEmpty(
 
   return count === 0 || count === null || count === undefined
 }
+
+export async function resetLibrary(
+  event: H3Event<EventHandlerRequest>,
+): Promise<boolean> {
+  const { user, client } = await authenticate(event)
+
+  const { error: booksDeletionError } = await client
+    .from('books')
+    .delete()
+    .eq('user_id', user.id)
+
+  if (booksDeletionError) {
+    logger.error(booksDeletionError)
+    throw createError(booksDeletionError)
+  }
+
+  const { error: collectionsDeletionError } = await client
+    .from('collections')
+    .delete()
+    .eq('user_id', user.id)
+
+  if (collectionsDeletionError) {
+    logger.error(collectionsDeletionError)
+    throw createError(collectionsDeletionError)
+  }
+
+  return true
+}
