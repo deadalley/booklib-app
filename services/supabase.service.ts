@@ -70,9 +70,36 @@ export async function getBooks(
       : []
 
   return (
-    data?.map((book, index) => ({
+    data.map((book, index) => ({
       ...book,
       cover_src: bookCovers[index],
-    })) ?? null
+    })) ?? []
   )
+}
+
+export async function getCollections(
+  event: H3Event<EventHandlerRequest>,
+): Promise<
+  (CollectionDB & {
+    'collection-book': { book_id: BookDB['id']; order: number }[]
+  })[]
+> {
+  const { client } = await authenticate(event)
+
+  const { data, error } = await client.from('collections').select(
+    `
+      *,
+      "collection-book" (
+        order,
+        book_id
+      )
+    `,
+  )
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  return data ?? []
 }
