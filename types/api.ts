@@ -19,7 +19,7 @@ export type GetOrderedBooksQuerySearchParams = {
 export type DBClient<ID extends number | string = number> = {
   getBook: (
     event: H3Event<EventHandlerRequest>,
-    id: number,
+    id: BookDB<ID>['id'],
   ) => Promise<BookDB<ID> | null>
   getBooks: (
     event: H3Event<EventHandlerRequest>,
@@ -27,7 +27,7 @@ export type DBClient<ID extends number | string = number> = {
   ) => Promise<BookDB<ID>[]>
   createBook: (
     event: H3Event<EventHandlerRequest>,
-    book: Book,
+    book: Book<ID>,
     collections: Pick<CollectionDB<ID>, 'id'>[],
     tempCoverSrc?: string,
   ) => Promise<
@@ -61,14 +61,14 @@ export type DBClient<ID extends number | string = number> = {
 
   getCollection: (
     event: H3Event<EventHandlerRequest>,
-    id: number,
+    id: CollectionDB<ID>['id'],
   ) => Promise<CollectionDB<ID> | null>
   getCollections: (
     event: H3Event<EventHandlerRequest>,
   ) => Promise<CollectionDB<ID>[]>
   createCollection: (
     event: H3Event<EventHandlerRequest>,
-    collection: Collection,
+    collection: Collection<ID>,
   ) => Promise<
     | (CollectionDB<ID> & {
         'collection-book': { book_id: Book<ID>['id']; order: number }[]

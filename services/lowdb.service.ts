@@ -9,6 +9,7 @@ import type { BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import type { Collection } from '~/types/collection'
+import { bookToDbBook, collectionToDbCollection } from '../utils'
 
 const user = {
   id: 'userId',
