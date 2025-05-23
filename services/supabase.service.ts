@@ -3,7 +3,8 @@ import type { GetBooksQuerySearchParams } from '~/types/api'
 import type { Database } from '~/types/db.generate'
 import type { BookDB, CollectionDB } from '~/types/database'
 import type { H3Event, EventHandlerRequest } from 'h3'
-import { executePromisesInChunks } from '../utils'
+import { bookToDbBook, executePromisesInChunks, logger } from '../utils'
+import type { Book } from '~/types/book'
 
 async function authenticate(event: H3Event<EventHandlerRequest>) {
   const user = await serverSupabaseUser(event)
@@ -75,6 +76,70 @@ export async function getBooks(
       cover_src: bookCovers[index],
     })) ?? []
   )
+}
+
+export async function createBook(
+  event: H3Event<EventHandlerRequest>,
+  book: Book,
+  collections: CollectionDB[],
+  tempCoverSrc?: string,
+): Promise<(BookDB & { collections: Pick<CollectionDB, 'id'>[] }) | null> {
+  const { user, client } = await authenticate(event)
+
+  const { data, error } = await client
+    .from('books')
+    .upsert([bookToDbBook(book, user.id)], {
+      onConflict: 'id',
+      defaultToNull: true,
+    })
+    .select('*, collections(id)')
+
+  if (error) {
+    logger.error(error)
+    throw createError(error)
+  }
+
+  if (tempCoverSrc) {
+    const { error: storageError } = await client.storage
+      .from('book-covers')
+      .move(`${user.id}/${tempCoverSrc}`, `${user.id}/${data[0].id}`)
+
+    if (storageError && storageError.message !== 'Object not found') {
+      logger.error(storageError)
+      throw createError(storageError.message)
+    }
+  }
+
+  const bookId = data?.[0].id ?? book.id
+
+  const { error: deleteBookCollectionError } = await client
+    .from('collection-book')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('book_id', bookId)
+
+  if (deleteBookCollectionError) {
+    logger.error(deleteBookCollectionError)
+    throw createError({ statusMessage: deleteBookCollectionError.message })
+  }
+
+  const { error: bookCollectionError } = await client
+    .from('collection-book')
+    .insert(
+      collections.map((collection) => ({
+        book_id: bookId,
+        collection_id: collection.id,
+        user_id: user.id,
+        order: -1, // TODO: fix
+      })),
+    )
+
+  if (bookCollectionError) {
+    logger.error(bookCollectionError)
+    throw createError(bookCollectionError)
+  }
+
+  return data[0]
 }
 
 export async function getCollection(

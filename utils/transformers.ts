@@ -54,8 +54,7 @@ export function bookToDbBook(
     title: book.title ?? '',
     year: nullify(book.year),
     genres: book.genres ?? null,
-    progress_status:
-      book.progressStatus === undefined ? null : book.progressStatus,
+    progress_status: book.progressStatus ?? 'not-read',
     started_at: nullify(book.startedAt),
     finished_at: nullify(book.finishedAt),
   }
