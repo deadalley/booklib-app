@@ -25,6 +25,6 @@ const series = computed(() => {
       label: book.title,
       value: book[props.bookProperty],
     }))
-    .filter((item): item is BarChartItem => item.value !== undefined)
+    .filter((item): item is BarChartItem => item.value !== null)
 })
 </script>

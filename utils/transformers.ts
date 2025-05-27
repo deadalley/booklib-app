@@ -23,7 +23,7 @@ export function dbBookToBook<T extends number | string>(
     originalLanguage: dbBook.original_language,
     pages: dbBook.pages,
     publisher: dbBook.publisher,
-    rating: dbBook.rating ?? 0,
+    rating: dbBook.rating,
     summary: dbBook.summary,
     year: dbBook.year,
     genres: dbBook.genres ?? [],
