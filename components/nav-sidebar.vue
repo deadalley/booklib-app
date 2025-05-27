@@ -20,6 +20,14 @@
           {{ button.label }}
         </bl-nav-sidebar-button>
       </div>
+      <div class="flex flex-col gap-3">
+        <bl-nav-sidebar-button to="/settings" :active="activeItemIndex === 7">
+          <template #icon="iconProps">
+            <IconSettings v-bind="iconProps" />
+          </template>
+          Settings
+        </bl-nav-sidebar-button>
+      </div>
     </div>
   </nav>
 </template>
@@ -32,6 +40,7 @@ import {
   IconChartLine,
   IconBookUpload,
   IconBookDownload,
+  IconSettings,
 } from '@tabler/icons-vue'
 
 const route = useRoute()
