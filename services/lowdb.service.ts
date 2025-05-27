@@ -9,7 +9,7 @@ import type { BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import type { Collection } from '~/types/collection'
-import { bookToDbBook, collectionToDbCollection } from '../utils'
+import { bookToDbBook, collectionToDbCollection, logger } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 
@@ -215,6 +215,44 @@ export async function updateBookCover(
   await client.write()
 
   return bookCoverUrl
+}
+
+export async function deleteBookCover(
+  event: H3Event<EventHandlerRequest>,
+): ReturnType<DBClient<string>['deleteBookCover']> {
+  const bookId = getRouterParam(event, 'id')
+
+  const allFiles = await getFilesLocally('/bookCovers')
+
+  // find the file extension
+  const fileName = allFiles.find(
+    (fileName) => fileName.split('.')[0] === bookId,
+  )
+
+  console.log({ bookId, fileName })
+
+  if (fileName) {
+    await deleteFile(fileName, '/bookCovers')
+
+    client.data.books = client.data.books.map((book) => {
+      if (book.id === bookId) {
+        return {
+          ...book,
+          cover_src: null,
+        }
+      }
+
+      return book
+    })
+
+    await client.write()
+
+    return null
+  }
+
+  const error = { message: 'Book cover not found' }
+  logger.error(error)
+  throw createError(error.message)
 }
 
 export async function getCollection(

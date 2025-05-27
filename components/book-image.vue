@@ -13,9 +13,23 @@
         'opacity-0': !hovered,
         'opacity-100': hovered,
       }"
+      @click="onUploadClick()"
     >
       <template #default="iconProps">
         <IconUpload v-bind="iconProps" />
+      </template>
+    </bl-icon-button>
+    <bl-icon-button
+      v-if="editing"
+      class="absolute right-0 top-0 z-20 -translate-x-1/2 translate-y-1/2 transition-opacity duration-300"
+      :class="{
+        'opacity-0': !hovered,
+        'opacity-100': hovered,
+      }"
+      @click="onRemoveClick()"
+    >
+      <template #default="iconProps">
+        <IconX v-bind="iconProps" />
       </template>
     </bl-icon-button>
     <div
@@ -43,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconUpload } from '@tabler/icons-vue'
+import { IconUpload, IconX } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 
 const fileInput = ref()
@@ -93,6 +107,22 @@ async function onFileChange(e: Event) {
     )
 
     coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function onRemoveClick() {
+  loading.value = true
+
+  try {
+    await $fetch(`/api/books/${props.book.id ?? props.tempCoverSrc}/cover`, {
+      method: 'delete',
+    })
+
+    coverSrc.value = null
   } catch (error) {
     console.error(error)
   } finally {
