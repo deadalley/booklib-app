@@ -96,23 +96,28 @@
 import type { Book, ViewBook } from '~/types/book'
 import { IconPlus } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
+import type { Author } from '~/types/author'
+import { keyBy, property } from 'lodash'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
 const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
   query: { withBookCovers: true },
 })
+const { data: authors } = await useFetch<Author[]>('/api/authors')
+
+const authorsById = computed(() => keyBy(authors.value, property('id')))
 
 const dropdownItems: DropdownItem[] = [
   { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
 ]
 
-const viewBooks = ref<ViewBook[]>(books.value ?? [])
+const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
 const editing = ref(false)
 const loading = ref(false)
 
 watch(books, (newBooks) => {
-  viewBooks.value = newBooks ?? []
+  viewBooks.value = getBooksWithAuthorNames(newBooks)
 })
 
 const {
@@ -189,6 +194,15 @@ function onCancel() {
   viewBooks.value = viewBooks.value.map((book) => ({
     ...book,
     selected: false,
+  }))
+}
+
+function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
+  return (_books ?? []).map((book) => ({
+    ...book,
+    authorName: book.author
+      ? authorsById.value[String(book.author)]?.name
+      : undefined,
   }))
 }
 </script>

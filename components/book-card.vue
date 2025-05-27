@@ -13,7 +13,7 @@
       />
       <div class="w-full flex-col">
         <NuxtLink :to="selectable ? undefined : href">
-          <h5
+          <h6
             class="overflow-hidden leading-tight"
             :style="{
               display: '-webkit-box',
@@ -22,11 +22,11 @@
             }"
           >
             {{ book.title }}
-          </h5>
+          </h6>
         </NuxtLink>
-        <h6 v-if="authorName" class="truncate">
-          {{ authorName }}
-        </h6>
+        <p v-if="book.authorName" class="truncate text-accent-darker">
+          {{ book.authorName }}
+        </p>
       </div>
     </div>
 
@@ -53,8 +53,10 @@ import { IconDirectionArrows } from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 
 const props = defineProps<{
-  book: Pick<ViewBook, 'id' | 'title' | 'coverSrc' | 'selected' | 'order'>
-  authorName?: string
+  book: Pick<
+    ViewBook,
+    'id' | 'title' | 'coverSrc' | 'selected' | 'order' | 'authorName'
+  >
   selectable?: boolean
   draggable?: boolean
 }>()

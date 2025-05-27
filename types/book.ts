@@ -25,4 +25,8 @@ export type Book<ID extends number | string = number> = {
   author: ID | null
 }
 
-export type ViewBook = Book & { selected?: boolean; order?: number }
+export type ViewBook = Book & {
+  authorName?: string
+  selected?: boolean
+  order?: number
+}

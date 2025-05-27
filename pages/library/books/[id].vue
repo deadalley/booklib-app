@@ -8,51 +8,58 @@
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         <h6>Back</h6>
       </button>
-      <div
-        class="flex flex-col items-center justify-between gap-3 md:flex-row md:items-center"
-      >
-        <div class="flex flex-1 items-center gap-5">
-          <h2 class="flex items-end leading-none">
-            {{ isNew ? 'New Book' : book.title }}
-          </h2>
-          <bl-rating
-            :editing="editing"
-            :rating="book.rating ?? 0"
-            :on-commit="onSubmitRating"
-          />
-        </div>
-        <div class="flex gap-2">
-          <div v-if="editing" class="flex justify-end gap-2">
-            <bl-button variant="secondary" @click="onCancel">
-              {{ isNew ? 'Cancel' : 'Discard changes' }}
-            </bl-button>
-            <bl-button @click="onSubmit(book)">
-              {{ isNew ? 'Create book' : 'Save changes' }}
-            </bl-button>
+      <div class="flex flex-col">
+        <div
+          class="flex flex-col items-center justify-between gap-3 md:flex-row md:items-center"
+        >
+          <div class="flex flex-1 items-center gap-5">
+            <h2 class="flex items-end leading-none">
+              {{ isNew ? 'New Book' : book.title }}
+            </h2>
+            <bl-rating
+              :editing="editing"
+              :rating="book.rating ?? 0"
+              :on-commit="onSubmitRating"
+            />
           </div>
+          <div class="flex gap-2">
+            <div v-if="editing" class="flex justify-end gap-2">
+              <bl-button variant="secondary" @click="onCancel">
+                {{ isNew ? 'Cancel' : 'Discard changes' }}
+              </bl-button>
+              <bl-button @click="onSubmit(book)">
+                {{ isNew ? 'Create book' : 'Save changes' }}
+              </bl-button>
+            </div>
 
-          <bl-button v-if="!editing" variant="secondary" @click="onEdit(true)">
-            Edit
-          </bl-button>
-          <bl-modal v-if="!isNew && !editing" size="sm" @confirm="deleteBook">
-            <template #trigger>
-              <bl-button>Delete</bl-button>
-            </template>
-            <template #title>
-              Are you sure you want to delete <strong>{{ book.title }}</strong>
-              ?
-            </template>
-            This action cannot be undone.
-            <template #cancel-label> Cancel </template>
-            <template #action-label> Delete </template>
-          </bl-modal>
+            <bl-button
+              v-if="!editing"
+              variant="secondary"
+              @click="onEdit(true)"
+            >
+              Edit
+            </bl-button>
+            <bl-modal v-if="!isNew && !editing" size="sm" @confirm="deleteBook">
+              <template #trigger>
+                <bl-button>Delete</bl-button>
+              </template>
+              <template #title>
+                Are you sure you want to delete
+                <strong>{{ book.title }}</strong>
+                ?
+              </template>
+              This action cannot be undone.
+              <template #cancel-label> Cancel </template>
+              <template #action-label> Delete </template>
+            </bl-modal>
+          </div>
+          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
+            <p>Added on</p>
+            <h6 class="w-max">{{ formattedDate }}</h6>
+          </div>
         </div>
-        <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
-          <p>Added on</p>
-          <h6 class="w-max">{{ formattedDate }}</h6>
-        </div>
+        <h5 v-if="authorName">{{ authorName }}</h5>
       </div>
-      <!-- <h5>{{ book.author }}</h5> -->
     </header>
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <div class="flex flex-col gap-2">
@@ -431,6 +438,10 @@ const progressSteps = computed(() => [
     ? PROGRESS_STATUS_MAP['not-finished']
     : PROGRESS_STATUS_MAP.read,
 ])
+
+const authorName = computed(
+  () => authors.value?.find(({ id }) => book.value?.author === id)?.name,
+)
 
 watch(isNew, () => {
   managingCollections.value = isNew.value
