@@ -113,7 +113,7 @@
         :selected-table-columns="selectedTableColumns"
         with-check
         default-selected
-        @selected-rows="onSelectBook"
+        @select:rows="onSelectBook"
       />
     </div>
   </NuxtLayout>
