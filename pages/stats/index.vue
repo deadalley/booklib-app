@@ -2,7 +2,7 @@
   <NuxtLayout name="dashboard" title="Statistics">
     <h3 class="mb-3">Statistics</h3>
     <div class="grid grid-cols-12 gap-4">
-      <bl-tile class="col-span-5">
+      <bl-tile class="col-span-12 lg:col-span-5">
         <template #title>Book ratings</template>
         <bl-books-pie-chart
           v-if="books"
@@ -11,11 +11,11 @@
           unit="★"
         />
       </bl-tile>
-      <bl-tile class="col-span-4">
+      <bl-tile class="col-span-12 lg:col-span-4">
         <template #title>Top rated books</template>
         <bl-ranking :items="rankedBooks" :unit="getRatingUnit" with-label />
       </bl-tile>
-      <bl-tile class="col-span-3">
+      <bl-tile class="col-span-12 lg:col-span-3">
         <template #title>Lowest rated books</template>
         <bl-ranking :items="lowRankedBooks" :unit="getRatingUnit" with-label />
       </bl-tile>
@@ -37,7 +37,7 @@
           :book-property="barChartProperty"
         />
       </bl-tile>
-      <bl-tile class="col-span-5">
+      <bl-tile class="col-span-12 lg:col-span-5">
         <template #title>Book status</template>
         <bl-books-pie-chart
           v-if="books"
@@ -46,7 +46,7 @@
           :height="200"
         />
       </bl-tile>
-      <bl-tile class="col-span-4">
+      <bl-tile class="col-span-12 lg:col-span-4">
         <template #title>Not finished books</template>
         <bl-ranking :items="notFinishedBooks" :height="200" />
       </bl-tile>
