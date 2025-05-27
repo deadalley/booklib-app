@@ -508,12 +508,7 @@ async function onSubmit(bookValues: Book) {
     })
 
     if (updatedBook) {
-      if (isNew.value) {
-        navigateTo(`/library/books/${updatedBook.id}`)
-      } else {
-        onEdit(false)
-        await fetchBook()
-      }
+      navigateTo('/library/books')
     }
   } catch (error) {
     console.error(error)
