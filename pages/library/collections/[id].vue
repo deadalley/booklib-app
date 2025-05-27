@@ -219,12 +219,7 @@ async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
     })
 
     if (updatedCollection) {
-      if (isNew.value) {
-        navigateTo(`/library/collections/${updatedCollection.id}`)
-      } else {
-        onEdit(false)
-        await fetchCollection()
-      }
+      navigateTo('/library/collections')
     }
   } catch (error) {
     console.error(error)
