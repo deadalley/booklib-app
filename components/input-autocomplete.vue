@@ -17,6 +17,9 @@
     }"
     :type="rawAutocomplete"
     :options="options"
+    :placeholder="placeholder"
+    :can-create-new="canCreateNew"
+    :not-found-label="notFoundLabel"
     @focus="onFocus"
     @blur="onBlur"
   />
@@ -27,28 +30,23 @@ import { IconCircleOff } from '@tabler/icons-vue'
 import { createInput } from '@formkit/vue'
 
 import AutocompleteForInput from '../components/autocomplete-for-input.vue'
+import type { AutocompleteProps } from './raw-autocomplete.vue'
 
 const rawAutocomplete = createInput(AutocompleteForInput, {
-  props: ['options', 'placeholder'],
+  props: ['options', 'placeholder', 'canCreateNew', 'notFoundLabel'],
 })
 
 const inputModel = ref()
 const focused = ref(false)
 
-const props = withDefaults(
-  defineProps<{
-    editing?: boolean
-    hidden?: boolean
-    options: { label: string; value: string }[]
-  }>(),
-  {
-    editing: true,
-    hidden: false,
-  },
-)
+const props = withDefaults(defineProps<AutocompleteProps>(), {
+  canCreateNew: false,
+  editing: true,
+  hidden: false,
+})
 
 const displayValue = computed(() => {
-  return props.options.find(({ value }) => value === inputModel.value)?.label
+  return props.options!.find(({ value }) => value === inputModel.value)?.label
 })
 
 function onFocus() {

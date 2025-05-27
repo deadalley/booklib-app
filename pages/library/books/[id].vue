@@ -165,6 +165,7 @@
                     name="title"
                     label="Title"
                     placeholder="Title"
+                    not-found-label="No authors found"
                   />
                 </div>
                 <div class="form-row">
@@ -175,6 +176,7 @@
                     label="Author"
                     placeholder="Author"
                     :options="authorSelectOptions"
+                    can-create-new
                   />
                 </div>
                 <div class="form-row">

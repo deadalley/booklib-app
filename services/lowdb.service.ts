@@ -83,13 +83,30 @@ export async function createBook(
   book: Book<string>,
   collections: Pick<CollectionDB<string>, 'id'>[],
 ): ReturnType<DBClient<string>['createBook']> {
+  await client.read()
+
+  const existingAuthor = client.data.authors.find(
+    ({ id }) => id === book.author,
+  )
+
+  const authorId = existingAuthor?.id ?? uuidv4()
+
+  if (!existingAuthor) {
+    if (book.author) {
+      client.data.authors.push({
+        id: authorId,
+        name: book.author,
+        created_at: new Date().toISOString(),
+      })
+    }
+  }
+
   const bookDb: BookDB<string> = {
     ...bookToDbBook(book, user.id),
     id: book.id ?? uuidv4(),
+    author_id: authorId,
     created_at: new Date().toISOString(),
   }
-
-  await client.read()
 
   const bookIndex = client.data.books.findIndex((b) => b.id === bookDb.id)
 
@@ -111,20 +128,6 @@ export async function createBook(
       user_id: user.id,
     })),
   )
-
-  const existingAuthor = client.data.authors.find(
-    ({ id }) => id === book.author,
-  )
-
-  if (!existingAuthor) {
-    if (book.author) {
-      client.data.authors.push({
-        id: uuidv4(),
-        name: book.author,
-        created_at: new Date().toISOString(),
-      })
-    }
-  }
 
   await client.write()
 

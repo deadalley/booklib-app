@@ -5,19 +5,19 @@
     :options="context.options"
     :placeholder="context.placeholder"
     :with-wrapper="false"
-    not-found-label="No authors found"
+    :can-create-new="props.context.canCreateNew"
+    :not-found-label="props.context.notFoundLabel"
   />
 </template>
 
 <script setup lang="ts">
+import type { AutocompleteProps } from './raw-autocomplete.vue'
 import type { SelectOption } from './raw-select.vue'
 
 const props = withDefaults(
   defineProps<{
-    context: {
+    context: AutocompleteProps & {
       attrs?: { class?: string }
-      options: SelectOption[]
-      placeholder?: string
       node: {
         input: (value: SelectOption['value']) => void
         _value: SelectOption['value']

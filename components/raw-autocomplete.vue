@@ -9,9 +9,13 @@
   >
     <ComboboxRoot
       v-model="selectValue"
+      v-model:search-term="searchTerm"
+      v-model:open="open"
       class="relative"
       :filter-function="filterFunction"
       :display-value="(v) => labelByValue[v]"
+      reset-search-term-on-select
+      reset-search-term-on-blur
     >
       <ComboboxAnchor
         :class="{
@@ -39,14 +43,24 @@
           class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
         >
           <ComboboxEmpty as-child>
-            <div class="px-4">
-              {{ notFoundLabel }}
+            <div
+              class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-accent-light"
+              @click="onAddNew"
+            >
+              {{
+                canCreateNew
+                  ? `Add ${searchTerm}`
+                  : (notFoundLabel ?? 'No matches')
+              }}
             </div>
           </ComboboxEmpty>
 
-          <ComboboxGroup v-if="options" class="flex w-full flex-col gap-1">
+          <ComboboxGroup
+            v-if="extendedOptions"
+            class="flex w-full flex-col gap-1"
+          >
             <ComboboxItem
-              v-for="(option, index) in options"
+              v-for="(option, index) in extendedOptions"
               :key="index"
               class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
               :value="option.value"
@@ -77,19 +91,25 @@ import {
   ComboboxViewport,
 } from 'radix-vue'
 
-const props = withDefaults(
-  defineProps<
-    SelectProps & {
-      editing?: boolean
-      hidden?: boolean
-      notFoundLabel: string
-    }
-  >(),
-  { withWrapper: true, editing: true, hidden: false },
-)
+export type AutocompleteProps = SelectProps & {
+  editing?: boolean
+  hidden?: boolean
+  canCreateNew?: boolean
+  notFoundLabel?: string
+}
+
+const props = withDefaults(defineProps<AutocompleteProps>(), {
+  withWrapper: true,
+  canCreateNew: false,
+  editing: true,
+  hidden: false,
+})
 
 const selectValue = defineModel<string>()
+const searchTerm = ref<string>()
+const open = ref<boolean>(false)
 const focused = ref(false)
+const extendedOptions = ref(props.options!)
 
 const labelByValue = computed<Record<string, string>>(() =>
   mapValues(
@@ -112,6 +132,18 @@ function filterFunction(list: string[], searchTerm: string) {
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   })
+}
+
+function onAddNew() {
+  if (searchTerm.value) {
+    extendedOptions.value.push({
+      value: searchTerm.value,
+      label: searchTerm.value,
+    })
+
+    selectValue.value = searchTerm.value
+    open.value = false
+  }
 }
 </script>
 
