@@ -68,7 +68,12 @@ const buttons = [
     disabled: !!isEmpty.value,
   },
   { label: 'Import', icon: IconBookUpload, to: '/import', disabled: false },
-  { label: 'Export', icon: IconBookDownload, to: '/export', disabled: false },
+  {
+    label: 'Export',
+    icon: IconBookDownload,
+    to: '/export',
+    disabled: !!isEmpty.value,
+  },
 ]
 const activeItemIndex = computed(() =>
   buttons.findIndex(({ to }) => route.path.includes(to)),
