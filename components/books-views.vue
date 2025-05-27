@@ -40,6 +40,7 @@
 
   <div v-if="totalBookCount" class="flex justify-center py-2">
     <bl-pagination
+      v-if="totalBookCount && totalBookCount > BOOKS_PAGE_SIZE"
       v-model="currentPage"
       :total-item-count="totalBookCount"
       :items-per-page="BOOKS_PAGE_SIZE"
