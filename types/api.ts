@@ -52,11 +52,9 @@ export type DBClient<ID extends number | string = number> = {
   getBookCover: (
     event: H3Event<EventHandlerRequest>,
     id: string,
-  ) => Promise<string | null>
+  ) => Promise<void>
   updateBookCover: (
     event: H3Event<EventHandlerRequest>,
-    bookId: string,
-    formData: FormData,
   ) => Promise<string | null>
 
   getCollection: (

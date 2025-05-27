@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     'nuxt-echarts',
     'nuxt-electron',
+    'nuxt-file-storage',
   ],
 
   components: {
@@ -60,6 +61,10 @@ export default defineNuxtConfig({
     options: {
       hashMode: true,
     },
+  },
+
+  fileStorage: {
+    mount: process.env.FILE_STORAGE_PATH,
   },
 
   typescript: {

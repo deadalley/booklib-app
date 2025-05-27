@@ -168,7 +168,6 @@ function onUploadClick() {
 }
 
 async function parseFile(file: File) {
-  console.log(importType.value)
   switch (importType.value) {
     case '.csv':
       return parseCsvFile(file)

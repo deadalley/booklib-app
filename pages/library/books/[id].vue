@@ -587,8 +587,6 @@ async function fetchBooksFromGoogle() {
       const books = await $fetch('/api/external/google', {
         query: { title: book.value.title, pageSize: 10 },
       })
-
-      console.log(books)
       externalBooks.value = books
     }
   } catch (error) {

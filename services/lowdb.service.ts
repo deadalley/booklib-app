@@ -10,6 +10,8 @@ import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import type { Collection } from '~/types/collection'
 import { bookToDbBook, collectionToDbCollection } from '../utils'
+import type { ServerFile } from 'nuxt-file-storage'
+import { createReadStream } from 'fs'
 
 const user = {
   id: 'userId',
@@ -26,18 +28,25 @@ type Database = {
   }[]
 }
 
-const client = await JSONFilePreset<Database>('booklib.json', {
+const client = await JSONFilePreset<Database>('usr/booklib.json', {
   books: [],
   collections: [],
   'collection-book': [],
 })
+
+function getBookCoverUrl(bookId: string | number) {
+  return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
+}
 
 export async function getBook(
   event: H3Event<EventHandlerRequest>,
   id: string,
 ): ReturnType<DBClient<string>['getBook']> {
   await client.read()
-  return client.data.books.find((book) => book.id === id) ?? null
+
+  const book = client.data.books.find((book) => book.id === id)
+
+  return book ?? null
 }
 
 export async function getBooks(
@@ -152,16 +161,60 @@ export async function getOrderedBooks(
     .slice(0, count ?? 11)
 }
 
-export async function getBookCover(): ReturnType<
-  DBClient<string>['getBookCover']
-> {
-  return ''
+export async function getBookCover(
+  event: H3Event<EventHandlerRequest>,
+  id: string,
+): ReturnType<DBClient<string>['getBookCover']> {
+  const allFiles = await getFilesLocally('/bookCovers')
+
+  // find the file extension
+  const fileName = allFiles.find((fileName) => fileName.split('.')[0] === id)
+
+  const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
+
+  if (filePath) {
+    return sendStream(event, createReadStream(filePath))
+  }
 }
 
-export async function updateBookCover(): ReturnType<
-  DBClient<string>['updateBookCover']
-> {
-  return ''
+export async function updateBookCover(
+  event: H3Event<EventHandlerRequest>,
+): ReturnType<DBClient<string>['updateBookCover']> {
+  const { bookId, file } = await readBody<{ bookId: string; file: ServerFile }>(
+    event,
+  )
+
+  const allFiles = await getFilesLocally('/bookCovers')
+
+  // find the file extension
+  const fileName = allFiles.find(
+    (fileName) => fileName.split('.')[0] === bookId,
+  )
+
+  if (fileName) {
+    await deleteFile(fileName, '/bookCovers')
+  }
+
+  await storeFileLocally(file, bookId, '/bookCovers')
+
+  const bookCoverUrl = getBookCoverUrl(bookId)
+
+  await client.read()
+
+  client.data.books = client.data.books.map((book) => {
+    if (book.id === bookId) {
+      return {
+        ...book,
+        cover_src: bookCoverUrl,
+      }
+    }
+
+    return book
+  })
+
+  await client.write()
+
+  return bookCoverUrl
 }
 
 export async function getCollection(
@@ -202,7 +255,6 @@ export async function createCollection(
 ): ReturnType<DBClient<string>['createCollection']> {
   await client.read()
 
-  console.log(collection)
   const collectionDb: CollectionDB<string> = {
     ...collectionToDbCollection(collection, user.id),
     id: collection.id ?? uuidv4(),

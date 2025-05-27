@@ -55,8 +55,12 @@ const props = defineProps<{
 }>()
 
 const loading = ref(false)
-const coverSrc = ref(props.book.coverSrc)
+const coverSrc = ref<string | null>(
+  props.book.coverSrc && `${props.book.coverSrc}#${randomInt(1000, 1_000_000)}`,
+)
 const hovered = ref(false)
+
+const { handleFileInput, files } = useFileStorage()
 
 function setHovered(value: boolean) {
   hovered.value = value
@@ -67,22 +71,28 @@ function onUploadClick() {
 }
 
 async function onFileChange(e: Event) {
+  await handleFileInput(e)
   loading.value = true
-  const file = (e.target as HTMLInputElement)?.files?.[0] as File
+  // const file = (e.target as HTMLInputElement)?.files?.[0] as File
 
-  const formData = new FormData()
-  formData.append('bookId', file, `${props.book.id ?? props.tempCoverSrc}`)
+  // const formData = new FormData()
+  // formData.append('bookId', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
+    console.log('AAAAA')
     const newCoverSrc = await $fetch(
       `/api/books/${props.book.id ?? props.tempCoverSrc}/cover`,
       {
         method: 'post',
-        body: formData,
+        body: {
+          bookId: props.book.id ?? props.tempCoverSrc,
+          file: files.value[0],
+        },
+        // body: formData,
       },
     )
 
-    coverSrc.value = newCoverSrc
+    coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
   } catch (error) {
     console.error(error)
   } finally {

@@ -19,7 +19,7 @@ import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export async function getBookCoverUrl(
+async function getBookCoverUrl(
   client: SupabaseClient<Database>,
   userId: string,
   bookId: string | number,
@@ -304,9 +304,11 @@ export async function getBookCover(
 
 export async function updateBookCover(
   event: H3Event<EventHandlerRequest>,
-  bookId: string,
-  formData: FormData,
 ): ReturnType<DBClient['updateBookCover']> {
+  const formData = await readFormData(event)
+
+  const bookId = (formData.get('bookId') as File).name
+
   const { user, client } = await authenticate(event)
 
   try {

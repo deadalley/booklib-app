@@ -18,8 +18,8 @@ logs
 .fleet
 .idea
 .nuxt-storybook
-booklib.json
 dist-electron
+usr
 
 # Local env files
 .env

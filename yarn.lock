@@ -429,9 +429,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -7688,6 +7688,14 @@ nuxt-electron@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/nuxt-electron/-/nuxt-electron-0.7.0.tgz#eda05f669606237f0bcb0c1e594214889fb7097f"
   integrity sha512-xterhxTP2HMzLWVMhmYbzF2uED9fGFMqCpMVCs6Iq3yMAXPkP4cZeduIkBcgbVzLYRjo9p7X3UpznwPofB7AAw==
+
+nuxt-file-storage@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/nuxt-file-storage/-/nuxt-file-storage-0.3.0.tgz#390ffa6afb35b510ee5c2e2c6dd3aff2be896067"
+  integrity sha512-5Ey04J0vnNhdeopqIempv2dM9VKvNuCj68qokyJKEno9Dy1MS2lUWNew1djxr2s+5pMm6TLLXzfqku0yLcRtvg==
+  dependencies:
+    "@nuxt/kit" "^3.15.4"
+    defu "^6.1.4"
 
 nuxt@^3.17.4:
   version "3.17.4"
