@@ -93,7 +93,6 @@ async function onFileChange(e: Event) {
   // formData.append('bookId', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
-    console.log('AAAAA')
     const newCoverSrc = await $fetch(
       `/api/books/${props.book.id ?? props.tempCoverSrc}/cover`,
       {

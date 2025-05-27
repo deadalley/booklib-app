@@ -161,6 +161,16 @@
                   />
                 </div>
                 <div class="form-row">
+                  <bl-input-autocomplete
+                    id="author"
+                    :editing="editing"
+                    name="author"
+                    label="Author"
+                    placeholder="Author"
+                    :options="authorSelectOptions"
+                  />
+                </div>
+                <div class="form-row">
                   <bl-input
                     id="publisher"
                     :editing="editing"
@@ -284,17 +294,6 @@
               </div>
             </section>
 
-            <section class="book-section">
-              <bl-input
-                id="authorName"
-                :editing="editing"
-                name="authorName"
-                label="Author"
-                placeholder="Author"
-                @input="(value) => debounce(onAuthorNameChange, 500)(value)"
-              />
-            </section>
-
             <section
               v-if="!!collectionsDisplayed.length"
               class="book-section overflow-visible"
@@ -371,8 +370,7 @@ import {
   IconArrowLeft,
 } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
-import { getAuthorByName } from '~/services/open-library.service'
-import { debounce } from 'lodash'
+import type { Author } from '~/types/author'
 
 const route = useRoute()
 
@@ -388,6 +386,7 @@ const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
+const { data: authors } = await useFetch<Author[]>('/api/authors')
 
 const collectionsDisplayed = computed(() => {
   return managingCollections.value
@@ -407,6 +406,15 @@ const currentStep = ref<number | undefined>(
 
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
+)
+
+const authorSelectOptions = computed(() =>
+  (authors.value ?? [])
+    .map((author) => ({
+      label: author.name,
+      value: String(author.id),
+    }))
+    .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2)),
 )
 
 const progressSteps = computed(() => [
@@ -469,13 +477,6 @@ function onCancel() {
     navigateTo('/library/books')
   } else {
     onEdit(false)
-  }
-}
-
-async function onAuthorNameChange(authorName: string) {
-  if (authorName) {
-    const authors = await getAuthorByName(authorName, { limit: 5 })
-    console.log(authors)
   }
 }
 

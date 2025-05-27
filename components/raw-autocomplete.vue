@@ -1,0 +1,135 @@
+<!-- eslint-disable tailwindcss/no-custom-classname -->
+<template>
+  <div
+    class="popper relative w-full"
+    :class="{
+      'popper-with-wrapper': withWrapper,
+      popper: !withWrapper,
+    }"
+  >
+    <ComboboxRoot
+      v-model="selectValue"
+      class="relative"
+      :filter-function="filterFunction"
+      :display-value="(v) => labelByValue[v]"
+    >
+      <ComboboxAnchor
+        :class="{
+          'flex size-full items-center gap-3': !withWrapper,
+          'formkit-inner': withWrapper,
+        }"
+      >
+        <ComboboxInput
+          v-bind="$attrs"
+          :class="{ hidden: !(editing && !hidden) }"
+          :classes="{
+            outer: `flex-1 ${editing ? '' : '!hidden'}`,
+            wrapper: 'flex-1',
+            label: 'ml-4',
+            inner: `${focused ? '!border-main' : 'border-accent'}`,
+          }"
+          :placeholder="placeholder"
+          @focus="onFocus"
+          @blur="onBlur"
+        />
+      </ComboboxAnchor>
+
+      <ComboboxContent position="popper">
+        <ComboboxViewport
+          class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
+        >
+          <ComboboxEmpty as-child>
+            <div class="px-4">
+              {{ notFoundLabel }}
+            </div>
+          </ComboboxEmpty>
+
+          <ComboboxGroup v-if="options" class="flex w-full flex-col gap-1">
+            <ComboboxItem
+              v-for="(option, index) in options"
+              :key="index"
+              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+              :value="option.value"
+            >
+              <ComboboxLabel>
+                {{ option.label }}
+              </ComboboxLabel>
+            </ComboboxItem>
+          </ComboboxGroup>
+        </ComboboxViewport>
+      </ComboboxContent>
+    </ComboboxRoot>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { keyBy, mapValues } from 'lodash'
+import type { SelectProps } from './raw-select.vue'
+import {
+  ComboboxAnchor,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxLabel,
+  ComboboxRoot,
+  ComboboxViewport,
+} from 'radix-vue'
+
+const props = withDefaults(
+  defineProps<
+    SelectProps & {
+      editing?: boolean
+      hidden?: boolean
+      notFoundLabel: string
+    }
+  >(),
+  { withWrapper: true, editing: true, hidden: false },
+)
+
+const selectValue = defineModel<string>()
+const focused = ref(false)
+
+const labelByValue = computed<Record<string, string>>(() =>
+  mapValues(
+    keyBy(props.options ?? {}, ({ value }) => value),
+    ({ label }) => label,
+  ),
+)
+
+function onFocus() {
+  focused.value = true
+}
+
+function onBlur() {
+  focused.value = false
+}
+
+function filterFunction(list: string[], searchTerm: string) {
+  return list.filter((option) => {
+    return labelByValue.value[option]
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  })
+}
+</script>
+
+<style scoped>
+[data-radix-popper-content-wrapper] {
+  position: absolute !important;
+  transform: none !important;
+  top: var(--radix-popper-anchor-height) !important;
+}
+
+.popper-with-wrapper [data-radix-popper-content-wrapper] {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.popper [data-radix-popper-content-wrapper] {
+  width: calc(100% + 30px);
+  margin-top: 8px !important;
+  margin-left: -15px !important;
+}
+</style>

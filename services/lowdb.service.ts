@@ -5,7 +5,7 @@ import type {
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
 import { JSONFilePreset } from 'lowdb/node'
-import type { BookDB, CollectionDB } from '~/types/database'
+import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import type { Collection } from '~/types/collection'
@@ -18,6 +18,7 @@ const user = {
 }
 
 type Database = {
+  authors: AuthorDB<string>[]
   books: BookDB<string>[]
   collections: CollectionDB<string>[]
   'collection-book': {
@@ -29,6 +30,7 @@ type Database = {
 }
 
 const client = await JSONFilePreset<Database>('usr/booklib.json', {
+  authors: [],
   books: [],
   collections: [],
   'collection-book': [],
@@ -36,6 +38,14 @@ const client = await JSONFilePreset<Database>('usr/booklib.json', {
 
 function getBookCoverUrl(bookId: string | number) {
   return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
+}
+
+export async function getAuthors(): ReturnType<DBClient<string>['getAuthors']> {
+  await client.read()
+
+  const data = client.data.authors
+
+  return data
 }
 
 export async function getBook(
@@ -79,28 +89,44 @@ export async function createBook(
     created_at: new Date().toISOString(),
   }
 
-  await client.update((data) => {
-    const bookIndex = data.books.findIndex((b) => b.id === bookDb.id)
+  await client.read()
 
-    if (bookIndex !== -1) {
-      data.books.splice(bookIndex, 1, bookDb)
-    } else {
-      data.books.push(bookDb)
+  const bookIndex = client.data.books.findIndex((b) => b.id === bookDb.id)
+
+  if (bookIndex !== -1) {
+    client.data.books.splice(bookIndex, 1, bookDb)
+  } else {
+    client.data.books.push(bookDb)
+  }
+
+  client.data['collection-book'] = client.data['collection-book'].filter(
+    (cb) => cb.book_id !== bookDb.id,
+  )
+
+  client.data['collection-book'] = client.data['collection-book'].concat(
+    collections.map((collection) => ({
+      book_id: bookDb.id,
+      collection_id: collection.id,
+      order: -1, // TODO: fix
+      user_id: user.id,
+    })),
+  )
+
+  const existingAuthor = client.data.authors.find(
+    ({ id }) => id === book.author,
+  )
+
+  if (!existingAuthor) {
+    if (book.author) {
+      client.data.authors.push({
+        id: uuidv4(),
+        name: book.author,
+        created_at: new Date().toISOString(),
+      })
     }
+  }
 
-    data['collection-book'] = data['collection-book'].filter(
-      (cb) => cb.book_id !== bookDb.id,
-    )
-
-    data['collection-book'] = data['collection-book'].concat(
-      collections.map((collection) => ({
-        book_id: bookDb.id,
-        collection_id: collection.id,
-        order: -1, // TODO: fix
-        user_id: user.id,
-      })),
-    )
-  })
+  await client.write()
 
   return bookDb
 }
@@ -228,8 +254,6 @@ export async function deleteBookCover(
   const fileName = allFiles.find(
     (fileName) => fileName.split('.')[0] === bookId,
   )
-
-  console.log({ bookId, fileName })
 
   if (fileName) {
     await deleteFile(fileName, '/bookCovers')

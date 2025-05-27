@@ -1,6 +1,6 @@
 import type { Book, BookProgressStatus } from './book'
 import type { Collection } from './collection'
-import type { BookDB, CollectionDB } from './database'
+import type { AuthorDB, BookDB, CollectionDB } from './database'
 import type { H3Event, EventHandlerRequest } from 'h3'
 
 export type GetBooksQuerySearchParams = {
@@ -17,6 +17,7 @@ export type GetOrderedBooksQuerySearchParams = {
 }
 
 export type DBClient<ID extends number | string = number> = {
+  getAuthors: (event: H3Event<EventHandlerRequest>) => Promise<AuthorDB<ID>[]>
   getBook: (
     event: H3Event<EventHandlerRequest>,
     id: BookDB<ID>['id'],

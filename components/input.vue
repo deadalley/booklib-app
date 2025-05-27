@@ -34,24 +34,23 @@
 <script setup lang="ts">
 import { IconCircleOff, IconX } from '@tabler/icons-vue'
 
+export type InputProps = {
+  editing?: boolean
+  hidden?: boolean
+  clearable?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatter?: (value: any) => string | undefined
+}
+
 const inputModel = ref()
 const focused = ref(false)
 
-const props = withDefaults(
-  defineProps<{
-    editing?: boolean
-    hidden?: boolean
-    clearable?: boolean
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formatter?: (value: any) => string | undefined
-  }>(),
-  {
-    editing: true,
-    hidden: false,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formatter: (value: any) => value && `${value}`,
-  },
-)
+const props = withDefaults(defineProps<InputProps>(), {
+  editing: true,
+  hidden: false,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatter: (value: any) => value && `${value}`,
+})
 
 const displayValue = computed(() => {
   return props.formatter(inputModel.value)

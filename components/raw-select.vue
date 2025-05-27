@@ -1,5 +1,12 @@
+<!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <div class="relative w-full" :class="$props.class">
+  <div
+    class="popper relative w-full"
+    :class="{
+      'popper-with-wrapper': withWrapper,
+      popper: !withWrapper,
+    }"
+  >
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
         :class="{
@@ -79,16 +86,14 @@ import {
 } from 'radix-vue'
 
 export type SelectOption = { label: string; value: string }
+export type SelectProps = {
+  options?: SelectOption[]
+  groups?: { label?: string; options: SelectOption[] }[]
+  placeholder?: string
+  withWrapper?: boolean
+}
 
-withDefaults(
-  defineProps<{
-    options?: SelectOption[]
-    groups?: { label?: string; options: SelectOption[] }[]
-    placeholder?: string
-    withWrapper?: boolean
-  }>(),
-  { withWrapper: true },
-)
+withDefaults(defineProps<SelectProps>(), { withWrapper: true })
 
 const selectValue = defineModel<string>()
 </script>
@@ -96,10 +101,19 @@ const selectValue = defineModel<string>()
 <style scoped>
 [data-radix-popper-content-wrapper] {
   position: absolute !important;
-  width: 100%;
   transform: none !important;
   top: var(--radix-popper-anchor-height) !important;
+}
+
+.popper-with-wrapper [data-radix-popper-content-wrapper] {
+  width: 100%;
   margin-top: 4px;
+}
+
+.popper [data-radix-popper-content-wrapper] {
+  width: calc(100% + 30px);
+  margin-top: 8px !important;
+  margin-left: -15px !important;
 }
 
 [data-state='open'] .chevron {

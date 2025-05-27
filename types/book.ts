@@ -22,6 +22,7 @@ export type Book<ID extends number | string = number> = {
   progressStatus: BookProgressStatus | null
   startedAt: string | null
   finishedAt: string | null
+  author: ID | null
 }
 
 export type ViewBook = Book & { selected?: boolean; order?: number }

@@ -5,7 +5,7 @@ import { db } from '~/services/db.service'
 export default defineEventHandler(async (event) => {
   const query = getQuery<GetBooksQuerySearchParams>(event)
 
-  const data = await db.getBooks(event, query)
+  const books = await db.getBooks(event, query)
 
-  return (data ?? [])?.map((b) => dbBookToBook(b, b.collections))
+  return (books ?? [])?.map((b) => dbBookToBook(b, b.collections))
 })

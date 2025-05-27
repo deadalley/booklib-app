@@ -1,11 +1,22 @@
 import type { Book } from '~/types/book'
-import type { BookDB, CollectionDB } from '~/types/database'
+import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
 import { toSimpleDate } from './date'
 import type { GoogleBook } from '~/types/google'
+import type { Author } from '~/types/author'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
+}
+
+export function dbAuthorToAuthor<T extends number | string>(
+  dbAuthor: AuthorDB<T>,
+): Author<T> {
+  return {
+    id: dbAuthor.id,
+    name: dbAuthor.name,
+    createdAt: dbAuthor.created_at,
+  }
 }
 
 export function dbBookToBook<T extends number | string>(
@@ -31,6 +42,7 @@ export function dbBookToBook<T extends number | string>(
     progressStatus: dbBook.progress_status,
     startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : null,
     finishedAt: dbBook.finished_at ? toSimpleDate(dbBook.finished_at) : null,
+    author: dbBook.author_id,
   }
 }
 
@@ -39,7 +51,7 @@ export function bookToDbBook<T extends number | string>(
   userId: string,
 ): Omit<BookDB<T>, 'created_at' | 'id'> {
   return {
-    author_id: 1,
+    author_id: book.author || null,
     user_id: userId,
     ...(book.id ? { id: book.id } : {}),
     original_title: book.originalTitle || null,
@@ -106,5 +118,6 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
     progressStatus: null,
     startedAt: null,
     finishedAt: null,
+    author: null,
   }
 }
