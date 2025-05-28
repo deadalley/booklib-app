@@ -22,11 +22,11 @@ export const PROGRESS_STATUS_MAP: Record<
     icon: keyof typeof icons
   }
 > = {
-  wishlist: {
-    id: 'wishlist',
+  'not-owned': {
+    id: 'not-owned',
     step: 1,
-    description: 'Wishlist',
-    icon: 'IconGift',
+    description: 'Not owned',
+    icon: 'IconArchiveOff',
   },
   owned: {
     id: 'owned',
@@ -36,37 +36,31 @@ export const PROGRESS_STATUS_MAP: Record<
   },
   'not-read': {
     id: 'not-read',
-    step: 1,
+    step: 2,
     description: 'Not read',
     icon: 'IconBook2',
   },
-  queued: {
-    id: 'queued',
-    step: 2,
-    description: 'Queued',
-    icon: 'IconStackPush',
-  },
   reading: {
     id: 'reading',
-    step: 3,
+    step: 2,
     description: 'Reading',
     icon: 'IconEyeglass2',
   },
   paused: {
     id: 'paused',
-    step: 3,
+    step: 2,
     description: 'Paused',
     icon: 'IconPlayerPause',
   },
   read: {
     id: 'read',
-    step: 4,
+    step: 3,
     description: 'Read',
     icon: 'IconBook',
   },
   'not-finished': {
     id: 'not-finished',
-    step: 4,
+    step: 3,
     description: 'Not finished',
     icon: 'IconBookOff',
   },

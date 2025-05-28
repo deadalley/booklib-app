@@ -22,7 +22,7 @@
             <bl-rating
               :editing="editing"
               :rating="book.rating ?? 0"
-              :on-commit="onSubmitRating"
+              :on-commit="onSelectRating"
             />
           </div>
           <div class="flex gap-2">
@@ -30,7 +30,7 @@
               <bl-button variant="secondary" @click="onCancel">
                 {{ isNew ? 'Cancel' : 'Discard changes' }}
               </bl-button>
-              <bl-button @click="onSubmit(book)">
+              <bl-button @click="onSaveChanges()">
                 {{ isNew ? 'Create book' : 'Save changes' }}
               </bl-button>
             </div>
@@ -84,64 +84,19 @@
             <div class="flex flex-col gap-3">
               <div class="flex justify-center gap-3">
                 <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP['not-read'].step"
+                  v-for="status in Object.values(PROGRESS_STATUS_MAP).filter(
+                    ({ step }) => step === currentStep,
+                  )"
+                  :key="status.id"
                   class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP['not-read'].id)"
+                  @click="onSelectProgress(status.id)"
                 >
-                  <IconBook2 :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP['not-read'].description }}
-                </div>
-                <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP['wishlist'].step"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP['wishlist'].id)"
-                >
-                  <IconGift :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP['wishlist'].description }}
-                </div>
-                <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP.owned.step"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP.owned.id)"
-                >
-                  <IconArchive :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP.owned.description }}
-                </div>
-                <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP.reading.step"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP.reading.id)"
-                >
-                  <IconEyeglass2 :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP.reading.description }}
-                </div>
-                <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP.paused.step"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP.paused.id)"
-                >
-                  <IconPlayerPause :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP.paused.description }}
-                </div>
-                <div
-                  v-if="currentStep === PROGRESS_STATUS_MAP.read.step"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(PROGRESS_STATUS_MAP.read.id)"
-                >
-                  <IconBook :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP.read.description }}
-                </div>
-                <div
-                  v-if="
-                    currentStep === PROGRESS_STATUS_MAP['not-finished'].step
-                  "
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="
-                    onSelectProgress(PROGRESS_STATUS_MAP['not-finished'].id)
-                  "
-                >
-                  <IconBookOff :size="32" class="text-main" />
-                  {{ PROGRESS_STATUS_MAP['not-finished'].description }}
+                  <component
+                    :is="icons[status.icon]"
+                    :size="32"
+                    class="text-main"
+                  />
+                  {{ status.description }}
                 </div>
               </div>
             </div>
@@ -292,7 +247,7 @@
                   :editable="editing"
                   :value="genre"
                   :index="index"
-                  :on-commit="onSubmitGenre"
+                  :on-commit="onSelectGenre"
                   :on-remove="onRemoveGenre"
                 />
                 <bl-genre-tag
@@ -301,7 +256,7 @@
                   :removable="editing"
                   :new-genre="true"
                   :index="book.genres?.length ?? -1"
-                  :on-commit="onSubmitGenre"
+                  :on-commit="onSelectGenre"
                   :on-remove="onRemoveGenre"
                 />
               </div>
@@ -372,16 +327,7 @@ import { faker } from '@faker-js/faker'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
-import {
-  IconEyeglass2,
-  IconBook,
-  IconBook2,
-  IconBookOff,
-  IconPlayerPause,
-  IconGift,
-  IconArchive,
-  IconArrowLeft,
-} from '@tabler/icons-vue'
+import { IconArrowLeft, icons } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 import type { Author } from '~/types/author'
 
@@ -431,15 +377,15 @@ const authorSelectOptions = computed(() =>
 )
 
 const progressSteps = computed(() => [
-  book.value?.progressStatus === 'wishlist'
-    ? PROGRESS_STATUS_MAP.wishlist
-    : book.value?.progressStatus === 'owned'
-      ? PROGRESS_STATUS_MAP.owned
-      : PROGRESS_STATUS_MAP['not-read'],
-  PROGRESS_STATUS_MAP.queued,
-  book.value?.progressStatus === 'paused'
-    ? PROGRESS_STATUS_MAP.paused
-    : PROGRESS_STATUS_MAP.reading,
+  book.value?.progressStatus === 'owned'
+    ? PROGRESS_STATUS_MAP.owned
+    : PROGRESS_STATUS_MAP['not-owned'],
+
+  book.value?.progressStatus === 'not-read'
+    ? PROGRESS_STATUS_MAP['not-read']
+    : book.value?.progressStatus === 'paused'
+      ? PROGRESS_STATUS_MAP.paused
+      : PROGRESS_STATUS_MAP.reading,
   book.value?.progressStatus === 'not-finished'
     ? PROGRESS_STATUS_MAP['not-finished']
     : PROGRESS_STATUS_MAP.read,
@@ -513,21 +459,29 @@ async function onSubmit(bookValues: Book) {
       },
     })
 
-    if (updatedBook) {
-      navigateTo('/library/books')
-    }
+    return updatedBook
   } catch (error) {
     console.error(error)
   }
 }
 
-async function onSubmitRating(rating: number) {
+async function onSaveChanges() {
+  if (book.value) {
+    const updatedBook = await onSubmit(book.value)
+
+    if (updatedBook) {
+      navigateTo('/library/books')
+    }
+  }
+}
+
+async function onSelectRating(rating: number) {
   if (book.value) {
     book.value.rating = rating
   }
 }
 
-async function onSubmitGenre(genre: string | undefined, index: number) {
+async function onSelectGenre(genre: string | undefined, index: number) {
   if (book.value && genre) {
     const _genres: string[] = (book.value.genres ?? []).concat()
     _genres.splice(index, 1, genre)

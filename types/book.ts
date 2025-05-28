@@ -1,7 +1,13 @@
 import type { Collection } from './collection'
-import type { Database } from './db.generate'
 
-export type BookProgressStatus = Database['public']['Enums']['BookProgress']
+export type BookProgressStatus =
+  | 'owned'
+  | 'not-owned'
+  | 'not-read'
+  | 'reading'
+  | 'paused'
+  | 'read'
+  | 'not-finished'
 
 export type Book<ID extends number | string = number> = {
   id: ID
