@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="popper relative w-full"
+    class="relative w-full"
     :class="{
       'popper-with-wrapper': withWrapper,
       popper: !withWrapper,
