@@ -53,11 +53,11 @@
               <template #trigger>
                 <bl-button @click="openDeleteModal">Delete</bl-button>
               </template>
-              <template #title
-                >Are you sure you want to delete
-                <strong>{{ collection.name }}</strong
-                >?</template
-              >
+              <template #title>
+                Are you sure you want to delete
+                <strong>{{ collection.name }}</strong>
+                ?
+              </template>
               Your books will <strong>not</strong> be deleted. This action
               cannot be undone.
               <template #cancel-label> Cancel </template>

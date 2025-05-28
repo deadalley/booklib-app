@@ -9,6 +9,7 @@
       @select="(args) => $emit('book-select', args)"
     />
     <hr v-if="editing" class="my-8 text-main" />
+    <h4 v-if="editing">All books</h4>
     <bl-books-grid
       v-if="view === 'cards' && editing"
       v-model="notSelectedBooks"
