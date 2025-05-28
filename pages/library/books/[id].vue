@@ -332,7 +332,7 @@
               </div>
             </section>
 
-            <section class="book-section">
+            <section v-if="!externalBooks.length && false" class="book-section">
               <template v-if="!externalBooks.length && false">
                 <h4>Find books</h4>
                 <bl-button @click="fetchBooksFromGoogle">Fetch</bl-button>
