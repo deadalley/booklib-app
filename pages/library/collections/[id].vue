@@ -44,7 +44,13 @@
             </div>
 
             <bl-modal
-              v-if="!isNew && !editing"
+              v-if="
+                !isNew &&
+                !editing &&
+                ![WISHLIST_COLLECTION_ID, FAVORITE_COLLECTION_ID].includes(
+                  String(collection?.id),
+                )
+              "
               ref="deleteModalRef"
               size="sm"
               @confirm="deleteCollection"

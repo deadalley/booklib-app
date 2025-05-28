@@ -366,7 +366,7 @@ export async function deleteBookCover(
     return null
   }
 
-  const error = { message: 'Book cover not found' }
+  const error = { message: `Book cover not found for ${bookId} to delete` }
   logger.error(error)
   throw createError(error.message)
 }
@@ -456,6 +456,11 @@ export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
   id: CollectionDB<string>['id'],
 ): ReturnType<DBClient<string>['deleteCollection']> {
+  if ([WISHLIST_COLLECTION_ID, FAVORITE_COLLECTION_ID].includes(id)) {
+    const error = { message: `Cannot delete ${id}` }
+    logger.error(error)
+    throw createError(error.message)
+  }
   await client.read()
 
   client.data.collections = client.data.collections.filter((c) => c.id !== id)
