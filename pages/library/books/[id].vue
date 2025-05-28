@@ -177,6 +177,7 @@
                     placeholder="Author"
                     :options="authorSelectOptions"
                     can-create-new
+                    clearable
                   />
                 </div>
                 <div class="form-row">

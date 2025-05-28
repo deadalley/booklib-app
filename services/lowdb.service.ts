@@ -104,7 +104,7 @@ export async function createBook(
   const bookDb: BookDB<string> = {
     ...bookToDbBook(book, user.id),
     id: book.id ?? uuidv4(),
-    author_id: authorId,
+    author_id: book.author ? authorId : null,
     created_at: new Date().toISOString(),
   }
 

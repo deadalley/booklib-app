@@ -20,6 +20,7 @@
     :placeholder="placeholder"
     :can-create-new="canCreateNew"
     :not-found-label="notFoundLabel"
+    :clearable="clearable"
     @focus="onFocus"
     @blur="onBlur"
   />
@@ -33,7 +34,13 @@ import AutocompleteForInput from '../components/autocomplete-for-input.vue'
 import type { AutocompleteProps } from './raw-autocomplete.vue'
 
 const rawAutocomplete = createInput(AutocompleteForInput, {
-  props: ['options', 'placeholder', 'canCreateNew', 'notFoundLabel'],
+  props: [
+    'options',
+    'placeholder',
+    'canCreateNew',
+    'notFoundLabel',
+    'clearable',
+  ],
 })
 
 const inputModel = ref()

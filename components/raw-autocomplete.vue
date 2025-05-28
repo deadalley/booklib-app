@@ -25,16 +25,16 @@
       >
         <ComboboxInput
           v-bind="$attrs"
-          :class="{ hidden: !(editing && !hidden) }"
-          :classes="{
-            outer: `flex-1 ${editing ? '' : '!hidden'}`,
-            wrapper: 'flex-1',
-            label: 'ml-4',
-            inner: `${focused ? '!border-main' : 'border-accent'}`,
-          }"
+          :class="{ hidden: !(editing && !hidden), 'w-full': true }"
           :placeholder="placeholder"
           @focus="onFocus"
           @blur="onBlur"
+        />
+        <IconX
+          v-if="clearable"
+          class="cursor-pointer"
+          :size="14"
+          @click="onClear"
         />
       </ComboboxAnchor>
 
@@ -90,8 +90,10 @@ import {
   ComboboxRoot,
   ComboboxViewport,
 } from 'radix-vue'
+import { IconX } from '@tabler/icons-vue'
 
 export type AutocompleteProps = SelectProps & {
+  clearable?: boolean
   editing?: boolean
   hidden?: boolean
   canCreateNew?: boolean
@@ -103,6 +105,7 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
   canCreateNew: false,
   editing: true,
   hidden: false,
+  clearable: false,
 })
 
 const selectValue = defineModel<string>()
@@ -144,6 +147,10 @@ function onAddNew() {
     selectValue.value = searchTerm.value
     open.value = false
   }
+}
+
+function onClear() {
+  selectValue.value = undefined
 }
 </script>
 

@@ -5,8 +5,9 @@
     :options="context.options"
     :placeholder="context.placeholder"
     :with-wrapper="false"
-    :can-create-new="props.context.canCreateNew"
-    :not-found-label="props.context.notFoundLabel"
+    :can-create-new="context.canCreateNew"
+    :not-found-label="context.notFoundLabel"
+    :clearable="context.clearable"
   />
 </template>
 
@@ -30,8 +31,6 @@ const props = withDefaults(
 const selectValue = ref(props.context.node?._value)
 
 watch(selectValue, (value) => {
-  if (value) {
-    props.context.node?.input?.(value)
-  }
+  props.context.node?.input?.(value)
 })
 </script>

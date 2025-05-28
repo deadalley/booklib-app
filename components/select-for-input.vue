@@ -24,8 +24,6 @@ const props = withDefaults(
 const selectValue = ref(props.context.node?._value)
 
 watch(selectValue, (value) => {
-  if (value) {
-    props.context.node?.input?.(value)
-  }
+  props.context.node?.input?.(value)
 })
 </script>
