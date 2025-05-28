@@ -423,9 +423,14 @@ export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
   id: CollectionDB<string>['id'],
 ): ReturnType<DBClient<string>['deleteCollection']> {
-  await client.update((data) => {
-    data.collections = data.collections.filter((c) => c.id !== id)
-  })
+  await client.read()
+
+  client.data.collections = client.data.collections.filter((c) => c.id !== id)
+  client.data['collection-book'] = client.data['collection-book'].filter(
+    ({ collection_id }) => collection_id !== id,
+  )
+
+  await client.write()
 
   return id
 }
