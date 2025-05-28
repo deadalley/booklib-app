@@ -48,7 +48,9 @@
         >
           <IconBooks class="text-main" size="50" stroke="1.5" />
           <h5>Books</h5>
-          <bl-total-tag v-if="bookCount">{{ bookCount }} books</bl-total-tag>
+          <bl-total-tag v-if="bookCount">
+            {{ bookCount }} {{ bookCount > 1 ? 'books' : 'book' }}
+          </bl-total-tag>
           <NuxtLink to="/library/books/new">
             <bl-button v-if="!bookCount">Create a book</bl-button>
           </NuxtLink>
@@ -59,9 +61,10 @@
         >
           <IconArchive class="text-main" size="50" stroke="1.5" />
           <h5>Collections</h5>
-          <bl-total-tag v-if="collectionCount"
-            >{{ collectionCount }} collections</bl-total-tag
-          >
+          <bl-total-tag v-if="collectionCount">
+            {{ collectionCount }}
+            {{ collectionCount > 1 ? 'collections' : 'collection' }}
+          </bl-total-tag>
           <NuxtLink to="/library/collections/new">
             <bl-button v-if="!collectionCount">Create a collection</bl-button>
           </NuxtLink>

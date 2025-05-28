@@ -28,7 +28,9 @@
               </h5>
             </NuxtLink>
             <bl-total-tag>{{
-              books.length ? `${books.length} books` : 'Empty'
+              books.length
+                ? `${books.length} ${books.length > 1 ? 'books' : 'book'}`
+                : 'Empty'
             }}</bl-total-tag>
           </div>
           <IconChevronDown
