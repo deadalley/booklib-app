@@ -62,7 +62,18 @@
   </AccordionRoot>
 </template>
 
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+  generic="
+    ID extends string | number,
+    T extends {
+      id: ID
+      name: string
+      selected?: boolean
+    }
+  "
+>
 import { IconChevronDown, icons } from '@tabler/icons-vue'
 import {
   AccordionContent,
@@ -72,10 +83,9 @@ import {
   AccordionTrigger,
 } from 'radix-vue'
 import type { Book } from '~/types/book'
-import type { Collection } from '~/types/collection'
 
 defineProps<{
-  collection: Collection
+  collection: T
   books: Book[]
   icon?: keyof typeof icons
 }>()

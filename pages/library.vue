@@ -31,6 +31,10 @@ const navItems = [
     to: '/library/collections',
     label: 'Collections',
   },
+  {
+    to: '/library/authors',
+    label: 'Authors',
+  },
 ]
 
 if (isEmpty.value && !route.path.includes('/new')) {

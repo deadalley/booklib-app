@@ -73,13 +73,24 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+  generic="
+    ID extends string | number,
+    T extends {
+      id: ID
+      name: string
+      books: Pick<ViewBook, 'id'>[]
+      selected?: boolean
+    }
+  "
+>
 import { icons } from '@tabler/icons-vue'
-import type { Book } from '~/types/book'
-import type { Collection } from '~/types/collection'
+import type { Book, ViewBook } from '~/types/book'
 
 const props = defineProps<{
-  collection: Collection & { selected?: boolean }
+  collection: T
   selectable?: boolean
   icon?: keyof typeof icons
 }>()
