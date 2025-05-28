@@ -10,7 +10,11 @@
         </NuxtLink>
 
         <ul v-if="!!navItems?.length" class="flex gap-5">
-          <li v-for="item of navItems" :key="item.label" class="text-lg">
+          <li
+            v-for="item of navItems"
+            :key="item.label"
+            class="text-lg hover:text-main"
+          >
             <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
           </li>
         </ul>
