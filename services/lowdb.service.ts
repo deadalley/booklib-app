@@ -177,8 +177,6 @@ export async function createBook(
     incomingCollectionIds,
   )
 
-  console.log({ collectionsToAdd, collectionsToRemove })
-
   client.data['collection-book'] = client.data['collection-book']
     .filter(
       ({ book_id, collection_id }) =>

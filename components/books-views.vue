@@ -9,10 +9,13 @@
       @select="(args) => $emit('book-select', args)"
     />
     <hr v-if="editing" class="my-8 text-main" />
-    <h4 v-if="editing">All books</h4>
+    <div v-if="editing" class="flex items-center justify-between">
+      <h4>All books</h4>
+      <bl-search-bar @input="onSearch" />
+    </div>
     <bl-books-grid
       v-if="view === 'cards' && editing"
-      v-model="notSelectedBooks"
+      v-model="sortedBooks"
       :selectable="editing"
       @select="(args) => $emit('book-select', args)"
     />
@@ -77,6 +80,8 @@ const books = defineModel<ViewBook[]>('books', {
 })
 
 const currentPage = defineModel<number>('currentPage')
+
+const { sortedBooks, onSearch } = useSortBooks(notSelectedBooks)
 
 defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
