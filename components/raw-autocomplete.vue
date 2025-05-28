@@ -128,7 +128,6 @@ function onFocus() {
 
 function onBlur() {
   focused.value = false
-  open.value = false
 }
 
 function filterFunction(list: string[], searchTerm: string) {
