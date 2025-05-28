@@ -36,7 +36,14 @@
       }"
     />
 
-    <bl-empty-book-image v-if="!coverSrc" class="!h-48 !p-5" :label="title" />
+    <bl-empty-book-image v-if="!coverSrc" :icon="icon" class="!h-48 !p-5">
+      <template v-if="title" #default>
+        {{ title }}
+      </template>
+      <template v-if="$slots['emptyLabel']" #emptyLabel>
+        <slot name="emptyLabel" />
+      </template>
+    </bl-empty-book-image>
     <NuxtImg
       v-if="coverSrc"
       :src="coverSrc ?? undefined"
@@ -48,6 +55,7 @@
 </template>
 
 <script setup lang="ts">
+import type { icons } from '@tabler/icons-vue'
 import { IconCheckbox, IconX, IconPlus } from '@tabler/icons-vue'
 
 defineProps<{
@@ -57,6 +65,7 @@ defineProps<{
   coverSrc?: string | null
   selectable?: boolean
   selected?: boolean
+  icon?: keyof typeof icons
 }>()
 
 defineEmits(['click'])

@@ -31,15 +31,20 @@
             :label="book.title!"
             :icon-size="20"
             class="!rounded-none !p-2 !text-xs"
-          />
+          >
+            {{ book.title }}
+          </bl-empty-book-image>
         </NuxtLink>
       </template>
       <bl-book-image-small
         v-if="!books?.length"
         :href="selectable ? undefined : `/library/collections/${collection.id}`"
         :alt="collection.name"
+        icon="IconArchive"
         class="col-span-2 row-span-2"
-      />
+      >
+        <template #emptyLabel> No Books </template>
+      </bl-book-image-small>
     </div>
     <div class="w-full flex-col">
       <NuxtLink
