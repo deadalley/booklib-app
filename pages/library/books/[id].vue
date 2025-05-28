@@ -4,7 +4,10 @@
     class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
   >
     <header class="flex flex-col gap-6">
-      <button class="flex items-center gap-2" @click="$router.back()">
+      <button
+        class="flex items-center gap-2 hover:text-main"
+        @click="$router.back()"
+      >
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         <h6>Back</h6>
       </button>
