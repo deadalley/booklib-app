@@ -47,9 +47,7 @@
               v-if="
                 !isNew &&
                 !editing &&
-                ![WISHLIST_COLLECTION_ID, FAVORITE_COLLECTION_ID].includes(
-                  String(collection?.id),
-                )
+                !DEFAULT_COLLECTIONS.includes(String(collection?.id))
               "
               ref="deleteModalRef"
               size="sm"

@@ -15,6 +15,7 @@ import {
   logger,
   FAVORITE_COLLECTION_ID,
   WISHLIST_COLLECTION_ID,
+  DEFAULT_COLLECTIONS,
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
@@ -24,7 +25,7 @@ const user = {
   id: 'userId',
 }
 
-const DEFAULT_COLLECTIONS = [
+const DEFAULT_COLLECTIONS_INIT = [
   {
     id: WISHLIST_COLLECTION_ID,
     name: 'Wishlist',
@@ -51,7 +52,7 @@ const client = await JSONFilePreset<Database>('usr/booklib.json', {
   authors: [],
   books: [],
   // collections: [],
-  collections: DEFAULT_COLLECTIONS.map((c) => ({
+  collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
     ...c,
     created_at: new Date().toISOString(),
     user_id: user.id,
@@ -456,7 +457,7 @@ export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
   id: CollectionDB<string>['id'],
 ): ReturnType<DBClient<string>['deleteCollection']> {
-  if ([WISHLIST_COLLECTION_ID, FAVORITE_COLLECTION_ID].includes(id)) {
+  if (DEFAULT_COLLECTIONS.includes(id)) {
     const error = { message: `Cannot delete ${id}` }
     logger.error(error)
     throw createError(error.message)
