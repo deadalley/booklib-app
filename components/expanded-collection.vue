@@ -14,7 +14,7 @@
           <div class="flex flex-1 items-center gap-3 md:flex-col lg:flex-row">
             <NuxtLink
               class="flex items-center gap-3"
-              :to="`/library/collections/${collection.id}`"
+              :to="`/library/${collectionType}/${collection.id}`"
               @click="(event: Event) => event.stopPropagation()"
             >
               <component
@@ -85,6 +85,7 @@ import {
 import type { Book } from '~/types/book'
 
 defineProps<{
+  collectionType: string
   collection: T
   books: Book[]
   icon?: keyof typeof icons

@@ -9,7 +9,11 @@
     >
       <template v-for="(book, index) in books" :key="book.id">
         <NuxtLink
-          :to="selectable ? undefined : `/library/collections/${collection.id}`"
+          :to="
+            selectable
+              ? undefined
+              : `/library/${collectionType}/${collection.id}`
+          "
           class="size-full"
           :class="{
             'col-span-2': books?.length === 1,
@@ -38,7 +42,9 @@
       </template>
       <bl-book-image-small
         v-if="!books?.length"
-        :href="selectable ? undefined : `/library/collections/${collection.id}`"
+        :href="
+          selectable ? undefined : `/library/${collectionType}/${collection.id}`
+        "
         :alt="collection.name"
         icon="IconArchive"
         class="col-span-2 row-span-2"
@@ -91,6 +97,7 @@ import type { Book, ViewBook } from '~/types/book'
 
 const props = defineProps<{
   collection: T
+  collectionType: string
   selectable?: boolean
   icon?: keyof typeof icons
 }>()

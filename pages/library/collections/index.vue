@@ -40,6 +40,7 @@
       <bl-collection-card
         v-for="collection in sortedCollections"
         :key="collection.id"
+        collection-type="collections"
         :collection="collection"
         :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
       />
@@ -49,6 +50,7 @@
         <bl-expanded-collection
           v-for="collection in sortedCollections"
           :key="collection.id"
+          collection-type="collections"
           :collection="collection"
           :books="booksByCollectionId[collection.id]"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"

@@ -29,6 +29,7 @@
       <bl-collection-card
         v-for="author in sortedAuthors"
         :key="author.id"
+        collection-type="authors"
         :collection="{ ...author, books: booksByAuthorId[author.id] ?? [] }"
         :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
       />
@@ -38,6 +39,7 @@
         <bl-expanded-collection
           v-for="author in sortedAuthors"
           :key="author.id"
+          collection-type="authors"
           :collection="author"
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
