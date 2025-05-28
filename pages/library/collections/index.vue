@@ -2,7 +2,7 @@
   <NuxtLayout
     name="library"
     title="Collections"
-    :total="collections?.length ?? 0"
+    :total="collections?.length && `${collections.length} collections`"
   >
     <template #navbar>
       <div class="flex w-full items-start gap-3 xl:flex-row">

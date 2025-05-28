@@ -2,7 +2,7 @@
   <NuxtLayout
     name="library"
     title="Books"
-    :total="bookCount"
+    :total="bookCount && `${bookCount} books`"
     :sidebar-content="sidebarContent"
     :loading="loading"
   >

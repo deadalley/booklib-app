@@ -11,7 +11,7 @@
         <AccordionTrigger
           class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-xl px-4 py-2 text-start hover:bg-accent-light"
         >
-          <div class="flex flex-1 items-baseline gap-3 md:flex-col lg:flex-row">
+          <div class="flex flex-1 items-center gap-3 md:flex-col lg:flex-row">
             <NuxtLink
               :to="`/library/collections/${collection.id}`"
               @click="(event: Event) => event.stopPropagation()"
@@ -20,9 +20,9 @@
                 {{ collection.name }}
               </h4>
             </NuxtLink>
-            <h6 class="flex gap-3 text-accent-dark">
-              TOTAL {{ books.length }}
-            </h6>
+            <bl-total-tag>{{
+              books.length ? `${books.length} books` : 'Empty'
+            }}</bl-total-tag>
           </div>
           <IconChevronDown
             class="accordion-chevron transition-transform duration-300 ease-in"
