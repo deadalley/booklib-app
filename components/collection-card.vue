@@ -50,7 +50,7 @@
       <NuxtLink
         :to="selectable ? undefined : `/library/collections/${collection.id}`"
       >
-        <h5
+        <h6
           class="overflow-hidden"
           :style="{
             display: '-webkit-box',
@@ -59,7 +59,7 @@
           }"
         >
           {{ collection.name }}
-        </h5>
+        </h6>
       </NuxtLink>
     </div>
   </div>

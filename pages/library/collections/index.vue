@@ -32,7 +32,7 @@
       />
     </div>
     <div v-if="view === 'expanded-cards'" class="h-full overflow-y-auto">
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-y-4">
         <bl-expanded-collection
           v-for="collection in sortedCollections"
           :key="collection.id"

@@ -4,12 +4,12 @@
     default-value="items"
     type="single"
     :collapsible="true"
-    class="!w-[calc(100% - 255px)]"
+    class="!w-[calc(100% - 255px)] mb-10"
   >
     <AccordionItem value="items">
       <AccordionHeader as="div" class="flex w-full">
         <AccordionTrigger
-          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-xl px-4 py-2 text-start hover:bg-accent-light"
+          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-accent px-8 py-2 text-start hover:bg-accent-light"
         >
           <div class="flex flex-1 items-center gap-3 md:flex-col lg:flex-row">
             <NuxtLink
