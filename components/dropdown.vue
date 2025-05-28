@@ -20,7 +20,7 @@
         <DropdownMenuContent
           :align="align"
           :avoid-collisions="false"
-          class="base-container top-2 z-10 mt-1 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
+          class="base-container top-2 z-50 mt-1 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
         >
           <DropdownMenuItem
             v-for="item in items"

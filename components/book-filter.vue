@@ -12,6 +12,31 @@
         "
       />
     </div>
+    <div>
+      <h6 class="mb-4">Collections</h6>
+      <bl-multiselect class="w-full">
+        <bl-multiselect-option
+          v-for="item in DEFAULT_COLLECTIONS"
+          :key="item"
+          :value="item"
+          :selected="!!selectedCollections?.includes(item)"
+          @select="onSelectCollection"
+        >
+          <template #icon="iconProps">
+            <component
+              :is="
+                icons[
+                  (selectedCollections?.includes(item)
+                    ? DEFAULT_COLLECTION_ICONS_FILLED
+                    : DEFAULT_COLLECTION_ICONS)[item]
+                ]
+              "
+              v-bind="iconProps"
+            />
+          </template>
+        </bl-multiselect-option>
+      </bl-multiselect>
+    </div>
     <bl-book-filter-section
       v-model="selectedPublishers"
       title="Publisher"
@@ -100,6 +125,7 @@ defineProps<{
   }
 }>()
 
+const selectedCollections = defineModel<string[]>('selectedCollections')
 const selectedAuthor = defineModel<string | undefined>('selectedAuthor')
 const selectedPublishers = defineModel<string[]>('selectedPublishers')
 const selectedLanguages = defineModel<string[]>('selectedLanguages')
@@ -123,6 +149,17 @@ function onSelectStatus(value: BookProgressStatus) {
       selectedStatuses.value = selectedStatuses.value.concat(value)
     } else {
       selectedStatuses.value = newValues
+    }
+  }
+}
+
+function onSelectCollection(value: string) {
+  if (selectedCollections.value) {
+    const index = selectedCollections.value.findIndex((v) => v === value)
+    if (index === -1) {
+      selectedCollections.value.push(value)
+    } else {
+      selectedCollections.value.splice(index, 1)
     }
   }
 }

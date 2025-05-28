@@ -72,6 +72,7 @@
     />
     <bl-book-filter
       v-if="sidebarContent === 'Filter'"
+      v-model:selected-collections="selectedCollections"
       v-model:selected-author="selectedAuthor"
       v-model:selected-publishers="selectedPublishers"
       v-model:selected-languages="selectedLanguages"
@@ -139,6 +140,7 @@ const {
   maxYear,
   minPages,
   maxPages,
+  selectedCollections,
   selectedAuthor,
   selectedPublishers,
   selectedLanguages,
