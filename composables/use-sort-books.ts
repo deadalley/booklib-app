@@ -1,7 +1,7 @@
-import type { Book, BookProgressStatus } from '~/types/book'
+import type { BookProgressStatus, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
-export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
+export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const router = useRouter()
   const route = useRoute()
 
@@ -72,7 +72,7 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     maxPages.value,
   ])
   const selectedTableColumns = ref<{
-    [key in keyof Book]?: { label: string; checked: boolean }
+    [key in keyof ViewBook]?: { label: string; checked: boolean }
   }>(defaultTableColumns)
 
   const filterCount = computed(() => {
@@ -114,7 +114,7 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
       selectedGenres.value.length
     )
 
-    let combinedFilters: Book[] = books.value ?? []
+    let combinedFilters: ViewBook[] = books.value ?? []
 
     if (hasFilter) {
       const filterByPublisher = filterElementsBySelectedArray(
@@ -153,7 +153,7 @@ export const useSortBooks = <T extends Book>(books: Ref<T[] | null>) => {
     const filterByTextSearch = filterElementsBySearchParam(
       combinedFilters,
       textSearch.value,
-      ['title'],
+      ['title', 'authorName'],
     )
 
     const filterByYear = filterElementsByRange(
