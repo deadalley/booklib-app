@@ -142,10 +142,6 @@ import type { Collection } from '~/types/collection'
 
 const route = useRoute()
 
-const { data: books } = await useFetch<Book[]>('/api/books', {
-  query: { withBookCovers: true },
-})
-
 const isNew = computed(() => route.params.id === 'new')
 
 const managingBooks = ref(isNew.value)
@@ -171,19 +167,23 @@ function openDeleteModal() {
 }
 
 async function fetchCollection() {
+  loading.value = true
   if (route.params.id === 'new') {
     collection.value = {} as Collection
   } else {
-    loading.value = true
     const data = await $fetch<Collection>(
       `/api/collections/${route.params.id}`,
       {},
     )
     collection.value = data
-    loading.value = false
   }
 
-  allBooks.value = getBooksFromCollection(collection.value)
+  const books = await $fetch<Book[]>('/api/books', {
+    query: { withBookCovers: true },
+  })
+
+  allBooks.value = getBooksFromCollection(collection.value, books)
+  loading.value = false
 }
 
 async function deleteCollection() {
@@ -199,12 +199,16 @@ function onEdit(value: boolean) {
   managingBooks.value = value
 }
 
-function onCancel() {
+async function onCancel() {
   if (isNew.value) {
     navigateTo('/library/collections')
   } else {
     if (collection.value) {
-      allBooks.value = getBooksFromCollection(collection.value)
+      const books = await $fetch<Book[]>('/api/books', {
+        query: { withBookCovers: true },
+      })
+
+      allBooks.value = getBooksFromCollection(collection.value, books)
     }
     onEdit(false)
   }
@@ -269,11 +273,11 @@ function onDragBook({
   }))
 }
 
-function getBooksFromCollection(collection: Collection) {
-  return (books.value ?? []).map((book) => ({
+function getBooksFromCollection(collection: Collection, books: Book[]) {
+  return books.map((book) => ({
     ...book,
-    selected: !!collection?.books.some(({ id }) => id === book.id),
-    order: collection?.books.find(({ id }) => id === book.id)?.order,
+    selected: !!collection?.books?.some(({ id }) => id === book.id),
+    order: collection?.books?.find(({ id }) => id === book.id)?.order,
   }))
 }
 
