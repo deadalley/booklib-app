@@ -1,6 +1,7 @@
 import type { H3Event, EventHandlerRequest } from 'h3'
 import type {
   DBClient,
+  DeleteAuthorParams,
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
@@ -87,6 +88,26 @@ export async function getAuthors(): ReturnType<DBClient<string>['getAuthors']> {
   const data = client.data.authors
 
   return data
+}
+
+export async function deleteAuthor(
+  event: H3Event<EventHandlerRequest>,
+  id: AuthorDB<string>['id'],
+  params: DeleteAuthorParams,
+): ReturnType<DBClient<string>['deleteAuthor']> {
+  await client.read()
+
+  client.data.authors = client.data.authors.filter((author) => author.id !== id)
+
+  if (params.deleteBooks) {
+    client.data.books = client.data.books.filter(
+      (book) => book.author_id !== id,
+    )
+  }
+
+  await client.write()
+
+  return id
 }
 
 export async function getBook(

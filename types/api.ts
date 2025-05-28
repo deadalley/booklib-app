@@ -3,6 +3,10 @@ import type { Collection } from './collection'
 import type { AuthorDB, BookDB, CollectionDB } from './database'
 import type { H3Event, EventHandlerRequest } from 'h3'
 
+export type DeleteAuthorParams = {
+  deleteBooks?: boolean
+}
+
 export type GetBooksQuerySearchParams = {
   page?: number
   pageSize?: number
@@ -18,6 +22,12 @@ export type GetOrderedBooksQuerySearchParams = {
 
 export type DBClient<ID extends number | string = number> = {
   getAuthors: (event: H3Event<EventHandlerRequest>) => Promise<AuthorDB<ID>[]>
+  deleteAuthor: (
+    event: H3Event<EventHandlerRequest>,
+    id: AuthorDB<string>['id'],
+    params: DeleteAuthorParams,
+  ) => Promise<AuthorDB<string>['id']>
+
   getBook: (
     event: H3Event<EventHandlerRequest>,
     id: BookDB<ID>['id'],
