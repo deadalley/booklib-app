@@ -202,9 +202,13 @@ export async function deleteBook(
   event: H3Event<EventHandlerRequest>,
   id: BookDB<string>['id'],
 ): ReturnType<DBClient<string>['deleteBook']> {
-  await client.update((data) => {
-    data.books = data.books.filter((b) => b.id !== id)
-  })
+  await client.read()
+
+  client.data['collection-book'] = client.data['collection-book'].filter(
+    ({ book_id }) => book_id !== id,
+  )
+
+  await client.write()
 
   return id
 }
@@ -213,9 +217,15 @@ export async function deleteBooks(
   event: H3Event<EventHandlerRequest>,
   ids: BookDB<string>['id'][],
 ): ReturnType<DBClient<string>['deleteBooks']> {
-  await client.update((data) => {
-    data.books = data.books.filter((b) => !ids.includes(b.id))
-  })
+  await client.read()
+
+  client.data.books = client.data.books.filter((b) => !ids.includes(b.id))
+
+  client.data['collection-book'] = client.data['collection-book'].filter(
+    ({ book_id }) => ids.includes(book_id),
+  )
+
+  await client.write()
 
   return ids
 }
