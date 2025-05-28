@@ -12,6 +12,7 @@ import type { Collection } from '~/types/collection'
 import { bookToDbBook, collectionToDbCollection, logger } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
+import difference from 'lodash/difference'
 
 const user = {
   id: 'userId',
@@ -76,8 +77,16 @@ export async function getBook(
   const bookCovers = await getAllBookCoverFileNames()
   const hasBookCover = book?.id && bookCovers.find(isBookCover(book.id))
 
+  const collections = client.data['collection-book']
+    .filter(({ book_id }) => book_id === id)
+    .map(({ collection_id: id }) => ({ id }))
+
   return book
-    ? { ...book, cover_src: hasBookCover ? getBookCoverUrl(book.id) : null }
+    ? {
+        ...book,
+        collections,
+        cover_src: hasBookCover ? getBookCoverUrl(book.id) : null,
+      }
     : null
 }
 
@@ -101,8 +110,14 @@ export async function getBooks(
 
   data = data.map((book) => {
     const hasBookCover = bookCovers.find(isBookCover(book.id))
+
+    const collections = client.data['collection-book']
+      .filter(({ book_id }) => book_id === book.id)
+      .map(({ collection_id: id }) => ({ id }))
+
     return {
       ...book,
+      collections,
       cover_src: hasBookCover ? getBookCoverUrl(book.id) : null,
     }
   })
@@ -148,18 +163,37 @@ export async function createBook(
     client.data.books.push(bookDb)
   }
 
-  client.data['collection-book'] = client.data['collection-book'].filter(
-    (cb) => cb.book_id !== bookDb.id,
+  const incomingCollectionIds = collections.map(({ id }) => id)
+  const existingCollectionIds = client.data['collection-book']
+    .filter(({ book_id }) => book_id === bookDb.id)
+    .map(({ collection_id }) => collection_id)
+
+  const collectionsToAdd = difference(
+    incomingCollectionIds,
+    existingCollectionIds,
+  )
+  const collectionsToRemove = difference(
+    existingCollectionIds,
+    incomingCollectionIds,
   )
 
-  client.data['collection-book'] = client.data['collection-book'].concat(
-    collections.map((collection) => ({
-      book_id: bookDb.id,
-      collection_id: collection.id,
-      order: -1, // TODO: fix
-      user_id: user.id,
-    })),
-  )
+  console.log({ collectionsToAdd, collectionsToRemove })
+
+  client.data['collection-book'] = client.data['collection-book']
+    .filter(
+      ({ book_id, collection_id }) =>
+        book_id !== bookDb.id || !collectionsToRemove.includes(collection_id),
+    )
+    .concat(
+      collectionsToAdd.map((collection_id) => ({
+        book_id: bookDb.id,
+        collection_id,
+        order: client.data['collection-book'].filter(
+          (cb) => collection_id === cb.collection_id,
+        ).length,
+        user_id: user.id,
+      })),
+    )
 
   await client.write()
 

@@ -505,7 +505,7 @@ async function onSubmit(bookValues: Book) {
         ...bookValues,
         collections: allCollections.value
           .filter(({ selected }) => !!selected)
-          .map(({ id }) => id),
+          .map(({ id }) => ({ id })),
         tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
         genres: book.value?.genres ?? [],
         rating: book.value?.rating,
