@@ -41,6 +41,7 @@
         v-for="collection in sortedCollections"
         :key="collection.id"
         :collection="collection"
+        :icon="collectionIcons[collection.id]"
       />
     </div>
     <div v-if="view === 'expanded-cards'" class="h-full overflow-y-auto">
@@ -50,6 +51,7 @@
           :key="collection.id"
           :collection="collection"
           :books="booksByCollectionId[collection.id]"
+          :icon="collectionIcons[collection.id]"
         />
       </div>
     </div>
@@ -58,9 +60,15 @@
 
 <script setup lang="ts">
 import type { Collection } from '~/types/collection'
+import type { icons } from '@tabler/icons-vue'
 import { IconArchive, IconPlus } from '@tabler/icons-vue'
 import type { Book, ViewBook } from '~/types/book'
 import type { Author } from '~/types/author'
+
+const collectionIcons: Record<string, keyof typeof icons> = {
+  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
+  [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
+}
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 const { data: books } = await useFetch<Book[]>('/api/books', {

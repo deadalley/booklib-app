@@ -9,7 +9,13 @@ import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import type { Collection } from '~/types/collection'
-import { bookToDbBook, collectionToDbCollection, logger } from '../utils'
+import {
+  bookToDbBook,
+  collectionToDbCollection,
+  logger,
+  FAVORITE_COLLECTION_ID,
+  WISHLIST_COLLECTION_ID,
+} from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import difference from 'lodash/difference'
@@ -17,6 +23,17 @@ import difference from 'lodash/difference'
 const user = {
   id: 'userId',
 }
+
+const DEFAULT_COLLECTIONS = [
+  {
+    id: WISHLIST_COLLECTION_ID,
+    name: 'Wishlist',
+  },
+  {
+    id: FAVORITE_COLLECTION_ID,
+    name: 'Favorites',
+  },
+]
 
 type Database = {
   authors: AuthorDB<string>[]
@@ -33,7 +50,12 @@ type Database = {
 const client = await JSONFilePreset<Database>('usr/booklib.json', {
   authors: [],
   books: [],
-  collections: [],
+  // collections: [],
+  collections: DEFAULT_COLLECTIONS.map((c) => ({
+    ...c,
+    created_at: new Date().toISOString(),
+    user_id: user.id,
+  })),
   'collection-book': [],
 })
 

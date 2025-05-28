@@ -1,6 +1,9 @@
 import type { icons } from '@tabler/icons-vue'
 import type { BookProgressStatus } from '~/types/book'
 
+export const WISHLIST_COLLECTION_ID = 'wishlist'
+export const FAVORITE_COLLECTION_ID = 'favorite'
+
 export const BOOKS_PAGE_SIZE = 44
 
 export const ICON_SIZE_SMALL = 20

@@ -43,13 +43,21 @@
         icon="IconArchive"
         class="col-span-2 row-span-2"
       >
-        <template #emptyLabel> No Books </template>
+        <template #emptyLabel>No books</template>
       </bl-book-image-small>
     </div>
     <div class="w-full flex-col">
       <NuxtLink
+        class="flex items-center gap-1"
         :to="selectable ? undefined : `/library/collections/${collection.id}`"
       >
+        <component
+          :is="icons[icon]"
+          v-if="icon"
+          :size="ICON_SIZE_SMALL"
+          stroke="1.5"
+          class="text-main"
+        />
         <h6
           class="overflow-hidden"
           :style="{
@@ -66,12 +74,14 @@
 </template>
 
 <script setup lang="ts">
+import { icons } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 const props = defineProps<{
   collection: Collection & { selected?: boolean }
   selectable?: boolean
+  icon?: keyof typeof icons
 }>()
 
 const { data: books, refresh } = await useAsyncData(

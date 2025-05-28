@@ -13,9 +13,16 @@
         >
           <div class="flex flex-1 items-center gap-3 md:flex-col lg:flex-row">
             <NuxtLink
+              class="flex items-center gap-3"
               :to="`/library/collections/${collection.id}`"
               @click="(event: Event) => event.stopPropagation()"
             >
+              <component
+                :is="icons[icon]"
+                v-if="icon"
+                stroke="1.5"
+                class="text-main"
+              />
               <h5 class="hover:text-main">
                 {{ collection.name }}
               </h5>
@@ -46,7 +53,7 @@
           v-if="!books.length"
           class="flex w-full items-center justify-center px-4 py-8"
         >
-          Collection is empty
+          There are no books in this collection.
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -54,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconChevronDown } from '@tabler/icons-vue'
+import { IconChevronDown, icons } from '@tabler/icons-vue'
 import {
   AccordionContent,
   AccordionHeader,
@@ -65,7 +72,11 @@ import {
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
-defineProps<{ collection: Collection; books: Book[] }>()
+defineProps<{
+  collection: Collection
+  books: Book[]
+  icon?: keyof typeof icons
+}>()
 </script>
 
 <style scoped>
