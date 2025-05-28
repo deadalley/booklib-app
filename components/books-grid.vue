@@ -57,7 +57,7 @@ const emit = defineEmits<{
 
 function getIcon(book: ViewBook): keyof typeof icons | undefined {
   if (book.isFavorite) {
-    return DEFAULT_COLLECTION_ICONS_FILLED[FAVORITE_COLLECTION_ID]
+    return DEFAULT_COLLECTION_ICONS[FAVORITE_COLLECTION_ID]
   }
 }
 </script>

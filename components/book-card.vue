@@ -23,11 +23,7 @@
         v-if="floatingIcon"
         class="absolute right-0 top-0 z-10 flex size-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-main text-white"
       >
-        <component
-          :is="icons[floatingIcon]"
-          :size="ICON_SIZE_SMALL - 4"
-          stroke="1.5"
-        />
+        <component :is="icons[floatingIcon]" :size="ICON_SIZE_SMALL - 4" />
       </div>
       <bl-book-image-small
         :alt="book.title"
