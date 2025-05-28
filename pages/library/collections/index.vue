@@ -22,6 +22,18 @@
       </NuxtLink>
     </template>
     <div
+      v-if="collections?.length === 0"
+      class="flex flex-col items-center justify-center gap-8 rounded-xl bg-accent-light px-4 py-16"
+    >
+      <IconArchive class="text-accent-dark" size="50" stroke="1" />
+      <div class="flex flex-col items-center justify-center gap-4">
+        There are no collections in your library
+        <NuxtLink to="/library/collections/new">
+          <bl-button>Create a collection</bl-button>
+        </NuxtLink>
+      </div>
+    </div>
+    <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
@@ -46,7 +58,7 @@
 
 <script setup lang="ts">
 import type { Collection } from '~/types/collection'
-import { IconPlus } from '@tabler/icons-vue'
+import { IconArchive, IconPlus } from '@tabler/icons-vue'
 import type { Book, ViewBook } from '~/types/book'
 import type { Author } from '~/types/author'
 

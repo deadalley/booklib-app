@@ -49,6 +49,18 @@
         </bl-button>
       </NuxtLink>
     </template>
+    <div
+      v-if="books?.length === 0"
+      class="flex flex-col items-center justify-center gap-8 rounded-xl bg-accent-light px-4 py-16"
+    >
+      <IconBooks class="text-accent-dark" size="50" stroke="1" />
+      <div class="flex flex-col items-center justify-center gap-4">
+        There are no books in your library
+        <NuxtLink to="/library/books/new">
+          <bl-button>Create a book</bl-button>
+        </NuxtLink>
+      </div>
+    </div>
     <bl-books-views
       v-model:current-page="currentPage"
       v-model:books="filteredBooksByPage"
@@ -94,7 +106,7 @@
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import { IconPlus } from '@tabler/icons-vue'
+import { IconBooks, IconPlus } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { keyBy, property } from 'lodash'
