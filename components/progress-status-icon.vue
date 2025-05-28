@@ -1,5 +1,5 @@
 <template>
-  <bl-tooltip :disabled="!iconOnly">
+  <bl-tooltip v-if="PROGRESS_STATUS_MAP[status]" :disabled="!iconOnly">
     <div
       v-if="!iconOnly"
       class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-1 text-base text-white"
