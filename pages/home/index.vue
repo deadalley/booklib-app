@@ -45,7 +45,7 @@
         <bl-tile>
           <template #title>Last books added to library</template>
           <div
-            class="relative flex size-max gap-x-6 p-3 transition duration-100 ease-out"
+            class="relative flex size-max w-full gap-x-6 overflow-x-auto p-3 transition duration-100 ease-out"
           >
             <bl-book-card
               v-for="book in latestBooks"
