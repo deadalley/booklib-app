@@ -65,6 +65,7 @@ const booksByCollectionId = computed(
           .filter((book) => collection.books.some(({ id }) => id === book.id))
           .map((book) => ({
             ...book,
+            order: collection.books.find(({ id }) => id === book.id)?.order,
             authorName: authors.value?.find(({ id }) => id === book.author)
               ?.name,
           })),
