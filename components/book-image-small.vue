@@ -1,9 +1,8 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative cursor-pointer rounded-xl border border-accent"
+    class="relative w-full cursor-pointer rounded-xl border border-accent"
     :class="{
-      'w-full': !coverSrc,
       'transition-all duration-300 ease-in-out': selectable,
       'border-main': selectable && !!selected,
     }"
@@ -45,7 +44,7 @@
       v-if="coverSrc"
       :src="coverSrc ?? undefined"
       :alt="alt"
-      class="h-auto w-full max-w-full rounded-xl object-cover object-center md:h-48 md:w-auto"
+      class="h-auto w-full rounded-xl object-cover object-top md:h-48"
     >
     </NuxtImg>
   </NuxtLink>
