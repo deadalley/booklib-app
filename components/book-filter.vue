@@ -71,10 +71,10 @@
       />
     </div>
     <div class="flex flex-col gap-2">
-      <bl-button expand variant="secondary" @click="onReset">
+      <bl-button expand variant="secondary" @click="$emit('reset')">
         Reset filters
       </bl-button>
-      <bl-button expand @click="onApply">Apply filters</bl-button>
+      <bl-button expand @click="$emit('apply')">Apply filters</bl-button>
     </div>
   </div>
 </template>

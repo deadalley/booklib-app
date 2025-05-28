@@ -9,20 +9,15 @@
     <template #navbar>
       <div class="flex w-full items-start gap-3 xl:flex-row">
         <bl-search-bar @input="onSearch" />
-        <bl-button expand variant="secondary" @click="onFilterOpen">
-          Filter {{ filterCount ? `(${filterCount})` : '' }}
-        </bl-button>
-        <bl-button
-          v-if="!editing"
-          expand
-          variant="secondary"
-          @click="editing = true"
+        <bl-view-switch v-model:view="view" />
+        <bl-dropdown
+          :with-chevron="false"
+          :items="manageDropdownItems"
+          align="end"
+          @click="onManageItemSelect"
         >
-          Manage
-        </bl-button>
-        <bl-button v-if="editing" expand variant="secondary" @click="onCancel">
-          Cancel
-        </bl-button>
+          <IconAdjustmentsHorizontal :size="ICON_SIZE_SMALL" stroke="1.5" />
+        </bl-dropdown>
         <bl-dropdown
           v-if="editing"
           :items="dropdownItems"
@@ -30,15 +25,9 @@
         >
           Select action
         </bl-dropdown>
-        <bl-button
-          v-if="view === 'table'"
-          expand
-          variant="secondary"
-          @click="onTableSettingsOpen"
-        >
-          Table
+        <bl-button v-if="editing" expand variant="secondary" @click="onCancel">
+          Cancel
         </bl-button>
-        <bl-view-switch v-model:view="view" />
       </div>
       <NuxtLink class="flex md:inline-flex" to="/library/books/new">
         <bl-button expand>
@@ -108,7 +97,11 @@
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import { IconBooks, IconPlus } from '@tabler/icons-vue'
+import {
+  IconBooks,
+  IconPlus,
+  IconAdjustmentsHorizontal,
+} from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { keyBy, property } from 'lodash'
@@ -165,9 +158,39 @@ const {
   onResetFilter,
 } = useSortBooks(viewBooks)
 
+const manageDropdownItems = computed<DropdownItem[]>(
+  () =>
+    [
+      {
+        label: `Filters ${filterCount.value ? `(${filterCount.value})` : ''}`,
+        value: 'filter',
+        icon: 'IconFilter',
+      },
+      view.value === 'table'
+        ? { label: 'Table', value: 'table', icon: 'IconTable' }
+        : null,
+      { label: 'Manage', value: 'edit', icon: 'IconStack2' },
+    ].filter(Boolean) as DropdownItem[],
+)
+
 function onPageChange(page: number) {
   currentPage.value = page
   refresh()
+}
+
+function onManageItemSelect(item: string) {
+  switch (item) {
+    case 'filter':
+      return onFilterOpen()
+    case 'edit':
+      editing.value = true
+      return
+    case 'table':
+      onTableSettingsOpen()
+      return
+    default:
+      return
+  }
 }
 
 async function onActionSelect(action: string) {

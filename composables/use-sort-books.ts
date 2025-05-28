@@ -23,7 +23,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const currentPage = ref<number>(1)
 
   const defaultTableColumns = {
-    coverSrc: { label: 'Cover', checked: true },
+    coverSrc: { label: 'Cover', checked: false },
     publisher: { label: 'Publisher', checked: false },
     language: { label: 'Language', checked: true },
     year: { label: 'Year', checked: false },
@@ -213,10 +213,12 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   }
 
   function onCloseSidebar() {
+    console.log('a')
     sidebarContent.value = undefined
   }
 
   function onResetFilter() {
+    selectedAuthor.value = undefined
     selectedPublishers.value = []
     selectedLanguages.value = []
     selectedOriginalLanguages.value = []
@@ -227,6 +229,8 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     selectedPageRange.value = [minPages.value, maxPages.value]
 
     selectedTableColumns.value = defaultTableColumns
+
+    onCloseSidebar()
   }
 
   return {

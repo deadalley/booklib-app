@@ -3,9 +3,9 @@
   <div class="relative">
     <DropdownMenuRoot>
       <DropdownMenuTrigger class="dropdown-trigger">
-        <bl-button v-bind="$props" expand variant="secondary">
+        <bl-button v-bind="$props" expand variant="tertiary">
           <slot />
-          <template #appendIcon="iconProps">
+          <template v-if="withChevron" #appendIcon="iconProps">
             <IconChevronDown
               v-bind="iconProps"
               :size="15"
@@ -18,7 +18,9 @@
 
       <DropdownMenuPortal disabled>
         <DropdownMenuContent
-          class="dropdown-content base-container top-2 z-10 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
+          :align="align"
+          :avoid-collisions="false"
+          class="base-container top-2 z-10 mt-1 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
         >
           <DropdownMenuItem
             v-for="item in items"
@@ -58,9 +60,14 @@ export type DropdownItem = {
   icon?: keyof typeof icons
 }
 
-defineProps<{
-  items: DropdownItem[]
-}>()
+withDefaults(
+  defineProps<{
+    items: DropdownItem[]
+    withChevron?: boolean
+    align?: 'start' | 'center' | 'end'
+  }>(),
+  { withChevron: true, align: 'start' },
+)
 
 defineEmits<{
   (e: 'click', val: string): void
@@ -68,14 +75,6 @@ defineEmits<{
 </script>
 
 <style scoped>
-[data-radix-popper-content-wrapper] {
-  position: absolute !important;
-  width: 100%;
-  transform: none !important;
-  top: var(--radix-popper-anchor-height) !important;
-  margin-top: 4px;
-}
-
 .dropdown-trigger {
   position: relative;
 }
