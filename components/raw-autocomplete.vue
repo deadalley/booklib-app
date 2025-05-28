@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="popper relative w-full"
+    class="relative w-full"
     :class="{
       'popper-with-wrapper': withWrapper,
       popper: !withWrapper,
@@ -31,7 +31,7 @@
           @blur="onBlur"
         />
         <IconX
-          v-if="clearable"
+          v-if="clearable && selectValue"
           class="cursor-pointer"
           :size="14"
           @click="onClear"
@@ -123,10 +123,12 @@ const labelByValue = computed<Record<string, string>>(() =>
 
 function onFocus() {
   focused.value = true
+  open.value = true
 }
 
 function onBlur() {
   focused.value = false
+  open.value = false
 }
 
 function filterFunction(list: string[], searchTerm: string) {

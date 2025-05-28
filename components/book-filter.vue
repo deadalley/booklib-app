@@ -1,5 +1,17 @@
 <template>
   <div class="flex flex-col gap-10">
+    <div>
+      <h6 class="mb-4">Author</h6>
+      <bl-raw-autocomplete
+        v-model="selectedAuthor"
+        with-wrapper
+        clearable
+        placeholder="Select author"
+        :options="
+          authors.map(({ id, name }) => ({ label: name, value: String(id) }))
+        "
+      />
+    </div>
     <bl-book-filter-section
       v-model="selectedPublishers"
       title="Publisher"
@@ -69,10 +81,11 @@
 
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
-// import { useVModels } from '@vueuse/core'
+import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus } from '~/types/book'
 
 defineProps<{
+  authors: Author[]
   books: Book[]
 
   publishers: string[]
@@ -85,11 +98,9 @@ defineProps<{
   selectedTableColumns: {
     [key in keyof Book]?: { label: string; checked: boolean }
   }
-
-  // onReset: () => void
-  // onApply: () => void
 }>()
 
+const selectedAuthor = defineModel<string | undefined>('selectedAuthor')
 const selectedPublishers = defineModel<string[]>('selectedPublishers')
 const selectedLanguages = defineModel<string[]>('selectedLanguages')
 const selectedOriginalLanguages = defineModel<string[]>(
@@ -101,27 +112,6 @@ const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
 
 defineEmits(['reset', 'apply'])
-
-// const emit = defineEmits([
-//   'update:selectedPublishers',
-//   'update:selectedLanguages',
-//   'update:selectedOriginalLanguages',
-//   'update:selectedGenres',
-//   'update:selectedStatuses',
-//   'update:selectedYearRange',
-//   'update:selectedPageRange',
-//   'update:selectedTableColumns',
-// ])
-
-// const {
-//   selectedPublishers: _selectedPublishers,
-//   selectedLanguages: _selectedLanguages,
-//   selectedOriginalLanguages: _selectedOriginalLanguages,
-//   selectedGenres: _selectedGenres,
-//   selectedStatuses: _selectedStatuses,
-//   selectedYearRange: _selectedYearRange,
-//   selectedPageRange: _selectedPageRange,
-// } = useVModels(props, emit)
 
 function onSelectStatus(value: BookProgressStatus) {
   if (selectedStatuses.value) {

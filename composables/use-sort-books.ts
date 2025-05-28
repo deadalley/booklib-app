@@ -58,6 +58,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const minYear = computed(() => Math.min(...years.value, 0))
   const maxYear = computed(() => new Date().getFullYear())
 
+  const selectedAuthor = ref<string | undefined>()
   const selectedPublishers = ref<string[]>([])
   const selectedLanguages = ref<string[]>([])
   const selectedOriginalLanguages = ref<string[]>([])
@@ -175,7 +176,13 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       )
     })
 
-    const sorted = sortBooks(filterByStatus)
+    const filterByAuthor = selectedAuthor.value
+      ? filterByStatus.filter(
+          ({ author }) => String(author) === selectedAuthor.value,
+        )
+      : filterByStatus
+
+    const sorted = sortBooks(filterByAuthor)
 
     return sorted
   })
@@ -234,6 +241,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     maxYear,
     minPages,
     maxPages,
+    selectedAuthor,
     selectedPublishers,
     selectedLanguages,
     selectedOriginalLanguages,
