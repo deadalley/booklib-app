@@ -36,6 +36,23 @@ const client = await JSONFilePreset<Database>('usr/booklib.json', {
   'collection-book': [],
 })
 
+function isBookCover(id: string) {
+  return (fileName: string) => fileName.split('.')[0] === id
+}
+
+async function getAllBookCoverFileNames() {
+  return getFilesLocally('/bookCovers')
+}
+
+async function getBookCoverFileName(id: string) {
+  const allFiles = await getAllBookCoverFileNames()
+
+  // find the file extension
+  const fileName = allFiles.find(isBookCover(id))
+
+  return fileName
+}
+
 function getBookCoverUrl(bookId: string | number) {
   return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
 }
@@ -56,7 +73,12 @@ export async function getBook(
 
   const book = client.data.books.find((book) => book.id === id)
 
-  return book ?? null
+  const bookCovers = await getAllBookCoverFileNames()
+  const hasBookCover = book?.id && bookCovers.find(isBookCover(book.id))
+
+  return book
+    ? { ...book, cover_src: hasBookCover ? getBookCoverUrl(book.id) : null }
+    : null
 }
 
 export async function getBooks(
@@ -74,6 +96,16 @@ export async function getBooks(
   if (bookProgress !== undefined) {
     data = data.filter((book) => book.progress_status === bookProgress)
   }
+
+  const bookCovers = await getAllBookCoverFileNames()
+
+  data = data.map((book) => {
+    const hasBookCover = bookCovers.find(isBookCover(book.id))
+    return {
+      ...book,
+      cover_src: hasBookCover ? getBookCoverUrl(book.id) : null,
+    }
+  })
 
   return data
 }
@@ -194,10 +226,7 @@ export async function getBookCover(
   event: H3Event<EventHandlerRequest>,
   id: string,
 ): ReturnType<DBClient<string>['getBookCover']> {
-  const allFiles = await getFilesLocally('/bookCovers')
-
-  // find the file extension
-  const fileName = allFiles.find((fileName) => fileName.split('.')[0] === id)
+  const fileName = await getBookCoverFileName(id)
 
   const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
 
@@ -213,12 +242,7 @@ export async function updateBookCover(
     event,
   )
 
-  const allFiles = await getFilesLocally('/bookCovers')
-
-  // find the file extension
-  const fileName = allFiles.find(
-    (fileName) => fileName.split('.')[0] === bookId,
-  )
+  const fileName = await getBookCoverFileName(bookId)
 
   if (fileName) {
     await deleteFile(fileName, '/bookCovers')
