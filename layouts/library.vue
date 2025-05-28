@@ -5,9 +5,7 @@
   >
     <div class="flex flex-col items-baseline justify-between gap-5 lg:flex-row">
       <div class="flex w-full items-center gap-3 lg:flex-col xl:flex-row">
-        <NuxtLink to="/library/books">
-          <h3>{{ title }}</h3>
-        </NuxtLink>
+        <h3>{{ title }}</h3>
         <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
       </div>
       <div

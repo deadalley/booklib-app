@@ -1,10 +1,10 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <AccordionRoot
-    default-value="items"
+    :default-value="books.length ? 'items' : undefined"
     type="single"
     :collapsible="true"
-    class="!w-[calc(100% - 255px)] mb-10"
+    class="!w-[calc(100% - 255px)]"
   >
     <AccordionItem value="items">
       <AccordionHeader as="div" class="flex w-full">
@@ -16,9 +16,9 @@
               :to="`/library/collections/${collection.id}`"
               @click="(event: Event) => event.stopPropagation()"
             >
-              <h4 class="hover:text-main">
+              <h5 class="hover:text-main">
                 {{ collection.name }}
-              </h4>
+              </h5>
             </NuxtLink>
             <bl-total-tag>{{
               books.length ? `${books.length} books` : 'Empty'
@@ -30,8 +30,9 @@
           />
         </AccordionTrigger>
       </AccordionHeader>
-      <AccordionContent class="relative overflow-x-auto">
+      <AccordionContent class="relative mb-10 overflow-x-auto">
         <div
+          v-if="books.length"
           class="accordion-content relative flex size-max gap-x-6 p-4 transition duration-100 ease-out"
         >
           <bl-book-card
@@ -40,6 +41,12 @@
             :book="book"
             class="!w-36"
           />
+        </div>
+        <div
+          v-if="!books.length"
+          class="flex w-full items-center justify-center px-4 py-8"
+        >
+          Collection is empty
         </div>
       </AccordionContent>
     </AccordionItem>
