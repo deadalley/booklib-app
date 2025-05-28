@@ -4,9 +4,22 @@ import type { BookProgressStatus } from '~/types/book'
 export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const FAVORITE_COLLECTION_ID = 'favorite'
 export const DEFAULT_COLLECTIONS = [
-  WISHLIST_COLLECTION_ID,
   FAVORITE_COLLECTION_ID,
+  WISHLIST_COLLECTION_ID,
 ]
+
+export const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeart',
+  [WISHLIST_COLLECTION_ID]: 'IconGift',
+}
+
+export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
+  string,
+  keyof typeof icons
+> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
+  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
+}
 
 export const BOOKS_PAGE_SIZE = 44
 

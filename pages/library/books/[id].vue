@@ -73,6 +73,29 @@
             :temp-cover-src="tempCoverSrc"
           />
         </div>
+        <bl-multiselect class="w-full">
+          <bl-multiselect-option
+            v-for="item in DEFAULT_COLLECTIONS"
+            :key="item"
+            :value="item"
+            :selected="selectedDefaultCollections[item]"
+            @select="onDefaultCollectionChange"
+          >
+            <template #icon="iconProps">
+              <component
+                :is="
+                  icons[
+                    (selectedDefaultCollections[item]
+                      ? DEFAULT_COLLECTION_ICONS_FILLED
+                      : DEFAULT_COLLECTION_ICONS)[item]
+                  ]
+                "
+                class="text-main"
+                v-bind="iconProps"
+              />
+            </template>
+          </bl-multiselect-option>
+        </bl-multiselect>
         <div class="mt-4 flex flex-col gap-2">
           <bl-stepper
             v-model="currentStep"
@@ -363,6 +386,11 @@ const currentStep = ref<number | undefined>(
     : undefined,
 )
 
+const selectedDefaultCollections = ref<Record<string, boolean>>({
+  [WISHLIST_COLLECTION_ID]: false,
+  [FAVORITE_COLLECTION_ID]: false,
+})
+
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
 )
@@ -416,6 +444,11 @@ async function fetchBook() {
 
   currentStep.value =
     PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-read'].step
+
+  selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
+    isInDefaultCollection(FAVORITE_COLLECTION_ID)
+  selectedDefaultCollections.value[WISHLIST_COLLECTION_ID] =
+    isInDefaultCollection(WISHLIST_COLLECTION_ID)
 }
 
 async function deleteBook() {
@@ -501,14 +534,25 @@ function onSelectCollection({
   collectionId,
   selected,
 }: {
-  collectionId: Collection['id']
+  collectionId: string
   selected: boolean
 }) {
   allCollections.value = allCollections.value.map((collection) =>
-    collection.id === collectionId
-      ? { ...collection, selected: selected }
+    String(collection.id) === String(collectionId)
+      ? { ...collection, selected }
       : collection,
   )
+}
+
+function onDefaultCollectionChange(collectionId: string) {
+  if (editing.value) {
+    selectedDefaultCollections.value[collectionId] =
+      !selectedDefaultCollections.value[collectionId]
+    onSelectCollection({
+      collectionId,
+      selected: selectedDefaultCollections.value[collectionId],
+    })
+  }
 }
 
 function onSelectProgress(progressStatus: BookProgressStatus) {
@@ -542,6 +586,10 @@ function onProgressChange(progressStatusStep: number) {
       }
     }
   }
+}
+
+function isInDefaultCollection(collectionId: string): boolean {
+  return !!book.value?.collections.some((id) => String(id) === collectionId)
 }
 
 function dateFormatter(date: Date | undefined): string | undefined {
