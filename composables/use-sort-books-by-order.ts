@@ -21,7 +21,7 @@ export const useSortBooksByOrder = <T extends ViewBook>(
   )
 
   const defaultTableColumns = {
-    coverSrc: { label: 'Cover', checked: true },
+    coverSrc: { label: 'Cover', checked: false },
     publisher: { label: 'Publisher', checked: false },
     language: { label: 'Language', checked: true },
     year: { label: 'Year', checked: false },

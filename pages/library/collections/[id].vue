@@ -105,6 +105,7 @@
               v-if="!!selectedBooks.length || managingBooks"
               v-model:selected-books="selectedBooks"
               v-model:not-selected-books="notSelectedBooks"
+              v-model:books="allBooks"
               :view="view"
               interactive
               :editing="managingBooks"

@@ -11,7 +11,14 @@
     <hr v-if="editing" class="my-8 text-main" />
     <div v-if="editing" class="flex items-center justify-between">
       <h4>All books</h4>
-      <bl-search-bar @input="onSearch" />
+      <bl-search-bar
+        @input="
+          (v) => {
+            onSearch(v)
+            onSearchTable(v)
+          }
+        "
+      />
     </div>
     <bl-books-grid
       v-if="view === 'cards' && editing"
@@ -30,7 +37,7 @@
 
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
-      :books="books"
+      :books="editing ? sortedBooksForTable : selectedBooks"
       :selected-table-columns="selectedTableColumns"
       :with-check="editing"
       :row-clickable="!editing"
@@ -82,6 +89,8 @@ const books = defineModel<ViewBook[]>('books', {
 const currentPage = defineModel<number>('currentPage')
 
 const { sortedBooks, onSearch } = useSortBooks(notSelectedBooks)
+const { sortedBooks: sortedBooksForTable, onSearch: onSearchTable } =
+  useSortBooks(books)
 
 defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void

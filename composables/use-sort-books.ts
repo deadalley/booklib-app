@@ -217,7 +217,6 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   }
 
   function onCloseSidebar() {
-    console.log('a')
     sidebarContent.value = undefined
   }
 
