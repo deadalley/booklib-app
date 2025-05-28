@@ -73,6 +73,9 @@ export type DBClient<ID extends number | string = number> = {
       'collection-book': { book_id: BookDB<ID>['id']; order: number }[]
     })[]
   >
+  getCollectionCount: (
+    event: H3Event<EventHandlerRequest>,
+  ) => Promise<number | null>
   createCollection: (
     event: H3Event<EventHandlerRequest>,
     collection: Collection<ID>,

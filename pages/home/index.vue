@@ -41,6 +41,32 @@
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-10">
       <h1>Welcome to your library!</h1>
+      <div class="flex w-full gap-8">
+        <NuxtLink
+          to="/library/books"
+          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
+        >
+          <IconBooks class="text-main" size="50" stroke="1.5" />
+          <h5>Books</h5>
+          <bl-total-tag v-if="bookCount">{{ bookCount }} books</bl-total-tag>
+          <NuxtLink to="/library/books/new">
+            <bl-button v-if="!bookCount">Create a book</bl-button>
+          </NuxtLink>
+        </NuxtLink>
+        <NuxtLink
+          to="/library/collections"
+          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
+        >
+          <IconArchive class="text-main" size="50" stroke="1.5" />
+          <h5>Collections</h5>
+          <bl-total-tag v-if="collectionCount"
+            >{{ collectionCount }} collections</bl-total-tag
+          >
+          <NuxtLink to="/library/collections/new">
+            <bl-button v-if="!collectionCount">Create a collection</bl-button>
+          </NuxtLink>
+        </NuxtLink>
+      </div>
       <div class="flex flex-col gap-8">
         <bl-tile>
           <template #title>Last books added to library</template>
@@ -121,11 +147,21 @@
 </template>
 
 <script setup lang="ts">
-import { IconPlus, icons, IconUpload } from '@tabler/icons-vue'
+import {
+  IconArchive,
+  IconBooks,
+  IconPlus,
+  icons,
+  IconUpload,
+} from '@tabler/icons-vue'
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { Book } from '~/types/book'
 
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+const { data: bookCount } = await useFetch<number>('/api/library/book-count')
+const { data: collectionCount } = await useFetch<number>(
+  '/api/library/collection-count',
+)
 
 const { data: latestBooks } = await useFetch<
   Pick<Book, 'id' | 'title' | 'coverSrc'>[]

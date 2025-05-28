@@ -338,6 +338,14 @@ export async function getCollections(): ReturnType<
   }))
 }
 
+export async function getCollectionCount(): ReturnType<
+  DBClient<string>['getCollectionCount']
+> {
+  await client.read()
+
+  return client.data.collections.length
+}
+
 export async function createCollection(
   event: H3Event<EventHandlerRequest>,
   collection: Collection<string>,
