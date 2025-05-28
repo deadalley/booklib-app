@@ -47,21 +47,27 @@
 <script setup lang="ts">
 import type { Collection } from '~/types/collection'
 import { IconPlus } from '@tabler/icons-vue'
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
+import type { Author } from '~/types/author'
 
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 const { data: books } = await useFetch<Book[]>('/api/books', {
   query: { withBookCovers: true },
 })
+const { data: authors } = await useFetch<Author[]>('/api/authors')
 
 const booksByCollectionId = computed(
   () =>
-    collections.value?.reduce<Record<string, Book[]>>(
+    collections.value?.reduce<Record<string, ViewBook[]>>(
       (collectionBooks, collection) => ({
         ...collectionBooks,
-        [collection.id]: (books.value ?? []).filter((book) =>
-          collection.books.some(({ id }) => id === book.id),
-        ),
+        [collection.id]: (books.value ?? [])
+          .filter((book) => collection.books.some(({ id }) => id === book.id))
+          .map((book) => ({
+            ...book,
+            authorName: authors.value?.find(({ id }) => id === book.author)
+              ?.name,
+          })),
       }),
       {},
     ) ?? {},

@@ -137,6 +137,7 @@
 <script setup lang="ts">
 import { IconArrowLeft } from '@tabler/icons-vue'
 import { format } from 'date-fns'
+import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
@@ -182,7 +183,9 @@ async function fetchCollection() {
     query: { withBookCovers: true },
   })
 
-  allBooks.value = getBooksFromCollection(collection.value, books)
+  const authors = await $fetch<Author[]>('/api/authors')
+
+  allBooks.value = getBooksFromCollection(collection.value, books, authors)
   loading.value = false
 }
 
@@ -208,7 +211,9 @@ async function onCancel() {
         query: { withBookCovers: true },
       })
 
-      allBooks.value = getBooksFromCollection(collection.value, books)
+      const authors = await $fetch<Author[]>('/api/authors')
+
+      allBooks.value = getBooksFromCollection(collection.value, books, authors)
     }
     onEdit(false)
   }
@@ -273,11 +278,16 @@ function onDragBook({
   }))
 }
 
-function getBooksFromCollection(collection: Collection, books: Book[]) {
+function getBooksFromCollection(
+  collection: Collection,
+  books: Book[],
+  authors: Author[],
+): ViewBook[] {
   return books.map((book) => ({
     ...book,
     selected: !!collection?.books?.some(({ id }) => id === book.id),
     order: collection?.books?.find(({ id }) => id === book.id)?.order,
+    authorName: authors.find(({ id }) => id === book.author)?.name,
   }))
 }
 
