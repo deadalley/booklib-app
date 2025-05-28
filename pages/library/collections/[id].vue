@@ -20,14 +20,13 @@
           </h2>
         </div>
         <div
-          v-if="!isNew"
           class="flex w-full flex-col items-start gap-3 md:w-[unset] md:flex-row md:items-end"
         >
           <div
             class="order-3 flex w-full flex-col items-start gap-2 md:order-none md:flex-row md:items-end"
           >
             <bl-button
-              v-if="!editing"
+              v-if="!isNew && !editing"
               variant="secondary"
               class="w-full"
               @click="onEdit(true)"
@@ -65,7 +64,7 @@
             </bl-modal>
             <bl-view-switch v-model:view="view" />
           </div>
-          <div class="flex flex-col justify-end leading-tight">
+          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6 class="w-max">{{ formattedDate }}</h6>
           </div>
