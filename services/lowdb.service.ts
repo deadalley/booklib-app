@@ -204,6 +204,7 @@ export async function deleteBook(
 ): ReturnType<DBClient<string>['deleteBook']> {
   await client.read()
 
+  client.data.books = client.data.books.filter((book) => book.id !== id)
   client.data['collection-book'] = client.data['collection-book'].filter(
     ({ book_id }) => book_id !== id,
   )
