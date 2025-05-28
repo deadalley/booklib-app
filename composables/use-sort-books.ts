@@ -107,7 +107,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     return count
   })
 
-  const sortedBooks = computed(() => {
+  const sortedBooks = computed<ViewBook[]>(() => {
     const hasFilter = !!(
       selectedPublishers.value.length ||
       selectedLanguages.value.length ||
@@ -182,7 +182,11 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
         )
       : filterByStatus
 
-    const sorted = sortBooks(filterByAuthor)
+    const sorted = sortBooks(filterByAuthor).map((book) => ({
+      ...book,
+      isFavorite: isBookInDefaultCollection(book, FAVORITE_COLLECTION_ID),
+      isWishlist: isBookInDefaultCollection(book, WISHLIST_COLLECTION_ID),
+    }))
 
     return sorted
   })

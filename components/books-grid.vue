@@ -22,6 +22,7 @@
         class="md:!w-36"
         :selectable="selectable"
         :draggable="props.draggable"
+        :floating-icon="getIcon(book)"
         @selected="
           (selected: boolean) => $emit('select', { bookId: book.id, selected })
         "
@@ -33,7 +34,8 @@
 <script setup lang="ts">
 // eslint-disable-next-line vue/no-dupe-keys
 import draggable from 'vuedraggable'
-import type { Book, ViewBook } from '~/types/book'
+import type { ViewBook } from '~/types/book'
+import type { icons } from '@tabler/icons-vue'
 
 const props = defineProps<{
   small?: boolean
@@ -46,10 +48,16 @@ const books = defineModel<ViewBook[]>({
 })
 
 const emit = defineEmits<{
-  (e: 'select', val: { bookId: Book['id']; selected: boolean }): void
+  (e: 'select', val: { bookId: ViewBook['id']; selected: boolean }): void
   (
     e: 'drag',
-    val: { bookId: Book['id']; newOrder: number; oldOrder: number },
+    val: { bookId: ViewBook['id']; newOrder: number; oldOrder: number },
   ): void
 }>()
+
+function getIcon(book: ViewBook): keyof typeof icons | undefined {
+  if (book.isFavorite) {
+    return DEFAULT_COLLECTION_ICONS_FILLED[FAVORITE_COLLECTION_ID]
+  }
+}
 </script>

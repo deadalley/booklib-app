@@ -19,6 +19,16 @@
       />
     </div>
     <div class="relative flex flex-col items-start gap-3">
+      <div
+        v-if="floatingIcon"
+        class="absolute right-0 top-0 z-10 flex size-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-main text-white"
+      >
+        <component
+          :is="icons[floatingIcon]"
+          :size="ICON_SIZE_SMALL - 4"
+          stroke="1.5"
+        />
+      </div>
       <bl-book-image-small
         :alt="book.title"
         :href="href"
@@ -51,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconDirectionArrows } from '@tabler/icons-vue'
+import { icons, IconDirectionArrows } from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 
 const props = defineProps<{
@@ -61,6 +71,7 @@ const props = defineProps<{
   >
   selectable?: boolean
   draggable?: boolean
+  floatingIcon?: keyof typeof icons
 }>()
 
 const href = `/library/books/${props.book.id}`

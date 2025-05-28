@@ -446,9 +446,11 @@ async function fetchBook() {
     PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-read'].step
 
   selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
-    isInDefaultCollection(FAVORITE_COLLECTION_ID)
+    !!book.value &&
+    isBookInDefaultCollection(book.value, FAVORITE_COLLECTION_ID)
   selectedDefaultCollections.value[WISHLIST_COLLECTION_ID] =
-    isInDefaultCollection(WISHLIST_COLLECTION_ID)
+    !!book.value &&
+    isBookInDefaultCollection(book.value, WISHLIST_COLLECTION_ID)
 }
 
 async function deleteBook() {
@@ -545,13 +547,15 @@ function onSelectCollection({
 }
 
 function onDefaultCollectionChange(collectionId: string) {
-  if (editing.value) {
-    selectedDefaultCollections.value[collectionId] =
-      !selectedDefaultCollections.value[collectionId]
-    onSelectCollection({
-      collectionId,
-      selected: selectedDefaultCollections.value[collectionId],
-    })
+  selectedDefaultCollections.value[collectionId] =
+    !selectedDefaultCollections.value[collectionId]
+  onSelectCollection({
+    collectionId,
+    selected: selectedDefaultCollections.value[collectionId],
+  })
+
+  if (book.value) {
+    onSubmit(book.value)
   }
 }
 
@@ -586,10 +590,6 @@ function onProgressChange(progressStatusStep: number) {
       }
     }
   }
-}
-
-function isInDefaultCollection(collectionId: string): boolean {
-  return !!book.value?.collections.some((id) => String(id) === collectionId)
 }
 
 function dateFormatter(date: Date | undefined): string | undefined {

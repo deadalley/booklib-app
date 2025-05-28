@@ -35,4 +35,6 @@ export type ViewBook = Book & {
   authorName?: string
   selected?: boolean
   order?: number
+  isFavorite?: boolean
+  isWishlist?: boolean
 }

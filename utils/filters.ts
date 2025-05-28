@@ -1,4 +1,5 @@
 import { flatten, intersection, uniqBy } from 'lodash'
+import type { Book } from '~/types/book'
 
 export function getUniqueElements<
   T extends Partial<Record<K, unknown>>,
@@ -86,4 +87,11 @@ export function mergeAndFilter<T extends object, K extends keyof T>(
 
 function standardizeValue<K>(value: K) {
   return typeof value === 'string' ? (value.trim().toLowerCase() as K) : value
+}
+
+export function isBookInDefaultCollection(
+  book: Book,
+  collectionId: string,
+): boolean {
+  return !!book.collections.some((id) => String(id) === collectionId)
 }
