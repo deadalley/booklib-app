@@ -21,7 +21,7 @@
   }
 
   .formkit-label {
-    @apply font-ReemKufi text-base text-black;
+    @apply font-ReemKufi text-base text-accent-darker;
   }
 
   .formkit-inner {
