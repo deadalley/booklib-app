@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-col items-start gap-3">
     <div
-      class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-xl transition duration-300 ease-in-out hover:scale-110"
+      class="grid h-48 w-full cursor-pointer grid-cols-2 grid-rows-2 overflow-hidden rounded-xl !ring-1 ring-accent transition duration-300 ease-in-out hover:scale-110"
       :class="{
-        '!ring-2 !ring-main': selectable && collection.selected,
+        '!ring-main': selectable && collection.selected,
       }"
       @click="onSelect"
     >

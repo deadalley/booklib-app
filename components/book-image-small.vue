@@ -1,37 +1,34 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative cursor-pointer"
+    class="relative cursor-pointer rounded-xl border border-accent"
     :class="{
       'w-full': !coverSrc,
-      'rounded-xl ring-1 ring-main transition-all duration-300 ease-in-out':
-        selectable,
-      'ring-main': !!selected,
+      'transition-all duration-300 ease-in-out': selectable,
+      'border-main': selectable && !!selected,
     }"
     @click="$emit('click')"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
     <bl-icon-button
-      v-if="selectable"
+      v-if="selectable && hovered"
       class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       :class="{
         'opacity-0': !selected,
         'opacity-100': selected || hovered,
       }"
     >
-      <template #default="iconProps">
-        <IconCheckbox v-if="selected && !hovered" v-bind="iconProps" />
-        <IconX v-if="selected && hovered" v-bind="iconProps" />
-        <IconPlus v-if="!selected && hovered" v-bind="iconProps" />
+      <template v-if="hovered" #default="iconProps">
+        <IconX v-if="selected" v-bind="iconProps" />
+        <IconPlus v-if="!selected" v-bind="iconProps" />
       </template>
     </bl-icon-button>
     <div
       v-if="selectable"
       class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-black transition-opacity duration-300"
       :class="{
-        'opacity-0': !selected,
-        'opacity-30': selected && !hovered,
+        'opacity-0': !selected || !hovered,
         'opacity-60': hovered,
       }"
     />
@@ -56,7 +53,7 @@
 
 <script setup lang="ts">
 import type { icons } from '@tabler/icons-vue'
-import { IconCheckbox, IconX, IconPlus } from '@tabler/icons-vue'
+import { IconX, IconPlus } from '@tabler/icons-vue'
 
 defineProps<{
   href?: string

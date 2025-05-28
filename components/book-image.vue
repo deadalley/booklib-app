@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl lg:flex-1"
+    class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border border-accent lg:flex-1"
     :class="{ 'justify-center': loading }"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"

@@ -1,5 +1,23 @@
 <template>
-  <div class="flex flex-col justify-between gap-3">
+  <div class="relative flex flex-col">
+    <div
+      v-if="draggable"
+      class="relative flex w-full cursor-grab items-center gap-3 rounded-t-xl border-x border-t border-main bg-main px-4 py-1"
+    >
+      <span
+        v-if="book.order !== undefined"
+        class="w-full text-center text-lg text-white"
+        >{{ book.order + 1 }}</span
+      >
+      <IconDirectionArrows
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-white"
+        :size="ICON_SIZE_SMALL"
+        stroke="1.5"
+      />
+      <div
+        class="absolute -inset-x-px -bottom-4 -z-10 h-4 border-x border-main bg-main"
+      />
+    </div>
     <div class="relative flex flex-col items-start gap-3">
       <bl-book-image-small
         :alt="book.title"
@@ -28,22 +46,6 @@
           {{ book.authorName }}
         </p>
       </div>
-    </div>
-
-    <div
-      v-if="draggable"
-      class="relative flex w-full cursor-grab items-center gap-3 rounded-xl border border-accent bg-accent-light px-4 py-1"
-    >
-      <span
-        v-if="book.order !== undefined"
-        class="w-full text-center text-lg text-black"
-        >{{ book.order + 1 }}</span
-      >
-      <IconDirectionArrows
-        class="absolute right-4 top-1/2 -translate-y-1/2 text-main"
-        :size="ICON_SIZE_SMALL"
-        stroke="1.5"
-      />
     </div>
   </div>
 </template>
