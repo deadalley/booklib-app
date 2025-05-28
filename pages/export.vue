@@ -1,58 +1,54 @@
 <template>
   <NuxtLayout name="dashboard" title="Import">
-    <div class="flex flex-col items-center gap-12">
-      <h2>Export your library</h2>
+    <div class="flex flex-col items-center">
       <div
-        class="flex max-w-5xl rounded-3xl border-2 border-accent px-12 py-16"
+        class="flex w-full flex-col gap-12 rounded-3xl border border-accent p-16 md:w-3/5"
       >
-        <NuxtImg
-          src="/books-5.jpg"
-          alt="Books"
-          class="w-2/5 rounded-3xl object-cover object-center"
-        />
-        <div class="flex w-3/5 flex-col gap-12 px-16 pb-16">
-          <div class="flex flex-col gap-2">
-            <h6>1. Choose your preferred file format</h6>
-            <bl-raw-select
-              v-model="exportType"
-              :options="exportOptions"
-              class="ml-4"
-              placeholder="Select file format"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <h6>2. Choose data to export</h6>
-            <bl-raw-select
-              v-model="exportCollection"
-              :options="
-                exportType === '.csv'
-                  ? exportCollectionOptions.filter(
-                      (option) => option.value !== 'all',
-                    )
-                  : exportCollectionOptions
-              "
-              class="ml-4"
-              placeholder="Select data"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <h6>3. Export your library</h6>
-            <bl-button
-              class="ml-4"
-              :disabled="!exportType || !exportCollection || loading"
-              @click="downloadFile"
-            >
-              <template #prependIcon="prependIcon">
-                <IconDownload v-bind="prependIcon" />
-              </template>
-              {{
-                exportType && exportCollection
-                  ? `Export ${exportCollection === 'all' ? 'library' : exportCollection} as ${exportType}`
-                  : 'Choose file format'
-              }}
-              <bl-loading v-if="loading" class="!size-4" />
-            </bl-button>
-          </div>
+        <div class="self-center text-main">
+          <IconDownload size="80" stroke="1.5" />
+          <h4>Export</h4>
+        </div>
+        <div class="flex flex-col gap-2">
+          <h6>1. Choose your preferred file format</h6>
+          <bl-raw-select
+            v-model="exportType"
+            :options="exportOptions"
+            class="ml-4"
+            placeholder="Select file format"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <h6>2. Choose data to export</h6>
+          <bl-raw-select
+            v-model="exportCollection"
+            :options="
+              exportType === '.csv'
+                ? exportCollectionOptions.filter(
+                    (option) => option.value !== 'all',
+                  )
+                : exportCollectionOptions
+            "
+            class="ml-4"
+            placeholder="Select data"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <h6>3. Export your library</h6>
+          <bl-button
+            class="ml-4"
+            :disabled="!exportType || !exportCollection || loading"
+            @click="downloadFile"
+          >
+            <template #prependIcon="prependIcon">
+              <IconDownload v-bind="prependIcon" />
+            </template>
+            {{
+              exportType && exportCollection
+                ? `Export ${exportCollection === 'all' ? 'library' : exportCollection} as ${exportType}`
+                : 'Choose file format'
+            }}
+            <bl-loading v-if="loading" class="!size-4" />
+          </bl-button>
         </div>
       </div>
     </div>
@@ -110,15 +106,10 @@ async function downloadFile() {
 
 async function downloadAsJson(collectionType: ExportCollectionType) {
   const userName = 'username'
-  const userId = 'user_id'
 
   const libraryData = await fetchLibrary()
-  const exportData = {
-    [userId]:
-      collectionType === 'all'
-        ? libraryData
-        : pick(libraryData, collectionType),
-  }
+  const exportData =
+    collectionType === 'all' ? libraryData : pick(libraryData, collectionType)
   const data = JSON.stringify(exportData)
 
   createDownloadLink(userName, collectionType, '.json', data)
