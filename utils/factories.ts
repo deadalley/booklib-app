@@ -22,6 +22,7 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     startedAt: faker.date.past().toISOString(),
     finishedAt: faker.date.past().toISOString(),
     collections: [],
+    author: faker.number.int(),
     ...overwrite,
   }
 }
