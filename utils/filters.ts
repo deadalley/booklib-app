@@ -1,4 +1,4 @@
-import { flatten, intersection, uniqBy } from 'lodash'
+import { flatten, intersection, prop, uniqBy } from 'ramda'
 import type { Book } from '~/types/book'
 
 export function getUniqueElements<
@@ -82,7 +82,7 @@ export function mergeAndFilter<T extends object, K extends keyof T>(
   key: K,
   ...elements: T[][]
 ) {
-  return uniqBy(flatten(elements), key)
+  return uniqBy(prop(key), flatten(elements))
 }
 
 function standardizeValue<K>(value: K) {

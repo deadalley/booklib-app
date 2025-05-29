@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { keyBy, mapValues } from 'lodash'
+import { map, indexBy, prop } from 'ramda'
 import type { SelectProps } from './raw-select.vue'
 import {
   ComboboxAnchor,
@@ -115,10 +115,7 @@ const focused = ref(false)
 const extendedOptions = ref(props.options!)
 
 const labelByValue = computed<Record<string, string>>(() =>
-  mapValues(
-    keyBy(props.options ?? {}, ({ value }) => value),
-    ({ label }) => label,
-  ),
+  map(prop('label'), indexBy(prop('value'), props.options!)),
 )
 
 function onFocus() {

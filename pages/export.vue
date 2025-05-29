@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { IconDownload } from '@tabler/icons-vue'
-import { pick } from 'lodash'
+import { pick } from 'ramda'
 import type { SelectOption } from '~/components/raw-select.vue'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
@@ -109,7 +109,7 @@ async function downloadAsJson(collectionType: ExportCollectionType) {
 
   const libraryData = await fetchLibrary()
   const exportData =
-    collectionType === 'all' ? libraryData : pick(libraryData, collectionType)
+    collectionType === 'all' ? libraryData : pick([collectionType], libraryData)
   const data = JSON.stringify(exportData)
 
   createDownloadLink(userName, collectionType, '.json', data)

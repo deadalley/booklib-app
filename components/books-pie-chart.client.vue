@@ -13,7 +13,7 @@
   "
 >
 import type { Book, BookProgressStatus } from '~/types/book'
-import { groupBy } from 'lodash'
+import { groupBy } from 'ramda'
 import languageOptions from '~/public/languages-2.json'
 import type { PieChartItem } from './pie-chart.client.vue'
 
@@ -29,13 +29,13 @@ const props = withDefaults(
 
 const series = computed(() => {
   const groupedBooks = groupBy(
+    (book) => String(book[props.bookProperty]),
     props.books.filter((book) => !!book[props.bookProperty]),
-    props.bookProperty,
   )
   return sortByBookProperty(
     Object.entries(groupedBooks).map(([label, items]) => ({
       label: getChartLabel(label as NonNullable<T>),
-      value: items.length,
+      value: items?.length ?? 0,
       originalLabel: label,
     })),
   )

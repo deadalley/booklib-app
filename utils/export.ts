@@ -1,17 +1,27 @@
-import { mapKeys, omit } from 'lodash'
+import { curry, fromPairs, omit, toPairs } from 'ramda'
 import Papa from 'papaparse'
-import type { Book } from '~/types/book'
-import type { Collection } from '~/types/collection'
 
-function preprocessData<T extends Book | Collection>(data: T[]) {
+const mapKeys = curry(
+  <T>(fn: (key: string) => string, obj: Record<string, T>): Record<string, T> =>
+    fromPairs(toPairs(obj).map(([k, v]) => [fn(k), v])),
+)
+
+function preprocessData<
+  ID extends string | number,
+  T extends { id: ID; collections?: string[]; books?: string[] },
+>(data: T[]) {
   return data.map((value) =>
-    mapKeys(omit(value, 'id', 'collections', 'books'), (_, key) =>
-      camelCaseToSnakeCase(key).toUpperCase(),
+    mapKeys(
+      (key) => camelCaseToSnakeCase(key).toUpperCase(),
+      omit(['id', 'collections', 'books'], value),
     ),
   )
 }
 
-export function createCsvFile<T extends Book | Collection>(data: T[]): string {
+export function createCsvFile<
+  ID extends string | number,
+  T extends { id: ID; collections?: string[]; books?: string[] },
+>(data: T[]): string {
   const dataForExport = preprocessData(data)
   return Papa.unparse(dataForExport, {
     header: true,

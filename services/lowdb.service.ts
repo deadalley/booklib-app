@@ -21,7 +21,7 @@ import {
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
-import difference from 'lodash/difference'
+import { difference } from 'ramda'
 
 const user = {
   id: 'userId',

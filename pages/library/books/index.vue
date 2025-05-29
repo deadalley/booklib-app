@@ -105,7 +105,7 @@ import {
 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
-import { keyBy, property } from 'lodash'
+import { indexBy } from 'ramda'
 
 const { data: bookCount } = await useFetch<number>('/api/library/book-count')
 const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
@@ -113,7 +113,9 @@ const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
 })
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 
-const authorsById = computed(() => keyBy(authors.value, property('id')))
+const authorsById = computed(() =>
+  authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
+)
 
 const dropdownItems: DropdownItem[] = [
   { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
