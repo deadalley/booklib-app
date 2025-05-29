@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     '@formkit/nuxt',
     '@nuxt/image',
     '@nuxt/eslint',
+    '@nuxt/test-utils/module',
     'nuxt-echarts',
     'nuxt-electron',
     'nuxt-file-storage',

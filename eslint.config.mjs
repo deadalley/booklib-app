@@ -1,4 +1,5 @@
 import tailwind from 'eslint-plugin-tailwindcss'
+import vitest from '@vitest/eslint-plugin'
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt([
@@ -12,6 +13,15 @@ export default withNuxt([
       'vue/multi-word-component-names': 0,
       'vue/require-default-prop': 'off',
       'vue/html-self-closing': 0,
+    },
+  },
+  {
+    files: ['**/*.test.*'],
+    plugins: {
+      vitest,
+    },
+    rules: {
+      ...vitest.configs.recommended.rules,
     },
   },
 ])
