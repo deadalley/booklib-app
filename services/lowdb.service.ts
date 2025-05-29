@@ -447,6 +447,7 @@ export class LowDBClient {
 
   async resetLibrary(): ReturnType<DBClient['resetLibrary']> {
     await this.client.update((data) => {
+      data.authors = []
       data.books = []
       data.collections = []
       data['collection-book'] = []
@@ -457,7 +458,7 @@ export class LowDBClient {
 
   async importLibrary(
     event: H3Event<EventHandlerRequest>,
-    books: Book[],
+    books: BookDB[],
   ): ReturnType<DBClient['importLibrary']> {
     await this.client.read()
 

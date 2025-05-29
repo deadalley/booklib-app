@@ -50,11 +50,12 @@ function getDbSeed({
 describe('lowdb', async () => {
   const authors = [buildAuthor(), buildAuthor()]
   const books = [
-    buildBook({ id: 'Book1', pages: 200, year: null }),
+    buildBook({ id: 'Book1', pages: 200, year: null, author_id: null }),
     buildBook({
       id: 'Book2',
       pages: 800,
       year: 2020,
+      author_id: null,
       progress_status: 'reading',
     }),
     buildBook({
@@ -65,7 +66,7 @@ describe('lowdb', async () => {
     }),
     buildBook({ id: 'Book4', pages: 80, year: 2025, author_id: authors[1].id }),
   ]
-  const collections = [buildCollection()]
+  const collections = [buildCollection({ id: 'Collection1' })]
   const collectionBooks = [
     { collection_id: 'wishlist', book_id: books[0].id, order: 0 },
     { collection_id: 'favorite', book_id: books[0].id, order: 0 },
@@ -381,6 +382,90 @@ describe('lowdb', async () => {
           db.deleteCollection(event, 'favorite', {}),
         ).rejects.toThrow('Cannot delete favorite')
         expect(client.data.collections).toHaveLength(3)
+      })
+    })
+  })
+
+  describe('library', async () => {
+    describe('isLibraryEmpty', async () => {
+      it('should return false if library is not empty', async () => {
+        const result = await db.isLibraryEmpty()
+        expect(result).toBe(false)
+      })
+
+      it('should return true if library is empty', async () => {
+        client.data = getDbSeed({
+          authors: [],
+          books: [],
+          collections: [],
+          collectionBooks: [],
+        })
+        await client.write()
+        const result = await db.isLibraryEmpty()
+        expect(result).toBe(true)
+      })
+    })
+
+    describe('resetLibrary', async () => {
+      it('should reset library to initial state', async () => {
+        await db.resetLibrary()
+        expect(client.data.authors).toHaveLength(0)
+        expect(client.data.books).toHaveLength(0)
+        expect(client.data.collections).toHaveLength(0)
+        expect(client.data['collection-book']).toHaveLength(0)
+      })
+    })
+
+    describe('importLibrary', async () => {
+      it('should import books into library', async () => {
+        const newBooks = [
+          buildBook({ id: 'imported-book-1', title: 'Imported Book 1' }),
+          buildBook({ id: 'imported-book-2', title: 'Imported Book 2' }),
+        ]
+        const result = await db.importLibrary(event, newBooks)
+        expect(result).toBe(true)
+        expect(client.data.books).toHaveLength(books.length + newBooks.length)
+      })
+    })
+
+    describe('checkLibraryIntegrity', async () => {
+      it('should return no errors if library is consistent', async () => {
+        const result = await db.checkLibraryIntegrity()
+        expect(result).toEqual({
+          authors: [],
+          books: [],
+          collections: [],
+        })
+      })
+
+      it('should return errors', async () => {
+        client.data = getDbSeed({
+          authors,
+          books: books.concat([
+            buildBook({ id: 'Book5', author_id: 'non-existent' }),
+          ]),
+          collections,
+          collectionBooks: [
+            { collection_id: 'non-existent', book_id: books[0].id, order: 0 },
+            {
+              collection_id: collections[0].id,
+              book_id: 'non-existent',
+              order: 0,
+            },
+          ],
+        })
+        await client.write()
+        const result = await db.checkLibraryIntegrity()
+        expect(result).toEqual({
+          authors: [],
+          books: [
+            'Book Book1 is assigned collection non-existent, which does not exist.',
+            'Book Book5 is assigned author non-existent, which does not exist.',
+          ],
+          collections: [
+            'Collection Collection1 contains book non-existent, which does not exist',
+          ],
+        })
       })
     })
   })
