@@ -4,7 +4,7 @@ import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 export function buildBook(overwrite?: Partial<BookDB>): BookDB {
   return {
     title: faker.commerce.productName(),
-    cover_src: faker.image.urlPicsumPhotos({ height: 540, width: 340 }),
+    cover_src: null,
     created_at: faker.date.past().toISOString(),
     id: faker.string.uuid(),
     isbn: faker.commerce.isbn(),

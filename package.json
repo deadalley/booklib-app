@@ -15,6 +15,7 @@
     "lint": "yarn lint:js && yarn lint:ts && yarn lint:prettier",
     "lint:fix": "prettier . --write --list-different && yarn lint:js --fix",
     "test": "vitest",
+    "coverage": "vitest run --coverage",
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview"
@@ -54,6 +55,7 @@
     "@types/node": "^22.15.21",
     "@types/papaparse": "^5.3.15",
     "@types/ramda": "^0.30.2",
+    "@vitest/coverage-v8": "3.1.4",
     "@vitest/eslint-plugin": "^1.2.1",
     "@vue/test-utils": "^2.4.6",
     "electron": "^36.3.1",

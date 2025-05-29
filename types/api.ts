@@ -67,7 +67,7 @@ export type DBClient = {
   getOrderedBooks: (
     event: H3Event<EventHandlerRequest>,
     params: GetOrderedBooksQuerySearchParams,
-  ) => Promise<Pick<BookDB, 'id' | 'title'>[]>
+  ) => Promise<BookDB[]>
   getBookCover: (
     event: H3Event<EventHandlerRequest>,
     id: string,

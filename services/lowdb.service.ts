@@ -7,7 +7,7 @@ import type {
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
-import { Low } from 'lowdb'
+import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
@@ -21,24 +21,23 @@ import {
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference } from 'ramda'
+import { FileStorageService } from './file-storage.service'
 
 export class LowDBClient {
-  client: Low<Database>
+  private client: Low<Database>
+  private fileStorage: FileStorageService
 
   constructor(client: Low<Database>) {
     this.client = client
+    this.fileStorage = new FileStorageService('/bookCovers')
   }
 
   private isBookCover(id: string) {
     return (fileName: string) => fileName.split('.')[0] === id
   }
 
-  private async getAllBookCoverFileNames() {
-    return getFilesLocally('/bookCovers')
-  }
-
   private async getBookCoverFileName(id: string) {
-    const allFiles = await this.getAllBookCoverFileNames()
+    const allFiles = await this.fileStorage.getAllFileNames()
 
     // find the file extension
     const fileName = allFiles.find(this.isBookCover(id))
@@ -92,7 +91,7 @@ export class LowDBClient {
 
     const book = this.client.data.books.find((book) => book.id === id)
 
-    const bookCovers = await this.getAllBookCoverFileNames()
+    const bookCovers = await this.fileStorage.getAllFileNames()
     const hasBookCover = book?.id && bookCovers.find(this.isBookCover(book.id))
 
     const collections = this.client.data['collection-book']
@@ -117,14 +116,14 @@ export class LowDBClient {
     let data = this.client.data.books
 
     if (page !== undefined && pageSize !== undefined) {
-      data = data.slice(page * pageSize, (page + 1) * pageSize - 1)
+      data = data.slice(page * pageSize, (page + 1) * pageSize)
     }
 
     if (bookProgress !== undefined) {
       data = data.filter((book) => book.progress_status === bookProgress)
     }
 
-    const bookCovers = await this.getAllBookCoverFileNames()
+    const bookCovers = await this.fileStorage.getAllFileNames()
 
     data = data.map((book) => {
       const hasBookCover = bookCovers.find(this.isBookCover(book.id))
@@ -145,31 +144,33 @@ export class LowDBClient {
 
   async createBook(
     event: H3Event<EventHandlerRequest>,
-    book: Book,
+    book: BookDB,
     collections: CollectionDB['id'][],
   ): ReturnType<DBClient['createBook']> {
     await this.client.read()
 
+    // update author information
     const existingAuthor = this.client.data.authors.find(
-      ({ id }) => id === book.author,
+      ({ id }) => id === book.author_id,
     )
 
     const authorId = existingAuthor?.id ?? uuidv4()
 
     if (!existingAuthor) {
-      if (book.author) {
+      if (book.author_id) {
         this.client.data.authors.push({
           id: authorId,
-          name: book.author,
+          name: book.author_id,
           created_at: new Date().toISOString(),
         })
       }
     }
 
+    // create or update book
     const bookDb: BookDB = {
-      ...bookToDbBook(book),
+      ...book,
       id: book.id ?? uuidv4(),
-      author_id: book.author ? authorId : null,
+      author_id: book.author_id ? authorId : null,
       created_at: new Date().toISOString(),
     }
 
@@ -183,6 +184,7 @@ export class LowDBClient {
       this.client.data.books.push(bookDb)
     }
 
+    // update collection information
     const existingCollectionIds = this.client.data['collection-book']
       .filter(({ book_id }) => book_id === bookDb.id)
       .map(({ collection_id }) => collection_id)
@@ -269,14 +271,21 @@ export class LowDBClient {
   ): ReturnType<DBClient['getOrderedBooks']> {
     await this.client.read()
 
-    return this.client.data.books
+    const filteredBooks = this.client.data.books
       .filter((b) => b[property])
       .sort((b1, b2) =>
         b1[property]!.toLocaleString().localeCompare(
           b2[property]!.toLocaleString(),
+          undefined,
+          { numeric: true },
         ),
       )
-      .slice(0, count ?? 11)
+
+    if (count !== undefined) {
+      return filteredBooks.slice(0, count)
+    }
+
+    return filteredBooks
   }
 
   async getBookCover(
