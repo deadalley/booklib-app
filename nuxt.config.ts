@@ -53,7 +53,7 @@ export default defineNuxtConfig({
   },
 
   fileStorage: {
-    mount: '/usr',
+    mount: 'usr',
   },
 
   typescript: {

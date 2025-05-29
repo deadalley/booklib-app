@@ -93,7 +93,6 @@ async function checkLibrary() {
         method: 'post',
       },
     )
-    console.log(libraryIntegrityResult.value)
   } catch (error) {
     console.error(error)
   }

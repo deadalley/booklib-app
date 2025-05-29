@@ -1,7 +1,7 @@
 import { db } from '~/services/db.service'
 import type { BookDB } from '~/types/database'
 import { v4 as uuidv4 } from 'uuid'
-import { dbBookToBook } from '~/utils'
+import { bookToDbBook, dbBookToBook } from '~/utils'
 
 export default defineEventHandler(async (event) => {
   const book = await readBody(event)
