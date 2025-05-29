@@ -37,7 +37,7 @@
 
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
-      :books="editing ? sortedBooksForTable : selectedBooks"
+      :books="!interactive || editing ? sortedBooksForTable : selectedBooks"
       :selected-table-columns="selectedTableColumns"
       :with-check="editing"
       :row-clickable="!editing"
