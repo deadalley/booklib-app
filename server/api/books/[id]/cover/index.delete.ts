@@ -1,5 +1,11 @@
 import { db } from '~/services/db.service'
 
 export default defineEventHandler(async (event) => {
-  return db.deleteBookCover(event)
+  const id = getRouterParam(event, 'id')
+
+  if (!id) {
+    throw createError('No id provided')
+  }
+
+  return db.deleteBookCover(event, id)
 })

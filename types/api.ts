@@ -70,12 +70,15 @@ export type DBClient = {
   ) => Promise<BookDB[]>
   getBookCover: (
     event: H3Event<EventHandlerRequest>,
-    id: string,
+    id: BookDB['id'],
   ) => Promise<void>
   updateBookCover: (
     event: H3Event<EventHandlerRequest>,
   ) => Promise<string | null>
-  deleteBookCover: (event: H3Event<EventHandlerRequest>) => Promise<null>
+  deleteBookCover: (
+    event: H3Event<EventHandlerRequest>,
+    id: BookDB['id'],
+  ) => Promise<null>
 
   getCollection: (
     event: H3Event<EventHandlerRequest>,

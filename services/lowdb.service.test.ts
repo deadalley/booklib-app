@@ -3,10 +3,21 @@ import { Low, Memory } from 'lowdb'
 import type { Database } from '~/types/api'
 import { buildAuthor, DEFAULT_COLLECTIONS_INIT } from '~/utils'
 import { LowDBClient } from './lowdb.service'
+import type { ServerFile } from 'nuxt-file-storage'
+
+const getAllFileNamesMock = vi.fn(() =>
+  Promise.resolve(['Book1.jpg', 'Book2.jpg']),
+)
+const getFileMock = vi.fn(() => Promise.resolve(''))
+const saveFileMock = vi.fn(() => Promise.resolve(''))
+const deleteFileMock = vi.fn(() => Promise.resolve(''))
 
 vi.mock('./file-storage.service', () => ({
   FileStorageService: vi.fn(() => ({
-    getAllFileNames: vi.fn(() => Promise.resolve([])),
+    getAllFileNames: getAllFileNamesMock,
+    getFile: getFileMock,
+    saveFile: saveFileMock,
+    deleteFile: deleteFileMock,
   })),
 }))
 
@@ -119,7 +130,7 @@ describe('lowdb', async () => {
           deleteBooks: true,
         })
 
-        expect(client.data.books).toHaveLength(books.length - 1)
+        expect(client.data.books).toHaveLength(books.length - 2)
       })
 
       it('should not delete books from author if deleteBooks is false', async () => {
@@ -225,6 +236,55 @@ describe('lowdb', async () => {
           count: 2,
         })
         expect(ids(result)).toEqual([books[3].id, books[0].id])
+      })
+    })
+  })
+
+  describe('book covers', async () => {
+    describe('getBookCover', async () => {
+      it.skip('should return book cover', async () => {
+        getFileMock.mockResolvedValueOnce('Book1.jpg')
+        const result = await db.getBookCover(event, books[0].id)
+        expect(result).toBeDefined()
+      })
+
+      it('should return undefined if book cover does not exist', async () => {
+        const result = await db.getBookCover(event, 'non-existent-id')
+        expect(result).toBeUndefined()
+      })
+    })
+
+    describe('updateBookCover', async () => {
+      const file = {} as unknown as ServerFile
+
+      it('should create book cover if it does not exist', async () => {
+        await db.updateBookCover(event, books[2].id, file)
+        expect(deleteFileMock).not.toHaveBeenCalled()
+        expect(saveFileMock).toHaveBeenCalledWith(books[2].id, file)
+      })
+
+      it('should delete and create book cover if it exists', async () => {
+        await db.updateBookCover(event, books[0].id, file)
+        expect(deleteFileMock).toHaveBeenCalledWith('Book1.jpg')
+        expect(saveFileMock).toHaveBeenCalledWith(books[0].id, file)
+      })
+
+      it('returns the book cover url', async () => {
+        const result = await db.updateBookCover(event, books[2].id, file)
+        expect(result).toContain('/api/books/Book3/cover')
+      })
+    })
+
+    describe('deleteBookCover', async () => {
+      it('should delete book cover', async () => {
+        const result = await db.deleteBookCover(event, books[0].id)
+        expect(result).toBeNull()
+      })
+
+      it('should throw error if book cover does not exist', async () => {
+        await expect(
+          db.deleteBookCover(event, 'non-existent-id'),
+        ).rejects.toThrow('Book cover not found for non-existent-id to delete')
       })
     })
   })

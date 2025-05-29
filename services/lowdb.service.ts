@@ -32,11 +32,11 @@ export class LowDBClient {
     this.fileStorage = new FileStorageService('/bookCovers')
   }
 
-  private isBookCover(id: string) {
+  private isBookCover(id: BookDB['id']) {
     return (fileName: string) => fileName.split('.')[0] === id
   }
 
-  private async getBookCoverFileName(id: string) {
+  private async getBookCoverFileName(id: BookDB['id']) {
     const allFiles = await this.fileStorage.getAllFileNames()
 
     // find the file extension
@@ -45,8 +45,8 @@ export class LowDBClient {
     return fileName
   }
 
-  private getBookCoverUrl(bookId: string | number) {
-    return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
+  private getBookCoverUrl(id: BookDB['id']) {
+    return `${process.env.VITE_DEV_SERVER_URL}/api/books/${id}/cover`
   }
 
   async getAuthors(): ReturnType<DBClient['getAuthors']> {
@@ -85,7 +85,7 @@ export class LowDBClient {
 
   async getBook(
     event: H3Event<EventHandlerRequest>,
-    id: string,
+    id: BookDB['id'],
   ): ReturnType<DBClient['getBook']> {
     await this.client.read()
 
@@ -290,11 +290,11 @@ export class LowDBClient {
 
   async getBookCover(
     event: H3Event<EventHandlerRequest>,
-    id: string,
+    id: BookDB['id'],
   ): ReturnType<DBClient['getBookCover']> {
     const fileName = await this.getBookCoverFileName(id)
 
-    const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
+    const filePath = fileName && (await this.fileStorage.getFile(fileName))
 
     if (filePath) {
       return sendStream(event, createReadStream(filePath))
@@ -303,79 +303,42 @@ export class LowDBClient {
 
   async updateBookCover(
     event: H3Event<EventHandlerRequest>,
+    id: BookDB['id'],
+    file: ServerFile,
   ): ReturnType<DBClient['updateBookCover']> {
-    const { bookId, file } = await readBody<{
-      bookId: string
-      file: ServerFile
-    }>(event)
-
-    const fileName = await this.getBookCoverFileName(bookId)
+    const fileName = await this.getBookCoverFileName(id)
 
     if (fileName) {
-      await deleteFile(fileName, '/bookCovers')
+      await this.fileStorage.deleteFile(fileName)
     }
 
-    await storeFileLocally(file, bookId, '/bookCovers')
+    await this.fileStorage.saveFile(id, file)
 
-    const bookCoverUrl = this.getBookCoverUrl(bookId)
-
-    await this.client.read()
-
-    this.client.data.books = this.client.data.books.map((book) => {
-      if (book.id === bookId) {
-        return {
-          ...book,
-          cover_src: bookCoverUrl,
-        }
-      }
-
-      return book
-    })
-
-    await this.client.write()
+    const bookCoverUrl = this.getBookCoverUrl(id)
 
     return bookCoverUrl
   }
 
   async deleteBookCover(
     event: H3Event<EventHandlerRequest>,
+    id: BookDB['id'],
   ): ReturnType<DBClient['deleteBookCover']> {
-    const bookId = getRouterParam(event, 'id')
-
-    const allFiles = await getFilesLocally('/bookCovers')
-
-    // find the file extension
-    const fileName = allFiles.find(
-      (fileName) => fileName.split('.')[0] === bookId,
-    )
+    const fileName = await this.getBookCoverFileName(id)
 
     if (fileName) {
-      await deleteFile(fileName, '/bookCovers')
-
-      this.client.data.books = this.client.data.books.map((book) => {
-        if (book.id === bookId) {
-          return {
-            ...book,
-            cover_src: null,
-          }
-        }
-
-        return book
-      })
-
-      await this.client.write()
+      await this.fileStorage.deleteFile(fileName)
 
       return null
     }
 
-    const error = { message: `Book cover not found for ${bookId} to delete` }
+    const error = { message: `Book cover not found for ${id} to delete` }
     logger.error(error)
     throw createError(error.message)
   }
 
   async getCollection(
     event: H3Event<EventHandlerRequest>,
-    id: string,
+    id: CollectionDB['id'],
   ): ReturnType<DBClient['getCollection']> {
     await this.client.read()
 
