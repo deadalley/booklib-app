@@ -50,7 +50,6 @@ export type DBClient = {
     event: H3Event<EventHandlerRequest>,
     book: Book,
     collections: CollectionDB['id'][],
-    tempCoverSrc?: string,
   ) => Promise<BookDB | null>
   deleteBook: (
     event: H3Event<EventHandlerRequest>,

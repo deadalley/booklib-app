@@ -28,10 +28,12 @@ function ids<T extends { id: string }>(items: T[]): string[] {
 function getDbSeed({
   authors,
   books,
+  collections,
   collectionBooks,
 }: {
   authors: Database['authors']
   books: Database['books']
+  collections: Database['collections']
   collectionBooks: Database['collection-book']
 }): Database {
   return {
@@ -40,7 +42,7 @@ function getDbSeed({
     collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
       ...c,
       created_at: new Date().toISOString(),
-    })),
+    })).concat(collections),
     'collection-book': [...collectionBooks],
   }
 }
@@ -63,15 +65,17 @@ describe('lowdb', async () => {
     }),
     buildBook({ id: 'Book4', pages: 80, year: 2025, author_id: authors[1].id }),
   ]
+  const collections = [buildCollection()]
   const collectionBooks = [
     { collection_id: 'wishlist', book_id: books[0].id, order: 0 },
     { collection_id: 'favorite', book_id: books[0].id, order: 0 },
     { collection_id: 'favorite', book_id: books[1].id, order: 0 },
+    { collection_id: collections[0].id, book_id: books[2].id, order: 0 },
   ]
 
   const client = await new Low(
     new Memory<Database>(),
-    getDbSeed({ authors, books, collectionBooks }),
+    getDbSeed({ authors, books, collections, collectionBooks }),
   )
 
   const db = new LowDBClient(client)
@@ -79,7 +83,7 @@ describe('lowdb', async () => {
   const event: H3Event<EventHandlerRequest> = {} as H3Event<EventHandlerRequest>
 
   beforeEach(async () => {
-    client.data = getDbSeed({ authors, books, collectionBooks })
+    client.data = getDbSeed({ authors, books, collections, collectionBooks })
     await client.write()
   })
 
@@ -285,6 +289,98 @@ describe('lowdb', async () => {
         await expect(
           db.deleteBookCover(event, 'non-existent-id'),
         ).rejects.toThrow('Book cover not found for non-existent-id to delete')
+      })
+    })
+  })
+
+  describe('collections', async () => {
+    describe('getCollection', async () => {
+      it('should return collection by id', async () => {
+        const result = await db.getCollection(event, 'wishlist')
+        expect(result?.id).toBe('wishlist')
+      })
+
+      it('should return null if collection does not exist', async () => {
+        const result = await db.getCollection(event, 'non-existent-id')
+        expect(result).toBeNull()
+      })
+    })
+
+    describe('getCollections', async () => {
+      it('should return all collections', async () => {
+        const result = await db.getCollections()
+        expect(result).toHaveLength(3)
+      })
+    })
+
+    describe('createCollection', async () => {
+      it('should create a new collection', async () => {
+        const newCollection = buildCollection({
+          id: 'new-collection',
+          name: 'New Collection',
+        })
+        const result = await db.createCollection(event, newCollection, [])
+        expect(result?.id).toBeDefined()
+        expect(client.data.collections).toHaveLength(4)
+      })
+
+      it('should add books to collection if provided', async () => {
+        const newCollection = buildCollection({
+          id: 'new-collection',
+          name: 'New Collection',
+        })
+        const result = await db.createCollection(event, newCollection, [
+          { id: books[0].id, order: 0 },
+          { id: books[1].id, order: 1 },
+        ])
+
+        expect(result?.id).toBeDefined()
+        expect(client.data['collection-book']).toHaveLength(
+          collectionBooks.length + 2,
+        )
+      })
+    })
+
+    describe('deleteCollection', async () => {
+      it('should delete collection by id', async () => {
+        const result = await db.deleteCollection(event, collections[0].id, {})
+        expect(result).toBe(collections[0].id)
+        expect(client.data.collections).toHaveLength(2)
+        expect(client.data['collection-book']).toHaveLength(3)
+      })
+
+      it('should delete books if deleteBooks is true', async () => {
+        await db.deleteCollection(event, collections[0].id, {
+          deleteBooks: true,
+        })
+        expect(client.data.books).toHaveLength(books.length - 1)
+      })
+
+      it('should not delete books if deleteBooks is false', async () => {
+        await db.deleteCollection(event, collections[0].id, {
+          deleteBooks: false,
+        })
+        expect(client.data.books).toHaveLength(books.length)
+      })
+
+      it('should not delete collection if it does not exist', async () => {
+        const result = await db.deleteCollection(event, 'non-existent-id', {})
+        expect(result).toBe('non-existent-id')
+        expect(client.data.collections).toHaveLength(3)
+      })
+
+      it('should not delete wishlist', async () => {
+        await expect(
+          db.deleteCollection(event, 'wishlist', {}),
+        ).rejects.toThrow('Cannot delete wishlist')
+        expect(client.data.collections).toHaveLength(3)
+      })
+
+      it('should not delete favorite', async () => {
+        await expect(
+          db.deleteCollection(event, 'favorite', {}),
+        ).rejects.toThrow('Cannot delete favorite')
+        expect(client.data.collections).toHaveLength(3)
       })
     })
   })

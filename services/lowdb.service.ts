@@ -11,17 +11,12 @@ import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
-import type { Collection } from '~/types/collection'
-import {
-  bookToDbBook,
-  collectionToDbCollection,
-  logger,
-  DEFAULT_COLLECTIONS,
-} from '../utils'
+import { bookToDbBook, logger, DEFAULT_COLLECTIONS } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference } from 'ramda'
 import { FileStorageService } from './file-storage.service'
+import type { Collection } from '~/types/collection'
 
 export class LowDBClient {
   private client: Low<Database>
@@ -169,9 +164,7 @@ export class LowDBClient {
     // create or update book
     const bookDb: BookDB = {
       ...book,
-      id: book.id ?? uuidv4(),
       author_id: book.author_id ? authorId : null,
-      created_at: new Date().toISOString(),
     }
 
     const bookIndex = this.client.data.books.findIndex(
@@ -374,33 +367,28 @@ export class LowDBClient {
 
   async createCollection(
     event: H3Event<EventHandlerRequest>,
-    collection: Collection,
+    collection: CollectionDB,
+    books: Collection['books'],
   ): ReturnType<DBClient['createCollection']> {
     await this.client.read()
 
-    const collectionDb: CollectionDB = {
-      ...collectionToDbCollection(collection),
-      id: collection.id ?? uuidv4(),
-      created_at: new Date().toISOString(),
-    }
-
     const bookIndex = this.client.data.collections.findIndex(
-      (b) => b.id === collectionDb.id,
+      (b) => b.id === collection.id,
     )
 
     if (bookIndex !== -1) {
-      this.client.data.collections.splice(bookIndex, 1, collectionDb)
+      this.client.data.collections.splice(bookIndex, 1, collection)
     } else {
-      this.client.data.collections.push(collectionDb)
+      this.client.data.collections.push(collection)
     }
 
     this.client.data['collection-book'] = this.client.data[
       'collection-book'
-    ].filter((cb) => cb.collection_id !== collectionDb.id)
+    ].filter((cb) => cb.collection_id !== collection.id)
 
-    const collectionBooks = collection.books.map((book) => ({
+    const collectionBooks = books.map((book) => ({
       book_id: book.id,
-      collection_id: collectionDb.id,
+      collection_id: collection.id,
       order: book.order,
     }))
 
@@ -409,7 +397,7 @@ export class LowDBClient {
 
     await this.client.write()
 
-    return { ...collectionDb, 'collection-book': collectionBooks }
+    return { ...collection, 'collection-book': collectionBooks }
   }
 
   async deleteCollection(
