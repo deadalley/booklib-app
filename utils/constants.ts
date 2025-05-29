@@ -21,6 +21,17 @@ export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
   [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
 }
 
+export const DEFAULT_COLLECTIONS_INIT = [
+  {
+    id: WISHLIST_COLLECTION_ID,
+    name: 'Wishlist',
+  },
+  {
+    id: FAVORITE_COLLECTION_ID,
+    name: 'Favorites',
+  },
+]
+
 export const BOOKS_PAGE_SIZE = 44
 
 export const ICON_SIZE_SMALL = 20

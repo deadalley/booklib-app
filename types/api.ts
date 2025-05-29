@@ -117,3 +117,14 @@ export type DBClient = {
   ) => Promise<boolean>
   checkLibraryIntegrity: () => Promise<object>
 }
+
+export type Database = {
+  authors: AuthorDB[]
+  books: BookDB[]
+  collections: CollectionDB[]
+  'collection-book': {
+    book_id: BookDB['id']
+    collection_id: CollectionDB['id']
+    order: number
+  }[]
+}

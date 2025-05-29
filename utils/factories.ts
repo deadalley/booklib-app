@@ -1,42 +1,47 @@
 import { faker } from '@faker-js/faker'
-import type { Book } from '~/types/book'
-import type { Collection } from '~/types/collection'
+import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 
-export function buildBook(overwrite?: Partial<Book>): Book {
+export function buildBook(overwrite?: Partial<BookDB>): BookDB {
   return {
     title: faker.commerce.productName(),
-    coverSrc: faker.image.urlPicsumPhotos({ height: 540, width: 340 }),
-    createdAt: faker.date.past().toISOString(),
+    cover_src: faker.image.urlPicsumPhotos({ height: 540, width: 340 }),
+    created_at: faker.date.past().toISOString(),
     id: faker.string.uuid(),
     isbn: faker.commerce.isbn(),
     language: 'English',
-    originalTitle: faker.commerce.productName(),
-    originalLanguage: 'English',
+    original_title: faker.commerce.productName(),
+    original_language: 'English',
     pages: faker.number.int(),
     publisher: faker.company.name(),
     rating: faker.number.int(),
     summary: faker.lorem.lines(5),
     year: faker.date.past().getFullYear(),
     genres: faker.helpers.multiple(faker.color.human, { count: 5 }),
-    progressStatus: 'not-read',
-    startedAt: faker.date.past().toISOString(),
-    finishedAt: faker.date.past().toISOString(),
+    started_at: faker.date.past().toISOString(),
+    finished_at: faker.date.past().toISOString(),
     collections: [],
-    author: faker.string.uuid(),
+    author_id: faker.string.uuid(),
+    progress_status: 'not-owned',
     ...overwrite,
   }
 }
 
-export function buildCollection(overwrite?: Partial<Collection>): Collection {
+export function buildCollection(
+  overwrite?: Partial<CollectionDB>,
+): CollectionDB {
   return {
     id: faker.string.uuid(),
     name: faker.commerce.productName(),
-    books: [
-      { id: faker.string.uuid(), order: 0 },
-      { id: faker.string.uuid(), order: 1 },
-      { id: faker.string.uuid(), order: 2 },
-    ],
-    createdAt: faker.date.past().toISOString(),
+    created_at: faker.date.past().toISOString(),
+    ...overwrite,
+  }
+}
+
+export function buildAuthor(overwrite?: Partial<AuthorDB>): AuthorDB {
+  return {
+    id: faker.string.uuid(),
+    name: faker.person.fullName(),
+    created_at: faker.date.past().toISOString(),
     ...overwrite,
   }
 }

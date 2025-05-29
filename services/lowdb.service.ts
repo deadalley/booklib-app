@@ -1,12 +1,13 @@
 import type { H3Event, EventHandlerRequest } from 'h3'
 import type {
+  Database,
   DBClient,
   DeleteAuthorParams,
   DeleteCollectionParams,
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
-import { JSONFilePreset } from 'lowdb/node'
+import { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,559 +16,539 @@ import {
   bookToDbBook,
   collectionToDbCollection,
   logger,
-  FAVORITE_COLLECTION_ID,
-  WISHLIST_COLLECTION_ID,
   DEFAULT_COLLECTIONS,
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference } from 'ramda'
 
-const DEFAULT_COLLECTIONS_INIT = [
-  {
-    id: WISHLIST_COLLECTION_ID,
-    name: 'Wishlist',
-  },
-  {
-    id: FAVORITE_COLLECTION_ID,
-    name: 'Favorites',
-  },
-]
+export class LowDBClient {
+  client: Low<Database>
 
-type Database = {
-  authors: AuthorDB[]
-  books: BookDB[]
-  collections: CollectionDB[]
-  'collection-book': {
-    book_id: BookDB['id']
-    collection_id: CollectionDB['id']
-    order: number
-  }[]
-}
+  constructor(client: Low<Database>) {
+    this.client = client
+  }
 
-const client = await JSONFilePreset<Database>('usr/booklib.json', {
-  authors: [],
-  books: [],
-  // collections: [],
-  collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
-    ...c,
-    created_at: new Date().toISOString(),
-  })),
-  'collection-book': [],
-})
+  private isBookCover(id: string) {
+    return (fileName: string) => fileName.split('.')[0] === id
+  }
 
-function isBookCover(id: string) {
-  return (fileName: string) => fileName.split('.')[0] === id
-}
+  private async getAllBookCoverFileNames() {
+    return getFilesLocally('/bookCovers')
+  }
 
-async function getAllBookCoverFileNames() {
-  return getFilesLocally('/bookCovers')
-}
+  private async getBookCoverFileName(id: string) {
+    const allFiles = await this.getAllBookCoverFileNames()
 
-async function getBookCoverFileName(id: string) {
-  const allFiles = await getAllBookCoverFileNames()
+    // find the file extension
+    const fileName = allFiles.find(this.isBookCover(id))
 
-  // find the file extension
-  const fileName = allFiles.find(isBookCover(id))
+    return fileName
+  }
 
-  return fileName
-}
+  private getBookCoverUrl(bookId: string | number) {
+    return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
+  }
 
-function getBookCoverUrl(bookId: string | number) {
-  return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
-}
+  async getAuthors(): ReturnType<DBClient['getAuthors']> {
+    await this.client.read()
 
-export async function getAuthors(): ReturnType<DBClient['getAuthors']> {
-  await client.read()
+    const data = this.client.data.authors
 
-  const data = client.data.authors
+    return data
+  }
 
-  return data
-}
+  async deleteAuthor(
+    event: H3Event<EventHandlerRequest>,
+    id: AuthorDB['id'],
+    params: DeleteAuthorParams,
+  ): ReturnType<DBClient['deleteAuthor']> {
+    await this.client.read()
 
-export async function deleteAuthor(
-  event: H3Event<EventHandlerRequest>,
-  id: AuthorDB['id'],
-  params: DeleteAuthorParams,
-): ReturnType<DBClient['deleteAuthor']> {
-  await client.read()
-
-  client.data.authors = client.data.authors.filter((author) => author.id !== id)
-
-  if (params.deleteBooks) {
-    client.data.books = client.data.books.filter(
-      (book) => book.author_id !== id,
+    this.client.data.authors = this.client.data.authors.filter(
+      (author) => author.id !== id,
     )
-  } else {
-    client.data.books = client.data.books.map((book) =>
-      book.author_id === id ? { ...book, author_id: null } : book,
-    )
+
+    if (params.deleteBooks) {
+      this.client.data.books = this.client.data.books.filter(
+        (book) => book.author_id !== id,
+      )
+    } else {
+      this.client.data.books = this.client.data.books.map((book) =>
+        book.author_id === id ? { ...book, author_id: null } : book,
+      )
+    }
+
+    await this.client.write()
+
+    return id
   }
 
-  await client.write()
+  async getBook(
+    event: H3Event<EventHandlerRequest>,
+    id: string,
+  ): ReturnType<DBClient['getBook']> {
+    await this.client.read()
 
-  return id
-}
+    const book = this.client.data.books.find((book) => book.id === id)
 
-export async function getBook(
-  event: H3Event<EventHandlerRequest>,
-  id: string,
-): ReturnType<DBClient['getBook']> {
-  await client.read()
+    const bookCovers = await this.getAllBookCoverFileNames()
+    const hasBookCover = book?.id && bookCovers.find(this.isBookCover(book.id))
 
-  const book = client.data.books.find((book) => book.id === id)
-
-  const bookCovers = await getAllBookCoverFileNames()
-  const hasBookCover = book?.id && bookCovers.find(isBookCover(book.id))
-
-  const collections = client.data['collection-book']
-    .filter(({ book_id }) => book_id === id)
-    .map(({ collection_id }) => collection_id)
-
-  return book
-    ? {
-        ...book,
-        collections,
-        cover_src: hasBookCover ? getBookCoverUrl(book.id) : null,
-      }
-    : null
-}
-
-export async function getBooks(
-  event: H3Event<EventHandlerRequest>,
-  { page, pageSize, bookProgress }: GetBooksQuerySearchParams,
-): ReturnType<DBClient['getBooks']> {
-  await client.read()
-
-  let data = client.data.books
-
-  if (page !== undefined && pageSize !== undefined) {
-    data = data.slice(page * pageSize, (page + 1) * pageSize - 1)
-  }
-
-  if (bookProgress !== undefined) {
-    data = data.filter((book) => book.progress_status === bookProgress)
-  }
-
-  const bookCovers = await getAllBookCoverFileNames()
-
-  data = data.map((book) => {
-    const hasBookCover = bookCovers.find(isBookCover(book.id))
-
-    const collections = client.data['collection-book']
-      .filter(({ book_id }) => book_id === book.id)
+    const collections = this.client.data['collection-book']
+      .filter(({ book_id }) => book_id === id)
       .map(({ collection_id }) => collection_id)
 
-    return {
-      ...book,
-      collections,
-      cover_src: hasBookCover ? getBookCoverUrl(book.id) : null,
+    return book
+      ? {
+          ...book,
+          collections,
+          cover_src: hasBookCover ? this.getBookCoverUrl(book.id) : null,
+        }
+      : null
+  }
+
+  async getBooks(
+    event: H3Event<EventHandlerRequest>,
+    { page, pageSize, bookProgress }: GetBooksQuerySearchParams,
+  ): ReturnType<DBClient['getBooks']> {
+    await this.client.read()
+
+    let data = this.client.data.books
+
+    if (page !== undefined && pageSize !== undefined) {
+      data = data.slice(page * pageSize, (page + 1) * pageSize - 1)
     }
-  })
 
-  return data
-}
-
-export async function createBook(
-  event: H3Event<EventHandlerRequest>,
-  book: Book,
-  collections: CollectionDB['id'][],
-): ReturnType<DBClient['createBook']> {
-  await client.read()
-
-  const existingAuthor = client.data.authors.find(
-    ({ id }) => id === book.author,
-  )
-
-  const authorId = existingAuthor?.id ?? uuidv4()
-
-  if (!existingAuthor) {
-    if (book.author) {
-      client.data.authors.push({
-        id: authorId,
-        name: book.author,
-        created_at: new Date().toISOString(),
-      })
+    if (bookProgress !== undefined) {
+      data = data.filter((book) => book.progress_status === bookProgress)
     }
-  }
 
-  const bookDb: BookDB = {
-    ...bookToDbBook(book),
-    id: book.id ?? uuidv4(),
-    author_id: book.author ? authorId : null,
-    created_at: new Date().toISOString(),
-  }
+    const bookCovers = await this.getAllBookCoverFileNames()
 
-  const bookIndex = client.data.books.findIndex((b) => b.id === bookDb.id)
+    data = data.map((book) => {
+      const hasBookCover = bookCovers.find(this.isBookCover(book.id))
 
-  if (bookIndex !== -1) {
-    client.data.books.splice(bookIndex, 1, bookDb)
-  } else {
-    client.data.books.push(bookDb)
-  }
+      const collections = this.client.data['collection-book']
+        .filter(({ book_id }) => book_id === book.id)
+        .map(({ collection_id }) => collection_id)
 
-  const existingCollectionIds = client.data['collection-book']
-    .filter(({ book_id }) => book_id === bookDb.id)
-    .map(({ collection_id }) => collection_id)
-
-  const collectionsToAdd = difference(collections, existingCollectionIds)
-  const collectionsToRemove = difference(existingCollectionIds, collections)
-
-  client.data['collection-book'] = client.data['collection-book']
-    .filter(
-      ({ book_id, collection_id }) =>
-        book_id !== bookDb.id || !collectionsToRemove.includes(collection_id),
-    )
-    .concat(
-      collectionsToAdd.map((collection_id) => ({
-        book_id: bookDb.id,
-        collection_id,
-        order: client.data['collection-book'].filter(
-          (cb) => collection_id === cb.collection_id,
-        ).length,
-      })),
-    )
-
-  await client.write()
-
-  return bookDb
-}
-
-export async function deleteBook(
-  event: H3Event<EventHandlerRequest>,
-  id: BookDB['id'],
-): ReturnType<DBClient['deleteBook']> {
-  await client.read()
-
-  client.data.books = client.data.books.filter((book) => book.id !== id)
-  client.data['collection-book'] = client.data['collection-book'].filter(
-    ({ book_id }) => book_id !== id,
-  )
-
-  await client.write()
-
-  return id
-}
-
-export async function deleteBooks(
-  event: H3Event<EventHandlerRequest>,
-  ids: BookDB['id'][],
-): ReturnType<DBClient['deleteBooks']> {
-  await client.read()
-
-  client.data.books = client.data.books.filter((b) => !ids.includes(b.id))
-
-  client.data['collection-book'] = client.data['collection-book'].filter(
-    ({ book_id }) => ids.includes(book_id),
-  )
-
-  await client.write()
-
-  return ids
-}
-
-export async function getBookCount(): ReturnType<DBClient['getBookCount']> {
-  await client.read()
-
-  return client.data.books.length
-}
-
-export async function getLatestBooks(): ReturnType<DBClient['getLatestBooks']> {
-  await client.read()
-
-  return client.data.books
-    .sort(({ created_at: c1 }, { created_at: c2 }) =>
-      new Date(c1) > new Date(c2) ? 1 : -1,
-    )
-    .slice(0, 9)
-}
-
-export async function getOrderedBooks(
-  event: H3Event<EventHandlerRequest>,
-  { property, count }: GetOrderedBooksQuerySearchParams,
-): ReturnType<DBClient['getOrderedBooks']> {
-  await client.read()
-
-  return client.data.books
-    .filter((b) => b[property])
-    .sort((b1, b2) =>
-      b1[property]!.toLocaleString().localeCompare(
-        b2[property]!.toLocaleString(),
-      ),
-    )
-    .slice(0, count ?? 11)
-}
-
-export async function getBookCover(
-  event: H3Event<EventHandlerRequest>,
-  id: string,
-): ReturnType<DBClient['getBookCover']> {
-  const fileName = await getBookCoverFileName(id)
-
-  const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
-
-  if (filePath) {
-    return sendStream(event, createReadStream(filePath))
-  }
-}
-
-export async function updateBookCover(
-  event: H3Event<EventHandlerRequest>,
-): ReturnType<DBClient['updateBookCover']> {
-  const { bookId, file } = await readBody<{ bookId: string; file: ServerFile }>(
-    event,
-  )
-
-  const fileName = await getBookCoverFileName(bookId)
-
-  if (fileName) {
-    await deleteFile(fileName, '/bookCovers')
-  }
-
-  await storeFileLocally(file, bookId, '/bookCovers')
-
-  const bookCoverUrl = getBookCoverUrl(bookId)
-
-  await client.read()
-
-  client.data.books = client.data.books.map((book) => {
-    if (book.id === bookId) {
       return {
         ...book,
-        cover_src: bookCoverUrl,
+        collections,
+        cover_src: hasBookCover ? this.getBookCoverUrl(book.id) : null,
+      }
+    })
+
+    return data
+  }
+
+  async createBook(
+    event: H3Event<EventHandlerRequest>,
+    book: Book,
+    collections: CollectionDB['id'][],
+  ): ReturnType<DBClient['createBook']> {
+    await this.client.read()
+
+    const existingAuthor = this.client.data.authors.find(
+      ({ id }) => id === book.author,
+    )
+
+    const authorId = existingAuthor?.id ?? uuidv4()
+
+    if (!existingAuthor) {
+      if (book.author) {
+        this.client.data.authors.push({
+          id: authorId,
+          name: book.author,
+          created_at: new Date().toISOString(),
+        })
       }
     }
 
-    return book
-  })
+    const bookDb: BookDB = {
+      ...bookToDbBook(book),
+      id: book.id ?? uuidv4(),
+      author_id: book.author ? authorId : null,
+      created_at: new Date().toISOString(),
+    }
 
-  await client.write()
+    const bookIndex = this.client.data.books.findIndex(
+      (b) => b.id === bookDb.id,
+    )
 
-  return bookCoverUrl
-}
+    if (bookIndex !== -1) {
+      this.client.data.books.splice(bookIndex, 1, bookDb)
+    } else {
+      this.client.data.books.push(bookDb)
+    }
 
-export async function deleteBookCover(
-  event: H3Event<EventHandlerRequest>,
-): ReturnType<DBClient['deleteBookCover']> {
-  const bookId = getRouterParam(event, 'id')
+    const existingCollectionIds = this.client.data['collection-book']
+      .filter(({ book_id }) => book_id === bookDb.id)
+      .map(({ collection_id }) => collection_id)
 
-  const allFiles = await getFilesLocally('/bookCovers')
+    const collectionsToAdd = difference(collections, existingCollectionIds)
+    const collectionsToRemove = difference(existingCollectionIds, collections)
 
-  // find the file extension
-  const fileName = allFiles.find(
-    (fileName) => fileName.split('.')[0] === bookId,
-  )
+    this.client.data['collection-book'] = this.client.data['collection-book']
+      .filter(
+        ({ book_id, collection_id }) =>
+          book_id !== bookDb.id || !collectionsToRemove.includes(collection_id),
+      )
+      .concat(
+        collectionsToAdd.map((collection_id) => ({
+          book_id: bookDb.id,
+          collection_id,
+          order: this.client.data['collection-book'].filter(
+            (cb) => collection_id === cb.collection_id,
+          ).length,
+        })),
+      )
 
-  if (fileName) {
-    await deleteFile(fileName, '/bookCovers')
+    await this.client.write()
 
-    client.data.books = client.data.books.map((book) => {
+    return bookDb
+  }
+
+  async deleteBook(
+    event: H3Event<EventHandlerRequest>,
+    id: BookDB['id'],
+  ): ReturnType<DBClient['deleteBook']> {
+    await this.client.read()
+
+    this.client.data.books = this.client.data.books.filter(
+      (book) => book.id !== id,
+    )
+    this.client.data['collection-book'] = this.client.data[
+      'collection-book'
+    ].filter(({ book_id }) => book_id !== id)
+
+    await this.client.write()
+
+    return id
+  }
+
+  async deleteBooks(
+    event: H3Event<EventHandlerRequest>,
+    ids: BookDB['id'][],
+  ): ReturnType<DBClient['deleteBooks']> {
+    await this.client.read()
+
+    this.client.data.books = this.client.data.books.filter(
+      (b) => !ids.includes(b.id),
+    )
+
+    this.client.data['collection-book'] = this.client.data[
+      'collection-book'
+    ].filter(({ book_id }) => ids.includes(book_id))
+
+    await this.client.write()
+
+    return ids
+  }
+
+  async getBookCount(): ReturnType<DBClient['getBookCount']> {
+    await this.client.read()
+
+    return this.client.data.books.length
+  }
+
+  async getLatestBooks(): ReturnType<DBClient['getLatestBooks']> {
+    await this.client.read()
+
+    return this.client.data.books
+      .sort(({ created_at: c1 }, { created_at: c2 }) =>
+        new Date(c1) > new Date(c2) ? 1 : -1,
+      )
+      .slice(0, 9)
+  }
+
+  async getOrderedBooks(
+    event: H3Event<EventHandlerRequest>,
+    { property, count }: GetOrderedBooksQuerySearchParams,
+  ): ReturnType<DBClient['getOrderedBooks']> {
+    await this.client.read()
+
+    return this.client.data.books
+      .filter((b) => b[property])
+      .sort((b1, b2) =>
+        b1[property]!.toLocaleString().localeCompare(
+          b2[property]!.toLocaleString(),
+        ),
+      )
+      .slice(0, count ?? 11)
+  }
+
+  async getBookCover(
+    event: H3Event<EventHandlerRequest>,
+    id: string,
+  ): ReturnType<DBClient['getBookCover']> {
+    const fileName = await this.getBookCoverFileName(id)
+
+    const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
+
+    if (filePath) {
+      return sendStream(event, createReadStream(filePath))
+    }
+  }
+
+  async updateBookCover(
+    event: H3Event<EventHandlerRequest>,
+  ): ReturnType<DBClient['updateBookCover']> {
+    const { bookId, file } = await readBody<{
+      bookId: string
+      file: ServerFile
+    }>(event)
+
+    const fileName = await this.getBookCoverFileName(bookId)
+
+    if (fileName) {
+      await deleteFile(fileName, '/bookCovers')
+    }
+
+    await storeFileLocally(file, bookId, '/bookCovers')
+
+    const bookCoverUrl = this.getBookCoverUrl(bookId)
+
+    await this.client.read()
+
+    this.client.data.books = this.client.data.books.map((book) => {
       if (book.id === bookId) {
         return {
           ...book,
-          cover_src: null,
+          cover_src: bookCoverUrl,
         }
       }
 
       return book
     })
 
-    await client.write()
+    await this.client.write()
 
-    return null
+    return bookCoverUrl
   }
 
-  const error = { message: `Book cover not found for ${bookId} to delete` }
-  logger.error(error)
-  throw createError(error.message)
-}
+  async deleteBookCover(
+    event: H3Event<EventHandlerRequest>,
+  ): ReturnType<DBClient['deleteBookCover']> {
+    const bookId = getRouterParam(event, 'id')
 
-export async function getCollection(
-  event: H3Event<EventHandlerRequest>,
-  id: string,
-): ReturnType<DBClient['getCollection']> {
-  await client.read()
+    const allFiles = await getFilesLocally('/bookCovers')
 
-  const collection = client.data.collections.find((c) => c.id === id)
-  const books = client.data['collection-book'].filter(
-    (cb) => cb.collection_id === id,
-  )
+    // find the file extension
+    const fileName = allFiles.find(
+      (fileName) => fileName.split('.')[0] === bookId,
+    )
 
-  return collection
-    ? {
-        ...collection,
-        ['collection-book']: books,
-      }
-    : null
-}
+    if (fileName) {
+      await deleteFile(fileName, '/bookCovers')
 
-export async function getCollections(): ReturnType<DBClient['getCollections']> {
-  await client.read()
+      this.client.data.books = this.client.data.books.map((book) => {
+        if (book.id === bookId) {
+          return {
+            ...book,
+            cover_src: null,
+          }
+        }
 
-  return client.data.collections.map((collection) => ({
-    ...collection,
-    ['collection-book']: client.data['collection-book'].filter(
-      (cb) => cb.collection_id === collection.id,
-    ),
-  }))
-}
+        return book
+      })
 
-export async function getCollectionCount(): ReturnType<
-  DBClient['getCollectionCount']
-> {
-  await client.read()
+      await this.client.write()
 
-  return client.data.collections.length
-}
+      return null
+    }
 
-export async function createCollection(
-  event: H3Event<EventHandlerRequest>,
-  collection: Collection,
-): ReturnType<DBClient['createCollection']> {
-  await client.read()
-
-  const collectionDb: CollectionDB = {
-    ...collectionToDbCollection(collection),
-    id: collection.id ?? uuidv4(),
-    created_at: new Date().toISOString(),
-  }
-
-  const bookIndex = client.data.collections.findIndex(
-    (b) => b.id === collectionDb.id,
-  )
-
-  if (bookIndex !== -1) {
-    client.data.collections.splice(bookIndex, 1, collectionDb)
-  } else {
-    client.data.collections.push(collectionDb)
-  }
-
-  client.data['collection-book'] = client.data['collection-book'].filter(
-    (cb) => cb.collection_id !== collectionDb.id,
-  )
-
-  const collectionBooks = collection.books.map((book) => ({
-    book_id: book.id,
-    collection_id: collectionDb.id,
-    order: book.order,
-  }))
-
-  client.data['collection-book'] =
-    client.data['collection-book'].concat(collectionBooks)
-
-  await client.write()
-
-  return { ...collectionDb, 'collection-book': collectionBooks }
-}
-
-export async function deleteCollection(
-  event: H3Event<EventHandlerRequest>,
-  id: CollectionDB['id'],
-  params: DeleteCollectionParams,
-): ReturnType<DBClient['deleteCollection']> {
-  if (DEFAULT_COLLECTIONS.includes(id)) {
-    const error = { message: `Cannot delete ${id}` }
+    const error = { message: `Book cover not found for ${bookId} to delete` }
     logger.error(error)
     throw createError(error.message)
   }
 
-  await client.read()
+  async getCollection(
+    event: H3Event<EventHandlerRequest>,
+    id: string,
+  ): ReturnType<DBClient['getCollection']> {
+    await this.client.read()
 
-  const booksInCollection = client.data['collection-book']
-    .filter(({ collection_id }) => collection_id === id)
-    .map(({ book_id }) => book_id)
+    const collection = this.client.data.collections.find((c) => c.id === id)
+    const books = this.client.data['collection-book'].filter(
+      (cb) => cb.collection_id === id,
+    )
 
-  client.data.collections = client.data.collections.filter((c) => c.id !== id)
-
-  if (params.deleteBooks) {
-    client.data.books = client.data.books.filter(
-      (book) => !booksInCollection.includes(book.id),
-    )
-    client.data['collection-book'] = client.data['collection-book'].filter(
-      ({ book_id }) => !booksInCollection.includes(book_id),
-    )
-  } else {
-    client.data['collection-book'] = client.data['collection-book'].filter(
-      ({ collection_id }) => collection_id !== id,
-    )
+    return collection
+      ? {
+          ...collection,
+          ['collection-book']: books,
+        }
+      : null
   }
 
-  await client.write()
+  async getCollections(): ReturnType<DBClient['getCollections']> {
+    await this.client.read()
 
-  return id
-}
+    return this.client.data.collections.map((collection) => ({
+      ...collection,
+      ['collection-book']: this.client.data['collection-book'].filter(
+        (cb) => cb.collection_id === collection.id,
+      ),
+    }))
+  }
 
-export async function isLibraryEmpty(): ReturnType<DBClient['isLibraryEmpty']> {
-  await client.read()
+  async getCollectionCount(): ReturnType<DBClient['getCollectionCount']> {
+    await this.client.read()
 
-  return client.data.books.length === 0
-}
+    return this.client.data.collections.length
+  }
 
-export async function resetLibrary(): ReturnType<DBClient['resetLibrary']> {
-  await client.update((data) => {
-    data.books = []
-    data.collections = []
-    data['collection-book'] = []
-  })
+  async createCollection(
+    event: H3Event<EventHandlerRequest>,
+    collection: Collection,
+  ): ReturnType<DBClient['createCollection']> {
+    await this.client.read()
 
-  return true
-}
-
-export async function importLibrary(
-  event: H3Event<EventHandlerRequest>,
-  books: Book[],
-): ReturnType<DBClient['importLibrary']> {
-  await client.read()
-
-  client.data.books = client.data.books.concat(
-    books.map(({ id, ...book }) => ({
-      ...bookToDbBook(book),
-      id: uuidv4(),
+    const collectionDb: CollectionDB = {
+      ...collectionToDbCollection(collection),
+      id: collection.id ?? uuidv4(),
       created_at: new Date().toISOString(),
-    })),
-  )
+    }
 
-  await client.write()
+    const bookIndex = this.client.data.collections.findIndex(
+      (b) => b.id === collectionDb.id,
+    )
 
-  return true
-}
+    if (bookIndex !== -1) {
+      this.client.data.collections.splice(bookIndex, 1, collectionDb)
+    } else {
+      this.client.data.collections.push(collectionDb)
+    }
 
-export async function checkLibraryIntegrity(): ReturnType<
-  DBClient['checkLibraryIntegrity']
-> {
-  await client.read()
+    this.client.data['collection-book'] = this.client.data[
+      'collection-book'
+    ].filter((cb) => cb.collection_id !== collectionDb.id)
 
-  const authorIds = client.data.authors.map(({ id }) => id)
-  const collectionIds = client.data.collections.map(({ id }) => id)
-  const bookIds = client.data.books.map(({ id }) => id)
+    const collectionBooks = collection.books.map((book) => ({
+      book_id: book.id,
+      collection_id: collectionDb.id,
+      order: book.order,
+    }))
 
-  const booksWithNonExistentCollections = client.data['collection-book'].filter(
-    ({ collection_id }) => !collectionIds.includes(collection_id),
-  )
+    this.client.data['collection-book'] =
+      this.client.data['collection-book'].concat(collectionBooks)
 
-  const booksWithNonExistentAuthors = client.data.books.filter(
-    ({ author_id }) => author_id && !authorIds.includes(author_id),
-  )
+    await this.client.write()
 
-  const collectionsWithNonExistentBooks = client.data['collection-book'].filter(
-    ({ book_id }) => !bookIds.includes(book_id),
-  )
+    return { ...collectionDb, 'collection-book': collectionBooks }
+  }
 
-  return {
-    books: [
-      ...booksWithNonExistentCollections.map(
+  async deleteCollection(
+    event: H3Event<EventHandlerRequest>,
+    id: CollectionDB['id'],
+    params: DeleteCollectionParams,
+  ): ReturnType<DBClient['deleteCollection']> {
+    if (DEFAULT_COLLECTIONS.includes(id)) {
+      const error = { message: `Cannot delete ${id}` }
+      logger.error(error)
+      throw createError(error.message)
+    }
+
+    await this.client.read()
+
+    const booksInCollection = this.client.data['collection-book']
+      .filter(({ collection_id }) => collection_id === id)
+      .map(({ book_id }) => book_id)
+
+    this.client.data.collections = this.client.data.collections.filter(
+      (c) => c.id !== id,
+    )
+
+    if (params.deleteBooks) {
+      this.client.data.books = this.client.data.books.filter(
+        (book) => !booksInCollection.includes(book.id),
+      )
+      this.client.data['collection-book'] = this.client.data[
+        'collection-book'
+      ].filter(({ book_id }) => !booksInCollection.includes(book_id))
+    } else {
+      this.client.data['collection-book'] = this.client.data[
+        'collection-book'
+      ].filter(({ collection_id }) => collection_id !== id)
+    }
+
+    await this.client.write()
+
+    return id
+  }
+
+  async isLibraryEmpty(): ReturnType<DBClient['isLibraryEmpty']> {
+    await this.client.read()
+
+    return this.client.data.books.length === 0
+  }
+
+  async resetLibrary(): ReturnType<DBClient['resetLibrary']> {
+    await this.client.update((data) => {
+      data.books = []
+      data.collections = []
+      data['collection-book'] = []
+    })
+
+    return true
+  }
+
+  async importLibrary(
+    event: H3Event<EventHandlerRequest>,
+    books: Book[],
+  ): ReturnType<DBClient['importLibrary']> {
+    await this.client.read()
+
+    this.client.data.books = this.client.data.books.concat(
+      books.map(({ id, ...book }) => ({
+        ...bookToDbBook(book),
+        id: uuidv4(),
+        created_at: new Date().toISOString(),
+      })),
+    )
+
+    await this.client.write()
+
+    return true
+  }
+
+  async checkLibraryIntegrity(): ReturnType<DBClient['checkLibraryIntegrity']> {
+    await this.client.read()
+
+    const authorIds = this.client.data.authors.map(({ id }) => id)
+    const collectionIds = this.client.data.collections.map(({ id }) => id)
+    const bookIds = this.client.data.books.map(({ id }) => id)
+
+    const booksWithNonExistentCollections = this.client.data[
+      'collection-book'
+    ].filter(({ collection_id }) => !collectionIds.includes(collection_id))
+
+    const booksWithNonExistentAuthors = this.client.data.books.filter(
+      ({ author_id }) => author_id && !authorIds.includes(author_id),
+    )
+
+    const collectionsWithNonExistentBooks = this.client.data[
+      'collection-book'
+    ].filter(({ book_id }) => !bookIds.includes(book_id))
+
+    return {
+      books: [
+        ...booksWithNonExistentCollections.map(
+          ({ book_id, collection_id }) =>
+            `Book ${book_id} is assigned collection ${collection_id}, which does not exist.`,
+        ),
+        ...booksWithNonExistentAuthors.map(
+          ({ id, author_id }) =>
+            `Book ${id} is assigned author ${author_id}, which does not exist.`,
+        ),
+      ],
+      collections: collectionsWithNonExistentBooks.map(
         ({ book_id, collection_id }) =>
-          `Book ${book_id} is assigned collection ${collection_id}, which does not exist.`,
+          `Collection ${collection_id} contains book ${book_id}, which does not exist`,
       ),
-      ...booksWithNonExistentAuthors.map(
-        ({ id, author_id }) =>
-          `Book ${id} is assigned author ${author_id}, which does not exist.`,
-      ),
-    ],
-    collections: collectionsWithNonExistentBooks.map(
-      ({ book_id, collection_id }) =>
-        `Collection ${collection_id} contains book ${book_id}, which does not exist`,
-    ),
-    authors: [],
+      authors: [],
+    }
   }
 }
