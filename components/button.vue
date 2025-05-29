@@ -2,7 +2,7 @@
   <button
     v-bind="$attrs"
     type="button"
-    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-base font-medium lg:inline-flex lg:grow-0"
+    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-xl py-2 text-base font-medium lg:inline-flex lg:grow-0"
     :class="{
       'bg-main text-white hover:bg-main/90 active:bg-main-dark':
         variant === 'primary',
@@ -13,6 +13,12 @@
       '!bg-accent-light !text-accent-dark': !!disabled,
       'cursor-pointer': !disabled,
       'w-full flex-1': !!expand,
+      'px-2':
+        !$slots['default'] && ($slots['prependIcon'] || $slots['appendIcon']),
+      'px-4': !(
+        !$slots['default'] &&
+        ($slots['prependIcon'] || $slots['appendIcon'])
+      ),
     }"
     :disabled="disabled"
   >
