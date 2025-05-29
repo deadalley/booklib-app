@@ -9,7 +9,6 @@ import type {
 } from '~/types/api'
 import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
-import type { Book } from '~/types/book'
 import { v4 as uuidv4 } from 'uuid'
 import { bookToDbBook, logger, DEFAULT_COLLECTIONS } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
@@ -235,7 +234,7 @@ export class LowDBClient {
 
     this.client.data['collection-book'] = this.client.data[
       'collection-book'
-    ].filter(({ book_id }) => ids.includes(book_id))
+    ].filter(({ book_id }) => !ids.includes(book_id))
 
     await this.client.write()
 
@@ -252,10 +251,11 @@ export class LowDBClient {
     await this.client.read()
 
     return this.client.data.books
+      .concat()
       .sort(({ created_at: c1 }, { created_at: c2 }) =>
-        new Date(c1) > new Date(c2) ? 1 : -1,
+        new Date(c1) < new Date(c2) ? 1 : -1,
       )
-      .slice(0, 9)
+      .slice(0, 10)
   }
 
   async getOrderedBooks(
