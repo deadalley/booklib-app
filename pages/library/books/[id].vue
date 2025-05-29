@@ -305,6 +305,7 @@
                   :key="collection.id"
                   :collection="collection"
                   :selectable="managingCollections"
+                  collection-type="collections"
                   @select="onSelectCollection"
                 />
               </div>

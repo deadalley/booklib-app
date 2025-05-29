@@ -1,3 +1,4 @@
+import type { Author } from './author'
 import type { Collection } from './collection'
 
 export type BookProgressStatus =
@@ -9,8 +10,8 @@ export type BookProgressStatus =
   | 'read'
   | 'not-finished'
 
-export type Book<ID extends number | string = number> = {
-  id: ID
+export type Book = {
+  id: string
   title: string
   coverSrc: string | null
   createdAt: string
@@ -24,11 +25,11 @@ export type Book<ID extends number | string = number> = {
   summary: string | null
   year: number | null
   genres: string[] | null
-  collections: Collection<ID>['id'][]
+  collections: Collection['id'][]
   progressStatus: BookProgressStatus | null
   startedAt: string | null
   finishedAt: string | null
-  author: ID | null
+  author: Author['id'] | null
 }
 
 export type ViewBook = Book & {

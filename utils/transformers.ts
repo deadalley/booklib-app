@@ -9,9 +9,7 @@ export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
 }
 
-export function dbAuthorToAuthor<T extends number | string>(
-  dbAuthor: AuthorDB<T>,
-): Author<T> {
+export function dbAuthorToAuthor(dbAuthor: AuthorDB): Author {
   return {
     id: dbAuthor.id,
     name: dbAuthor.name,
@@ -19,10 +17,10 @@ export function dbAuthorToAuthor<T extends number | string>(
   }
 }
 
-export function dbBookToBook<T extends number | string>(
-  dbBook: BookDB<T>,
-  collections: Pick<CollectionDB<T>, 'id'>[],
-): Book<T> {
+export function dbBookToBook(
+  dbBook: BookDB,
+  collections: CollectionDB['id'][],
+): Book {
   return {
     id: dbBook.id,
     title: dbBook.title,
@@ -38,21 +36,19 @@ export function dbBookToBook<T extends number | string>(
     summary: dbBook.summary,
     year: dbBook.year,
     genres: dbBook.genres ?? [],
-    collections: collections.map(({ id }) => id),
     progressStatus: dbBook.progress_status,
     startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : null,
     finishedAt: dbBook.finished_at ? toSimpleDate(dbBook.finished_at) : null,
+    collections,
     author: dbBook.author_id,
   }
 }
 
-export function bookToDbBook<T extends number | string>(
-  book: Partial<Book<T>>,
-  userId: string,
-): Omit<BookDB<T>, 'created_at' | 'id'> {
+export function bookToDbBook(
+  book: Partial<Book>,
+): Omit<BookDB, 'created_at' | 'id'> {
   return {
     author_id: book.author || null,
-    user_id: userId,
     ...(book.id ? { id: book.id } : {}),
     original_title: book.originalTitle || null,
     cover_src: book.coverSrc || null,
@@ -69,14 +65,14 @@ export function bookToDbBook<T extends number | string>(
     progress_status: book.progressStatus || 'not-read',
     started_at: nullify(book.startedAt),
     finished_at: nullify(book.finishedAt),
-    collections: [],
+    collections: book.collections ?? [],
   }
 }
 
-export function dbCollectionToCollection<T extends number | string>(
-  dbCollection: CollectionDB<T>,
-  books: { book_id: Book<T>['id']; order: number }[],
-): Collection<T> {
+export function dbCollectionToCollection(
+  dbCollection: CollectionDB,
+  books: { book_id: Book['id']; order: number }[],
+): Collection {
   return {
     id: dbCollection.id,
     name: dbCollection.name,
@@ -87,20 +83,18 @@ export function dbCollectionToCollection<T extends number | string>(
   }
 }
 
-export function collectionToDbCollection<T extends number | string>(
-  collection: Collection<T>,
-  userId: string,
-): Omit<CollectionDB<T>, 'created_at' | 'id'> {
+export function collectionToDbCollection(
+  collection: Collection,
+): Omit<CollectionDB, 'created_at' | 'id'> {
   return {
     ...(collection.id ? { id: collection.id } : {}),
-    user_id: userId,
     name: collection.name,
   }
 }
 
 export function googleBookToBook(googleBook: GoogleBook): Book {
   return {
-    id: 0,
+    id: '0',
     title: googleBook.volumeInfo.title,
     coverSrc: googleBook.volumeInfo.imageLinks.thumbnail,
     createdAt: '',

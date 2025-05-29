@@ -1,5 +1,5 @@
-export type Author<ID extends number | string = number> = {
-  id: ID
+export type Author = {
+  id: string
   name: string
   createdAt: string
 }

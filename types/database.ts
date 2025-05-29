@@ -1,23 +1,34 @@
-import type { Database } from './db.generate'
+import type { BookProgressStatus } from './book'
 
-export type AuthorDB<ID extends number | string = number> = Omit<
-  Database['public']['Tables']['authors']['Row'],
-  'id'
-> & {
-  id: ID
+export type AuthorDB = {
+  id: string
+  created_at: string
+  name: string
 }
-export type BookDB<ID extends number | string = number> = Omit<
-  Database['public']['Tables']['books']['Row'],
-  'id' | 'author_id'
-> & {
-  id: ID
-  author_id: ID | null
-  collections: Pick<CollectionDB<ID>, 'id'>[]
+export type BookDB = {
+  id: string
+  author_id: string | null
   cover_src: string | null
+  created_at: string
+  finished_at: string | null
+  genres: string[] | null
+  isbn: string | null
+  language: string | null
+  original_language: string | null
+  original_title: string | null
+  pages: number | null
+  progress_status: BookProgressStatus | null
+  publisher: string | null
+  rating: number | null
+  started_at: string | null
+  summary: string | null
+  title: string
+  year: number | null
+  collections: CollectionDB['id'][]
 }
-export type CollectionDB<ID extends number | string = number> = Omit<
-  Database['public']['Tables']['collections']['Row'],
-  'id'
-> & {
-  id: ID
+
+export type CollectionDB = {
+  id: string
+  created_at: string
+  name: string
 }

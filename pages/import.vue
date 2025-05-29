@@ -177,7 +177,7 @@ async function onFileChange(e: Event) {
 
   const booksWithIds = books.map((book, index) => ({
     ...book,
-    id: index + 1,
+    id: String(index + 1),
   }))
 
   importedBooks.value = booksWithIds

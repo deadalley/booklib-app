@@ -1,8 +1,8 @@
 import type { Book } from './book'
 
-export type Collection<ID extends number | string = number> = {
-  id: ID
+export type Collection = {
+  id: string
   name: string
   createdAt: string
-  books: { id: Book<ID>['id']; order: number }[]
+  books: { id: Book['id']; order: number }[]
 }

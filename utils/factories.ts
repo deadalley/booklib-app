@@ -7,7 +7,7 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     title: faker.commerce.productName(),
     coverSrc: faker.image.urlPicsumPhotos({ height: 540, width: 340 }),
     createdAt: faker.date.past().toISOString(),
-    id: faker.number.float(),
+    id: faker.string.uuid(),
     isbn: faker.commerce.isbn(),
     language: 'English',
     originalTitle: faker.commerce.productName(),
@@ -22,19 +22,19 @@ export function buildBook(overwrite?: Partial<Book>): Book {
     startedAt: faker.date.past().toISOString(),
     finishedAt: faker.date.past().toISOString(),
     collections: [],
-    author: faker.number.int(),
+    author: faker.string.uuid(),
     ...overwrite,
   }
 }
 
 export function buildCollection(overwrite?: Partial<Collection>): Collection {
   return {
-    id: faker.number.float(),
+    id: faker.string.uuid(),
     name: faker.commerce.productName(),
     books: [
-      { id: 1, order: 0 },
-      { id: 2, order: 1 },
-      { id: 3, order: 2 },
+      { id: faker.string.uuid(), order: 0 },
+      { id: faker.string.uuid(), order: 1 },
+      { id: faker.string.uuid(), order: 2 },
     ],
     createdAt: faker.date.past().toISOString(),
     ...overwrite,

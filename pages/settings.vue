@@ -87,7 +87,6 @@ async function resetLibrary() {
 
 async function checkLibrary() {
   try {
-    // @ts-expect-error throws depth error
     libraryIntegrityResult.value = await $fetch(
       '/api/library/check-integrity',
       {

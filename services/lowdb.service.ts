@@ -23,10 +23,6 @@ import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference } from 'ramda'
 
-const user = {
-  id: 'userId',
-}
-
 const DEFAULT_COLLECTIONS_INIT = [
   {
     id: WISHLIST_COLLECTION_ID,
@@ -39,14 +35,13 @@ const DEFAULT_COLLECTIONS_INIT = [
 ]
 
 type Database = {
-  authors: AuthorDB<string>[]
-  books: BookDB<string>[]
-  collections: CollectionDB<string>[]
+  authors: AuthorDB[]
+  books: BookDB[]
+  collections: CollectionDB[]
   'collection-book': {
-    book_id: BookDB<string>['id']
-    collection_id: CollectionDB<string>['id']
+    book_id: BookDB['id']
+    collection_id: CollectionDB['id']
     order: number
-    user_id: string
   }[]
 }
 
@@ -57,7 +52,6 @@ const client = await JSONFilePreset<Database>('usr/booklib.json', {
   collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
     ...c,
     created_at: new Date().toISOString(),
-    user_id: user.id,
   })),
   'collection-book': [],
 })
@@ -83,7 +77,7 @@ function getBookCoverUrl(bookId: string | number) {
   return `${process.env.VITE_DEV_SERVER_URL}/api/books/${bookId}/cover`
 }
 
-export async function getAuthors(): ReturnType<DBClient<string>['getAuthors']> {
+export async function getAuthors(): ReturnType<DBClient['getAuthors']> {
   await client.read()
 
   const data = client.data.authors
@@ -93,9 +87,9 @@ export async function getAuthors(): ReturnType<DBClient<string>['getAuthors']> {
 
 export async function deleteAuthor(
   event: H3Event<EventHandlerRequest>,
-  id: AuthorDB<string>['id'],
+  id: AuthorDB['id'],
   params: DeleteAuthorParams,
-): ReturnType<DBClient<string>['deleteAuthor']> {
+): ReturnType<DBClient['deleteAuthor']> {
   await client.read()
 
   client.data.authors = client.data.authors.filter((author) => author.id !== id)
@@ -118,7 +112,7 @@ export async function deleteAuthor(
 export async function getBook(
   event: H3Event<EventHandlerRequest>,
   id: string,
-): ReturnType<DBClient<string>['getBook']> {
+): ReturnType<DBClient['getBook']> {
   await client.read()
 
   const book = client.data.books.find((book) => book.id === id)
@@ -128,7 +122,7 @@ export async function getBook(
 
   const collections = client.data['collection-book']
     .filter(({ book_id }) => book_id === id)
-    .map(({ collection_id: id }) => ({ id }))
+    .map(({ collection_id }) => collection_id)
 
   return book
     ? {
@@ -142,7 +136,7 @@ export async function getBook(
 export async function getBooks(
   event: H3Event<EventHandlerRequest>,
   { page, pageSize, bookProgress }: GetBooksQuerySearchParams,
-): ReturnType<DBClient<string>['getBooks']> {
+): ReturnType<DBClient['getBooks']> {
   await client.read()
 
   let data = client.data.books
@@ -162,7 +156,7 @@ export async function getBooks(
 
     const collections = client.data['collection-book']
       .filter(({ book_id }) => book_id === book.id)
-      .map(({ collection_id: id }) => ({ id }))
+      .map(({ collection_id }) => collection_id)
 
     return {
       ...book,
@@ -176,9 +170,9 @@ export async function getBooks(
 
 export async function createBook(
   event: H3Event<EventHandlerRequest>,
-  book: Book<string>,
-  collections: Pick<CollectionDB<string>, 'id'>[],
-): ReturnType<DBClient<string>['createBook']> {
+  book: Book,
+  collections: CollectionDB['id'][],
+): ReturnType<DBClient['createBook']> {
   await client.read()
 
   const existingAuthor = client.data.authors.find(
@@ -197,8 +191,8 @@ export async function createBook(
     }
   }
 
-  const bookDb: BookDB<string> = {
-    ...bookToDbBook(book, user.id),
+  const bookDb: BookDB = {
+    ...bookToDbBook(book),
     id: book.id ?? uuidv4(),
     author_id: book.author ? authorId : null,
     created_at: new Date().toISOString(),
@@ -212,19 +206,12 @@ export async function createBook(
     client.data.books.push(bookDb)
   }
 
-  const incomingCollectionIds = collections.map(({ id }) => id)
   const existingCollectionIds = client.data['collection-book']
     .filter(({ book_id }) => book_id === bookDb.id)
     .map(({ collection_id }) => collection_id)
 
-  const collectionsToAdd = difference(
-    incomingCollectionIds,
-    existingCollectionIds,
-  )
-  const collectionsToRemove = difference(
-    existingCollectionIds,
-    incomingCollectionIds,
-  )
+  const collectionsToAdd = difference(collections, existingCollectionIds)
+  const collectionsToRemove = difference(existingCollectionIds, collections)
 
   client.data['collection-book'] = client.data['collection-book']
     .filter(
@@ -238,7 +225,6 @@ export async function createBook(
         order: client.data['collection-book'].filter(
           (cb) => collection_id === cb.collection_id,
         ).length,
-        user_id: user.id,
       })),
     )
 
@@ -249,8 +235,8 @@ export async function createBook(
 
 export async function deleteBook(
   event: H3Event<EventHandlerRequest>,
-  id: BookDB<string>['id'],
-): ReturnType<DBClient<string>['deleteBook']> {
+  id: BookDB['id'],
+): ReturnType<DBClient['deleteBook']> {
   await client.read()
 
   client.data.books = client.data.books.filter((book) => book.id !== id)
@@ -265,8 +251,8 @@ export async function deleteBook(
 
 export async function deleteBooks(
   event: H3Event<EventHandlerRequest>,
-  ids: BookDB<string>['id'][],
-): ReturnType<DBClient<string>['deleteBooks']> {
+  ids: BookDB['id'][],
+): ReturnType<DBClient['deleteBooks']> {
   await client.read()
 
   client.data.books = client.data.books.filter((b) => !ids.includes(b.id))
@@ -286,9 +272,7 @@ export async function getBookCount(): ReturnType<DBClient['getBookCount']> {
   return client.data.books.length
 }
 
-export async function getLatestBooks(): ReturnType<
-  DBClient<string>['getLatestBooks']
-> {
+export async function getLatestBooks(): ReturnType<DBClient['getLatestBooks']> {
   await client.read()
 
   return client.data.books
@@ -301,7 +285,7 @@ export async function getLatestBooks(): ReturnType<
 export async function getOrderedBooks(
   event: H3Event<EventHandlerRequest>,
   { property, count }: GetOrderedBooksQuerySearchParams,
-): ReturnType<DBClient<string>['getOrderedBooks']> {
+): ReturnType<DBClient['getOrderedBooks']> {
   await client.read()
 
   return client.data.books
@@ -317,7 +301,7 @@ export async function getOrderedBooks(
 export async function getBookCover(
   event: H3Event<EventHandlerRequest>,
   id: string,
-): ReturnType<DBClient<string>['getBookCover']> {
+): ReturnType<DBClient['getBookCover']> {
   const fileName = await getBookCoverFileName(id)
 
   const filePath = fileName && (await getFileLocally(fileName, '/bookCovers'))
@@ -329,7 +313,7 @@ export async function getBookCover(
 
 export async function updateBookCover(
   event: H3Event<EventHandlerRequest>,
-): ReturnType<DBClient<string>['updateBookCover']> {
+): ReturnType<DBClient['updateBookCover']> {
   const { bookId, file } = await readBody<{ bookId: string; file: ServerFile }>(
     event,
   )
@@ -364,7 +348,7 @@ export async function updateBookCover(
 
 export async function deleteBookCover(
   event: H3Event<EventHandlerRequest>,
-): ReturnType<DBClient<string>['deleteBookCover']> {
+): ReturnType<DBClient['deleteBookCover']> {
   const bookId = getRouterParam(event, 'id')
 
   const allFiles = await getFilesLocally('/bookCovers')
@@ -401,7 +385,7 @@ export async function deleteBookCover(
 export async function getCollection(
   event: H3Event<EventHandlerRequest>,
   id: string,
-): ReturnType<DBClient<string>['getCollection']> {
+): ReturnType<DBClient['getCollection']> {
   await client.read()
 
   const collection = client.data.collections.find((c) => c.id === id)
@@ -417,9 +401,7 @@ export async function getCollection(
     : null
 }
 
-export async function getCollections(): ReturnType<
-  DBClient<string>['getCollections']
-> {
+export async function getCollections(): ReturnType<DBClient['getCollections']> {
   await client.read()
 
   return client.data.collections.map((collection) => ({
@@ -431,7 +413,7 @@ export async function getCollections(): ReturnType<
 }
 
 export async function getCollectionCount(): ReturnType<
-  DBClient<string>['getCollectionCount']
+  DBClient['getCollectionCount']
 > {
   await client.read()
 
@@ -440,12 +422,12 @@ export async function getCollectionCount(): ReturnType<
 
 export async function createCollection(
   event: H3Event<EventHandlerRequest>,
-  collection: Collection<string>,
-): ReturnType<DBClient<string>['createCollection']> {
+  collection: Collection,
+): ReturnType<DBClient['createCollection']> {
   await client.read()
 
-  const collectionDb: CollectionDB<string> = {
-    ...collectionToDbCollection(collection, user.id),
+  const collectionDb: CollectionDB = {
+    ...collectionToDbCollection(collection),
     id: collection.id ?? uuidv4(),
     created_at: new Date().toISOString(),
   }
@@ -468,7 +450,6 @@ export async function createCollection(
     book_id: book.id,
     collection_id: collectionDb.id,
     order: book.order,
-    user_id: user.id,
   }))
 
   client.data['collection-book'] =
@@ -481,9 +462,9 @@ export async function createCollection(
 
 export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
-  id: CollectionDB<string>['id'],
+  id: CollectionDB['id'],
   params: DeleteCollectionParams,
-): ReturnType<DBClient<string>['deleteCollection']> {
+): ReturnType<DBClient['deleteCollection']> {
   if (DEFAULT_COLLECTIONS.includes(id)) {
     const error = { message: `Cannot delete ${id}` }
     logger.error(error)
@@ -516,21 +497,13 @@ export async function deleteCollection(
   return id
 }
 
-export async function deleteUser(): ReturnType<DBClient<string>['deleteUser']> {
-  return null
-}
-
-export async function isLibraryEmpty(): ReturnType<
-  DBClient<string>['isLibraryEmpty']
-> {
+export async function isLibraryEmpty(): ReturnType<DBClient['isLibraryEmpty']> {
   await client.read()
 
   return client.data.books.length === 0
 }
 
-export async function resetLibrary(): ReturnType<
-  DBClient<string>['resetLibrary']
-> {
+export async function resetLibrary(): ReturnType<DBClient['resetLibrary']> {
   await client.update((data) => {
     data.books = []
     data.collections = []
@@ -542,13 +515,13 @@ export async function resetLibrary(): ReturnType<
 
 export async function importLibrary(
   event: H3Event<EventHandlerRequest>,
-  books: Book<string>[],
-): ReturnType<DBClient<string>['importLibrary']> {
+  books: Book[],
+): ReturnType<DBClient['importLibrary']> {
   await client.read()
 
   client.data.books = client.data.books.concat(
     books.map(({ id, ...book }) => ({
-      ...bookToDbBook(book, user.id),
+      ...bookToDbBook(book),
       id: uuidv4(),
       created_at: new Date().toISOString(),
     })),
@@ -560,7 +533,7 @@ export async function importLibrary(
 }
 
 export async function checkLibraryIntegrity(): ReturnType<
-  DBClient<string>['checkLibraryIntegrity']
+  DBClient['checkLibraryIntegrity']
 > {
   await client.read()
 

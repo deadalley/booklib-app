@@ -30,46 +30,44 @@ export type GetOrderedBooksQuerySearchParams = {
   count?: number
 }
 
-export type DBClient<ID extends number | string = number> = {
-  getAuthors: (event: H3Event<EventHandlerRequest>) => Promise<AuthorDB<ID>[]>
+export type DBClient = {
+  getAuthors: (event: H3Event<EventHandlerRequest>) => Promise<AuthorDB[]>
   deleteAuthor: (
     event: H3Event<EventHandlerRequest>,
-    id: AuthorDB<string>['id'],
+    id: AuthorDB['id'],
     params: DeleteAuthorParams,
-  ) => Promise<AuthorDB<string>['id']>
+  ) => Promise<AuthorDB['id']>
 
   getBook: (
     event: H3Event<EventHandlerRequest>,
-    id: BookDB<ID>['id'],
-  ) => Promise<BookDB<ID> | null>
+    id: BookDB['id'],
+  ) => Promise<BookDB | null>
   getBooks: (
     event: H3Event<EventHandlerRequest>,
     params: GetBooksQuerySearchParams,
-  ) => Promise<BookDB<ID>[]>
+  ) => Promise<BookDB[]>
   createBook: (
     event: H3Event<EventHandlerRequest>,
-    book: Book<ID>,
-    collections: Pick<CollectionDB<ID>, 'id'>[],
+    book: Book,
+    collections: CollectionDB['id'][],
     tempCoverSrc?: string,
-  ) => Promise<
-    (BookDB<ID> & { collections: Pick<CollectionDB<ID>, 'id'>[] }) | null
-  >
+  ) => Promise<BookDB | null>
   deleteBook: (
     event: H3Event<EventHandlerRequest>,
-    id: BookDB<ID>['id'],
-  ) => Promise<BookDB<ID>['id'] | null>
+    id: BookDB['id'],
+  ) => Promise<BookDB['id'] | null>
   deleteBooks: (
     event: H3Event<EventHandlerRequest>,
-    ids: BookDB<ID>['id'][],
-  ) => Promise<BookDB<ID>['id'][]>
+    ids: BookDB['id'][],
+  ) => Promise<BookDB['id'][]>
   getBookCount: (event: H3Event<EventHandlerRequest>) => Promise<number | null>
   getLatestBooks: (
     event: H3Event<EventHandlerRequest>,
-  ) => Promise<Pick<BookDB<ID>, 'id' | 'title' | 'cover_src'>[]>
+  ) => Promise<Pick<BookDB, 'id' | 'title' | 'cover_src'>[]>
   getOrderedBooks: (
     event: H3Event<EventHandlerRequest>,
     params: GetOrderedBooksQuerySearchParams,
-  ) => Promise<Pick<BookDB<ID>, 'id' | 'title'>[]>
+  ) => Promise<Pick<BookDB, 'id' | 'title'>[]>
   getBookCover: (
     event: H3Event<EventHandlerRequest>,
     id: string,
@@ -81,16 +79,16 @@ export type DBClient<ID extends number | string = number> = {
 
   getCollection: (
     event: H3Event<EventHandlerRequest>,
-    id: CollectionDB<ID>['id'],
+    id: CollectionDB['id'],
   ) => Promise<
-    | (CollectionDB<ID> & {
-        'collection-book': { book_id: BookDB<ID>['id']; order: number }[]
+    | (CollectionDB & {
+        'collection-book': { book_id: BookDB['id']; order: number }[]
       })
     | null
   >
   getCollections: (event: H3Event<EventHandlerRequest>) => Promise<
-    (CollectionDB<ID> & {
-      'collection-book': { book_id: BookDB<ID>['id']; order: number }[]
+    (CollectionDB & {
+      'collection-book': { book_id: BookDB['id']; order: number }[]
     })[]
   >
   getCollectionCount: (
@@ -98,25 +96,24 @@ export type DBClient<ID extends number | string = number> = {
   ) => Promise<number | null>
   createCollection: (
     event: H3Event<EventHandlerRequest>,
-    collection: Collection<ID>,
+    collection: Collection,
   ) => Promise<
-    | (CollectionDB<ID> & {
-        'collection-book': { book_id: Book<ID>['id']; order: number }[]
+    | (CollectionDB & {
+        'collection-book': { book_id: Book['id']; order: number }[]
       })
     | null
   >
   deleteCollection: (
     event: H3Event<EventHandlerRequest>,
-    id: CollectionDB<ID>['id'],
+    id: CollectionDB['id'],
     params: DeleteCollectionParams,
-  ) => Promise<CollectionDB<ID>['id'] | null>
+  ) => Promise<CollectionDB['id'] | null>
 
-  deleteUser: (event: H3Event<EventHandlerRequest>) => Promise<string | null>
   isLibraryEmpty: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
   resetLibrary: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
   importLibrary: (
     event: H3Event<EventHandlerRequest>,
-    books: Book<ID>[],
+    books: Book[],
   ) => Promise<boolean>
   checkLibraryIntegrity: () => Promise<object>
 }
