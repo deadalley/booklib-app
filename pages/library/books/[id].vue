@@ -135,7 +135,7 @@
             v-model="book"
             type="form"
             :actions="false"
-            @submit="onSubmit"
+            @submit="onSaveChanges"
           >
             <section class="book-section max-w-screen-md">
               <div class="form-section">
@@ -306,6 +306,7 @@
                   :collection="collection"
                   :selectable="managingCollections"
                   collection-type="collections"
+                  :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
                   @select="onSelectCollection"
                 />
               </div>

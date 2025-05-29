@@ -1,5 +1,5 @@
 import { db } from '~/services/db.service'
-import { dbCollectionToCollection } from '~/utils'
+import { collectionToDbCollection, dbCollectionToCollection } from '~/utils'
 import { v4 as uuidv4 } from 'uuid'
 import type { CollectionDB } from '~/types/database'
 
