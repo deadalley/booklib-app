@@ -3,6 +3,12 @@ import type { Collection } from './collection'
 import type { AuthorDB, BookDB, CollectionDB } from './database'
 import type { H3Event, EventHandlerRequest } from 'h3'
 
+export type LibraryIntegrityResult = {
+  books: string[]
+  collections: string[]
+  authors: string[]
+}
+
 export type DeleteAuthorParams = {
   deleteBooks?: boolean
 }
@@ -112,4 +118,5 @@ export type DBClient<ID extends number | string = number> = {
     event: H3Event<EventHandlerRequest>,
     books: Book<ID>[],
   ) => Promise<boolean>
+  checkLibraryIntegrity: () => Promise<object>
 }

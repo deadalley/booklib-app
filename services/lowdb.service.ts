@@ -558,3 +558,43 @@ export async function importLibrary(
 
   return true
 }
+
+export async function checkLibraryIntegrity(): ReturnType<
+  DBClient<string>['checkLibraryIntegrity']
+> {
+  await client.read()
+
+  const authorIds = client.data.authors.map(({ id }) => id)
+  const collectionIds = client.data.collections.map(({ id }) => id)
+  const bookIds = client.data.books.map(({ id }) => id)
+
+  const booksWithNonExistentCollections = client.data['collection-book'].filter(
+    ({ collection_id }) => !collectionIds.includes(collection_id),
+  )
+
+  const booksWithNonExistentAuthors = client.data.books.filter(
+    ({ author_id }) => author_id && !authorIds.includes(author_id),
+  )
+
+  const collectionsWithNonExistentBooks = client.data['collection-book'].filter(
+    ({ book_id }) => !bookIds.includes(book_id),
+  )
+
+  return {
+    books: [
+      ...booksWithNonExistentCollections.map(
+        ({ book_id, collection_id }) =>
+          `Book ${book_id} is assigned collection ${collection_id}, which does not exist.`,
+      ),
+      ...booksWithNonExistentAuthors.map(
+        ({ id, author_id }) =>
+          `Book ${id} is assigned author ${author_id}, which does not exist.`,
+      ),
+    ],
+    collections: collectionsWithNonExistentBooks.map(
+      ({ book_id, collection_id }) =>
+        `Collection ${collection_id} contains book ${book_id}, which does not exist`,
+    ),
+    authors: [],
+  }
+}
