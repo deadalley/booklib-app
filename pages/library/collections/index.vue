@@ -54,6 +54,7 @@
           :collection="collection"
           :books="booksByCollectionId[collection.id]"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
+          can-delete
         />
       </div>
     </div>

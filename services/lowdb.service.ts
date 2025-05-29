@@ -2,6 +2,7 @@ import type { H3Event, EventHandlerRequest } from 'h3'
 import type {
   DBClient,
   DeleteAuthorParams,
+  DeleteCollectionParams,
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
@@ -481,18 +482,34 @@ export async function createCollection(
 export async function deleteCollection(
   event: H3Event<EventHandlerRequest>,
   id: CollectionDB<string>['id'],
+  params: DeleteCollectionParams,
 ): ReturnType<DBClient<string>['deleteCollection']> {
   if (DEFAULT_COLLECTIONS.includes(id)) {
     const error = { message: `Cannot delete ${id}` }
     logger.error(error)
     throw createError(error.message)
   }
+
   await client.read()
 
+  const booksInCollection = client.data['collection-book']
+    .filter(({ collection_id }) => collection_id === id)
+    .map(({ book_id }) => book_id)
+
   client.data.collections = client.data.collections.filter((c) => c.id !== id)
-  client.data['collection-book'] = client.data['collection-book'].filter(
-    ({ collection_id }) => collection_id !== id,
-  )
+
+  if (params.deleteBooks) {
+    client.data.books = client.data.books.filter(
+      (book) => !booksInCollection.includes(book.id),
+    )
+    client.data['collection-book'] = client.data['collection-book'].filter(
+      ({ book_id }) => !booksInCollection.includes(book_id),
+    )
+  } else {
+    client.data['collection-book'] = client.data['collection-book'].filter(
+      ({ collection_id }) => collection_id !== id,
+    )
+  }
 
   await client.write()
 

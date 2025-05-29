@@ -7,6 +7,10 @@ export type DeleteAuthorParams = {
   deleteBooks?: boolean
 }
 
+export type DeleteCollectionParams = {
+  deleteBooks?: boolean
+}
+
 export type GetBooksQuerySearchParams = {
   page?: number
   pageSize?: number
@@ -98,6 +102,7 @@ export type DBClient<ID extends number | string = number> = {
   deleteCollection: (
     event: H3Event<EventHandlerRequest>,
     id: CollectionDB<ID>['id'],
+    params: DeleteCollectionParams,
   ) => Promise<CollectionDB<ID>['id'] | null>
 
   deleteUser: (event: H3Event<EventHandlerRequest>) => Promise<string | null>
