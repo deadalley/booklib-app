@@ -4,16 +4,15 @@
     class="flex size-full cursor-pointer items-center gap-3 text-black"
     :class="{
       'justify-center': !$slots['default'],
+      'flex-row-reverse': align === 'left',
     }"
-    @click="onClick"
   >
     <span v-if="$slots['default']" class="size-full">
       <slot />
     </span>
-
     <input
       v-bind="$attrs"
-      v-model="_checked"
+      v-model="checked"
       type="checkbox"
       class="relative aspect-square size-4 cursor-pointer appearance-none rounded-md border border-accent-dark transition-all checked:border-main checked:bg-main"
     />
@@ -21,15 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core'
+withDefaults(defineProps<{ align?: 'right' | 'left' }>(), { align: 'right' })
 
-const props = defineProps<{ checked?: boolean }>()
-
-const emit = defineEmits(['update:checked'])
-
-const _checked = useVModel(props, 'checked', emit)
-
-function onClick(event: Event) {
-  event.stopPropagation()
-}
+const checked = defineModel<boolean>()
 </script>

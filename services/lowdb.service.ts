@@ -103,6 +103,10 @@ export async function deleteAuthor(
     client.data.books = client.data.books.filter(
       (book) => book.author_id !== id,
     )
+  } else {
+    client.data.books = client.data.books.map((book) =>
+      book.author_id === id ? { ...book, author_id: null } : book,
+    )
   }
 
   await client.write()

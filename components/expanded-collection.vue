@@ -33,6 +33,38 @@
                 : 'Empty'
             }}</bl-total-tag>
           </div>
+          <bl-modal
+            v-if="canDelete"
+            ref="deleteModalRef"
+            size="sm"
+            @confirm="deleteCollection"
+          >
+            <template #trigger>
+              <IconTrash
+                class="mr-4 cursor-pointer text-accent-dark hover:text-main"
+                :size="ICON_SIZE_SMALL"
+                stroke="1.5"
+                @click="openDeleteModal"
+              />
+            </template>
+            <template #title>
+              Are you sure you want to delete
+              <strong>{{ collection.name }}</strong>
+              ?
+            </template>
+            <bl-checkbox v-model="deleteBooks" align="left">
+              <template v-if="!deleteBooks">
+                Your books will <strong>not</strong> be deleted.
+              </template>
+              <template v-if="deleteBooks">
+                Your books <strong>will</strong> be deleted.
+              </template>
+              This action cannot be undone.
+            </bl-checkbox>
+            <template #cancel-label> Cancel </template>
+            <template #action-label> Delete </template>
+          </bl-modal>
+
           <IconChevronDown
             class="accordion-chevron transition-transform duration-300 ease-in"
             :size="20"
@@ -74,7 +106,7 @@
     }
   "
 >
-import { IconChevronDown, icons } from '@tabler/icons-vue'
+import { IconChevronDown, icons, IconTrash } from '@tabler/icons-vue'
 import {
   AccordionContent,
   AccordionHeader,
@@ -84,12 +116,38 @@ import {
 } from 'radix-vue'
 import type { Book } from '~/types/book'
 
-defineProps<{
-  collectionType: string
+const props = defineProps<{
+  collectionType: 'authors' | 'collections'
   collection: T
   books: Book[]
+  canDelete?: boolean
   icon?: keyof typeof icons
 }>()
+
+defineEmits(['delete'])
+
+const deleteModalRef = ref()
+const deleteBooks = ref(false)
+
+function openDeleteModal() {
+  deleteModalRef.value.setIsOpen(true)
+}
+
+async function deleteCollection() {
+  const url = {
+    collections: `/api/collections/${props.collection.id}`,
+    authors: `/api/authors/${props.collection.id}`,
+  }[props.collectionType]
+
+  await $fetch(url, {
+    method: 'delete',
+    query: {
+      deleteBooks: deleteBooks.value,
+    },
+  })
+
+  navigateTo(`/library/${props.collectionType}`)
+}
 </script>
 
 <style scoped>

@@ -3,11 +3,15 @@ import type { DeleteAuthorParams } from '~/types/api'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
-  const query = getQuery<DeleteAuthorParams>(event)
+  const query = getQuery<{ deleteBooks: string }>(event)
 
   if (!id) {
     throw createError('No id provided')
   }
 
-  return db.deleteAuthor(event, id, query)
+  const correctedQuery: DeleteAuthorParams = {
+    deleteBooks: query.deleteBooks === 'true',
+  }
+
+  return db.deleteAuthor(event, id, correctedQuery)
 })
