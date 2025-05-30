@@ -1,5 +1,5 @@
 import type { Author } from '~/types/author'
-import type { ViewBook } from '~/types/book'
+import type { BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 import { sum } from 'ramda'
@@ -66,5 +66,29 @@ export function getAverageRating(books: ViewBook[]): number | undefined {
 
   return roundToNearestHalf(
     sum(booksWithValidRatings) / booksWithValidRatings.length,
+  )
+}
+
+export function getBooksByStatus(
+  books: ViewBook[],
+): Record<BookProgressStatus, number> {
+  return PROGRESS_STATUS.reduce(
+    (acc, currentStatus) => {
+      return {
+        ...acc,
+        [currentStatus]: books.filter(
+          (book) => book.progressStatus === currentStatus,
+        ).length,
+      }
+    },
+    {
+      owned: 0,
+      'not-owned': 0,
+      'not-read': 0,
+      reading: 0,
+      paused: 0,
+      read: 0,
+      'not-finished': 0,
+    },
   )
 }

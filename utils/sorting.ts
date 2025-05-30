@@ -1,6 +1,6 @@
 import { indexBy, prop } from 'ramda'
 import type { Author } from '~/types/author'
-import type { Book, ViewBook } from '~/types/book'
+import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 export function sortBooks(booksToBeSorted: ViewBook[]) {
@@ -118,4 +118,25 @@ export function sortAuthorsByBookRatings(
 
     return b.average - a.average
   })
+}
+
+export function sortAuthorByStatusesCount(
+  books: ViewBook[],
+  authors: Author[],
+): {
+  author: Author
+  count: number
+  countByStatus?: Record<BookProgressStatus, number>
+}[] {
+  const authorsById = indexBy(prop('id'), authors)
+  const booksByAuthor = getBooksByAuthor(books, authors)
+  const authorCounts = Object.keys(booksByAuthor)
+    .map((authorId) => ({
+      author: authorsById[authorId],
+      count: booksByAuthor[authorId].length,
+      countByStatus: getBooksByStatus(booksByAuthor[authorId]),
+    }))
+    .filter(({ count }) => count > 0)
+
+  return authorCounts
 }

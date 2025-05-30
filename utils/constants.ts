@@ -39,6 +39,16 @@ export const AUTHORS_PAGE_SIZE = 15
 export const ICON_SIZE_SMALL = 20
 export const ICON_SIZE_MEDIUM = 22
 
+export const PROGRESS_STATUS = [
+  'owned',
+  'not-owned',
+  'not-read',
+  'reading',
+  'paused',
+  'read',
+  'not-finished',
+]
+
 export const PROGRESS_STATUS_MAP: Record<
   BookProgressStatus,
   {

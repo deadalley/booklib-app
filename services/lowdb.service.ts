@@ -10,7 +10,12 @@ import type {
 import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import { v4 as uuidv4 } from 'uuid'
-import { logger, DEFAULT_COLLECTIONS, DEFAULT_COLLECTIONS_INIT } from '../utils'
+import {
+  logger,
+  DEFAULT_COLLECTIONS,
+  DEFAULT_COLLECTIONS_INIT,
+  PROGRESS_STATUS,
+} from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference, indexBy, prop, uniq } from 'ramda'
@@ -560,16 +565,7 @@ export class LowDBClient {
 
     const booksWithOutdatedStatus = this.client.data.books.filter(
       ({ progress_status }) =>
-        progress_status &&
-        ![
-          'owned',
-          'not-owned',
-          'not-read',
-          'reading',
-          'paused',
-          'read',
-          'not-finished',
-        ].includes(progress_status),
+        progress_status && !PROGRESS_STATUS.includes(progress_status),
     )
 
     const collectionsWithNonExistentBooks = this.client.data[

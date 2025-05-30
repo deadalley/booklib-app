@@ -2,18 +2,22 @@
   <bl-tile v-if="authors?.length" class="flex-1">
     <!-- <template #title><slot name="title" /></template> -->
     <div class="flex w-full flex-col items-center gap-6">
-      <div class="flex w-full items-center gap-2">
+      <div class="flex w-full items-center justify-between gap-2">
         <IconChevronLeft
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
           @click="index = index === authors.length - 1 ? 0 : index - 1"
         />
-        <h6 class="flex-1">{{ authors[index].author.name }}</h6>
+        <h6 class="text-center">{{ authors[index].author.name }}</h6>
         <IconChevronRight
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
           @click="index = index === authors.length - 1 ? 0 : index + 1"
         />
       </div>
       <div
+        v-if="
+          authors[index]?.average !== undefined ||
+          authors[index]?.countByStatus === undefined
+        "
         class="flex flex-col items-center rounded-2xl border border-accent bg-white px-6 py-2 text-main"
       >
         <div class="flex items-center">
@@ -34,6 +38,33 @@
           {{ authors[index]?.label }}
         </p>
       </div>
+      <div v-if="authors[index]?.countByStatus" class="flex gap-2">
+        <div
+          v-for="[status, count] in Object.entries(
+            authors[index].countByStatus ?? {},
+          )
+            .filter(([, count]) => count > 0)
+            .slice(0, 2)"
+          :key="status"
+          class="flex flex-col items-center rounded-2xl border border-accent bg-white px-6 py-2 text-main"
+        >
+          <div class="flex items-center">
+            <h4>
+              {{ count }}
+            </h4>
+            <component
+              :is="
+                icons[PROGRESS_STATUS_MAP[status as BookProgressStatus].icon]
+              "
+              :size="ICON_SIZE_MEDIUM"
+              stroke="2"
+            />
+          </div>
+          <p class="text-accent-darker">
+            {{ PROGRESS_STATUS_MAP[status as BookProgressStatus].description }}
+          </p>
+        </div>
+      </div>
     </div>
   </bl-tile>
 </template>
@@ -43,9 +74,11 @@ import {
   IconBooks,
   IconChevronLeft,
   IconChevronRight,
+  icons,
   IconStar,
 } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
+import type { BookProgressStatus } from '~/types/book'
 
 const props = defineProps<{
   authors: {
@@ -53,6 +86,7 @@ const props = defineProps<{
     label?: string
     average?: number | undefined
     count: number
+    countByStatus?: Record<BookProgressStatus, number>
   }[]
 }>()
 

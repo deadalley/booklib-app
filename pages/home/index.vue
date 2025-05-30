@@ -101,21 +101,17 @@
           <bl-author-highlight-tile
             v-if="authorsByBookCount?.length"
             :authors="authorsByRatings"
-          >
-            <template #title>Highest rated authors</template>
-          </bl-author-highlight-tile>
+          />
+
           <bl-author-highlight-tile
             v-if="authorsByBookCount?.length"
             :authors="authorsByBookCount"
-          >
-            <template #title>Author with the most books</template>
-          </bl-author-highlight-tile>
+          />
+
           <bl-author-highlight-tile
-            v-if="authorsByBookCount?.length"
-            :authors="authorsByBookCount"
-          >
-            <template #title>Author with the most books</template>
-          </bl-author-highlight-tile>
+            v-if="authorsByWithStatuses?.length"
+            :authors="authorsByWithStatuses"
+          />
         </div>
       </div>
     </div>
@@ -149,7 +145,15 @@ const authorsByBookCount = computed(() =>
   sortAuthorsByBookCount(books.value ?? [], authors.value ?? []).map(
     (author) => ({
       ...author,
-      label: `${author.count} ${author.count > 1 ? 'books' : 'book'}`,
+      label: 'Total books',
+    }),
+  ),
+)
+
+const authorsByWithStatuses = computed(() =>
+  sortAuthorByStatusesCount(books.value ?? [], authors.value ?? []).map(
+    (author) => ({
+      ...author,
     }),
   ),
 )

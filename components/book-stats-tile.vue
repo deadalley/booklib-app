@@ -35,7 +35,7 @@ const selectedOption = computed(() => options[index.value])
 onMounted(() => {
   timer = setInterval(() => {
     index.value = (index.value + 1) % options.length
-  }, 8 * 1_000)
+  }, 14 * 1_000)
 })
 
 onUnmounted(() => {
