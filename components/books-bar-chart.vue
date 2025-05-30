@@ -8,7 +8,13 @@
   generic="
     T extends keyof Pick<
       Book,
-      'pages' | 'rating' | 'year' | 'author' | 'collections'
+      | 'pages'
+      | 'rating'
+      | 'year'
+      | 'author'
+      | 'collections'
+      | 'language'
+      | 'originalLanguage'
     >
   "
 >
@@ -16,6 +22,7 @@ import type { Book } from '~/types/book'
 import type { BarChartItem } from './bar-chart.client.vue'
 import type { Author } from '~/types/author'
 import type { Collection } from '~/types/collection'
+import languageOptions from '~/public/languages-2.json'
 
 const props = withDefaults(
   defineProps<{
@@ -65,6 +72,21 @@ const series = computed(() => {
           value: books.length,
         }
       })
+      .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
+  }
+
+  if (
+    props.bookProperty === 'language' ||
+    props.bookProperty === 'originalLanguage'
+  ) {
+    const booksByLanguage = getBooksByLanguage(props.books, props.bookProperty)
+
+    return Object.entries(booksByLanguage)
+      .map(([language, books]) => ({
+        label:
+          languageOptions[language as keyof typeof languageOptions] ?? language,
+        value: books.length,
+      }))
       .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
   }
 

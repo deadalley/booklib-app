@@ -152,9 +152,21 @@ const barChartPropertyOptions: SelectOption[] = [
   { label: 'Year', value: 'year' },
   { label: 'Author', value: 'author' },
   { label: 'Collection', value: 'collections' },
+  { label: 'Language', value: 'language' },
+  { label: 'Original language', value: 'originalLanguage' },
 ]
 const barChartProperty =
-  ref<keyof Pick<Book, 'pages' | 'year' | 'author' | 'collections'>>('pages')
+  ref<
+    keyof Pick<
+      Book,
+      | 'pages'
+      | 'year'
+      | 'author'
+      | 'collections'
+      | 'language'
+      | 'originalLanguage'
+    >
+  >('pages')
 
 function getRankedBooks() {
   return sortBooksBy(
