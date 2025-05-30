@@ -2,7 +2,10 @@
   <NuxtLayout
     name="library"
     title="Books"
-    :total="bookCount && `${bookCount} books`"
+    :total="
+      sortedBooks.length &&
+      `${sortedBooks.length} ${sortedBooks.length > 1 ? 'books' : 'book'}`
+    "
     :sidebar-content="sidebarContent"
     :loading="loading"
   >
@@ -129,7 +132,6 @@ import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 
-const { data: bookCount } = await useFetch<number>('/api/library/book-count')
 const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
   query: { withBookCovers: true },
 })
