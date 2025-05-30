@@ -28,6 +28,9 @@ export function getUniqueElements<
       return uniqueKeys
     }, [])
     .filter((p): p is Exclude<T[K], null | undefined> => !!p)
+    .sort((p1, p2) =>
+      String(p1).localeCompare(String(p2), undefined, { numeric: true }),
+    )
 }
 
 export function filterElementsBySearchParam<
