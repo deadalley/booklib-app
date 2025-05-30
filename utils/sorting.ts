@@ -6,7 +6,7 @@ export function sortBooks(booksToBeSorted: ViewBook[]) {
     if (book1.order !== undefined && book2.order !== undefined) {
       return book1.order - book2.order
     }
-    return book1.title.localeCompare(book2.title)
+    return book1.title.localeCompare(book2.title, undefined, { numeric: true })
   })
 }
 
@@ -30,8 +30,12 @@ export function sortBooksBy<B extends Book>(
       typeof book2[bookProperty] === 'string'
     ) {
       return direction === 'desc'
-        ? book2[bookProperty].localeCompare(book1[bookProperty])
-        : book1[bookProperty].localeCompare(book2[bookProperty])
+        ? book2[bookProperty].localeCompare(book1[bookProperty], undefined, {
+            numeric: true,
+          })
+        : book1[bookProperty].localeCompare(book2[bookProperty], undefined, {
+            numeric: true,
+          })
     }
 
     return direction === 'desc'
@@ -48,7 +52,7 @@ export function sortCollections(collections: Collection[]) {
     const isB2Favorite = DEFAULT_COLLECTIONS.includes(String(b2.id))
 
     if (isB1Favorite && isB2Favorite) {
-      return b1.name.localeCompare(b2.name)
+      return b1.name.localeCompare(b2.name, undefined, { numeric: true })
     }
 
     if (isB1Favorite) {
@@ -59,6 +63,6 @@ export function sortCollections(collections: Collection[]) {
       return 1
     }
 
-    return b1.name.localeCompare(b2.name)
+    return b1.name.localeCompare(b2.name, undefined, { numeric: true })
   })
 }
