@@ -48,6 +48,7 @@ const props = withDefaults(
   defineProps<{
     items: BarChartItem[]
     height?: number
+    unit?: string
   }>(),
   { height: 340 },
 )
@@ -63,7 +64,6 @@ const option = computed<EChartsOption>(() => ({
       type: 'none',
     },
     transitionDuration: 0,
-    formatter: '{c}',
     textStyle: {
       fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
       color: tailwind.theme.colors['accent-darker'],
@@ -110,6 +110,10 @@ const option = computed<EChartsOption>(() => ({
     {
       data: props.items.map(({ value }) => value),
       type: 'bar',
+      tooltip: {
+        formatter: `{b}<br />{c} ${props.unit ?? ''}`,
+        color: tailwind.theme.colors.black,
+      },
       itemStyle: {
         borderRadius: 6,
       },

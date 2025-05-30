@@ -1,5 +1,5 @@
 <template>
-  <bl-bar-chart :height="height" :items="series" />
+  <bl-bar-chart :height="height" :items="series" unit="books" />
 </template>
 
 <script
