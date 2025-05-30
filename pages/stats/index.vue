@@ -1,24 +1,7 @@
 <template>
   <NuxtLayout name="dashboard" title="Statistics">
-    <h3 class="mb-3">Statistics</h3>
+    <h3 class="mb-3">Overview</h3>
     <div class="grid grid-cols-12 gap-4">
-      <!-- <bl-tile class="col-span-12 lg:col-span-5">
-        <template #title>Book ratings</template>
-        <bl-books-pie-chart
-          v-if="books"
-          :books="books"
-          book-property="rating"
-          unit="★"
-        />
-      </bl-tile> -->
-      <!-- <bl-tile class="col-span-12 lg:col-span-4">
-        <template #title>Top rated books</template>
-        <bl-ranking :items="rankedBooks" :unit="getRatingUnit" with-label />
-      </bl-tile> -->
-      <!-- <bl-tile class="col-span-12 lg:col-span-3">
-        <template #title>Lowest rated books</template>
-        <bl-ranking :items="lowRankedBooks" :unit="getRatingUnit" with-label />
-      </bl-tile> -->
       <bl-tile class="col-span-12 lg:col-span-6">
         <template #title>{{
           pieChartPropertyOptions.find(
@@ -57,7 +40,7 @@
             <bl-raw-select
               v-model="rankingChartPropertyOrder"
               :options="rankingChartPropertyOrderOptions"
-              class="!w-24"
+              class="!w-32"
             />
             <bl-input
               id="isbn"
@@ -76,7 +59,7 @@
         />
       </bl-tile>
       <bl-tile class="col-span-12">
-        <template #title>Statistics</template>
+        <template #title>Books</template>
         <template #actions>
           <div>
             <bl-raw-select
@@ -127,7 +110,7 @@ const rankingChartProperty = ref<'rating' | 'year' | 'pages'>('rating')
 
 const rankingChartPropertyOrderOptions: SelectOption[] = [
   { label: 'Top', value: 'top' },
-  { label: 'Low', value: 'low' },
+  { label: 'Lowest', value: 'low' },
 ]
 const rankingChartPropertyOrder = ref<'top' | 'low'>('top')
 
