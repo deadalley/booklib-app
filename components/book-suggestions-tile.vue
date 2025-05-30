@@ -98,7 +98,7 @@ const options = computed(() => {
   ].filter((option) => option.book !== undefined)
 })
 
-const index = useAutoIncrementIndex(options.value.length, 8)
+const { index } = useAutoIncrementIndex(options.value.length, 8)
 
 const selectedOption = computed(() => options.value[index.value])
 

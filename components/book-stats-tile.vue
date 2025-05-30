@@ -27,7 +27,7 @@ const options: (SelectOption & {
   { label: 'Books by progress status', value: 'progressStatus' },
 ]
 
-const index = useAutoIncrementIndex(options.length, 14)
+const { index } = useAutoIncrementIndex(options.length, 14)
 
 const selectedOption = computed(() => options[index.value])
 </script>

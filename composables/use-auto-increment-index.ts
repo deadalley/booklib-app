@@ -8,12 +8,20 @@ export const useAutoIncrementIndex = (
   onMounted(() => {
     timer = setInterval(() => {
       index.value = (index.value + 1) % arrayLength
-    }, interval * 1000)
+    }, interval * 1_000)
   })
 
   onUnmounted(() => {
     if (timer) clearInterval(timer)
   })
 
-  return index
+  return {
+    index,
+    resetTimer: (newInterval: number) => {
+      if (timer) clearInterval(timer)
+      timer = setInterval(() => {
+        index.value = (index.value + 1) % arrayLength
+      }, newInterval * 1_000)
+    },
+  }
 }

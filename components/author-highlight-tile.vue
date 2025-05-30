@@ -5,12 +5,12 @@
       <div class="flex w-full items-center justify-between gap-2">
         <IconChevronLeft
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
-          @click="index = index === authors.length - 1 ? 0 : index - 1"
+          @click="onClickBack"
         />
         <h6 class="text-center">{{ authors[index].author.name }}</h6>
         <IconChevronRight
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
-          @click="index = index === authors.length - 1 ? 0 : index + 1"
+          @click="onClickForward"
         />
       </div>
       <div
@@ -90,5 +90,19 @@ const props = defineProps<{
   }[]
 }>()
 
-const index = useAutoIncrementIndex(props.authors.length, 8)
+const interacted = ref(false)
+
+const { index, resetTimer } = useAutoIncrementIndex(props.authors.length, 8)
+
+function onClickBack() {
+  index.value = index.value === 0 ? props.authors.length - 1 : index.value - 1
+  if (!interacted.value) resetTimer(20)
+  interacted.value = true
+}
+
+function onClickForward() {
+  index.value = index.value === props.authors.length - 1 ? 0 : index.value + 1
+  if (!interacted.value) resetTimer(20)
+  interacted.value = true
+}
 </script>
