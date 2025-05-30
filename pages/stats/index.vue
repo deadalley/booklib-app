@@ -33,6 +33,8 @@
         </template>
         <bl-books-bar-chart
           v-if="books && barChartProperty"
+          :authors="authors ?? []"
+          :collections="collections ?? []"
           :books="books"
           :book-property="barChartProperty"
         />
@@ -57,9 +59,13 @@
 <script setup lang="ts">
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { SelectOption } from '~/components/raw-select.vue'
+import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
+import type { Collection } from '~/types/collection'
 
+const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
+const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
 const rankedBooks = computed<RankingItem[]>(() =>
   sortBooksBy(books.value ?? [], 'rating', 'desc', 5).map((book) => ({
@@ -88,10 +94,13 @@ const barChartPropertyOptions: SelectOption[] = [
   { label: 'Pages', value: 'pages' },
   { label: 'Rating', value: 'rating' },
   { label: 'Year', value: 'year' },
+  { label: 'Author', value: 'author' },
+  { label: 'Collection', value: 'collections' },
 ]
-const barChartProperty = ref<
-  keyof Pick<Book, 'pages' | 'rating' | 'year'> | undefined
->('pages')
+const barChartProperty =
+  ref<keyof Pick<Book, 'pages' | 'rating' | 'year' | 'author' | 'collections'>>(
+    'pages',
+  )
 
 useHead({
   title: 'BookLib | Statistics',

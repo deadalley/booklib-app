@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { IconFeather } from '@tabler/icons-vue'
-import type { Book, ViewBook } from '~/types/book'
+import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
 const { data: books } = await useFetch<Book[]>('/api/books', {
@@ -60,17 +60,8 @@ const { data: books } = await useFetch<Book[]>('/api/books', {
 })
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 
-const booksByAuthorId = computed(
-  () =>
-    authors.value?.reduce<Record<string, ViewBook[]>>(
-      (authorBooks, author) => ({
-        ...authorBooks,
-        [author.id]: (books.value ?? []).filter(
-          (book) => book.author === author.id,
-        ),
-      }),
-      {},
-    ) ?? {},
+const booksByAuthorId = computed(() =>
+  getBooksByAuthor(books.value ?? [], authors.value ?? []),
 )
 
 const { view, sortedAuthors, onSearch } = useSortAuthors(authors.value ?? [])

@@ -1,4 +1,5 @@
 import type { Book, ViewBook } from '~/types/book'
+import type { Collection } from '~/types/collection'
 
 export function sortBooks(booksToBeSorted: ViewBook[]) {
   return booksToBeSorted.concat().sort((book1, book2) => {
@@ -11,7 +12,7 @@ export function sortBooks(booksToBeSorted: ViewBook[]) {
 
 export function sortBooksBy<B extends Book>(
   books: B[],
-  bookProperty: keyof Pick<B, 'pages' | 'rating' | 'year'>,
+  bookProperty: keyof B,
   direction: 'asc' | 'desc' = 'asc',
   count?: number,
 ) {
@@ -24,10 +25,40 @@ export function sortBooksBy<B extends Book>(
       return -1
     }
 
+    if (
+      typeof book1[bookProperty] === 'string' &&
+      typeof book2[bookProperty] === 'string'
+    ) {
+      return direction === 'desc'
+        ? book2[bookProperty].localeCompare(book1[bookProperty])
+        : book1[bookProperty].localeCompare(book2[bookProperty])
+    }
+
     return direction === 'desc'
-      ? book2[bookProperty] - book1[bookProperty]
-      : book1[bookProperty] - book2[bookProperty]
+      ? (book2[bookProperty] as number) - (book1[bookProperty] as number)
+      : (book1[bookProperty] as number) - (book2[bookProperty] as number)
   })
 
   return count ? sortedBooks.slice(0, count) : sortedBooks
+}
+
+export function sortCollections(collections: Collection[]) {
+  return collections.concat().sort((b1, b2) => {
+    const isB1Favorite = DEFAULT_COLLECTIONS.includes(String(b1.id))
+    const isB2Favorite = DEFAULT_COLLECTIONS.includes(String(b2.id))
+
+    if (isB1Favorite && isB2Favorite) {
+      return b1.name.localeCompare(b2.name)
+    }
+
+    if (isB1Favorite) {
+      return -1
+    }
+
+    if (isB2Favorite) {
+      return 1
+    }
+
+    return b1.name.localeCompare(b2.name)
+  })
 }
