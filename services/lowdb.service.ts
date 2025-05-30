@@ -10,7 +10,7 @@ import type {
 import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import { v4 as uuidv4 } from 'uuid'
-import { logger, DEFAULT_COLLECTIONS } from '../utils'
+import { logger, DEFAULT_COLLECTIONS, DEFAULT_COLLECTIONS_INIT } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference, indexBy, prop, uniq } from 'ramda'
@@ -490,7 +490,10 @@ export class LowDBClient {
     await this.client.update((data) => {
       data.authors = []
       data.books = []
-      data.collections = []
+      data.collections = DEFAULT_COLLECTIONS_INIT.map((c) => ({
+        ...c,
+        created_at: new Date().toISOString(),
+      }))
       data['collection-book'] = []
     })
 
