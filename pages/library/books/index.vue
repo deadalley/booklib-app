@@ -10,25 +10,34 @@
       <div class="flex w-full items-start gap-3 xl:flex-row">
         <bl-search-bar @input="onSearch" />
         <bl-view-switch v-model:view="view" />
-        <bl-button variant="tertiary" @click="onFilterOpen">
-          <template #appendIcon="iconProps">
-            <IconFilter v-bind="iconProps" />
-          </template>
-        </bl-button>
-        <bl-button variant="tertiary" @click="editing = true">
-          <template #appendIcon="iconProps">
-            <IconStack2 v-bind="iconProps" />
-          </template>
-        </bl-button>
-        <bl-button
-          v-if="view === 'table'"
-          variant="tertiary"
-          @click="onTableSettingsOpen"
-        >
-          <template #appendIcon="iconProps">
-            <IconTable v-bind="iconProps" />
-          </template>
-        </bl-button>
+        <bl-tooltip>
+          <template #tooltip-content>Filter</template>
+          <bl-button variant="tertiary" @click="onFilterOpen">
+            <template #appendIcon="iconProps">
+              <IconFilter v-bind="iconProps" />
+            </template>
+          </bl-button>
+        </bl-tooltip>
+        <bl-tooltip>
+          <template #tooltip-content>Bulk actions</template>
+          <bl-button variant="tertiary" @click="editing = true">
+            <template #appendIcon="iconProps">
+              <IconStack2 v-bind="iconProps" />
+            </template>
+          </bl-button>
+        </bl-tooltip>
+        <bl-tooltip>
+          <template #tooltip-content>Table</template>
+          <bl-button
+            v-if="view === 'table'"
+            variant="tertiary"
+            @click="onTableSettingsOpen"
+          >
+            <template #appendIcon="iconProps">
+              <IconTable v-bind="iconProps" />
+            </template>
+          </bl-button>
+        </bl-tooltip>
         <bl-button v-if="editing" expand variant="secondary" @click="onCancel">
           Cancel
         </bl-button>

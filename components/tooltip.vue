@@ -6,7 +6,7 @@
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="rounded-lg bg-white px-3 py-2 drop-shadow-md"
+          class="z-50 rounded-lg bg-white px-3 py-2 drop-shadow-md"
           :side-offset="5"
         >
           <slot name="tooltip-content" />

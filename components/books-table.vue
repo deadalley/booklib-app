@@ -16,13 +16,13 @@ import {
   type ColumnDef,
   type RowSelectionState,
 } from '@tanstack/vue-table'
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
 import BlRating from './rating.vue'
 import languageOptions from '~/public/languages-2.json'
 import { BlProgressStatusIcon } from '#components'
 
-type DataType = Book & { checked?: boolean }
+type DataType = ViewBook
 
 const props = defineProps<{
   books: DataType[]
@@ -36,7 +36,7 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
-  (e: 'select:row', val: { id: Book['id']; selected: boolean }): void
+  (e: 'select:row', val: { id: ViewBook['id']; selected: boolean }): void
   (e: 'select:rows', val: RowSelectionState): void
 }>()
 
@@ -64,7 +64,7 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
         header: 'Title',
         cell: (info) => h('b', info.getValue()),
       }),
-      columnHelper.accessor('author', {
+      columnHelper.accessor('authorName', {
         header: 'Author',
         cell: (info) => h('b', info.getValue() ?? ''),
       }),

@@ -8,6 +8,7 @@
       <template #icon="iconProps">
         <IconLayoutGrid v-bind="iconProps" />
       </template>
+      <template #tooltip>Grid view</template>
     </bl-switch-option>
     <bl-switch-option
       v-if="views.includes('expanded-cards')"
@@ -26,6 +27,7 @@
       <template #icon="iconProps">
         <IconList v-bind="iconProps" />
       </template>
+      <template #tooltip>Table view</template>
     </bl-switch-option>
   </bl-switch>
 </template>
