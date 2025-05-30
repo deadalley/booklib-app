@@ -46,8 +46,9 @@ const props = withDefaults(
     height?: number
     unit?: string | ((value: number) => string)
     withLabel?: boolean
+    labelPosition?: 'bottom' | 'right'
   }>(),
-  { height: 340 },
+  { height: 340, withLabel: true, labelPosition: 'bottom' },
 )
 
 const _items = computed(() =>
@@ -95,7 +96,7 @@ const option = computed<EChartsOption>(() => ({
         show: true,
         position: 'right',
         formatter: ({ value, name }) =>
-          `{label|${name}}${props.withLabel ? `\n{value|${value === 0.1 ? 0 : value} ${renderUnit(value as number)}}` : ''}`,
+          `{label|${name}}${props.withLabel ? `${props.labelPosition === 'bottom' ? '\n' : ' '}{value|${value === 0.1 ? 0 : value} ${renderUnit(value as number)}}` : ''}`,
         verticalAlign: 'top',
         offset: [10, -10],
         rich: {
@@ -103,7 +104,8 @@ const option = computed<EChartsOption>(() => ({
             fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
             fontWeight: 500,
             fontSize: 18,
-            padding: [0, 0, 4, 0],
+            padding:
+              props.labelPosition === 'bottom' ? [0, 0, 4, 0] : [0, 4, 0, 0],
             align: 'left',
           },
           value: {

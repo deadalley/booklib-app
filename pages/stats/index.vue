@@ -54,7 +54,7 @@
         </template>
         <bl-ranking
           :items="rankedBooks"
-          :with-label="+rankingChartQuantity < 8"
+          :label-position="+rankingChartQuantity < 8 ? 'bottom' : 'right'"
           :unit="rankingChartProperty === 'rating' ? getRatingUnit : undefined"
         />
       </bl-tile>
