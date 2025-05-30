@@ -52,12 +52,12 @@
             <bl-raw-select
               v-model="rankingChartProperty"
               :options="rankingChartPropertyOptions"
-              class="ml-4 !w-24"
+              class="ml-4 !w-32"
             />
             <bl-raw-select
               v-model="rankingChartPropertyOrder"
               :options="rankingChartPropertyOrderOptions"
-              class="!w-20"
+              class="!w-24"
             />
             <bl-input
               id="isbn"
@@ -117,11 +117,11 @@ const pieChartProperty =
   ref<keyof Pick<Book, 'rating' | 'progressStatus'>>('rating')
 
 const rankingChartPropertyOptions: (SelectOption & {
-  value: 'rating' | 'year'
-  title: string
+  value: 'rating' | 'year' | 'pages'
 })[] = [
-  { label: 'Rating', value: 'rating', title: 'ranked books' },
-  { label: 'Year', value: 'year', title: 'books' },
+  { label: 'Rating', value: 'rating' },
+  { label: 'Year', value: 'year' },
+  { label: 'Pages', value: 'pages' },
 ]
 const rankingChartProperty = ref<'rating' | 'year'>('rating')
 
