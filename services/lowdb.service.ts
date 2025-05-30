@@ -63,9 +63,16 @@ export class LowDBClient {
     )
 
     if (params.deleteBooks) {
-      this.client.data.books = this.client.data.books.filter(
-        (book) => book.author_id !== id,
-      )
+      this.client.data.books = this.client.data.books.filter((book) => {
+        if (book.author_id === id) {
+          this.getBookCoverFileName(book.id).then((fileName) => {
+            if (fileName) {
+              return this.fileStorage.deleteFile(fileName)
+            }
+          })
+        }
+        return book.author_id !== id
+      })
     } else {
       this.client.data.books = this.client.data.books.map((book) =>
         book.author_id === id ? { ...book, author_id: null } : book,
@@ -219,6 +226,12 @@ export class LowDBClient {
 
     await this.client.write()
 
+    const fileName = await this.getBookCoverFileName(id)
+
+    if (fileName) {
+      await this.fileStorage.deleteFile(fileName)
+    }
+
     return id
   }
 
@@ -237,6 +250,14 @@ export class LowDBClient {
     ].filter(({ book_id }) => !ids.includes(book_id))
 
     await this.client.write()
+
+    ids.forEach((id) => {
+      this.getBookCoverFileName(id).then((fileName) => {
+        if (fileName) {
+          return this.fileStorage.deleteFile(fileName)
+        }
+      })
+    })
 
     return ids
   }
@@ -425,7 +446,17 @@ export class LowDBClient {
 
     const booksInCollection = this.client.data['collection-book']
       .filter(({ collection_id }) => collection_id === id)
-      .map(({ book_id }) => book_id)
+      .map(({ book_id }) => {
+        if (params.deleteBooks) {
+          this.getBookCoverFileName(book_id).then((fileName) => {
+            if (fileName) {
+              return this.fileStorage.deleteFile(fileName)
+            }
+          })
+        }
+
+        return book_id
+      })
 
     this.client.data.collections = this.client.data.collections.filter(
       (c) => c.id !== id,
