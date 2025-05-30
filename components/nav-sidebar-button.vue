@@ -1,5 +1,5 @@
 <template>
-  <bl-tooltip :disabled="!$slots['tooltip']">
+  <bl-tooltip side="right" :disabled="!$slots['tooltip']">
     <template #tooltip-content>
       <slot name="tooltip" />
     </template>

@@ -8,6 +8,7 @@
         <TooltipContent
           class="z-50 rounded-lg bg-white px-3 py-2 drop-shadow-md"
           :side-offset="5"
+          :side="side"
         >
           <slot name="tooltip-content" />
           <TooltipArrow class="fill-white" :width="8" />
@@ -26,4 +27,6 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from 'radix-vue'
+
+defineProps<{ side?: 'top' | 'right' | 'bottom' | 'left' }>()
 </script>
