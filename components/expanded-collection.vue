@@ -64,7 +64,6 @@
             <template #cancel-label> Cancel </template>
             <template #action-label> Delete </template>
           </bl-modal>
-
           <IconChevronDown
             class="accordion-chevron transition-transform duration-300 ease-in"
             :size="20"

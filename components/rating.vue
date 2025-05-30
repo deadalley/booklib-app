@@ -23,12 +23,12 @@ import { IconStar, IconStarFilled, IconStarHalfFilled } from '@tabler/icons-vue'
 
 const props = withDefaults(
   defineProps<{
-    editing: boolean
+    editing?: boolean
     rating: number
     iconSize?: number
     onCommit?: (value: number) => Promise<void>
   }>(),
-  { iconSize: 24 },
+  { editing: false, iconSize: 24 },
 )
 
 const initialRating = ref(props.rating)
