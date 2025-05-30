@@ -1,5 +1,5 @@
 <template>
-  <bl-tile v-if="authors?.length">
+  <bl-tile v-if="authors?.length" class="flex-1">
     <template #title><slot name="title" /></template>
     <div class="flex w-full flex-col items-center gap-6">
       <div class="-mx-2 flex w-full items-center gap-2">

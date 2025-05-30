@@ -13,3 +13,7 @@ export function randomInt(min: number, max: number) {
 export function roundToNearestHalf(value: number): number {
   return Math.round(value * 2) / 2
 }
+
+export function getRandomIndex<T>(array: T[]): number {
+  return Math.floor(Math.random() * array.length)
+}

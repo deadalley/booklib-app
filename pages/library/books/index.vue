@@ -231,6 +231,7 @@ function onCancel() {
   }))
 }
 
+// TODO: return author name with book from server
 function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
   return (_books ?? []).map((book) => ({
     ...book,

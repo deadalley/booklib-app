@@ -94,9 +94,7 @@
           </bl-tile>
         </div>
         <div class="col-span-12 flex flex-col lg:col-span-4">
-          <bl-tile>
-            <template #title>Placeholder</template>
-          </bl-tile>
+          <bl-book-suggestions-tile />
         </div>
         <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
           <bl-author-highlight-tile
