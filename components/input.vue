@@ -42,7 +42,7 @@ export type InputProps = {
   formatter?: (value: any) => string | undefined
 }
 
-const inputModel = ref()
+const inputModel = defineModel<string | undefined>()
 const focused = ref(false)
 
 const props = withDefaults(defineProps<InputProps>(), {

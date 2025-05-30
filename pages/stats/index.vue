@@ -31,7 +31,6 @@
               v-model="pieChartProperty"
               :options="pieChartPropertyOptions"
               class="ml-4"
-              placeholder="Select file format"
             />
           </div>
         </template>
@@ -39,7 +38,41 @@
           v-if="books"
           :books="books"
           :book-property="pieChartProperty"
-          unit="★"
+          :unit="
+            pieChartPropertyOptions.find(
+              ({ value }) => value === pieChartProperty,
+            )?.unit
+          "
+        />
+      </bl-tile>
+      <bl-tile class="col-span-12 lg:col-span-6">
+        <template #title>Lowest rated books</template>
+        <template #actions>
+          <div class="flex justify-end gap-1">
+            <bl-raw-select
+              v-model="rankingChartProperty"
+              :options="rankingChartPropertyOptions"
+              class="ml-4 !w-24"
+            />
+            <bl-raw-select
+              v-model="rankingChartPropertyOrder"
+              :options="rankingChartPropertyOrderOptions"
+              class="!w-20"
+            />
+            <bl-input
+              id="isbn"
+              v-model="rankingChartQuantity"
+              editing
+              type="number"
+              :min="1"
+              :max="15"
+            />
+          </div>
+        </template>
+        <bl-ranking
+          :items="rankedBooks"
+          :with-label="+rankingChartQuantity < 8"
+          :unit="rankingChartProperty === 'rating' ? getRatingUnit : undefined"
         />
       </bl-tile>
       <bl-tile class="col-span-12">
@@ -50,7 +83,6 @@
               v-model="barChartProperty"
               :options="barChartPropertyOptions"
               class="ml-4"
-              placeholder="Select file format"
             />
           </div>
         </template>
@@ -61,19 +93,6 @@
           :books="books"
           :book-property="barChartProperty"
         />
-      </bl-tile>
-      <bl-tile class="col-span-12 lg:col-span-5">
-        <template #title>Book status</template>
-        <bl-books-pie-chart
-          v-if="books"
-          :books="books"
-          book-property="progressStatus"
-          :height="200"
-        />
-      </bl-tile>
-      <bl-tile class="col-span-12 lg:col-span-4">
-        <template #title>Not finished books</template>
-        <bl-ranking :items="notFinishedBooks" :height="200" />
       </bl-tile>
     </div>
   </NuxtLayout>
@@ -90,35 +109,43 @@ const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 
-// const rankedBooks = computed<RankingItem[]>(() =>
-//   sortBooksBy(books.value ?? [], 'rating', 'desc', 5).map((book) => ({
-//     label: book.title,
-//     value: book.rating!,
-//   })),
-// )
-
-// const lowRankedBooks = computed<RankingItem[]>(() =>
-//   sortBooksBy(books.value ?? [], 'rating', 'asc', 5).map((book) => ({
-//     label: book.title,
-//     value: book.rating!,
-//   })),
-// )
-
-const notFinishedBooks = computed<RankingItem[]>(() =>
-  (books.value ?? [])
-    .filter((book) => book.progressStatus === 'not-finished')
-    .map((book) => ({
-      label: book.title,
-      value: 3,
-    })),
-)
-
-const pieChartPropertyOptions: SelectOption[] = [
-  { label: 'Rating', value: 'rating' },
+const pieChartPropertyOptions: (SelectOption & { unit?: string })[] = [
+  { label: 'Rating', value: 'rating', unit: '★' },
   { label: 'Progress status', value: 'progressStatus' },
 ]
 const pieChartProperty =
   ref<keyof Pick<Book, 'rating' | 'progressStatus'>>('rating')
+
+const rankingChartPropertyOptions: (SelectOption & {
+  value: 'rating' | 'year'
+  title: string
+})[] = [
+  { label: 'Rating', value: 'rating', title: 'ranked books' },
+  { label: 'Year', value: 'year', title: 'books' },
+]
+const rankingChartProperty = ref<'rating' | 'year'>('rating')
+
+const rankingChartPropertyOrderOptions: SelectOption[] = [
+  { label: 'Top', value: 'top' },
+  { label: 'Low', value: 'low' },
+]
+const rankingChartPropertyOrder = ref<'top' | ' low'>('top')
+
+const rankingChartQuantity = ref<string>('5')
+
+const rankedBooks = ref<RankingItem[]>(getRankedBooks())
+
+watch(
+  [
+    books,
+    rankingChartProperty,
+    rankingChartPropertyOrder,
+    rankingChartQuantity,
+  ],
+  () => {
+    rankedBooks.value = getRankedBooks()
+  },
+)
 
 const barChartPropertyOptions: SelectOption[] = [
   { label: 'Pages', value: 'pages' },
@@ -128,6 +155,20 @@ const barChartPropertyOptions: SelectOption[] = [
 ]
 const barChartProperty =
   ref<keyof Pick<Book, 'pages' | 'year' | 'author' | 'collections'>>('pages')
+
+function getRankedBooks() {
+  return sortBooksBy(
+    books.value ?? [],
+    rankingChartProperty.value,
+    rankingChartPropertyOrder.value === 'top' ? 'desc' : 'asc',
+  )
+    .filter((book) => book[rankingChartProperty.value] != null)
+    .map((book) => ({
+      label: book.title,
+      value: book[rankingChartProperty.value] ?? 0,
+    }))
+    .slice(0, +rankingChartQuantity.value)
+}
 
 useHead({
   title: 'BookLib | Statistics',
