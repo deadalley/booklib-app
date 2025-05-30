@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { bookToDbBook, logger, DEFAULT_COLLECTIONS } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
-import { difference } from 'ramda'
+import { difference, indexBy, prop, uniq } from 'ramda'
 import { FileStorageService } from './file-storage.service'
 import type { Collection } from '~/types/collection'
 
@@ -503,11 +503,35 @@ export class LowDBClient {
   ): ReturnType<DBClient['importLibrary']> {
     await this.client.read()
 
+    const existingAuthorsByName = indexBy(
+      prop('name'),
+      this.client.data.authors,
+    )
+    const authorsToCreate = uniq(
+      books
+        .map(({ author_id }) => author_id)
+        .filter((author_id): author_id is string => !!author_id),
+    )
+
+    authorsToCreate.forEach((authorName) => {
+      if (!existingAuthorsByName[authorName]) {
+        this.client.data.authors.push({
+          id: uuidv4(),
+          name: authorName,
+          created_at: new Date().toISOString(),
+        })
+      }
+    })
+
+    const allAuthorsByName = indexBy(prop('name'), this.client.data.authors)
+
     this.client.data.books = this.client.data.books.concat(
       books.map(({ id, ...book }) => ({
         ...bookToDbBook(book),
         id: uuidv4(),
         created_at: new Date().toISOString(),
+        author_id:
+          book.author_id && (allAuthorsByName[book.author_id]?.id ?? null),
       })),
     )
 
@@ -531,6 +555,20 @@ export class LowDBClient {
       ({ author_id }) => author_id && !authorIds.includes(author_id),
     )
 
+    const booksWithOutdatedStatus = this.client.data.books.filter(
+      ({ progress_status }) =>
+        progress_status &&
+        ![
+          'owned',
+          'not-owned',
+          'not-read',
+          'reading',
+          'paused',
+          'read',
+          'not-finished',
+        ].includes(progress_status),
+    )
+
     const collectionsWithNonExistentBooks = this.client.data[
       'collection-book'
     ].filter(({ book_id }) => !bookIds.includes(book_id))
@@ -542,8 +580,12 @@ export class LowDBClient {
             `Book ${book_id} is assigned collection ${collection_id}, which does not exist.`,
         ),
         ...booksWithNonExistentAuthors.map(
-          ({ id, author_id }) =>
-            `Book ${id} is assigned author ${author_id}, which does not exist.`,
+          ({ title, author_id }) =>
+            `Book ${title} is assigned author ${author_id}, which does not exist.`,
+        ),
+        ...booksWithOutdatedStatus.map(
+          ({ title, progress_status }) =>
+            `Book ${title} has invalid progress status ${progress_status}`,
         ),
       ],
       collections: collectionsWithNonExistentBooks.map(

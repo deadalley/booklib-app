@@ -1,4 +1,5 @@
 import { db } from '~/services/db.service'
+import { bookToDbBook } from '~/utils'
 
 export default defineEventHandler(async (event) => {
   const books = await readBody(event)

@@ -64,6 +64,10 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
         header: 'Title',
         cell: (info) => h('b', info.getValue()),
       }),
+      columnHelper.accessor('author', {
+        header: 'Author',
+        cell: (info) => h('b', info.getValue() ?? ''),
+      }),
       columnHelper.accessor('publisher', {
         header: 'Publisher',
         cell,

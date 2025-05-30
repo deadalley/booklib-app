@@ -125,6 +125,7 @@ const importOptions: SelectOption[] = [
 ]
 const selectedTableColumns = {
   coverSrc: { label: 'Cover', checked: false },
+  author: { label: 'Author', checked: true },
   publisher: { label: 'Publisher', checked: true },
   language: { label: 'Language', checked: true },
   year: { label: 'Year', checked: true },

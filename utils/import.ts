@@ -15,7 +15,7 @@ export async function parseCsvFile(file: File): Promise<Book[]> {
           return snakeCaseToKebabCase(value)
         }
         if (['pages', 'year', 'rating'].includes(field)) {
-          return +value
+          return value ? +value : null
         }
         if (['language', 'originalLanguage'].includes(field)) {
           return Object.entries(languageOptions).reduce<Record<string, string>>(
