@@ -87,16 +87,17 @@
           </div>
         </bl-tile>
       </div>
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 flex flex-col lg:col-span-4">
-          <bl-tile>
-            <template #title>Placeholder</template>
-          </bl-tile>
+      <div class="grid grid-cols-12 gap-5">
+        <div class="col-span-12 flex flex-col lg:col-span-5">
+          <bl-book-stats-tile :books="books ?? []" />
         </div>
         <div class="col-span-12 flex flex-col lg:col-span-4">
-          <bl-book-suggestions-tile />
+          <bl-book-suggestions-tile
+            :books="books ?? []"
+            :authors="authors ?? []"
+          />
         </div>
-        <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
+        <div class="col-span-12 flex flex-col gap-4 lg:col-span-3">
           <bl-author-highlight-tile
             v-if="authorsByBookCount?.length"
             :authors="authorsByRatings"

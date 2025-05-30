@@ -1,12 +1,12 @@
 <template>
   <transition name="fade" mode="out-in">
-    <bl-tile :key="index" class="transition-opacity duration-500">
+    <bl-tile :key="index" class="flex-1">
       <template #title>{{ selectedOption.title }}</template>
-      <NuxtLink
-        :to="`/library/books/${selectedOption.book.id}`"
-        class="transition-opacity duration-500"
-      >
-        <bl-book-image :book="selectedOption.book" />
+      <NuxtLink :to="`/library/books/${selectedOption.book.id}`">
+        <bl-book-image
+          :book="selectedOption.book"
+          img-size-class="!h-[300px]"
+        />
       </NuxtLink>
       <div>
         <h6>{{ selectedOption.book.title }}</h6>
@@ -30,17 +30,19 @@ import { indexBy } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 
-const { data: authors } = await useFetch<Author[]>('/api/authors')
-const { data: books } = await useFetch<Book[]>('/api/books')
+const props = defineProps<{
+  authors: Author[]
+  books: Book[]
+}>()
 
 const index = ref(0)
 let timer: ReturnType<typeof setInterval> | null = null
 
 const authorsById = computed(() =>
-  authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
+  props.authors ? indexBy(({ id }) => String(id), props.authors) : {},
 )
 
-const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
+const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(props.books))
 
 const options = computed(() => {
   const _books = viewBooks.value ?? []

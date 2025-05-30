@@ -52,6 +52,7 @@
       v-if="!coverSrc && !loading"
       :label="book.title"
       class="!lg:h-[600px] h-[400px]"
+      :class="imgSizeClass"
     />
   </div>
 </template>
@@ -66,6 +67,7 @@ const props = defineProps<{
   book: Book
   editing?: boolean
   tempCoverSrc?: string
+  imgSizeClass?: string
 }>()
 
 const loading = ref(false)
