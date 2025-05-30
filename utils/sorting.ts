@@ -93,16 +93,29 @@ export function sortAuthorsByBookCount(
 export function sortAuthorsByBookRatings(
   books: ViewBook[],
   authors: Author[],
+  minAverage: number = 0.5,
 ): { author: Author; count: number; average: number }[] {
   const authorsById = indexBy(prop('id'), authors)
   const booksByAuthor = getBooksByAuthor(books, authors)
   const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => ({
-      author: authorsById[authorId],
-      count: booksByAuthor[authorId].length,
-      average: getAverageRating(booksByAuthor[authorId]) ?? 0,
-    }))
-    .filter(({ average }) => average >= 4)
+    .map((authorId) => {
+      console.log(
+        authorsById[authorId].name,
+        booksByAuthor[authorId]
+          .filter((book) => book.rating !== null)
+          .map((book) => book.rating ?? 0),
+        getAverageRating(booksByAuthor[authorId]),
+      )
+      return {
+        author: authorsById[authorId],
+        count: booksByAuthor[authorId].length,
+        average: getAverageRating(booksByAuthor[authorId]),
+      }
+    })
+    .filter(
+      (a): a is { author: Author; count: number; average: number } =>
+        a.average !== undefined && a.average >= minAverage,
+    )
 
   return authorCounts.sort((a, b) => {
     if (a.average === b.average) {

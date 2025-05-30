@@ -12,6 +12,7 @@
           <div>
             <bl-raw-select
               v-model="pieChartProperty"
+              align="end"
               :options="pieChartPropertyOptions"
               class="ml-4"
             />
@@ -34,11 +35,13 @@
           <div class="flex justify-end gap-1">
             <bl-raw-select
               v-model="rankingChartProperty"
+              align="end"
               :options="rankingChartPropertyOptions"
               class="ml-4 !w-32"
             />
             <bl-raw-select
               v-model="rankingChartPropertyOrder"
+              align="end"
               :options="rankingChartPropertyOrderOptions"
               class="!w-32"
             />
@@ -64,6 +67,7 @@
           <div>
             <bl-raw-select
               v-model="barChartProperty"
+              align="end"
               :options="barChartPropertyOptions"
               class="ml-4"
             />
@@ -135,11 +139,12 @@ const barChartPropertyOptions: SelectOption[] = [
   { label: 'Collection', value: 'collections' },
   { label: 'Language', value: 'language' },
   { label: 'Original language', value: 'originalLanguage' },
+  { label: 'Average author rating', value: 'averageRatingAuthor' },
 ]
-const barChartProperty =
-  ref<
-    keyof Pick<Book, 'author' | 'collections' | 'language' | 'originalLanguage'>
-  >('author')
+const barChartProperty = ref<
+  | keyof Pick<Book, 'author' | 'collections' | 'language' | 'originalLanguage'>
+  | 'averageRatingAuthor'
+>('author')
 
 function getRankedBooks() {
   return sortBooksBy(

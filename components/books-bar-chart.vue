@@ -1,21 +1,27 @@
 <template>
-  <bl-bar-chart :height="height" :items="series" unit="books" />
+  <bl-bar-chart
+    :height="height"
+    :items="series"
+    :unit="bookProperty === 'averageRatingAuthor' ? '★' : 'books'"
+  />
 </template>
 
 <script
   setup
   lang="ts"
   generic="
-    T extends keyof Pick<
-      Book,
-      | 'pages'
-      | 'rating'
-      | 'year'
-      | 'author'
-      | 'collections'
-      | 'language'
-      | 'originalLanguage'
-    >
+    T extends
+      | keyof Pick<
+          Book,
+          | 'pages'
+          | 'rating'
+          | 'year'
+          | 'author'
+          | 'collections'
+          | 'language'
+          | 'originalLanguage'
+        >
+      | 'averageRatingAuthor'
   "
 >
 import type { Book } from '~/types/book'
@@ -88,6 +94,15 @@ const series = computed(() => {
         value: books.length,
       }))
       .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
+  }
+
+  if (props.bookProperty === 'averageRatingAuthor') {
+    return sortAuthorsByBookRatings(props.books, props.authors).map(
+      ({ author, average }) => ({
+        label: author.name,
+        value: average,
+      }),
+    )
   }
 
   return sortBooksBy(props.books, props.bookProperty, 'desc')

@@ -132,7 +132,7 @@ const { data: latestBooks } = await useFetch<
 >('/api/library/latest-books')
 
 const authorsByRatings = computed(() =>
-  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? []),
+  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? [], 4),
 )
 
 const authorsByBookCount = computed(() =>

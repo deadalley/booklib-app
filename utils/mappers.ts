@@ -56,12 +56,15 @@ export function getBooksByLanguage(
 }
 
 export function getAverageRating(books: ViewBook[]): number | undefined {
-  return (
-    books.length &&
-    sum(
-      books
-        .filter((book) => book.rating !== null)
-        .map((book) => book.rating ?? 0),
-    ) / books.length
+  const booksWithValidRatings = books
+    .filter((book) => book.rating !== null)
+    .map((book) => book.rating ?? 0)
+
+  if (!booksWithValidRatings.length) {
+    return undefined
+  }
+
+  return roundToNearestHalf(
+    sum(booksWithValidRatings) / booksWithValidRatings.length,
   )
 }

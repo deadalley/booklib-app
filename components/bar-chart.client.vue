@@ -53,14 +53,23 @@ const props = withDefaults(
   { height: 340 },
 )
 
-const tooManyItems = computed(() => props.items.length > 20)
+const tooManyItems = computed(() => props.items.length > 15)
+
+const interval = computed(() => {
+  if (props.items.length <= 15) return 0
+  if (props.items.length <= 30) return 1
+  if (props.items.length <= 45) return 2
+  if (props.items.length <= 60) return 3
+  if (props.items.length <= 100) return 4
+  return 5
+})
 
 const option = computed<EChartsOption>(() => ({
   color: tailwind.theme.colors.main,
   grid: {
-    left: 30,
+    left: tooManyItems.value ? 100 : 30,
     right: 0,
-    bottom: tooManyItems.value ? 90 : 60,
+    bottom: tooManyItems.value ? 100 : 60,
   },
   tooltip: {
     trigger: 'item',
@@ -86,7 +95,7 @@ const option = computed<EChartsOption>(() => ({
       fontSize: 16,
       padding: [6, 0],
       color: tailwind.theme.colors['accent-darker'],
-      interval: tooManyItems.value ? 5 : 0,
+      interval: interval.value,
       rotate: tooManyItems.value ? 30 : 0,
     },
     axisLine: {

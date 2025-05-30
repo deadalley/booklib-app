@@ -9,3 +9,7 @@ export function randomInt(min: number, max: number) {
     Math.ceil(min)
   )
 }
+
+export function roundToNearestHalf(value: number): number {
+  return Math.round(value * 2) / 2
+}

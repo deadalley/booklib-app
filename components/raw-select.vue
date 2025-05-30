@@ -9,6 +9,7 @@
   >
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
+        clas="relative"
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'formkit-inner': withWrapper,
@@ -17,14 +18,17 @@
         <SelectValue class="flex size-full" :placeholder="placeholder" />
         <input class="w-0 opacity-0" />
         <!--  eslint-disable-next-line tailwindcss/no-custom-classname -->
-        <IconChevronDown class="chevron" size="1.2em" />
+        <IconChevronDown class="chevron" :size="ICON_SIZE_SMALL" />
       </SelectTrigger>
 
       <SelectPortal disabled>
-        <SelectContent position="popper">
-          <SelectViewport
-            class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
-          >
+        <SelectContent
+          :align="align"
+          :avoid-collisions="false"
+          position="popper"
+          class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
+        >
+          <SelectViewport class="w-full">
             <SelectGroup v-if="options" class="flex w-full flex-col gap-1">
               <SelectItem
                 v-for="(option, index) in options"
@@ -91,6 +95,7 @@ export type SelectProps = {
   groups?: { label?: string; options: SelectOption[] }[]
   placeholder?: string
   withWrapper?: boolean
+  align?: 'start' | 'center' | 'end'
 }
 
 withDefaults(defineProps<SelectProps>(), { withWrapper: true })
@@ -101,13 +106,10 @@ const selectValue = defineModel<string>()
 <style scoped>
 [data-radix-popper-content-wrapper] {
   position: absolute !important;
-  transform: none !important;
-  top: var(--radix-popper-anchor-height) !important;
 }
 
 .popper-with-wrapper [data-radix-popper-content-wrapper] {
   width: 100%;
-  margin-top: 4px;
 }
 
 .popper [data-radix-popper-content-wrapper] {
