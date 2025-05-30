@@ -90,16 +90,5 @@ const props = defineProps<{
   }[]
 }>()
 
-const index = ref(0)
-let timer: ReturnType<typeof setInterval> | null = null
-
-onMounted(() => {
-  timer = setInterval(() => {
-    index.value = (index.value + 1) % props.authors.length
-  }, 8 * 1_000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
+const index = useAutoIncrementIndex(props.authors.length, 8)
 </script>

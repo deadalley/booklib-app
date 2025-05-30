@@ -19,9 +19,6 @@ defineProps<{
   books: Book[]
 }>()
 
-const index = ref(0)
-let timer: ReturnType<typeof setInterval> | null = null
-
 const options: (SelectOption & {
   value: 'rating' | 'progressStatus'
   unit?: string
@@ -30,15 +27,7 @@ const options: (SelectOption & {
   { label: 'Books by progress status', value: 'progressStatus' },
 ]
 
+const index = useAutoIncrementIndex(options.length, 14)
+
 const selectedOption = computed(() => options[index.value])
-
-onMounted(() => {
-  timer = setInterval(() => {
-    index.value = (index.value + 1) % options.length
-  }, 14 * 1_000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
 </script>

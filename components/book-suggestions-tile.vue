@@ -35,9 +35,6 @@ const props = defineProps<{
   books: Book[]
 }>()
 
-const index = ref(0)
-let timer: ReturnType<typeof setInterval> | null = null
-
 const authorsById = computed(() =>
   props.authors ? indexBy(({ id }) => String(id), props.authors) : {},
 )
@@ -101,6 +98,8 @@ const options = computed(() => {
   ].filter((option) => option.book !== undefined)
 })
 
+const index = useAutoIncrementIndex(options.value.length, 8)
+
 const selectedOption = computed(() => options.value[index.value])
 
 // TODO: return author name with book from server
@@ -123,16 +122,6 @@ function onClick() {
       return
   }
 }
-
-onMounted(() => {
-  timer = setInterval(() => {
-    index.value = (index.value + 1) % options.value.length
-  }, 8 * 1_000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
 </script>
 
 <style scoped>
