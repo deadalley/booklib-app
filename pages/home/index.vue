@@ -41,7 +41,7 @@
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-10">
       <h1>Welcome to your library!</h1>
-      <div class="flex w-full gap-8">
+      <div class="flex w-full gap-4">
         <NuxtLink
           to="/library/books"
           class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
@@ -71,6 +71,18 @@
             >
           </NuxtLink>
         </NuxtLink>
+        <NuxtLink
+          to="/library/authors"
+          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
+        >
+          <IconFeather class="text-main" size="50" stroke="1.5" />
+          <h5>Authors</h5>
+          <bl-total-tag v-if="authors?.length">
+            {{ authors?.length }}
+            {{ authors?.length > 1 ? 'authors' : 'author' }}
+          </bl-total-tag>
+          <bl-total-tag v-if="!authors?.length"> No authors </bl-total-tag>
+        </NuxtLink>
       </div>
       <div class="flex flex-col gap-8">
         <bl-tile>
@@ -87,7 +99,7 @@
           </div>
         </bl-tile>
       </div>
-      <div class="grid grid-cols-12 gap-5">
+      <div class="grid grid-cols-12 gap-4">
         <div class="col-span-12 flex flex-col lg:col-span-5">
           <bl-book-stats-tile :books="books ?? []" />
         </div>
@@ -119,7 +131,13 @@
 </template>
 
 <script setup lang="ts">
-import { IconArchive, IconBooks, IconPlus, IconUpload } from '@tabler/icons-vue'
+import {
+  IconArchive,
+  IconBooks,
+  IconFeather,
+  IconPlus,
+  IconUpload,
+} from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
