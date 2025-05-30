@@ -46,7 +46,7 @@
         />
       </bl-tile>
       <bl-tile class="col-span-12 lg:col-span-6">
-        <template #title>Lowest rated books</template>
+        <template #title>{{ getRankedTitle() }}</template>
         <template #actions>
           <div class="flex justify-end gap-1">
             <bl-raw-select
@@ -123,13 +123,13 @@ const rankingChartPropertyOptions: (SelectOption & {
   { label: 'Year', value: 'year' },
   { label: 'Pages', value: 'pages' },
 ]
-const rankingChartProperty = ref<'rating' | 'year'>('rating')
+const rankingChartProperty = ref<'rating' | 'year' | 'pages'>('rating')
 
 const rankingChartPropertyOrderOptions: SelectOption[] = [
   { label: 'Top', value: 'top' },
   { label: 'Low', value: 'low' },
 ]
-const rankingChartPropertyOrder = ref<'top' | ' low'>('top')
+const rankingChartPropertyOrder = ref<'top' | 'low'>('top')
 
 const rankingChartQuantity = ref<string>('5')
 
@@ -148,8 +148,6 @@ watch(
 )
 
 const barChartPropertyOptions: SelectOption[] = [
-  { label: 'Pages', value: 'pages' },
-  { label: 'Year', value: 'year' },
   { label: 'Author', value: 'author' },
   { label: 'Collection', value: 'collections' },
   { label: 'Language', value: 'language' },
@@ -157,16 +155,8 @@ const barChartPropertyOptions: SelectOption[] = [
 ]
 const barChartProperty =
   ref<
-    keyof Pick<
-      Book,
-      | 'pages'
-      | 'year'
-      | 'author'
-      | 'collections'
-      | 'language'
-      | 'originalLanguage'
-    >
-  >('pages')
+    keyof Pick<Book, 'author' | 'collections' | 'language' | 'originalLanguage'>
+  >('author')
 
 function getRankedBooks() {
   return sortBooksBy(
@@ -180,6 +170,25 @@ function getRankedBooks() {
       value: book[rankingChartProperty.value] ?? 0,
     }))
     .slice(0, +rankingChartQuantity.value)
+}
+
+function getRankedTitle() {
+  switch (rankingChartProperty.value) {
+    case 'rating':
+      return rankingChartPropertyOrder.value === 'low'
+        ? 'Lowest rated books'
+        : 'Top rated books'
+    case 'year':
+      return rankingChartPropertyOrder.value === 'low'
+        ? 'Oldest books'
+        : 'Newest books'
+    case 'pages':
+      return rankingChartPropertyOrder.value === 'low'
+        ? 'Shortest books'
+        : 'Longest books'
+    default:
+      return ''
+  }
 }
 
 useHead({
