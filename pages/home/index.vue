@@ -110,6 +110,12 @@
           >
             <template #title>Author with the most books</template>
           </bl-author-highlight-tile>
+          <bl-author-highlight-tile
+            v-if="authorsByBookCount?.length"
+            :authors="authorsByBookCount"
+          >
+            <template #title>Author with the most books</template>
+          </bl-author-highlight-tile>
         </div>
       </div>
     </div>
@@ -131,11 +137,21 @@ const { data: latestBooks } = await useFetch<
 >('/api/library/latest-books')
 
 const authorsByRatings = computed(() =>
-  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? [], 4),
+  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? [], 4).map(
+    (author) => ({
+      ...author,
+      label: author.average ? 'Average rating' : undefined,
+    }),
+  ),
 )
 
 const authorsByBookCount = computed(() =>
-  sortAuthorsByBookCount(books.value ?? [], authors.value ?? []),
+  sortAuthorsByBookCount(books.value ?? [], authors.value ?? []).map(
+    (author) => ({
+      ...author,
+      label: `${author.count} ${author.count > 1 ? 'books' : 'book'}`,
+    }),
+  ),
 )
 
 useHead({

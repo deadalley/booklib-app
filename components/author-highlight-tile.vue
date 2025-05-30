@@ -1,15 +1,15 @@
 <template>
   <bl-tile v-if="authors?.length" class="flex-1">
-    <template #title><slot name="title" /></template>
+    <!-- <template #title><slot name="title" /></template> -->
     <div class="flex w-full flex-col items-center gap-6">
-      <div class="-mx-2 flex w-full items-center gap-2">
+      <div class="flex w-full items-center gap-2">
         <IconChevronLeft
-          class="cursor-pointer text-main hover:text-main/60"
+          class="-mx-2 cursor-pointer text-main hover:text-main/60"
           @click="index = index === authors.length - 1 ? 0 : index - 1"
         />
-        <h4 class="flex-1">{{ authors[index].author.name }}</h4>
+        <h6 class="flex-1">{{ authors[index].author.name }}</h6>
         <IconChevronRight
-          class="cursor-pointer text-main hover:text-main/60"
+          class="-mx-2 cursor-pointer text-main hover:text-main/60"
           @click="index = index === authors.length - 1 ? 0 : index + 1"
         />
       </div>
@@ -30,9 +30,8 @@
             <IconBooks stroke="1.5" :size="ICON_SIZE_MEDIUM + 2" />
           </template>
         </div>
-        <p v-if="authors[index]?.count" class="text-accent-darker">
-          {{ authors[index]?.count }}
-          {{ authors[index]?.count > 1 ? 'books' : 'book' }}
+        <p v-if="authors[index]?.label" class="text-accent-darker">
+          {{ authors[index]?.label }}
         </p>
       </div>
     </div>
@@ -48,9 +47,25 @@ import {
 } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 
-defineProps<{
-  authors: { author: Author; average?: number | undefined; count: number }[]
+const props = defineProps<{
+  authors: {
+    author: Author
+    label?: string
+    average?: number | undefined
+    count: number
+  }[]
 }>()
 
 const index = ref(0)
+let timer: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  timer = setInterval(() => {
+    index.value = (index.value + 1) % props.authors.length
+  }, 8 * 1_000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
 </script>
