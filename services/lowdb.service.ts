@@ -10,7 +10,7 @@ import type {
 import type { Low } from 'lowdb'
 import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
 import { v4 as uuidv4 } from 'uuid'
-import { bookToDbBook, logger, DEFAULT_COLLECTIONS } from '../utils'
+import { logger, DEFAULT_COLLECTIONS } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { createReadStream } from 'fs'
 import { difference, indexBy, prop, uniq } from 'ramda'
@@ -527,7 +527,7 @@ export class LowDBClient {
 
     this.client.data.books = this.client.data.books.concat(
       books.map(({ id, ...book }) => ({
-        ...bookToDbBook(book),
+        ...book,
         id: uuidv4(),
         created_at: new Date().toISOString(),
         author_id:
