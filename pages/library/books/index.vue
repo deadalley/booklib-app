@@ -142,7 +142,7 @@ const authorsById = computed(() =>
 )
 
 const dropdownItems: DropdownItem[] = [
-  { label: 'Delete books', value: 'delete', icon: 'IconTrash' },
+  { label: 'Delete', value: 'delete', icon: 'IconTrash' },
 ]
 
 const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
