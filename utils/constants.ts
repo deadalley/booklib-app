@@ -38,6 +38,7 @@ export const AUTHORS_PAGE_SIZE = 15
 
 export const ICON_SIZE_SMALL = 20
 export const ICON_SIZE_MEDIUM = 22
+export const ICON_SIZE_LARGE = 26
 
 export const PROGRESS_STATUS = [
   'owned',

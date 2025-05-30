@@ -1,5 +1,5 @@
 <template>
-  <transition name="sidebar-slide">
+  <transition name="sidebar-slide-right">
     <div
       v-show="isOpen"
       class="absolute right-0 top-0 z-50 flex h-full flex-col gap-8 overflow-auto border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:w-[355px]"
@@ -25,20 +25,3 @@ import { IconX } from '@tabler/icons-vue'
 
 defineProps<{ title?: string; isOpen: boolean; onClose: () => void }>()
 </script>
-
-<style scoped>
-.sidebar-slide-enter-active,
-.sidebar-slide-leave-active {
-  transition: all 0.3s ease-in-out;
-}
-
-.sidebar-slide-enter-to,
-.sidebar-slider-leave-from {
-  @apply -translate-x-0;
-}
-
-.sidebar-slide-enter-from,
-.sidebar-slide-leave-to {
-  @apply translate-x-full;
-}
-</style>

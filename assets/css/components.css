@@ -17,3 +17,33 @@
 .base-container {
   @apply flex flex-col items-start gap-1 rounded-xl border border-accent bg-white p-[0.35rem] text-base transition-all duration-100 ease-in;
 }
+
+.sidebar-slide-right-enter-active,
+.sidebar-slide-right-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-slide-right-enter-to,
+.sidebar-slide-rightr-leave-from {
+  @apply -translate-x-0;
+}
+
+.sidebar-slide-right-enter-from,
+.sidebar-slide-right-leave-to {
+  @apply translate-x-full;
+}
+
+.sidebar-slide-left-enter-active,
+.sidebar-slide-left-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-slide-left-enter-to,
+.sidebar-slide-leftr-leave-from {
+  @apply -translate-x-0;
+}
+
+.sidebar-slide-left-enter-from,
+.sidebar-slide-left-leave-to {
+  @apply -translate-x-full;
+}

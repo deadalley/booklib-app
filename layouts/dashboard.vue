@@ -1,8 +1,6 @@
 <template>
   <div class="relative flex h-screen w-screen">
-    <aside class="hidden h-full w-min md:block md:w-[255px]">
-      <bl-nav-sidebar />
-    </aside>
+    <bl-nav-sidebar />
     <main class="relative flex h-screen w-1/2 flex-1 flex-col">
       <nav class="flex items-center gap-8 border-b border-b-accent px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
