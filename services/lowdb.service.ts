@@ -248,6 +248,8 @@ export class LowDBClient {
   }
 
   async getLatestBooks(): ReturnType<DBClient['getLatestBooks']> {
+    const bookCovers = await this.fileStorage.getAllFileNames()
+
     await this.client.read()
 
     return this.client.data.books
@@ -256,6 +258,14 @@ export class LowDBClient {
         new Date(c1) < new Date(c2) ? 1 : -1,
       )
       .slice(0, 10)
+      .map((book) => {
+        const hasBookCover = bookCovers.find(this.isBookCover(book.id))
+
+        return {
+          ...book,
+          cover_src: hasBookCover ? this.getBookCoverUrl(book.id) : null,
+        }
+      })
   }
 
   async getOrderedBooks(
