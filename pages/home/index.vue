@@ -48,11 +48,11 @@
         >
           <IconBooks class="text-main" size="50" stroke="1.5" />
           <h5>Books</h5>
-          <bl-total-tag v-if="bookCount">
-            {{ bookCount }} {{ bookCount > 1 ? 'books' : 'book' }}
+          <bl-total-tag v-if="books?.length">
+            {{ books?.length }} {{ books?.length > 1 ? 'books' : 'book' }}
           </bl-total-tag>
           <NuxtLink to="/library/books/new">
-            <bl-button v-if="!bookCount">Create a book</bl-button>
+            <bl-button v-if="!books?.length">Create a book</bl-button>
           </NuxtLink>
         </NuxtLink>
         <NuxtLink
@@ -61,12 +61,14 @@
         >
           <IconArchive class="text-main" size="50" stroke="1.5" />
           <h5>Collections</h5>
-          <bl-total-tag v-if="collectionCount">
-            {{ collectionCount }}
-            {{ collectionCount > 1 ? 'collections' : 'collection' }}
+          <bl-total-tag v-if="collections?.length">
+            {{ collections?.length }}
+            {{ collections?.length > 1 ? 'collections' : 'collection' }}
           </bl-total-tag>
           <NuxtLink to="/library/collections/new">
-            <bl-button v-if="!collectionCount">Create a collection</bl-button>
+            <bl-button v-if="!collections?.length"
+              >Create a collection</bl-button
+            >
           </NuxtLink>
         </NuxtLink>
       </div>
@@ -84,65 +86,31 @@
             />
           </div>
         </bl-tile>
-        <div class="flex flex-1 gap-8">
-          <div class="flex flex-[4] flex-col">
-            <bl-tile v-if="bookListTileChance === 'length'">
-              <template #title> Your longest books </template>
-              <bl-ranking
-                :items="longestBooks"
-                :height="longestBooks.length * 60"
-                unit="Pages"
-                with-label
-              />
-            </bl-tile>
-            <bl-tile v-if="bookListTileChance === 'rating'">
-              <template #title> Your top rated books </template>
-              <bl-ranking
-                :items="ratedBooks"
-                :height="ratedBooks.length * 60"
-                :unit="getRatingUnit"
-                with-label
-              />
-            </bl-tile>
-          </div>
-          <div class="flex flex-[3] flex-col">
-            <bl-tile v-if="bookTileChance === 'not-read' && randomUnreadBook">
-              <template #title> How about starting a new book? </template>
-              <NuxtLink :to="`/library/books/${randomUnreadBook.id}`">
-                <bl-book-image :book="randomUnreadBook" />
-              </NuxtLink>
-              <bl-button expand>
-                Start reading
-                <template #appendIcon="iconProps">
-                  <component
-                    :is="icons[PROGRESS_STATUS_MAP.read.icon]"
-                    v-bind="iconProps"
-                  />
-                </template>
-              </bl-button>
-            </bl-tile>
-            <bl-tile v-if="bookTileChance === 'reading' && randomReadingBook">
-              <template #title>
-                Are you still reading
-                {{ randomReadingBook.title }}?
-              </template>
-              <NuxtLink :to="`/library/books/${randomReadingBook.id}`">
-                <bl-book-image :book="randomReadingBook" />
-              </NuxtLink>
-              <bl-button expand>
-                Mark as read
-                <template #appendIcon="iconProps">
-                  <component
-                    :is="icons[PROGRESS_STATUS_MAP.reading.icon]"
-                    v-bind="iconProps"
-                  />
-                </template>
-              </bl-button>
-            </bl-tile>
-          </div>
-          <div class="flex flex-[6] flex-col">
-            <bl-tile> </bl-tile>
-          </div>
+      </div>
+      <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 flex flex-col lg:col-span-4">
+          <bl-tile>
+            <template #title>Placeholder</template>
+          </bl-tile>
+        </div>
+        <div class="col-span-12 flex flex-col lg:col-span-4">
+          <bl-tile>
+            <template #title>Placeholder</template>
+          </bl-tile>
+        </div>
+        <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
+          <bl-author-highlight-tile
+            v-if="authorsByBookCount?.length"
+            :authors="authorsByRatings"
+          >
+            <template #title>Highest rated authors</template>
+          </bl-author-highlight-tile>
+          <bl-author-highlight-tile
+            v-if="authorsByBookCount?.length"
+            :authors="authorsByBookCount"
+          >
+            <template #title>Author with the most books</template>
+          </bl-author-highlight-tile>
         </div>
       </div>
     </div>
@@ -150,113 +118,25 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconArchive,
-  IconBooks,
-  IconPlus,
-  icons,
-  IconUpload,
-} from '@tabler/icons-vue'
-import type { RankingItem } from '~/components/ranking.client.vue'
+import { IconArchive, IconBooks, IconPlus, IconUpload } from '@tabler/icons-vue'
+import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
+import type { Collection } from '~/types/collection'
 
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
-const { data: bookCount } = await useFetch<number>('/api/library/book-count')
-const { data: collectionCount } = await useFetch<number>(
-  '/api/library/collection-count',
-)
-
+const { data: authors } = await useFetch<Author[]>('/api/authors')
+const { data: books } = await useFetch<Book[]>('/api/books')
+const { data: collections } = await useFetch<Collection[]>('/api/collections')
 const { data: latestBooks } = await useFetch<
   Pick<Book, 'id' | 'title' | 'coverSrc'>[]
 >('/api/library/latest-books')
 
-const { data: rankedBooksByPages } = await useFetch<
-  Required<Pick<Book, 'id' | 'title' | 'pages'>>[]
->('/api/library/ordered-books', {
-  query: {
-    property: 'pages',
-    count: 5,
-  },
-})
-const { data: rankedBooksByRating } = await useFetch<
-  Required<Pick<Book, 'id' | 'title' | 'rating'>>[]
->('/api/library/ordered-books', {
-  query: {
-    property: 'rating',
-    count: 5,
-  },
-})
-const { data: readingBooks } = await useFetch<Book[]>('/api/books', {
-  query: {
-    bookProgress: 'reading',
-    page: 0,
-    pageSize: 5,
-  },
-})
-const { data: unreadBooks } = await useFetch<Book[]>('/api/books', {
-  query: {
-    bookProgress: 'not-read',
-    page: 0,
-    pageSize: 5,
-  },
-})
-
-const bookListTileChance = computed(() => {
-  if (!ratedBooks.value?.length) {
-    return 'length'
-  } else if (!longestBooks.value?.length) {
-    return 'rating'
-  }
-
-  const random = Math.random()
-
-  if (random < 0.5) {
-    return 'length'
-  } else {
-    return 'rating'
-  }
-})
-
-const ratedBooks = computed<RankingItem[]>(() =>
-  (rankedBooksByRating.value ?? []).map((book) => ({
-    label: book.title,
-    value: book.rating ?? 0,
-  })),
+const authorsByRatings = computed(() =>
+  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? []),
 )
 
-const longestBooks = computed<RankingItem[]>(() =>
-  (rankedBooksByPages.value ?? []).map((book) => ({
-    label: book.title,
-    value: book.pages ?? 0,
-  })),
-)
-
-const bookTileChance = computed(() => {
-  if (!readingBooks.value?.length) {
-    return 'not-read'
-  } else if (!unreadBooks.value?.length) {
-    return 'reading'
-  }
-
-  const random = Math.random()
-
-  if (random < 0.5) {
-    return 'reading'
-  } else {
-    return 'not-read'
-  }
-})
-
-const randomUnreadBook = computed(
-  () =>
-    unreadBooks.value?.length &&
-    unreadBooks.value[randomInt(0, unreadBooks.value.length - 1)],
-)
-
-const randomReadingBook = computed(
-  () =>
-    readingBooks.value?.length &&
-    readingBooks.value[randomInt(0, readingBooks.value.length - 1)],
+const authorsByBookCount = computed(() =>
+  sortAuthorsByBookCount(books.value ?? [], authors.value ?? []),
 )
 
 useHead({

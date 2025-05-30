@@ -2,6 +2,7 @@ import type { Author } from '~/types/author'
 import type { ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
+import { sum } from 'ramda'
 
 export function getBooksByAuthor(books: ViewBook[], authors: Author[]) {
   return authors.reduce<Record<string, ViewBook[]>>(
@@ -51,5 +52,16 @@ export function getBooksByLanguage(
       return booksByLanguage
     },
     {},
+  )
+}
+
+export function getAverageRating(books: ViewBook[]): number | undefined {
+  return (
+    books.length &&
+    sum(
+      books
+        .filter((book) => book.rating !== null)
+        .map((book) => book.rating ?? 0),
+    ) / books.length
   )
 }

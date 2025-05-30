@@ -1,3 +1,5 @@
+import { indexBy, prop } from 'ramda'
+import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
@@ -64,5 +66,52 @@ export function sortCollections(collections: Collection[]) {
     }
 
     return b1.name.localeCompare(b2.name, undefined, { numeric: true })
+  })
+}
+
+export function sortAuthorsByBookCount(
+  books: ViewBook[],
+  authors: Author[],
+): { author: Author; count: number }[] {
+  const authorsById = indexBy(prop('id'), authors)
+  const booksByAuthor = getBooksByAuthor(books, authors)
+  const authorCounts = Object.keys(booksByAuthor)
+    .map((authorId) => ({
+      author: authorsById[authorId],
+      count: booksByAuthor[authorId].length,
+    }))
+    .filter(({ count }) => count > 0)
+
+  return authorCounts.sort((a, b) => {
+    if (a.count === b.count) {
+      return a.author.name.localeCompare(b.author.name)
+    }
+    return b.count - a.count
+  })
+}
+
+export function sortAuthorsByBookRatings(
+  books: ViewBook[],
+  authors: Author[],
+): { author: Author; count: number; average: number }[] {
+  const authorsById = indexBy(prop('id'), authors)
+  const booksByAuthor = getBooksByAuthor(books, authors)
+  const authorCounts = Object.keys(booksByAuthor)
+    .map((authorId) => ({
+      author: authorsById[authorId],
+      count: booksByAuthor[authorId].length,
+      average: getAverageRating(booksByAuthor[authorId]) ?? 0,
+    }))
+    .filter(({ average }) => average >= 4)
+
+  return authorCounts.sort((a, b) => {
+    if (a.average === b.average) {
+      if (a.count === b.count) {
+        return a.author.name.localeCompare(b.author.name)
+      }
+      return b.count - a.count
+    }
+
+    return b.average - a.average
   })
 }
