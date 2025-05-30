@@ -2,7 +2,10 @@
   <NuxtLayout
     name="library"
     title="Authors"
-    :total="authors?.length && `${authors.length} authors`"
+    :total="
+      sortedAuthors?.length &&
+      `${sortedAuthors.length} ${sortedAuthors.length > 1 ? 'authors' : 'author'}`
+    "
   >
     <template #navbar>
       <div class="flex w-full items-start gap-3 xl:flex-row">
