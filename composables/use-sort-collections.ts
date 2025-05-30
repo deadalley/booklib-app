@@ -12,6 +12,8 @@ export const useSortCollections = (collections: Collection[]) => {
     router.push({ query: { view: v } })
   })
 
+  const currentPage = ref<number>(1)
+
   const sortedCollections = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(
       collections ?? [],
@@ -24,13 +26,31 @@ export const useSortCollections = (collections: Collection[]) => {
     return sorted
   })
 
+  const filteredCollectionsByPage = computed(() => {
+    if (
+      (currentPage.value - 1) * COLLECTIONS_PAGE_SIZE >=
+      sortedCollections.value.length
+    ) {
+      currentPage.value = 1
+    }
+
+    const filteredByCurrentPage = sortedCollections.value.slice(
+      (currentPage.value - 1) * COLLECTIONS_PAGE_SIZE,
+      currentPage.value * COLLECTIONS_PAGE_SIZE,
+    )
+
+    return filteredByCurrentPage
+  })
+
   function onSearch($event: Event) {
     textSearch.value = ($event.target as HTMLInputElement)?.value
   }
 
   return {
     view,
+    currentPage,
     sortedCollections,
+    filteredCollectionsByPage,
     textSearch,
     onSearch,
   }

@@ -41,7 +41,7 @@
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
       <bl-collection-card
-        v-for="collection in sortedCollections"
+        v-for="collection in filteredCollectionsByPage"
         :key="collection.id"
         collection-type="collections"
         :collection="collection"
@@ -51,7 +51,7 @@
     <div v-if="view === 'expanded-cards'" class="h-full overflow-y-auto">
       <div class="flex flex-col gap-y-4">
         <bl-expanded-collection
-          v-for="collection in sortedCollections"
+          v-for="collection in filteredCollectionsByPage"
           :key="collection.id"
           collection-type="collections"
           :collection="collection"
@@ -60,6 +60,18 @@
           can-delete
         />
       </div>
+    </div>
+    <div v-if="sortedCollections.length" class="flex justify-center py-2">
+      <bl-pagination
+        v-if="
+          sortedCollections.length &&
+          sortedCollections.length > COLLECTIONS_PAGE_SIZE
+        "
+        v-model="currentPage"
+        :total-item-count="sortedCollections.length"
+        :items-per-page="COLLECTIONS_PAGE_SIZE"
+        @update:page="onPageChange"
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -84,7 +96,15 @@ const booksByCollectionId = computed(() =>
   ),
 )
 
-const { view, sortedCollections, onSearch } = useSortCollections(
-  collections.value ?? [],
-)
+const {
+  view,
+  currentPage,
+  sortedCollections,
+  filteredCollectionsByPage,
+  onSearch,
+} = useSortCollections(collections.value ?? [])
+
+function onPageChange(page: number) {
+  currentPage.value = page
+}
 </script>

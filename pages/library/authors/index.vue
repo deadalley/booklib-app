@@ -30,7 +30,7 @@
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
       <bl-collection-card
-        v-for="author in sortedAuthors"
+        v-for="author in filteredAuthorsByPage"
         :key="author.id"
         collection-type="authors"
         :collection="{ ...author, books: booksByAuthorId[author.id] ?? [] }"
@@ -40,7 +40,7 @@
     <div v-if="view === 'expanded-cards'" class="h-full overflow-y-auto">
       <div class="flex flex-col gap-y-4">
         <bl-expanded-collection
-          v-for="author in sortedAuthors"
+          v-for="author in filteredAuthorsByPage"
           :key="author.id"
           collection-type="authors"
           :collection="author"
@@ -49,6 +49,15 @@
           can-delete
         />
       </div>
+    </div>
+    <div v-if="sortedAuthors.length" class="flex justify-center py-2">
+      <bl-pagination
+        v-if="sortedAuthors.length && sortedAuthors.length > AUTHORS_PAGE_SIZE"
+        v-model="currentPage"
+        :total-item-count="sortedAuthors.length"
+        :items-per-page="AUTHORS_PAGE_SIZE"
+        @update:page="onPageChange"
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -67,5 +76,10 @@ const booksByAuthorId = computed(() =>
   getBooksByAuthor(books.value ?? [], authors.value ?? []),
 )
 
-const { view, sortedAuthors, onSearch } = useSortAuthors(authors.value ?? [])
+const { view, currentPage, sortedAuthors, filteredAuthorsByPage, onSearch } =
+  useSortAuthors(authors.value ?? [])
+
+function onPageChange(page: number) {
+  currentPage.value = page
+}
 </script>

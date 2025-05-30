@@ -33,6 +33,8 @@ export const DEFAULT_COLLECTIONS_INIT = [
 ]
 
 export const BOOKS_PAGE_SIZE = 44
+export const COLLECTIONS_PAGE_SIZE = 15
+export const AUTHORS_PAGE_SIZE = 15
 
 export const ICON_SIZE_SMALL = 20
 export const ICON_SIZE_MEDIUM = 22

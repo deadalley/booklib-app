@@ -187,7 +187,6 @@ const {
 
 function onPageChange(page: number) {
   currentPage.value = page
-  refresh()
 }
 
 async function onActionSelect(action: string) {

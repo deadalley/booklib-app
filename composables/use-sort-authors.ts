@@ -12,6 +12,8 @@ export const useSortAuthors = (authors: Author[]) => {
     router.push({ query: { view: v } })
   })
 
+  const currentPage = ref<number>(1)
+
   const sortedAuthors = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(
       authors ?? [],
@@ -26,13 +28,31 @@ export const useSortAuthors = (authors: Author[]) => {
     return sorted
   })
 
+  const filteredAuthorsByPage = computed(() => {
+    if (
+      (currentPage.value - 1) * AUTHORS_PAGE_SIZE >=
+      sortedAuthors.value.length
+    ) {
+      currentPage.value = 1
+    }
+
+    const filteredByCurrentPage = sortedAuthors.value.slice(
+      (currentPage.value - 1) * AUTHORS_PAGE_SIZE,
+      currentPage.value * AUTHORS_PAGE_SIZE,
+    )
+
+    return filteredByCurrentPage
+  })
+
   function onSearch($event: Event) {
     textSearch.value = ($event.target as HTMLInputElement)?.value
   }
 
   return {
     view,
+    currentPage,
     sortedAuthors,
+    filteredAuthorsByPage,
     textSearch,
     onSearch,
   }
