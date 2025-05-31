@@ -8,5 +8,5 @@ export default defineEventHandler(async (event) => {
     throw createError('Missing property in query params')
   }
 
-  return db.getOrderedBooks(event, query)
+  return db.getOrderedBooks(query)
 })

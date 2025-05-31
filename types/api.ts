@@ -1,7 +1,7 @@
 import type { Book, BookProgressStatus } from './book'
 import type { Collection } from './collection'
 import type { AuthorDB, BookDB, CollectionDB } from './database'
-import type { H3Event, EventHandlerRequest } from 'h3'
+import type { ServerFile } from 'nuxt-file-storage'
 
 export type LibraryIntegrityResult = {
   books: string[]
@@ -30,73 +30,48 @@ export type GetOrderedBooksQuerySearchParams = {
   count?: number
 }
 
-export type DBClient = {
-  getAuthors: (event: H3Event<EventHandlerRequest>) => Promise<AuthorDB[]>
+export interface DBClient {
+  getAuthors: () => Promise<AuthorDB[]>
   deleteAuthor: (
-    event: H3Event<EventHandlerRequest>,
     id: AuthorDB['id'],
     params: DeleteAuthorParams,
   ) => Promise<AuthorDB['id']>
 
-  getBook: (
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ) => Promise<BookDB | null>
-  getBooks: (
-    event: H3Event<EventHandlerRequest>,
-    params: GetBooksQuerySearchParams,
-  ) => Promise<BookDB[]>
+  getBook: (id: BookDB['id']) => Promise<BookDB | null>
+  getBooks: (params: GetBooksQuerySearchParams) => Promise<BookDB[]>
   createBook: (
-    event: H3Event<EventHandlerRequest>,
-    book: Book,
+    book: BookDB,
     collections: CollectionDB['id'][],
   ) => Promise<BookDB | null>
-  deleteBook: (
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ) => Promise<BookDB['id'] | null>
-  deleteBooks: (
-    event: H3Event<EventHandlerRequest>,
-    ids: BookDB['id'][],
-  ) => Promise<BookDB['id'][]>
-  getBookCount: (event: H3Event<EventHandlerRequest>) => Promise<number | null>
-  getLatestBooks: (event: H3Event<EventHandlerRequest>) => Promise<BookDB[]>
+  deleteBook: (id: BookDB['id']) => Promise<BookDB['id'] | null>
+  deleteBooks: (ids: BookDB['id'][]) => Promise<BookDB['id'][]>
+  getBookCount: () => Promise<number | null>
+  getLatestBooks: () => Promise<BookDB[]>
   getOrderedBooks: (
-    event: H3Event<EventHandlerRequest>,
     params: GetOrderedBooksQuerySearchParams,
   ) => Promise<BookDB[]>
-  getBookCover: (
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ) => Promise<void>
+  getBookCover: (id: BookDB['id']) => Promise<string | null>
   updateBookCover: (
-    event: H3Event<EventHandlerRequest>,
-  ) => Promise<string | null>
-  deleteBookCover: (
-    event: H3Event<EventHandlerRequest>,
     id: BookDB['id'],
-  ) => Promise<null>
+    file: ServerFile,
+  ) => Promise<string | null>
+  deleteBookCover: (id: BookDB['id']) => Promise<null>
 
-  getCollection: (
-    event: H3Event<EventHandlerRequest>,
-    id: CollectionDB['id'],
-  ) => Promise<
+  getCollection: (id: CollectionDB['id']) => Promise<
     | (CollectionDB & {
         'collection-book': { book_id: BookDB['id']; order: number }[]
       })
     | null
   >
-  getCollections: (event: H3Event<EventHandlerRequest>) => Promise<
+  getCollections: () => Promise<
     (CollectionDB & {
       'collection-book': { book_id: BookDB['id']; order: number }[]
     })[]
   >
-  getCollectionCount: (
-    event: H3Event<EventHandlerRequest>,
-  ) => Promise<number | null>
+  getCollectionCount: () => Promise<number | null>
   createCollection: (
-    event: H3Event<EventHandlerRequest>,
-    collection: Collection,
+    collection: CollectionDB,
+    books: Collection['books'],
   ) => Promise<
     | (CollectionDB & {
         'collection-book': { book_id: Book['id']; order: number }[]
@@ -104,17 +79,13 @@ export type DBClient = {
     | null
   >
   deleteCollection: (
-    event: H3Event<EventHandlerRequest>,
     id: CollectionDB['id'],
     params: DeleteCollectionParams,
   ) => Promise<CollectionDB['id'] | null>
 
-  isLibraryEmpty: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
-  resetLibrary: (event: H3Event<EventHandlerRequest>) => Promise<boolean>
-  importLibrary: (
-    event: H3Event<EventHandlerRequest>,
-    books: Book[],
-  ) => Promise<boolean>
+  isLibraryEmpty: () => Promise<boolean>
+  resetLibrary: () => Promise<boolean>
+  importLibrary: (books: BookDB[]) => Promise<boolean>
   checkLibraryIntegrity: () => Promise<object>
 }
 

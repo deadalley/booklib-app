@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     created_at: new Date().toISOString(),
   }
 
-  const data = await db.createCollection(event, collectionDb, collection.books)
+  const data = await db.createCollection(collectionDb, collection.books)
 
   return data && dbCollectionToCollection(data, data['collection-book'])
 })

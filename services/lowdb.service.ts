@@ -1,4 +1,3 @@
-import type { H3Event, EventHandlerRequest } from 'h3'
 import type {
   Database,
   DBClient,
@@ -17,12 +16,11 @@ import {
   PROGRESS_STATUS,
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
-import { createReadStream } from 'fs'
 import { difference, indexBy, prop, uniq } from 'ramda'
 import { FileStorageService } from './file-storage.service'
 import type { Collection } from '~/types/collection'
 
-export class LowDBClient {
+export class LowDBClient implements DBClient {
   private client: Low<Database>
   private fileStorage: FileStorageService
 
@@ -48,7 +46,7 @@ export class LowDBClient {
     return `${process.env.VITE_DEV_SERVER_URL}/api/books/${id}/cover`
   }
 
-  async getAuthors(): ReturnType<DBClient['getAuthors']> {
+  async getAuthors() {
     await this.client.read()
 
     const data = this.client.data.authors
@@ -56,11 +54,7 @@ export class LowDBClient {
     return data
   }
 
-  async deleteAuthor(
-    event: H3Event<EventHandlerRequest>,
-    id: AuthorDB['id'],
-    params: DeleteAuthorParams,
-  ): ReturnType<DBClient['deleteAuthor']> {
+  async deleteAuthor(id: AuthorDB['id'], params: DeleteAuthorParams) {
     await this.client.read()
 
     this.client.data.authors = this.client.data.authors.filter(
@@ -89,10 +83,7 @@ export class LowDBClient {
     return id
   }
 
-  async getBook(
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ): ReturnType<DBClient['getBook']> {
+  async getBook(id: BookDB['id']) {
     await this.client.read()
 
     const book = this.client.data.books.find((book) => book.id === id)
@@ -113,10 +104,7 @@ export class LowDBClient {
       : null
   }
 
-  async getBooks(
-    event: H3Event<EventHandlerRequest>,
-    { page, pageSize, bookProgress }: GetBooksQuerySearchParams,
-  ): ReturnType<DBClient['getBooks']> {
+  async getBooks({ page, pageSize, bookProgress }: GetBooksQuerySearchParams) {
     await this.client.read()
 
     let data = this.client.data.books
@@ -148,11 +136,7 @@ export class LowDBClient {
     return data
   }
 
-  async createBook(
-    event: H3Event<EventHandlerRequest>,
-    book: BookDB,
-    collections: CollectionDB['id'][],
-  ): ReturnType<DBClient['createBook']> {
+  async createBook(book: BookDB, collections: CollectionDB['id'][]) {
     await this.client.read()
 
     // update author information
@@ -216,10 +200,7 @@ export class LowDBClient {
     return bookDb
   }
 
-  async deleteBook(
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ): ReturnType<DBClient['deleteBook']> {
+  async deleteBook(id: BookDB['id']) {
     await this.client.read()
 
     this.client.data.books = this.client.data.books.filter(
@@ -240,10 +221,7 @@ export class LowDBClient {
     return id
   }
 
-  async deleteBooks(
-    event: H3Event<EventHandlerRequest>,
-    ids: BookDB['id'][],
-  ): ReturnType<DBClient['deleteBooks']> {
+  async deleteBooks(ids: BookDB['id'][]) {
     await this.client.read()
 
     this.client.data.books = this.client.data.books.filter(
@@ -267,13 +245,13 @@ export class LowDBClient {
     return ids
   }
 
-  async getBookCount(): ReturnType<DBClient['getBookCount']> {
+  async getBookCount() {
     await this.client.read()
 
     return this.client.data.books.length
   }
 
-  async getLatestBooks(): ReturnType<DBClient['getLatestBooks']> {
+  async getLatestBooks() {
     const bookCovers = await this.fileStorage.getAllFileNames()
 
     await this.client.read()
@@ -294,10 +272,12 @@ export class LowDBClient {
       })
   }
 
-  async getOrderedBooks(
-    event: H3Event<EventHandlerRequest>,
-    { property, count }: GetOrderedBooksQuerySearchParams,
-  ): ReturnType<DBClient['getOrderedBooks']> {
+  async getOrderedBooks({
+    property,
+    count,
+  }: GetOrderedBooksQuerySearchParams): ReturnType<
+    DBClient['getOrderedBooks']
+  > {
     await this.client.read()
 
     const filteredBooks = this.client.data.books
@@ -317,24 +297,15 @@ export class LowDBClient {
     return filteredBooks
   }
 
-  async getBookCover(
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ): ReturnType<DBClient['getBookCover']> {
+  async getBookCover(id: BookDB['id']) {
     const fileName = await this.getBookCoverFileName(id)
 
     const filePath = fileName && (await this.fileStorage.getFile(fileName))
 
-    if (filePath) {
-      return sendStream(event, createReadStream(filePath))
-    }
+    return filePath || null
   }
 
-  async updateBookCover(
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-    file: ServerFile,
-  ): ReturnType<DBClient['updateBookCover']> {
+  async updateBookCover(id: BookDB['id'], file: ServerFile) {
     const fileName = await this.getBookCoverFileName(id)
 
     if (fileName) {
@@ -348,10 +319,7 @@ export class LowDBClient {
     return bookCoverUrl
   }
 
-  async deleteBookCover(
-    event: H3Event<EventHandlerRequest>,
-    id: BookDB['id'],
-  ): ReturnType<DBClient['deleteBookCover']> {
+  async deleteBookCover(id: BookDB['id']) {
     const fileName = await this.getBookCoverFileName(id)
 
     if (fileName) {
@@ -365,10 +333,7 @@ export class LowDBClient {
     throw createError(error.message)
   }
 
-  async getCollection(
-    event: H3Event<EventHandlerRequest>,
-    id: CollectionDB['id'],
-  ): ReturnType<DBClient['getCollection']> {
+  async getCollection(id: CollectionDB['id']) {
     await this.client.read()
 
     const collection = this.client.data.collections.find((c) => c.id === id)
@@ -384,7 +349,7 @@ export class LowDBClient {
       : null
   }
 
-  async getCollections(): ReturnType<DBClient['getCollections']> {
+  async getCollections() {
     await this.client.read()
 
     return this.client.data.collections.map((collection) => ({
@@ -395,17 +360,13 @@ export class LowDBClient {
     }))
   }
 
-  async getCollectionCount(): ReturnType<DBClient['getCollectionCount']> {
+  async getCollectionCount() {
     await this.client.read()
 
     return this.client.data.collections.length
   }
 
-  async createCollection(
-    event: H3Event<EventHandlerRequest>,
-    collection: CollectionDB,
-    books: Collection['books'],
-  ): ReturnType<DBClient['createCollection']> {
+  async createCollection(collection: CollectionDB, books: Collection['books']) {
     await this.client.read()
 
     const bookIndex = this.client.data.collections.findIndex(
@@ -437,10 +398,9 @@ export class LowDBClient {
   }
 
   async deleteCollection(
-    event: H3Event<EventHandlerRequest>,
     id: CollectionDB['id'],
     params: DeleteCollectionParams,
-  ): ReturnType<DBClient['deleteCollection']> {
+  ) {
     if (DEFAULT_COLLECTIONS.includes(id)) {
       const error = { message: `Cannot delete ${id}` }
       logger.error(error)
@@ -485,13 +445,13 @@ export class LowDBClient {
     return id
   }
 
-  async isLibraryEmpty(): ReturnType<DBClient['isLibraryEmpty']> {
+  async isLibraryEmpty() {
     await this.client.read()
 
     return this.client.data.books.length === 0
   }
 
-  async resetLibrary(): ReturnType<DBClient['resetLibrary']> {
+  async resetLibrary() {
     await this.client.update((data) => {
       data.authors = []
       data.books = []
@@ -505,10 +465,7 @@ export class LowDBClient {
     return true
   }
 
-  async importLibrary(
-    event: H3Event<EventHandlerRequest>,
-    books: BookDB[],
-  ): ReturnType<DBClient['importLibrary']> {
+  async importLibrary(books: BookDB[]) {
     await this.client.read()
 
     const existingAuthorsByName = indexBy(
@@ -548,7 +505,7 @@ export class LowDBClient {
     return true
   }
 
-  async checkLibraryIntegrity(): ReturnType<DBClient['checkLibraryIntegrity']> {
+  async checkLibraryIntegrity() {
     await this.client.read()
 
     const authorIds = this.client.data.authors.map(({ id }) => id)

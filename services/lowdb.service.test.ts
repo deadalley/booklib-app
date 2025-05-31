@@ -1,4 +1,3 @@
-import type { H3Event, EventHandlerRequest } from 'h3'
 import { Low, Memory } from 'lowdb'
 import type { Database } from '~/types/api'
 import { buildAuthor, DEFAULT_COLLECTIONS_INIT } from '~/utils'
@@ -95,8 +94,6 @@ describe('lowdb', async () => {
 
   const db = new LowDBClient(client)
 
-  const event: H3Event<EventHandlerRequest> = {} as H3Event<EventHandlerRequest>
-
   beforeEach(async () => {
     client.data = getDbSeed({ authors, books, collections, collectionBooks })
     await client.write()
@@ -113,13 +110,13 @@ describe('lowdb', async () => {
     describe('deleteAuthor', async () => {
       it('should not delete author if author does not exist', async () => {
         const authorId = 'non-existent-id'
-        await db.deleteAuthor(event, authorId, {})
+        await db.deleteAuthor(authorId, {})
         expect(client.data.authors).toHaveLength(authors.length)
       })
 
       it('should delete author', async () => {
         const authorId = authors[0].id
-        const result = await db.deleteAuthor(event, authorId, {})
+        const result = await db.deleteAuthor(authorId, {})
         expect(result).toBe(authorId)
 
         expect(client.data.authors).toHaveLength(authors.length - 1)
@@ -135,7 +132,7 @@ describe('lowdb', async () => {
         )
         expect(bookWithAuthorId).toBeDefined()
 
-        await db.deleteAuthor(event, authorId, {})
+        await db.deleteAuthor(authorId, {})
 
         const bookWithAuthorIdAfterDelete = client.data.books.find(
           (b) => b.author_id === authorId,
@@ -145,7 +142,7 @@ describe('lowdb', async () => {
 
       it('should delete books from author if deleteBooks is true', async () => {
         const authorId = authors[1].id
-        await db.deleteAuthor(event, authorId, {
+        await db.deleteAuthor(authorId, {
           deleteBooks: true,
         })
 
@@ -154,7 +151,7 @@ describe('lowdb', async () => {
 
       it('should not delete books from author if deleteBooks is false', async () => {
         const authorId = authors[1].id
-        await db.deleteAuthor(event, authorId, {
+        await db.deleteAuthor(authorId, {
           deleteBooks: false,
         })
         expect(client.data.books).toHaveLength(books.length)
@@ -166,50 +163,50 @@ describe('lowdb', async () => {
     describe('getBook', async () => {
       it('should return book by id', async () => {
         const book = books[0]
-        const result = await db.getBook(event, book.id)
+        const result = await db.getBook(book.id)
         expect(result?.id).toEqual(book.id)
         expect(result?.title).toEqual(book.title)
       })
 
       it('should return book with collections', async () => {
         const book = books[0]
-        const result = await db.getBook(event, book.id)
+        const result = await db.getBook(book.id)
         expect(result?.collections).toEqual(['wishlist', 'favorite'])
       })
 
       it('should return null if book does not exist', async () => {
-        const result = await db.getBook(event, 'non-existent-id')
+        const result = await db.getBook('non-existent-id')
         expect(result).toBeNull()
       })
 
       it('should return cover src if exists', async () => {
         getFileMock.mockResolvedValueOnce('Book1.jpg')
-        const result = await db.getBook(event, books[0].id)
+        const result = await db.getBook(books[0].id)
         expect(result?.cover_src).toBeDefined()
         expect(result?.cover_src).toContain('/api/books/Book1/cover')
       })
 
       it('should return null if cover does not exist', async () => {
-        const result = await db.getBook(event, books[2].id)
+        const result = await db.getBook(books[2].id)
         expect(result?.cover_src).toBeNull()
       })
     })
 
     describe('getBooks', async () => {
       it('should return all books', async () => {
-        const result = await db.getBooks(event, {})
+        const result = await db.getBooks({})
         expect(result).toHaveLength(books.length)
         expect(ids(result)).toEqual(ids(books))
       })
 
       it('should return books with pagination', async () => {
-        const result = await db.getBooks(event, { page: 0, pageSize: 2 })
+        const result = await db.getBooks({ page: 0, pageSize: 2 })
         expect(result).toHaveLength(2)
         expect(ids(result)).toEqual([books[0].id, books[1].id])
       })
 
       it('should filter books by progress status', async () => {
-        const result = await db.getBooks(event, { bookProgress: 'reading' })
+        const result = await db.getBooks({ bookProgress: 'reading' })
         expect(result).toHaveLength(1)
       })
     })
@@ -217,7 +214,7 @@ describe('lowdb', async () => {
     describe('createBook', async () => {
       it('should create a new book', async () => {
         const newBook = buildBook({ id: 'new-book', title: 'New Book' })
-        const result = await db.createBook(event, newBook, [])
+        const result = await db.createBook(newBook, [])
         expect(result?.id).toBeDefined()
         expect(client.data.books).toHaveLength(books.length + 1)
       })
@@ -225,7 +222,7 @@ describe('lowdb', async () => {
       it('should add book to collections if provided', async () => {
         const newBook = buildBook({ id: 'new-book', title: 'New Book' })
         const collectionIds = ['wishlist']
-        const result = await db.createBook(event, newBook, collectionIds)
+        const result = await db.createBook(newBook, collectionIds)
 
         expect(result?.id).toBeDefined()
         expect(client.data['collection-book']).toHaveLength(
@@ -240,7 +237,7 @@ describe('lowdb', async () => {
           author_id: 'New Author',
         })
 
-        await db.createBook(event, newBook, [])
+        await db.createBook(newBook, [])
 
         expect(client.data.books).toHaveLength(books.length + 1)
         expect(client.data.authors).toHaveLength(authors.length + 1)
@@ -253,7 +250,7 @@ describe('lowdb', async () => {
           author_id: authors[0].id,
         })
 
-        await db.createBook(event, newBook, [])
+        await db.createBook(newBook, [])
 
         expect(client.data.books).toHaveLength(books.length + 1)
         expect(client.data.authors).toHaveLength(authors.length)
@@ -266,7 +263,7 @@ describe('lowdb', async () => {
           author_id: authors[0].id,
         }
 
-        await db.createBook(event, updatedBook, [])
+        await db.createBook(updatedBook, [])
 
         const book = client.data.books.find((b) => b.id === updatedBook.id)
         expect(book?.id).toBe(updatedBook.id)
@@ -276,7 +273,7 @@ describe('lowdb', async () => {
       })
 
       it('should correctly update collections', async () => {
-        await db.createBook(event, books[0], [collections[0].id])
+        await db.createBook(books[0], [collections[0].id])
 
         const bookCollections = client.data['collection-book'].filter(
           ({ book_id }) => book_id === books[0].id,
@@ -288,7 +285,7 @@ describe('lowdb', async () => {
 
     describe('deleteBook', async () => {
       it('should delete book by id', async () => {
-        const result = await db.deleteBook(event, books[0].id)
+        const result = await db.deleteBook(books[0].id)
 
         expect(result).toBe(books[0].id)
         expect(client.data.books).toHaveLength(books.length - 1)
@@ -301,7 +298,7 @@ describe('lowdb', async () => {
     describe('deleteBooks', async () => {
       it('should delete all books and remove from collections', async () => {
         const bookIds = [books[0].id, books[2].id, books[3].id]
-        const result = await db.deleteBooks(event, bookIds)
+        const result = await db.deleteBooks(bookIds)
 
         expect(result).toEqual(bookIds)
         expect(client.data.books).toHaveLength(books.length - bookIds.length)
@@ -366,21 +363,21 @@ describe('lowdb', async () => {
 
     describe('orderedBooks', async () => {
       it('should return books ordered by pages in ascending order', async () => {
-        const result = await db.getOrderedBooks(event, {
+        const result = await db.getOrderedBooks({
           property: 'pages',
         })
         expect(ids(result)).toEqual([books[3].id, books[0].id, books[1].id])
       })
 
       it('should return books ordered by year in ascending order', async () => {
-        const result = await db.getOrderedBooks(event, {
+        const result = await db.getOrderedBooks({
           property: 'year',
         })
         expect(ids(result)).toEqual([books[2].id, books[1].id, books[3].id])
       })
 
       it('should return correct amount of books when count is defined', async () => {
-        const result = await db.getOrderedBooks(event, {
+        const result = await db.getOrderedBooks({
           property: 'pages',
           count: 2,
         })
@@ -393,12 +390,12 @@ describe('lowdb', async () => {
     describe('getBookCover', async () => {
       it.skip('should return book cover', async () => {
         getFileMock.mockResolvedValueOnce('Book1.jpg')
-        const result = await db.getBookCover(event, books[0].id)
+        const result = await db.getBookCover(books[0].id)
         expect(result).toBeDefined()
       })
 
       it('should return undefined if book cover does not exist', async () => {
-        const result = await db.getBookCover(event, 'non-existent-id')
+        const result = await db.getBookCover('non-existent-id')
         expect(result).toBeUndefined()
       })
     })
@@ -407,33 +404,33 @@ describe('lowdb', async () => {
       const file = {} as unknown as ServerFile
 
       it('should create book cover if it does not exist', async () => {
-        await db.updateBookCover(event, books[2].id, file)
+        await db.updateBookCover(books[2].id, file)
         expect(deleteFileMock).not.toHaveBeenCalled()
         expect(saveFileMock).toHaveBeenCalledWith(books[2].id, file)
       })
 
       it('should delete and create book cover if it exists', async () => {
-        await db.updateBookCover(event, books[0].id, file)
+        await db.updateBookCover(books[0].id, file)
         expect(deleteFileMock).toHaveBeenCalledWith('Book1.jpg')
         expect(saveFileMock).toHaveBeenCalledWith(books[0].id, file)
       })
 
       it('returns the book cover url', async () => {
-        const result = await db.updateBookCover(event, books[2].id, file)
+        const result = await db.updateBookCover(books[2].id, file)
         expect(result).toContain('/api/books/Book3/cover')
       })
     })
 
     describe('deleteBookCover', async () => {
       it('should delete book cover', async () => {
-        const result = await db.deleteBookCover(event, books[0].id)
+        const result = await db.deleteBookCover(books[0].id)
         expect(result).toBeNull()
       })
 
       it('should throw error if book cover does not exist', async () => {
-        await expect(
-          db.deleteBookCover(event, 'non-existent-id'),
-        ).rejects.toThrow('Book cover not found for non-existent-id to delete')
+        await expect(db.deleteBookCover('non-existent-id')).rejects.toThrow(
+          'Book cover not found for non-existent-id to delete',
+        )
       })
     })
   })
@@ -441,12 +438,12 @@ describe('lowdb', async () => {
   describe('collections', async () => {
     describe('getCollection', async () => {
       it('should return collection by id', async () => {
-        const result = await db.getCollection(event, 'wishlist')
+        const result = await db.getCollection('wishlist')
         expect(result?.id).toBe('wishlist')
       })
 
       it('should return null if collection does not exist', async () => {
-        const result = await db.getCollection(event, 'non-existent-id')
+        const result = await db.getCollection('non-existent-id')
         expect(result).toBeNull()
       })
     })
@@ -469,7 +466,7 @@ describe('lowdb', async () => {
           id: 'new-collection',
           name: 'New Collection',
         })
-        const result = await db.createCollection(event, newCollection, [])
+        const result = await db.createCollection(newCollection, [])
         expect(result?.id).toBeDefined()
         expect(client.data.collections).toHaveLength(4)
       })
@@ -479,7 +476,7 @@ describe('lowdb', async () => {
           id: 'new-collection',
           name: 'New Collection',
         })
-        const result = await db.createCollection(event, newCollection, [
+        const result = await db.createCollection(newCollection, [
           { id: books[0].id, order: 0 },
           { id: books[1].id, order: 1 },
         ])
@@ -496,7 +493,7 @@ describe('lowdb', async () => {
           name: 'Updated Collection',
         }
 
-        await db.createCollection(event, updatedCollection, [])
+        await db.createCollection(updatedCollection, [])
 
         const collection = client.data.collections.find(
           (b) => b.id === updatedCollection.id,
@@ -507,7 +504,7 @@ describe('lowdb', async () => {
       })
 
       it('should correctly update collection books', async () => {
-        await db.createCollection(event, collections[0], [
+        await db.createCollection(collections[0], [
           { id: books[0].id, order: 1 },
         ])
 
@@ -521,43 +518,43 @@ describe('lowdb', async () => {
 
     describe('deleteCollection', async () => {
       it('should delete collection by id', async () => {
-        const result = await db.deleteCollection(event, collections[0].id, {})
+        const result = await db.deleteCollection(collections[0].id, {})
         expect(result).toBe(collections[0].id)
         expect(client.data.collections).toHaveLength(2)
         expect(client.data['collection-book']).toHaveLength(3)
       })
 
       it('should delete books if deleteBooks is true', async () => {
-        await db.deleteCollection(event, collections[0].id, {
+        await db.deleteCollection(collections[0].id, {
           deleteBooks: true,
         })
         expect(client.data.books).toHaveLength(books.length - 1)
       })
 
       it('should not delete books if deleteBooks is false', async () => {
-        await db.deleteCollection(event, collections[0].id, {
+        await db.deleteCollection(collections[0].id, {
           deleteBooks: false,
         })
         expect(client.data.books).toHaveLength(books.length)
       })
 
       it('should not delete collection if it does not exist', async () => {
-        const result = await db.deleteCollection(event, 'non-existent-id', {})
+        const result = await db.deleteCollection('non-existent-id', {})
         expect(result).toBe('non-existent-id')
         expect(client.data.collections).toHaveLength(3)
       })
 
       it('should not delete wishlist', async () => {
-        await expect(
-          db.deleteCollection(event, 'wishlist', {}),
-        ).rejects.toThrow('Cannot delete wishlist')
+        await expect(db.deleteCollection('wishlist', {})).rejects.toThrow(
+          'Cannot delete wishlist',
+        )
         expect(client.data.collections).toHaveLength(3)
       })
 
       it('should not delete favorite', async () => {
-        await expect(
-          db.deleteCollection(event, 'favorite', {}),
-        ).rejects.toThrow('Cannot delete favorite')
+        await expect(db.deleteCollection('favorite', {})).rejects.toThrow(
+          'Cannot delete favorite',
+        )
         expect(client.data.collections).toHaveLength(3)
       })
     })
@@ -599,7 +596,7 @@ describe('lowdb', async () => {
           buildBook({ id: 'imported-book-1', title: 'Imported Book 1' }),
           buildBook({ id: 'imported-book-2', title: 'Imported Book 2' }),
         ]
-        const result = await db.importLibrary(event, newBooks)
+        const result = await db.importLibrary(newBooks)
         expect(result).toBe(true)
         expect(client.data.books).toHaveLength(books.length + newBooks.length)
       })

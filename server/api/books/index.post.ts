@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     collections: book.collections.map(({ id }: { id: string }) => id),
   }
 
-  const data = await db.createBook(event, bookDb, bookDb.collections)
+  const data = await db.createBook(bookDb, bookDb.collections)
 
   return data && dbBookToBook(data, data.collections)
 })

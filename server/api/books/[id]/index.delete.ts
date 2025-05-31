@@ -7,5 +7,5 @@ export default defineEventHandler(async (event) => {
     throw createError('No id provided')
   }
 
-  return db.deleteBook(event, id)
+  return db.deleteBook(id)
 })

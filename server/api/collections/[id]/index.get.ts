@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError('No id provided')
   }
 
-  const data = await db.getCollection(event, id)
+  const data = await db.getCollection(id)
 
   return data && dbCollectionToCollection(data, data['collection-book'])
 })

@@ -13,5 +13,5 @@ export default defineEventHandler(async (event) => {
     deleteBooks: query.deleteBooks === 'true',
   }
 
-  return db.deleteCollection(event, id, correctedQuery)
+  return db.deleteCollection(id, correctedQuery)
 })

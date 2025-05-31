@@ -1,4 +1,5 @@
 import { db } from '~/services/db.service'
+import { createReadStream } from 'fs'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -7,5 +8,9 @@ export default defineEventHandler(async (event) => {
     throw createError('No id provided')
   }
 
-  return db.getBookCover(event, id)
+  const filePath = await db.getBookCover(id)
+
+  if (filePath) {
+    return sendStream(event, createReadStream(filePath))
+  }
 })

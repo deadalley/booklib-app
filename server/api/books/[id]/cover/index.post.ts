@@ -11,5 +11,5 @@ export default defineEventHandler(async (event) => {
     throw createError('No id provided')
   }
 
-  return db.updateBookCover(event, bookId, file)
+  return db.updateBookCover(bookId, file)
 })
