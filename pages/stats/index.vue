@@ -46,7 +46,7 @@
               class="!w-32"
             />
             <bl-input
-              id="isbn"
+              id="rankingChartQuantity"
               v-model="rankingChartQuantity"
               editing
               type="number"
@@ -58,7 +58,7 @@
         <bl-ranking
           :items="rankedBooks"
           :label-position="+rankingChartQuantity < 8 ? 'bottom' : 'right'"
-          :unit="rankingChartProperty === 'rating' ? getRatingUnit : undefined"
+          :unit="getRankingUnit"
         />
       </bl-tile>
       <bl-tile class="col-span-12">
@@ -177,6 +177,18 @@ function getRankedTitle() {
     default:
       return ''
   }
+}
+
+function getRankingUnit(value: number) {
+  if (rankingChartProperty.value === 'rating') {
+    return getRatingUnit(value)
+  }
+
+  if (rankingChartProperty.value === 'pages') {
+    return ' pages'
+  }
+
+  return ''
 }
 
 useHead({
