@@ -76,6 +76,23 @@
       </bl-multiselect>
     </div>
     <div>
+      <h6 class="mb-4">Book Format</h6>
+      <bl-multiselect class="w-full">
+        <bl-multiselect-option
+          v-for="item in Object.values(BOOK_FORMAT_MAP)"
+          :key="item.id"
+          :value="item.id"
+          :selected="!!selectedFormats?.includes(item.id)"
+          @select="onSelectFormat"
+        >
+          <template #icon="iconProps">
+            <component :is="icons[item.icon]" v-bind="iconProps" />
+          </template>
+          <template #tooltip>{{ item.description }}</template>
+        </bl-multiselect-option>
+      </bl-multiselect>
+    </div>
+    <div>
       <h6>Year</h6>
       <bl-slider
         v-if="selectedYearRange"
@@ -107,7 +124,7 @@
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
-import type { Book, BookProgressStatus } from '~/types/book'
+import type { Book, BookFormat, BookProgressStatus } from '~/types/book'
 
 defineProps<{
   authors: Author[]
@@ -134,6 +151,7 @@ const selectedOriginalLanguages = defineModel<string[]>(
 )
 const selectedGenres = defineModel<string[]>('selectedGenres')
 const selectedStatuses = defineModel<BookProgressStatus[]>('selectedStatuses')
+const selectedFormats = defineModel<BookFormat[]>('selectedFormats')
 const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
 
@@ -149,6 +167,18 @@ function onSelectStatus(value: BookProgressStatus) {
       selectedStatuses.value = selectedStatuses.value.concat(value)
     } else {
       selectedStatuses.value = newValues
+    }
+  }
+}
+
+function onSelectFormat(value: BookFormat) {
+  if (selectedFormats.value) {
+    const newValues = selectedFormats.value.filter((status) => status !== value)
+
+    if (newValues.length === selectedFormats.value.length) {
+      selectedFormats.value = selectedFormats.value.concat(value)
+    } else {
+      selectedFormats.value = newValues
     }
   }
 }

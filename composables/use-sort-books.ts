@@ -1,4 +1,4 @@
-import type { BookProgressStatus, ViewBook } from '~/types/book'
+import type { BookFormat, BookProgressStatus, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
 export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
@@ -65,6 +65,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const selectedOriginalLanguages = ref<string[]>([])
   const selectedGenres = ref<string[]>([])
   const selectedStatuses = ref<BookProgressStatus[]>([])
+  const selectedFormats = ref<BookFormat[]>([])
   const selectedYearRange = ref<[number, number]>([
     minYear.value,
     maxYear.value,
@@ -177,11 +178,18 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       )
     })
 
+    const filterByFormat = filterByStatus.filter(({ bookFormat }) => {
+      return (
+        !selectedFormats.value.length ||
+        (bookFormat && selectedFormats.value.includes(bookFormat))
+      )
+    })
+
     const filterByAuthor = selectedAuthor.value
-      ? filterByStatus.filter(
+      ? filterByFormat.filter(
           ({ author }) => String(author) === selectedAuthor.value,
         )
-      : filterByStatus
+      : filterByFormat
 
     const filterByCollections = selectedCollections.value.length
       ? filterByAuthor.filter(({ collections }) =>
@@ -264,6 +272,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     selectedOriginalLanguages,
     selectedGenres,
     selectedStatuses,
+    selectedFormats,
     selectedYearRange,
     selectedPageRange,
     textSearch,

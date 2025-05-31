@@ -102,6 +102,7 @@
       v-model:selected-original-languages="selectedOriginalLanguages"
       v-model:selected-genres="selectedGenres"
       v-model:selected-statuses="selectedStatuses"
+      v-model:selected-formats="selectedFormats"
       v-model:selected-year-range="selectedYearRange"
       v-model:selected-page-range="selectedPageRange"
       v-model:selected-table-columns="selectedTableColumns"
@@ -172,6 +173,7 @@ const {
   selectedOriginalLanguages,
   selectedGenres,
   selectedStatuses,
+  selectedFormats,
   selectedYearRange,
   selectedPageRange,
   publishers,
