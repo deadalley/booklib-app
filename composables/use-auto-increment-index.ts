@@ -24,6 +24,7 @@ export const useAutoIncrementIndex = (
   return {
     index,
     resetTimer: (newInterval: number) => {
+      stop()
       start(newInterval)
     },
     stop,

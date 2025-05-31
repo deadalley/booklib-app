@@ -1,9 +1,9 @@
 <template>
   <transition name="fade" mode="out-in">
-    <bl-tile :key="index" class="flex-1">
+    <bl-tile v-if="selectedOption" :key="index" class="flex-1">
       <template #title>{{ selectedOption.title }}</template>
       <div
-        v-if="loading || success"
+        v-if="loading || success || rating"
         class="flex size-full flex-col items-center justify-center gap-3"
       >
         <template v-if="loading">
@@ -14,8 +14,12 @@
           <IconCircleCheck size="48px" class="text-main" />
           <p>Success!</p>
         </template>
+        <template v-if="rating">
+          <bl-rating editing :rating="0" :on-commit="onRateBook" />
+          <p>Rate {{ selectedOption.book.title }}</p>
+        </template>
       </div>
-      <template v-if="!loading && !success">
+      <template v-if="!loading && !success && !rating">
         <NuxtLink
           :to="`/library/books/${selectedOption.book.id}`"
           class="w-full"
@@ -59,6 +63,7 @@ const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(props.books))
 
 const loading = ref<boolean>(false)
 const success = ref<boolean>(false)
+const rating = ref<boolean>(false)
 
 const options = computed(() => {
   const _books = viewBooks.value ?? []
@@ -103,7 +108,7 @@ const options = computed(() => {
     },
     {
       id: 'rateFinishedBook',
-      title: `What did you think of ${finishedBookWithNoRating.title}?`,
+      title: `What did you think of ${finishedBookWithNoRating?.title}?`,
       icon: icons['IconStar'],
       buttonLabel: 'Rate book',
       book: finishedBookWithNoRating,
@@ -139,7 +144,6 @@ function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
 }
 
 async function onClick() {
-  loading.value = true
   stop()
   switch (selectedOption.value.id) {
     case 'startNewBook':
@@ -155,6 +159,8 @@ async function onClick() {
       })
       break
     case 'rateFinishedBook':
+      rating.value = true
+      break
     case 'resumePausedBook':
       await onUpdateBook({
         ...selectedOption.value.book,
@@ -165,10 +171,10 @@ async function onClick() {
       return
   }
   start()
-  loading.value = false
 }
 
 async function onUpdateBook(bookValues: Book) {
+  loading.value = true
   try {
     const updatedBook = await $fetch<Book>('/api/books', {
       method: 'post',
@@ -181,7 +187,19 @@ async function onUpdateBook(bookValues: Book) {
     return updatedBook
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
+}
+
+async function onRateBook(ratingValue: number) {
+  stop()
+  await onUpdateBook({
+    ...selectedOption.value.book,
+    rating: ratingValue > 0 ? ratingValue : null,
+  })
+  rating.value = false
+  start()
 }
 </script>
 
