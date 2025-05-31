@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { IconCircleOff } from '@tabler/icons-vue'
 import { createInput } from '@formkit/vue'
+import type { SelectOption } from './raw-select.vue'
 
 import SelectForInput from '../components/select-for-input.vue'
 
@@ -39,7 +40,7 @@ const props = withDefaults(
   defineProps<{
     editing?: boolean
     hidden?: boolean
-    options: { label: string; value: string }[]
+    options: SelectOption[]
   }>(),
   {
     editing: true,

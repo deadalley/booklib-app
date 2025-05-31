@@ -158,6 +158,25 @@
                   />
                 </div>
                 <div class="form-row">
+                  <bl-select
+                    id="bookFormat"
+                    type="select"
+                    :editing="editing"
+                    name="bookFormat"
+                    label="Format"
+                    placeholder="Format"
+                    :options="
+                      Object.values(BOOK_FORMAT_MAP).map(
+                        ({ id, description, icon }) => ({
+                          label: description,
+                          value: id,
+                          icon,
+                        }),
+                      )
+                    "
+                  />
+                </div>
+                <div class="form-row">
                   <bl-input
                     id="publisher"
                     :editing="editing"

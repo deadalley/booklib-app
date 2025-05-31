@@ -15,9 +15,11 @@
           'formkit-inner': withWrapper,
         }"
       >
-        <SelectValue class="flex size-full" :placeholder="placeholder" />
+        <div class="flex flex-1 items-center gap-1">
+          <component :is="icons[icon]" v-if="icon" :size="16" stroke="1.5" />
+          <SelectValue :placeholder="placeholder" />
+        </div>
         <input class="w-0 opacity-0" />
-        <!--  eslint-disable-next-line tailwindcss/no-custom-classname -->
         <IconChevronDown class="chevron" :size="ICON_SIZE_SMALL" />
       </SelectTrigger>
 
@@ -33,9 +35,15 @@
               <SelectItem
                 v-for="(option, index) in options"
                 :key="index"
-                class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+                class="relative flex w-full cursor-pointer select-none items-center gap-1 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
                 :value="option.value"
               >
+                <component
+                  :is="icons[option.icon]"
+                  v-if="option.icon"
+                  :size="16"
+                  stroke="1.5"
+                />
                 <SelectItemText>
                   {{ option.label }}
                 </SelectItemText>
@@ -59,6 +67,12 @@
                   <SelectItemText>
                     {{ option.label }}
                   </SelectItemText>
+                  <component
+                    :is="icons[option.icon]"
+                    v-if="option.icon"
+                    :size="16"
+                    stroke="1.5"
+                  />
                 </SelectItem>
               </SelectGroup>
               <SelectSeparator
@@ -74,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconChevronDown } from '@tabler/icons-vue'
+import { icons, IconChevronDown } from '@tabler/icons-vue'
 import {
   SelectContent,
   SelectGroup,
@@ -89,7 +103,11 @@ import {
   SelectViewport,
 } from 'radix-vue'
 
-export type SelectOption = { label: string; value: string }
+export type SelectOption = {
+  label: string
+  value: string
+  icon?: keyof typeof icons
+}
 export type SelectProps = {
   options?: SelectOption[]
   groups?: { label?: string; options: SelectOption[] }[]
@@ -98,9 +116,13 @@ export type SelectProps = {
   align?: 'start' | 'center' | 'end'
 }
 
-withDefaults(defineProps<SelectProps>(), { withWrapper: true })
+const props = withDefaults(defineProps<SelectProps>(), { withWrapper: true })
 
 const selectValue = defineModel<string>()
+
+const icon = computed(
+  () => props.options?.find(({ value }) => selectValue.value === value)?.icon,
+)
 </script>
 
 <style scoped>

@@ -10,6 +10,13 @@ export type BookProgressStatus =
   | 'read'
   | 'not-finished'
 
+export type BookFormat =
+  | 'hardcover'
+  | 'paperback'
+  | 'ebook'
+  | 'audiobook'
+  | 'other'
+
 export type Book = {
   id: string
   title: string
@@ -27,6 +34,7 @@ export type Book = {
   genres: string[] | null
   collections: Collection['id'][]
   progressStatus: BookProgressStatus | null
+  bookFormat: BookFormat | null
   startedAt: string | null
   finishedAt: string | null
   author: Author['id'] | null

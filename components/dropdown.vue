@@ -32,7 +32,6 @@
             <component
               :is="icons[item.icon]"
               v-if="item.icon"
-              class=""
               :size="16"
               stroke="1.5"
             />

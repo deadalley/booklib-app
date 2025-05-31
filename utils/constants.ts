@@ -1,5 +1,5 @@
 import type { icons } from '@tabler/icons-vue'
-import type { BookProgressStatus } from '~/types/book'
+import type { BookFormat, BookProgressStatus } from '~/types/book'
 
 export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const FAVORITE_COLLECTION_ID = 'favorite'
@@ -100,5 +100,54 @@ export const PROGRESS_STATUS_MAP: Record<
     step: 3,
     description: 'Not finished',
     icon: 'IconBookOff',
+  },
+}
+
+export const BOOK_FORMAT = [
+  'hardcover',
+  'paperback',
+  'ebook',
+  'audiobook',
+  'other',
+]
+
+export const BOOK_FORMAT_MAP: Record<
+  BookFormat,
+  {
+    id: BookFormat
+    description: string
+    step: number
+    icon: keyof typeof icons
+  }
+> = {
+  hardcover: {
+    id: 'hardcover',
+    step: 1,
+    description: 'Hardcover',
+    icon: 'IconBook2',
+  },
+  paperback: {
+    id: 'paperback',
+    step: 1,
+    description: 'Paperback',
+    icon: 'IconFileDescription',
+  },
+  ebook: {
+    id: 'ebook',
+    step: 2,
+    description: 'E-book',
+    icon: 'IconDeviceTablet',
+  },
+  audiobook: {
+    id: 'audiobook',
+    step: 2,
+    description: 'Audiobook',
+    icon: 'IconHeadphones',
+  },
+  other: {
+    id: 'other',
+    step: 2,
+    description: 'Other',
+    icon: 'IconDeviceUnknown',
   },
 }

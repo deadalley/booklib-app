@@ -6,6 +6,7 @@ import { bookToDbBook, dbBookToBook } from '~/utils'
 export default defineEventHandler(async (event) => {
   const book = await readBody(event)
 
+  console.log({ book })
   const bookDb: BookDB = {
     ...bookToDbBook(book),
     id: book.id ?? uuidv4(),

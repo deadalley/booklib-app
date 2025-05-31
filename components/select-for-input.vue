@@ -9,11 +9,13 @@
 </template>
 
 <script setup lang="ts">
+import type { SelectOption } from './raw-select.vue'
+
 const props = withDefaults(
   defineProps<{
     context: {
       attrs?: { class?: string }
-      options: { label: string; value: string }[]
+      options: SelectOption[]
       placeholder?: string
       node: { input: (value: string) => void; _value: string }
     }
