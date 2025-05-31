@@ -4,15 +4,16 @@
       <slot name="tooltip" />
     </template>
     <NuxtLink
+      v-bind="$attrs"
       :to="disabled ? undefined : to"
-      class="flex items-center gap-3 rounded-xl py-3 text-lg"
+      class="flex items-center rounded-xl py-3 text-lg"
       :class="{
         'cursor-pointer transition-all hover:bg-accent/30 active:bg-accent-dark/20':
           !disabled,
         'cursor-default text-accent': disabled,
         'bg-main text-white hover:bg-main/80': active,
-        'px-5': !!$slots['default'],
-        'px-3': !$slots['default'],
+        'gap-3 px-5': !iconOnly,
+        'px-3': !!iconOnly,
       }"
       :disabled="disabled"
     >
@@ -23,5 +24,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ active?: boolean; to?: string; disabled?: boolean }>()
+defineProps<{
+  active?: boolean
+  to?: string
+  disabled?: boolean
+  iconOnly?: boolean
+}>()
 </script>

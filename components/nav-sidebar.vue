@@ -7,28 +7,32 @@
     }"
     :style="{ 'min-width': collapsed ? '0px' : '255px' }"
   >
-    <h3
-      class="mb-6 flex items-center"
+    <div
+      class="flex items-center"
       :class="{
-        'justify-between': !collapsed,
         'justify-center': collapsed,
+        'justify-between': !collapsed,
       }"
     >
-      <NuxtLink
-        v-show="!collapsed"
-        class="cursor-pointer text-2xl font-medium tracking-wider"
-        to="/"
+      <h3
+        class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
+        :class="{
+          'pointer-events-none max-w-0 opacity-0': collapsed,
+          'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
+        }"
       >
-        BOOKLIB
-      </NuxtLink>
-      <component
-        :is="collapsed ? IconChevronRightPipe : IconChevronLeftPipe"
-        class="cursor-pointer text-accent-darker hover:text-main"
+        <NuxtLink to="/">BOOKLIB</NuxtLink>
+      </h3>
+      <IconChevronLeftPipe
+        class="cursor-pointer text-accent-darker transition-all duration-100 hover:text-main"
+        :class="{
+          'rotate-180': collapsed,
+        }"
         :size="ICON_SIZE_LARGE"
         stroke="1.5"
         @click="onCollapse"
       />
-    </h3>
+    </div>
     <div class="flex flex-1 flex-col justify-between">
       <div class="flex flex-1 flex-col gap-3">
         <bl-nav-sidebar-button
@@ -37,23 +41,46 @@
           :active="activeItemIndex === index"
           :to="button.to"
           :disabled="button.disabled"
+          :icon-only="collapsed"
         >
           <template #icon="iconProps">
             <component v-bind="iconProps" :is="button.icon" />
           </template>
           <template v-if="collapsed" #tooltip>{{ button.label }}</template>
-          <template v-if="!collapsed" #default>
-            {{ button.label }}
+          <template #default>
+            <span
+              class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
+              :class="{
+                'pointer-events-none max-w-0 opacity-0': collapsed,
+                'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
+              }"
+            >
+              {{ button.label }}
+            </span>
           </template>
         </bl-nav-sidebar-button>
       </div>
       <div class="flex flex-col gap-3">
-        <bl-nav-sidebar-button to="/settings" :active="activeItemIndex === 7">
+        <bl-nav-sidebar-button
+          to="/settings"
+          :active="route.path.includes('settings')"
+          :icon-only="collapsed"
+        >
           <template #icon="iconProps">
             <IconSettings v-bind="iconProps" />
           </template>
           <template v-if="collapsed" #tooltip>Settings</template>
-          <template v-if="!collapsed" #default>Settings</template>
+          <template #default>
+            <span
+              class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
+              :class="{
+                'pointer-events-none max-w-0 opacity-0': collapsed,
+                'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
+              }"
+            >
+              Settings
+            </span>
+          </template>
         </bl-nav-sidebar-button>
       </div>
     </div>
@@ -70,7 +97,6 @@ import {
   IconBookDownload,
   IconSettings,
   IconChevronLeftPipe,
-  IconChevronRightPipe,
 } from '@tabler/icons-vue'
 
 const route = useRoute()
