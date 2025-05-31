@@ -6,36 +6,31 @@
   />
 </template>
 
-<script
-  setup
-  lang="ts"
-  generic="
-    T extends
-      | keyof Pick<
-          Book,
-          | 'pages'
-          | 'rating'
-          | 'year'
-          | 'author'
-          | 'collections'
-          | 'language'
-          | 'originalLanguage'
-        >
-      | 'averageRatingAuthor'
-  "
->
-import type { Book } from '~/types/book'
-import type { BarChartItem } from './bar-chart.client.vue'
+<script setup lang="ts">
+import type { Book, BookFormat } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
+
+export type BooksBarChartProperty =
+  | keyof Pick<
+      Book,
+      | 'author'
+      | 'collections'
+      | 'language'
+      | 'originalLanguage'
+      | 'publisher'
+      | 'genres'
+      | 'bookFormat'
+    >
+  | 'averageRatingAuthor'
 
 const props = withDefaults(
   defineProps<{
     authors: Author[]
     collections: Collection[]
     books: Book[]
-    bookProperty: T
+    bookProperty: BooksBarChartProperty
     height?: number
   }>(),
   { height: 340 },
@@ -105,11 +100,38 @@ const series = computed(() => {
     )
   }
 
-  return sortBooksBy(props.books, props.bookProperty, 'desc')
-    .map((book) => ({
-      label: book.title,
-      value: book[props.bookProperty as keyof Book],
-    }))
-    .filter((item): item is BarChartItem => item.value !== null)
+  if (props.bookProperty === 'publisher') {
+    const booksByPublisher = getBooksByPublisher(props.books)
+
+    return Object.entries(booksByPublisher)
+      .map(([publisher, books]) => ({
+        label: publisher,
+        value: books.length,
+      }))
+      .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
+  }
+
+  if (props.bookProperty === 'genres') {
+    const booksByGenre = getBooksByGenre(props.books)
+
+    return Object.entries(booksByGenre)
+      .map(([genre, books]) => ({
+        label: genre,
+        value: books.length,
+      }))
+      .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
+  }
+
+  if (props.bookProperty === 'bookFormat') {
+    const booksByFormat = getBooksByFormat(props.books)
+
+    return Object.entries(booksByFormat)
+      .map(([format, books]) => ({
+        label: BOOK_FORMAT_MAP[format as BookFormat].description,
+        value: books.length,
+      }))
+      .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
+  }
+  return []
 })
 </script>

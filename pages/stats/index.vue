@@ -86,6 +86,7 @@
 </template>
 
 <script setup lang="ts">
+import type { BooksBarChartProperty } from '~/components/books-bar-chart.vue'
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { SelectOption } from '~/components/raw-select.vue'
 import type { Author } from '~/types/author'
@@ -139,12 +140,12 @@ const barChartPropertyOptions: SelectOption[] = [
   { label: 'Collection', value: 'collections' },
   { label: 'Language', value: 'language' },
   { label: 'Original language', value: 'originalLanguage' },
+  { label: 'Publisher', value: 'publisher' },
+  { label: 'Genre', value: 'genres' },
+  { label: 'Format', value: 'bookFormat' },
   { label: 'Average author rating', value: 'averageRatingAuthor' },
 ]
-const barChartProperty = ref<
-  | keyof Pick<Book, 'author' | 'collections' | 'language' | 'originalLanguage'>
-  | 'averageRatingAuthor'
->('author')
+const barChartProperty = ref<BooksBarChartProperty>('author')
 
 function getRankedBooks() {
   return sortBooksBy(

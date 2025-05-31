@@ -2,7 +2,7 @@ import type { Author } from '~/types/author'
 import type { BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
-import { sum } from 'ramda'
+import { sum, uniq } from 'ramda'
 
 export function getBooksByAuthor(books: ViewBook[], authors: Author[]) {
   return authors.reduce<Record<string, ViewBook[]>>(
@@ -51,6 +51,57 @@ export function getBooksByLanguage(
 
       return booksByLanguage
     },
+    {},
+  )
+}
+
+export function getBooksByPublisher(books: ViewBook[]) {
+  return books.reduce<Record<string, ViewBook[]>>(
+    (publisherBooks, book) => ({
+      ...publisherBooks,
+      ...(book.publisher
+        ? {
+            [book.publisher]: (publisherBooks[book.publisher] || []).concat(
+              book,
+            ),
+          }
+        : {}),
+    }),
+    {},
+  )
+}
+
+export function getBooksByGenre(books: ViewBook[]) {
+  const genres = uniq(
+    books.flatMap((book) => book.genres).filter((v): v is string => !!v),
+  )
+
+  return genres.reduce<Record<string, ViewBook[]>>((booksByGenre, genre) => {
+    const booksForGenre = books.filter((book) => book.genres?.includes(genre))
+
+    if (booksForGenre.length) {
+      return {
+        ...booksByGenre,
+        [genre]: booksForGenre,
+      }
+    }
+
+    return booksByGenre
+  }, {})
+}
+
+export function getBooksByFormat(books: ViewBook[]) {
+  return books.reduce<Record<string, ViewBook[]>>(
+    (formatBooks, book) => ({
+      ...formatBooks,
+      ...(book.bookFormat
+        ? {
+            [book.bookFormat]: (formatBooks[book.bookFormat] || []).concat(
+              book,
+            ),
+          }
+        : {}),
+    }),
     {},
   )
 }
