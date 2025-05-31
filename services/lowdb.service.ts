@@ -450,7 +450,9 @@ export class LowDBClient implements DBClient {
   }
 
   async getGoals() {
-    return []
+    await this.client.read()
+
+    return this.client.data.goals
   }
 
   async createGoal(goal: GoalDB) {

@@ -160,6 +160,7 @@ const props = defineProps<{
   isNew?: boolean
   authors: Author[]
   books: Book[]
+  reloadGoals: () => Promise<void>
 }>()
 
 const goal = defineModel<Goal | undefined>()
@@ -208,6 +209,7 @@ async function onSubmit(goalValues: Goal) {
 
     reset('goal')
     open.value = false
+    props.reloadGoals()
     return goal
   } catch (error) {
     console.error(error)

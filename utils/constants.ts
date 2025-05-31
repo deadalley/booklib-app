@@ -1,6 +1,6 @@
 import type { icons } from '@tabler/icons-vue'
 import type { BookFormat, BookProgressStatus } from '~/types/book'
-import type { GoalInterval, GoalType } from '~/types/goal'
+import type { GoalInterval, GoalStatus, GoalType } from '~/types/goal'
 
 export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const FAVORITE_COLLECTION_ID = 'favorite'
@@ -199,5 +199,29 @@ export const GOAL_INTERVAL_MAP: Record<
   total: {
     id: 'total',
     description: 'in total',
+  },
+}
+
+export const GOAL_STATUS = ['tracking', 'not-tracking', 'finished', 'expired']
+
+export const GOAL_STATUS_MAP: Record<
+  GoalStatus,
+  { id: GoalStatus; description: string }
+> = {
+  tracking: {
+    id: 'tracking',
+    description: 'Active',
+  },
+  'not-tracking': {
+    id: 'not-tracking',
+    description: 'Inactive',
+  },
+  finished: {
+    id: 'finished',
+    description: 'Completed',
+  },
+  expired: {
+    id: 'expired',
+    description: 'Not finished',
   },
 }

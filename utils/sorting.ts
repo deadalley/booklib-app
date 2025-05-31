@@ -2,6 +2,7 @@ import { indexBy, prop } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { Goal, GoalStatus } from '~/types/goal'
 
 export function sortBooks(booksToBeSorted: ViewBook[]) {
   return booksToBeSorted.concat().sort((book1, book2) => {
@@ -66,6 +67,19 @@ export function sortCollections(collections: Collection[]) {
     }
 
     return b1.name.localeCompare(b2.name, undefined, { numeric: true })
+  })
+}
+
+export function sortGoals(goals: Goal[]) {
+  const goalSortingOrder: Record<GoalStatus, number> = {
+    tracking: 0,
+    finished: 1,
+    expired: 2,
+    'not-tracking': 3,
+  }
+
+  return goals.concat().sort((g1, g2) => {
+    return goalSortingOrder[g1.status] - goalSortingOrder[g2.status]
   })
 }
 
