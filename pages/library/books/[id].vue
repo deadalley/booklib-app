@@ -142,7 +142,6 @@
                     name="title"
                     label="Title"
                     placeholder="Title"
-                    not-found-label="No authors found"
                   />
                 </div>
                 <div class="form-row">

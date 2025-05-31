@@ -8,8 +8,14 @@
     @apply relative flex flex-col gap-3;
   }
 
+  .book-section h3,
   .book-section h4 {
     @apply pb-4;
+  }
+
+  .book-section h5,
+  .book-section h6 {
+    @apply pb-2;
   }
 
   .book-section:not(:first-child) {

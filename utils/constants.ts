@@ -1,5 +1,6 @@
 import type { icons } from '@tabler/icons-vue'
 import type { BookFormat, BookProgressStatus } from '~/types/book'
+import type { GoalInterval, GoalType } from '~/types/goal'
 
 export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const FAVORITE_COLLECTION_ID = 'favorite'
@@ -116,38 +117,87 @@ export const BOOK_FORMAT_MAP: Record<
   {
     id: BookFormat
     description: string
-    step: number
     icon: keyof typeof icons
   }
 > = {
   hardcover: {
     id: 'hardcover',
-    step: 1,
     description: 'Hardcover',
     icon: 'IconBook2',
   },
   paperback: {
     id: 'paperback',
-    step: 1,
     description: 'Paperback',
     icon: 'IconFileDescription',
   },
   ebook: {
     id: 'ebook',
-    step: 2,
     description: 'E-book',
     icon: 'IconDeviceTablet',
   },
   audiobook: {
     id: 'audiobook',
-    step: 2,
     description: 'Audiobook',
     icon: 'IconHeadphones',
   },
   other: {
     id: 'other',
-    step: 2,
     description: 'Other',
     icon: 'IconDeviceUnknown',
+  },
+}
+
+export const GOAL_TYPE = ['books', 'pages', 'hours']
+
+export const GOAL_TYPE_MAP: Record<
+  GoalType,
+  {
+    id: GoalType
+    description: string
+    icon: keyof typeof icons
+  }
+> = {
+  books: {
+    id: 'books',
+    description: 'Books',
+    icon: 'IconBooks',
+  },
+  pages: {
+    id: 'pages',
+    description: 'Pages',
+    icon: 'IconFileDescription',
+  },
+  hours: {
+    id: 'hours',
+    description: 'Hours',
+    icon: 'IconClockHour4',
+  },
+}
+
+export const GOAL_INTERVAL = ['daily', 'weekly', 'monthly', 'yearly', 'total']
+
+export const GOAL_INTERVAL_MAP: Record<
+  GoalInterval,
+  { id: GoalInterval; description: string }
+> = {
+  daily: {
+    id: 'daily',
+    description: 'per day',
+  },
+  weekly: {
+    id: 'weekly',
+    description: 'per week',
+  },
+  monthly: {
+    id: 'monthly',
+    description: 'per month',
+  },
+  yearly: {
+    id: 'yearly',
+    description: 'per year',
+  },
+  total: {
+    id: 'total',
+    description: 'in total',
   },
 }

@@ -24,7 +24,14 @@
           as="div"
           class="items-top mb-4 flex w-full items-start"
         >
-          <h4 class="flex-1">
+          <h4 class="flex flex-1 items-center gap-2">
+            <component
+              :is="icons[icon]"
+              v-if="icon"
+              class="text-main"
+              :size="30"
+              stroke="1.5"
+            />
             <slot name="title" />
           </h4>
           <DialogClose v-if="withCloseButton">
@@ -69,14 +76,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'radix-vue'
-import { IconX } from '@tabler/icons-vue'
+import { icons, IconX } from '@tabler/icons-vue'
 
 withDefaults(
   defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
+    icon?: keyof typeof icons
     withCloseButton?: boolean
-    onCancel?: () => void
-    onConfirm?: () => void
   }>(),
   { withCloseButton: true },
 )
@@ -86,13 +92,11 @@ const open = defineModel<boolean>({ default: false })
 const emit = defineEmits<{ (e: 'cancel' | 'confirm'): void }>()
 
 function _onCancel() {
-  // props.onCancel?.()
   emit('cancel')
   open.value = false
 }
 
 function _onConfirm() {
-  // props.onConfirm?.()
   emit('confirm')
   open.value = false
 }
