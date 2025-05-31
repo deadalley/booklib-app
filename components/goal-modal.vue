@@ -41,6 +41,73 @@
           </section>
           <section class="book-section">
             <h6 class="flex flex-1 items-center gap-2">
+              <IconLicense
+                class="text-main"
+                :size="ICON_SIZE_SMALL"
+                stroke="1.5"
+              />
+              Goal
+            </h6>
+            <div class="form-row items-end">
+              <bl-input
+                id="amount"
+                type="number"
+                name="amount"
+                placeholder="Amount"
+              />
+              <bl-select
+                id="type"
+                type="select"
+                name="type"
+                placeholder="Type"
+                :options="
+                  Object.values(GOAL_TYPE_MAP).map(
+                    ({ id, description, icon }) => ({
+                      label: description,
+                      value: id,
+                      icon,
+                    }),
+                  )
+                "
+              />
+              <bl-select
+                id="interval"
+                type="select"
+                name="interval"
+                placeholder="Interval"
+                :options="
+                  Object.values(GOAL_INTERVAL_MAP).map(
+                    ({ id, description }) => ({
+                      label: description,
+                      value: id,
+                    }),
+                  )
+                "
+              />
+            </div>
+            <div class="form-row">
+              <bl-input-autocomplete
+                v-if="authorSelectOptions.length"
+                id="author"
+                name="author"
+                label="From author"
+                placeholder="Author"
+                :options="authorSelectOptions"
+                clearable
+              />
+              <bl-input-autocomplete
+                v-if="genreSelectOptions.length"
+                id="genres"
+                name="genres"
+                label="From genres"
+                placeholder="Genres"
+                :options="genreSelectOptions"
+                clearable
+              />
+            </div>
+          </section>
+          <section class="book-section">
+            <h6 class="flex flex-1 items-center gap-2">
               <IconTimeDuration30
                 class="text-main"
                 :size="ICON_SIZE_SMALL"
@@ -67,55 +134,6 @@
               />
             </div>
           </section>
-          <section class="book-section">
-            <h6 class="flex flex-1 items-center gap-2">
-              <IconLicense
-                class="text-main"
-                :size="ICON_SIZE_SMALL"
-                stroke="1.5"
-              />
-              Tracking
-            </h6>
-            <div class="form-row items-end">
-              <bl-input
-                id="amount"
-                type="number"
-                name="amount"
-                placeholder="Amount"
-              />
-              <bl-select
-                id="type"
-                type="select"
-                name="type"
-                placeholder="Type"
-                side="top"
-                :options="
-                  Object.values(GOAL_TYPE_MAP).map(
-                    ({ id, description, icon }) => ({
-                      label: description,
-                      value: id,
-                      icon,
-                    }),
-                  )
-                "
-              />
-              <bl-select
-                id="interval"
-                type="select"
-                name="interval"
-                placeholder="Interval"
-                side="top"
-                :options="
-                  Object.values(GOAL_INTERVAL_MAP).map(
-                    ({ id, description }) => ({
-                      label: description,
-                      value: id,
-                    }),
-                  )
-                "
-              />
-            </div>
-          </section>
           <div class="flex items-baseline justify-end gap-2">
             <bl-button variant="secondary" @click="onCancel">
               Cancel
@@ -132,13 +150,43 @@
 import type { Goal } from '~/types/goal'
 import { reset } from '@formkit/core'
 import { IconLicense, IconTimeDuration30 } from '@tabler/icons-vue'
+import { uniq } from 'ramda'
+import type { Book } from '~/types/book'
+import type { Author } from '~/types/author'
 
-defineProps<{ isNew?: boolean }>()
+const props = defineProps<{
+  isNew?: boolean
+  authors: Author[]
+  books: Book[]
+}>()
 
 const goal = defineModel<Goal | undefined>()
 
 const open = ref<boolean>(false)
 const trackingGoal = ref<boolean>(false)
+
+const authorSelectOptions = computed(() =>
+  props.authors
+    .map((author) => ({
+      label: author.name,
+      value: String(author.id),
+    }))
+    .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2)),
+)
+
+const genreSelectOptions = computed(() => {
+  const allGenres = uniq(
+    props.books
+      .flatMap((book) => book.genres)
+      .filter((genre): genre is string => !!genre),
+  )
+  return allGenres
+    .map((genre) => ({
+      label: genre,
+      value: genre,
+    }))
+    .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2))
+})
 
 function onSubmit() {
   reset('goal')
