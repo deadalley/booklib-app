@@ -36,9 +36,9 @@
     <div class="flex flex-1 flex-col justify-between">
       <div class="flex flex-1 flex-col gap-3">
         <bl-nav-sidebar-button
-          v-for="(button, index) in buttons"
+          v-for="button in buttons"
           :key="button.label"
-          :active="activeItemIndex === index"
+          :active="route.path.includes(button.to)"
           :to="button.to"
           :disabled="button.disabled"
           :icon-only="collapsed"
@@ -133,10 +133,6 @@ const buttons = [
 ]
 
 const collapsed = useState<boolean>('collapsed', () => false)
-
-const activeItemIndex = computed(() =>
-  buttons.findIndex(({ to }) => route.path.includes(to)),
-)
 
 function onCollapse() {
   collapsed.value = !collapsed.value
