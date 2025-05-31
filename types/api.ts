@@ -85,7 +85,7 @@ export interface DBClient {
 
   getGoal: (id: GoalDB['id']) => Promise<GoalDB | null>
   getGoals: () => Promise<GoalDB[] | null>
-  createGoal: () => Promise<GoalDB | null>
+  createGoal: (goal: GoalDB) => Promise<GoalDB | null>
   deleteGoal: () => Promise<GoalDB['id'] | null>
 
   isLibraryEmpty: () => Promise<boolean>

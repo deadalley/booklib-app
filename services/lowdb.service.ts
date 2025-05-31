@@ -7,7 +7,7 @@ import type {
   GetOrderedBooksQuerySearchParams,
 } from '~/types/api'
 import type { Low } from 'lowdb'
-import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
+import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import { v4 as uuidv4 } from 'uuid'
 import {
   logger,
@@ -453,8 +453,21 @@ export class LowDBClient implements DBClient {
     return []
   }
 
-  async createGoal() {
-    return null
+  async createGoal(goal: GoalDB) {
+    await this.client.read()
+
+    // create or update goal
+    const goalIndex = this.client.data.goals.findIndex((b) => b.id === goal.id)
+
+    if (goalIndex !== -1) {
+      this.client.data.goals.splice(goalIndex, 1, goal)
+    } else {
+      this.client.data.goals.push(goal)
+    }
+
+    await this.client.write()
+
+    return goal
   }
 
   async deleteGoal() {

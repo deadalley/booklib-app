@@ -1,9 +1,10 @@
 import type { Book } from '~/types/book'
-import type { AuthorDB, BookDB, CollectionDB } from '~/types/database'
+import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
 import { toSimpleDate } from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
+import type { Goal } from '~/types/goal'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
@@ -91,6 +92,37 @@ export function collectionToDbCollection(
   return {
     ...(collection.id ? { id: collection.id } : {}),
     name: collection.name,
+  }
+}
+
+export function dbGoalToGoal(dbGoal: GoalDB): Goal {
+  return {
+    id: dbGoal.id,
+    title: dbGoal.title,
+    type: dbGoal.type,
+    interval: dbGoal.interval,
+    amount: dbGoal.amount,
+    createdAt: dbGoal.created_at,
+    startedAt: toSimpleDate(dbGoal.started_at),
+    finishedAt: toSimpleDate(dbGoal.finished_at),
+    status: dbGoal.status,
+    author: dbGoal.author_id,
+    genres: dbGoal.genres,
+  }
+}
+
+export function goalToDbGoal(goal: Goal): Omit<GoalDB, 'created_at' | 'id'> {
+  return {
+    ...(goal.id ? { id: goal.id } : {}),
+    title: goal.title,
+    type: goal.type,
+    interval: goal.interval,
+    amount: goal.amount,
+    started_at: goal.startedAt,
+    finished_at: goal.finishedAt,
+    status: goal.status,
+    author_id: goal.author,
+    genres: goal.genres || [],
   }
 }
 

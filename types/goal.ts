@@ -2,7 +2,7 @@ export type GoalType = 'books' | 'pages' | 'hours'
 
 export type GoalInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'total'
 
-export type GoalStatus = 'active' | 'finished' | 'expired'
+export type GoalStatus = 'tracking' | 'not-tracking' | 'finished' | 'expired'
 
 export type Goal = {
   id: string
@@ -10,6 +10,7 @@ export type Goal = {
   type: GoalType
   interval: GoalInterval
   amount: number
+  createdAt: string
   startedAt: string
   finishedAt: string
   status: GoalStatus

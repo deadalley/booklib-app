@@ -8,7 +8,7 @@
         <bl-goal-modal
           v-if="authors && books"
           v-model="selectedGoal"
-          :is-new="!selectedGoal"
+          is-new
           :authors="authors"
           :books="books"
         >

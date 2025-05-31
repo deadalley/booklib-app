@@ -5,7 +5,7 @@
     </template>
 
     <template #title>
-      {{ isNew ? goal?.title : 'New goal' }}
+      {{ isNew ? 'New goal' : goal?.title }}
     </template>
 
     <ClientOnly>
@@ -15,7 +15,7 @@
           v-model="goal"
           type="form"
           :actions="false"
-          @submit="onSubmit"
+          @submit="onSaveChanges"
         >
           <section class="book-section">
             <div class="form-section">
@@ -136,9 +136,11 @@
           </section>
           <div class="flex items-baseline justify-end gap-2">
             <bl-button variant="secondary" @click="onCancel">
-              Cancel
+              {{ isNew ? 'Cancel' : 'Discard changes' }}
             </bl-button>
-            <bl-button @click="onSubmit">Save</bl-button>
+            <bl-button @click="onSaveChanges">{{
+              isNew ? 'Create goal' : 'Save changes'
+            }}</bl-button>
           </div>
         </FormKit>
       </div>
@@ -188,8 +190,28 @@ const genreSelectOptions = computed(() => {
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2))
 })
 
-function onSubmit() {
-  reset('goal')
+async function onSaveChanges() {
+  if (goal.value) {
+    await onSubmit(goal.value)
+  }
+}
+
+async function onSubmit(goalValues: Goal) {
+  try {
+    const goal = await $fetch<Goal>('/api/goals', {
+      method: 'POST',
+      body: {
+        ...goalValues,
+        status: trackingGoal.value ? 'tracking' : 'not-tracking',
+      } as Goal,
+    })
+
+    reset('goal')
+    open.value = false
+    return goal
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 function onCancel() {
