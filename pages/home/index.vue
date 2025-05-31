@@ -94,7 +94,7 @@
               v-for="book in latestBooks"
               :key="book.title"
               :book="book"
-              class="!w-36"
+              class="!w-32 shrink-0"
             />
           </div>
         </bl-tile>

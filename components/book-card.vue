@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex flex-col">
+  <div class="relative flex flex-col" v-bind="$attrs">
     <div
       v-if="draggable"
       class="relative flex w-full cursor-grab items-center gap-3 rounded-t-xl border-x border-t border-main bg-main px-4 py-1"
