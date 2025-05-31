@@ -5,11 +5,13 @@
       <div class="flex w-full items-center justify-between gap-2">
         <IconChevronLeft
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
+          :size="ICON_SIZE_SMALL"
           @click="onClickBack"
         />
         <h6 class="text-center">{{ authors[index].author.name }}</h6>
         <IconChevronRight
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
+          :size="ICON_SIZE_SMALL"
           @click="onClickForward"
         />
       </div>
