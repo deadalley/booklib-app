@@ -1,4 +1,5 @@
 import type { BookFormat, BookProgressStatus } from './book'
+import type { GoalType } from './goal'
 
 export type AuthorDB = {
   id: string
@@ -32,4 +33,12 @@ export type CollectionDB = {
   id: string
   created_at: string
   name: string
+}
+
+export type GoalDB = {
+  id: string
+  title: string
+  type: GoalType
+  started_at: string
+  finished_at: string
 }

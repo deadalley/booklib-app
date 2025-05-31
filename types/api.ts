@@ -1,6 +1,6 @@
 import type { Book, BookProgressStatus } from './book'
 import type { Collection } from './collection'
-import type { AuthorDB, BookDB, CollectionDB } from './database'
+import type { AuthorDB, BookDB, CollectionDB, GoalDB } from './database'
 import type { ServerFile } from 'nuxt-file-storage'
 
 export type LibraryIntegrityResult = {
@@ -83,6 +83,11 @@ export interface DBClient {
     params: DeleteCollectionParams,
   ) => Promise<CollectionDB['id'] | null>
 
+  getGoal: (id: GoalDB['id']) => Promise<GoalDB | null>
+  getGoals: () => Promise<GoalDB[] | null>
+  createGoal: () => Promise<GoalDB | null>
+  deleteGoal: () => Promise<GoalDB['id'] | null>
+
   isLibraryEmpty: () => Promise<boolean>
   resetLibrary: () => Promise<boolean>
   importLibrary: (books: BookDB[]) => Promise<boolean>
@@ -98,4 +103,5 @@ export type Database = {
     collection_id: CollectionDB['id']
     order: number
   }[]
+  goals: GoalDB[]
 }

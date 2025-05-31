@@ -11,6 +11,7 @@ const client = await JSONFilePreset<Database>('usr/booklib.json', {
     created_at: new Date().toISOString(),
   })),
   'collection-book': [],
+  goals: [],
 })
 
 export const db = new LowDBClient(client)

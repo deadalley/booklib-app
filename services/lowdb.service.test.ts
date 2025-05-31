@@ -43,6 +43,7 @@ function getDbSeed({
       created_at: new Date().toISOString(),
     })).concat(collections),
     'collection-book': [...collectionBooks],
+    goals: [],
   }
 }
 
