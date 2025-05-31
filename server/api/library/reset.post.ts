@@ -1,5 +1,5 @@
 import { db } from '~/services/db.service'
 
-export default defineEventHandler(async (event) => {
-  return db.resetLibrary(event)
+export default defineEventHandler(async () => {
+  return db.resetLibrary()
 })

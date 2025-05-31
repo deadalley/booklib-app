@@ -1,5 +1,5 @@
 import { db } from '~/services/db.service'
 
-export default defineEventHandler(async (event) => {
-  return db.getBookCount(event)
+export default defineEventHandler(async () => {
+  return db.getBookCount()
 })

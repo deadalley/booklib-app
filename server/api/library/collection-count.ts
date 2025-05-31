@@ -1,5 +1,5 @@
 import { db } from '~/services/db.service'
 
-export default defineEventHandler(async (event) => {
-  return db.getCollectionCount(event)
+export default defineEventHandler(async () => {
+  return db.getCollectionCount()
 })
