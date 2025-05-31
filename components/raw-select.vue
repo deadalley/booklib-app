@@ -5,11 +5,12 @@
     :class="{
       'popper-with-wrapper': withWrapper,
       popper: !withWrapper,
+      [side]: true,
     }"
   >
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
-        clas="relative"
+        class="select-trigger relative"
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'formkit-inner': withWrapper,
@@ -20,12 +21,16 @@
           <SelectValue :placeholder="placeholder" />
         </div>
         <input class="w-0 opacity-0" />
-        <IconChevronDown class="chevron" :size="ICON_SIZE_SMALL" />
+        <IconChevronDown
+          class="select-chevron transition-transform duration-300 ease-in"
+          :size="ICON_SIZE_SMALL"
+        />
       </SelectTrigger>
 
       <SelectPortal disabled>
         <SelectContent
           :align="align"
+          :side="side"
           :avoid-collisions="false"
           position="popper"
           class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
@@ -114,9 +119,13 @@ export type SelectProps = {
   placeholder?: string
   withWrapper?: boolean
   align?: 'start' | 'center' | 'end'
+  side?: 'top' | 'right' | 'bottom' | 'left'
 }
 
-const props = withDefaults(defineProps<SelectProps>(), { withWrapper: true })
+const props = withDefaults(defineProps<SelectProps>(), {
+  withWrapper: true,
+  side: 'bottom',
+})
 
 const selectValue = defineModel<string>()
 
@@ -136,15 +145,18 @@ const icon = computed(
 
 .popper [data-radix-popper-content-wrapper] {
   width: calc(100% + 30px);
-  margin-top: 8px !important;
   margin-left: -15px !important;
 }
 
-[data-state='open'] .chevron {
-  transform: rotate(180deg);
+.popper.bottom [data-radix-popper-content-wrapper] {
+  margin-top: 8px !important;
 }
 
-.chevron {
-  transition: transform 300ms;
+.popper.top [data-radix-popper-content-wrapper] {
+  padding-bottom: 12px !important;
+}
+
+.select-trigger[data-state='open'] .select-chevron {
+  transform: rotate(180deg);
 }
 </style>

@@ -88,6 +88,7 @@
                 type="select"
                 name="type"
                 placeholder="Type"
+                side="top"
                 :options="
                   Object.values(GOAL_TYPE_MAP).map(
                     ({ id, description, icon }) => ({
@@ -103,6 +104,7 @@
                 type="select"
                 name="interval"
                 placeholder="Interval"
+                side="top"
                 :options="
                   Object.values(GOAL_INTERVAL_MAP).map(
                     ({ id, description }) => ({

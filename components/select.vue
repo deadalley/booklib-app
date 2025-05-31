@@ -17,6 +17,11 @@
     }"
     :type="rawSelect"
     :options="options"
+    :groups="groups"
+    :placeholder="placeholder"
+    :with-wrapper="withWrapper"
+    :align="align"
+    :side="side"
     @focus="onFocus"
     @blur="onBlur"
   />
@@ -25,23 +30,25 @@
 <script setup lang="ts">
 import { IconCircleOff } from '@tabler/icons-vue'
 import { createInput } from '@formkit/vue'
-import type { SelectOption } from './raw-select.vue'
+import type { SelectOption, SelectProps } from './raw-select.vue'
 
 import SelectForInput from '../components/select-for-input.vue'
 
 const rawSelect = createInput(SelectForInput, {
-  props: ['options', 'placeholder'],
+  props: ['options', 'placeholder', 'align', 'side', 'withWrapper'],
 })
 
 const inputModel = ref()
 const focused = ref(false)
 
 const props = withDefaults(
-  defineProps<{
-    editing?: boolean
-    hidden?: boolean
-    options: SelectOption[]
-  }>(),
+  defineProps<
+    {
+      editing?: boolean
+      hidden?: boolean
+      options: SelectOption[]
+    } & SelectProps
+  >(),
   {
     editing: true,
     hidden: false,

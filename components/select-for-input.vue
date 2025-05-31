@@ -5,20 +5,21 @@
     :options="context.options"
     :placeholder="context.placeholder"
     :with-wrapper="false"
+    :align="context.align"
+    :side="context.side"
   />
 </template>
 
 <script setup lang="ts">
-import type { SelectOption } from './raw-select.vue'
+import type { SelectOption, SelectProps } from './raw-select.vue'
 
 const props = withDefaults(
   defineProps<{
     context: {
       attrs?: { class?: string }
       options: SelectOption[]
-      placeholder?: string
       node: { input: (value: string) => void; _value: string }
-    }
+    } & SelectProps
   }>(),
   {},
 )
