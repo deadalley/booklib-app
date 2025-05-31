@@ -2,6 +2,34 @@
   <NuxtLayout name="dashboard" title="Statistics">
     <h3 class="mb-3">Overview</h3>
     <div class="grid grid-cols-12 gap-4">
+      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+        <template #icon="iconProps">
+          <IconBooks v-bind="iconProps" />
+        </template>
+        <template #value>{{ totalReadBooks }}</template>
+        <template #unit>books read</template>
+      </bl-kpi-tile>
+      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+        <template #icon="iconProps">
+          <IconBook v-bind="iconProps" />
+        </template>
+        <template #value>{{ totalReadPages }}</template>
+        <template #unit>pages read</template>
+      </bl-kpi-tile>
+      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+        <template #icon="iconProps">
+          <IconFeather v-bind="iconProps" />
+        </template>
+        <template #value>{{ totalReadAuthors }}</template>
+        <template #unit>authors read</template>
+      </bl-kpi-tile>
+      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+        <template #icon="iconProps">
+          <IconHeartFilled v-bind="iconProps" />
+        </template>
+        <template #value>{{ totalFavoriteBooks }}</template>
+        <template #unit>favorite books</template>
+      </bl-kpi-tile>
       <bl-tile class="col-span-12 lg:col-span-6">
         <template #title>{{
           pieChartPropertyOptions.find(
@@ -86,6 +114,13 @@
 </template>
 
 <script setup lang="ts">
+import {
+  IconBook,
+  IconBooks,
+  IconFeather,
+  IconHeartFilled,
+} from '@tabler/icons-vue'
+import { sum, uniq } from 'ramda'
 import type { BooksBarChartProperty } from '~/components/books-bar-chart.vue'
 import type { RankingItem } from '~/components/ranking.client.vue'
 import type { SelectOption } from '~/components/raw-select.vue'
@@ -96,6 +131,50 @@ import type { Collection } from '~/types/collection'
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
+
+const totalReadBooks = computed(() => {
+  const totalBooks =
+    books.value?.filter((book) => book.progressStatus === 'read').length ?? 0
+
+  return totalBooks.toLocaleString('en-US', {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  })
+})
+
+const totalReadPages = computed(() => {
+  const totalPages = sum(books.value?.map((book) => book.pages ?? 0) ?? [])
+
+  return totalPages.toLocaleString('en-US', {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  })
+})
+
+const totalReadAuthors = computed(() => {
+  const totalAuthors = uniq(
+    books.value
+      ?.filter((book) => !!book.author && book.progressStatus === 'read')
+      .map((book) => book.author) ?? [],
+  ).length
+
+  return totalAuthors.toLocaleString('en-US', {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  })
+})
+
+const totalFavoriteBooks = computed(() => {
+  const totalFavoriteBooks =
+    books.value?.filter((book) =>
+      book.collections.includes(FAVORITE_COLLECTION_ID),
+    ).length ?? 0
+
+  return totalFavoriteBooks.toLocaleString('en-US', {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  })
+})
 
 const pieChartPropertyOptions: (SelectOption & { unit?: string })[] = [
   { label: 'Rating', value: 'rating', unit: '★' },

@@ -6,15 +6,15 @@ import { bookToDbBook, dbBookToBook } from '~/utils'
 export default defineEventHandler(async (event) => {
   const book = await readBody(event)
 
-  console.log({ book })
   const bookDb: BookDB = {
     ...bookToDbBook(book),
     id: book.id ?? uuidv4(),
     author_id: book.author ?? null,
     created_at: new Date().toISOString(),
+    collections: book.collections.map(({ id }: { id: string }) => id),
   }
 
-  const data = await db.createBook(event, bookDb, book.collections)
+  const data = await db.createBook(event, bookDb, bookDb.collections)
 
   return data && dbBookToBook(data, data.collections)
 })
