@@ -107,6 +107,7 @@
           <bl-book-suggestions-tile
             :books="books ?? []"
             :authors="authors ?? []"
+            :reload-books="refresh"
           />
         </div>
         <div class="col-span-12 flex flex-col gap-4 lg:col-span-3">
@@ -144,7 +145,7 @@ import type { Collection } from '~/types/collection'
 
 const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
 const { data: authors } = await useFetch<Author[]>('/api/authors')
-const { data: books } = await useFetch<Book[]>('/api/books')
+const { data: books, refresh } = await useFetch<Book[]>('/api/books')
 const { data: collections } = await useFetch<Collection[]>('/api/collections')
 const { data: latestBooks } = await useFetch<
   Pick<Book, 'id' | 'title' | 'coverSrc'>[]

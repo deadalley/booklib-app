@@ -2,30 +2,45 @@
   <transition name="fade" mode="out-in">
     <bl-tile :key="index" class="flex-1">
       <template #title>{{ selectedOption.title }}</template>
-      <NuxtLink :to="`/library/books/${selectedOption.book.id}`">
-        <bl-book-image
-          :book="selectedOption.book"
-          img-size-class="!h-[300px]"
-        />
-      </NuxtLink>
-      <div>
-        <h6>{{ selectedOption.book.title }}</h6>
-        <p v-if="selectedOption.book.authorName">
-          {{ selectedOption.book.authorName }}
-        </p>
-      </div>
-      <bl-button expand @click="onClick">
-        {{ selectedOption.buttonLabel }}
-        <template #appendIcon="iconProps">
-          <component :is="selectedOption.icon" v-bind="iconProps" />
+      <div
+        v-if="loading || success"
+        class="flex size-full flex-col items-center justify-center gap-3"
+      >
+        <template v-if="loading">
+          <bl-loading class="!size-12" />
+          <p>Loading...</p>
         </template>
-      </bl-button>
+        <template v-if="success">
+          <IconCircleCheck size="48px" class="text-main" />
+          <p>Success!</p>
+        </template>
+      </div>
+      <template v-if="!loading && !success">
+        <NuxtLink
+          :to="`/library/books/${selectedOption.book.id}`"
+          class="w-full"
+        >
+          <bl-book-image :book="selectedOption.book" img-size-class="!w-full" />
+        </NuxtLink>
+        <div>
+          <h6>{{ selectedOption.book.title }}</h6>
+          <p v-if="selectedOption.book.authorName">
+            {{ selectedOption.book.authorName }}
+          </p>
+        </div>
+        <bl-button expand @click="onClick">
+          {{ selectedOption.buttonLabel }}
+          <template #appendIcon="iconProps">
+            <component :is="selectedOption.icon" v-bind="iconProps" />
+          </template>
+        </bl-button>
+      </template>
     </bl-tile>
   </transition>
 </template>
 
 <script setup lang="ts">
-import { icons } from '@tabler/icons-vue'
+import { icons, IconCircleCheck } from '@tabler/icons-vue'
 import { indexBy } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
@@ -33,6 +48,7 @@ import type { Book, ViewBook } from '~/types/book'
 const props = defineProps<{
   authors: Author[]
   books: Book[]
+  reloadBooks: () => Promise<void>
 }>()
 
 const authorsById = computed(() =>
@@ -41,11 +57,15 @@ const authorsById = computed(() =>
 
 const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(props.books))
 
+const loading = ref<boolean>(false)
+const success = ref<boolean>(false)
+
 const options = computed(() => {
   const _books = viewBooks.value ?? []
 
   const unreadBooks = _books.filter(
-    ({ progressStatus }) => progressStatus === 'owned',
+    ({ progressStatus }) =>
+      progressStatus === 'owned' || progressStatus === 'not-read',
   )
   const unreadBook = unreadBooks[getRandomIndex(unreadBooks)]
 
@@ -98,7 +118,13 @@ const options = computed(() => {
   ].filter((option) => option.book !== undefined)
 })
 
-const { index } = useAutoIncrementIndex(options.value.length, 8)
+const { index, start, stop } = useAutoIncrementIndex(options.value.length, 8)
+
+watch(index, () => {
+  if (success.value) {
+    success.value = false
+  }
+})
 
 const selectedOption = computed(() => options.value[index.value])
 
@@ -112,14 +138,49 @@ function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
   }))
 }
 
-function onClick() {
+async function onClick() {
+  loading.value = true
+  stop()
   switch (selectedOption.value.id) {
     case 'startNewBook':
+      await onUpdateBook({
+        ...selectedOption.value.book,
+        progressStatus: 'reading',
+      })
+      break
     case 'finishCurrentBook':
+      await onUpdateBook({
+        ...selectedOption.value.book,
+        progressStatus: 'read',
+      })
+      break
     case 'rateFinishedBook':
     case 'resumePausedBook':
+      await onUpdateBook({
+        ...selectedOption.value.book,
+        progressStatus: 'reading',
+      })
+      break
     default:
       return
+  }
+  start()
+  loading.value = false
+}
+
+async function onUpdateBook(bookValues: Book) {
+  try {
+    const updatedBook = await $fetch<Book>('/api/books', {
+      method: 'post',
+      body: bookValues,
+    })
+
+    await props.reloadBooks()
+    success.value = true
+
+    return updatedBook
+  } catch (error) {
+    console.error(error)
   }
 }
 </script>

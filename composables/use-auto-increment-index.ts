@@ -5,23 +5,28 @@ export const useAutoIncrementIndex = (
   const index = ref(0)
   let timer: ReturnType<typeof setInterval> | null = null
 
-  onMounted(() => {
+  function start(_interval: number = interval) {
     timer = setInterval(() => {
       index.value = (index.value + 1) % arrayLength
-    }, interval * 1_000)
+    }, _interval * 1_000)
+  }
+
+  function stop() {
+    if (timer) clearInterval(timer)
+  }
+
+  onMounted(() => {
+    start(interval)
   })
 
-  onUnmounted(() => {
-    if (timer) clearInterval(timer)
-  })
+  onUnmounted(() => {})
 
   return {
     index,
     resetTimer: (newInterval: number) => {
-      if (timer) clearInterval(timer)
-      timer = setInterval(() => {
-        index.value = (index.value + 1) % arrayLength
-      }, newInterval * 1_000)
+      start(newInterval)
     },
+    stop,
+    start,
   }
 }

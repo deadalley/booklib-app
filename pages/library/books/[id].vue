@@ -67,11 +67,7 @@
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <div class="flex flex-col gap-2">
         <div class="lg:w-80">
-          <bl-book-image
-            :editing="editing"
-            :book="book!"
-            :temp-cover-src="tempCoverSrc"
-          />
+          <bl-book-image editing :book="book!" :temp-cover-src="tempCoverSrc" />
         </div>
         <bl-multiselect class="w-full">
           <bl-multiselect-option
