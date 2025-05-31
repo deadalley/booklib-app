@@ -23,7 +23,7 @@
 <script setup lang="ts">
 defineProps<{
   title: string
-  total: string
+  total: string | number
   sidebarContent?: string
   loading?: boolean
 }>()
