@@ -15,6 +15,10 @@ export function toFullDate(date: ConfigType) {
   return dayjs(date).format('LL')
 }
 
+export function toFullDateCompact(date: ConfigType) {
+  return dayjs(date).format('ll')
+}
+
 export function getDateRange(
   date: ConfigType,
   range: OpUnitType,

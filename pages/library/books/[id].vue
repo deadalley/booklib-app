@@ -361,7 +361,6 @@
 </template>
 
 <script setup lang="ts">
-import { format } from 'date-fns'
 import { faker } from '@faker-js/faker'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
@@ -392,9 +391,7 @@ const collectionsDisplayed = computed(() => {
     : allCollections.value.filter((collection) => collection.selected)
 })
 
-const formattedDate = computed(() =>
-  format(book.value?.createdAt ?? '', 'dd MMM yyyy'),
-)
+const formattedDate = computed(() => toFullDateCompact(book.value?.createdAt))
 
 const currentStep = ref<number | undefined>(
   book.value

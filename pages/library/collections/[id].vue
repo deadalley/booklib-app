@@ -140,7 +140,6 @@
 
 <script setup lang="ts">
 import { IconArrowLeft } from '@tabler/icons-vue'
-import { format } from 'date-fns'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
@@ -157,7 +156,7 @@ const loading = ref(false)
 const allBooks = ref<ViewBook[]>([])
 
 const formattedDate = computed(() =>
-  format(collection.value?.createdAt ?? '', 'dd MMM yyyy'),
+  toFullDateCompact(collection.value?.createdAt),
 )
 
 const { view, selectedBooks, notSelectedBooks, selectedTableColumns } =
