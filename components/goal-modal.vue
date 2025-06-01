@@ -125,17 +125,17 @@
             </div>
             <div v-if="dateRange === 'custom'" class="form-row">
               <bl-input
-                id="startedAt"
+                id="startAt"
                 type="date"
-                name="startedAt"
+                name="startAt"
                 label="Start on"
                 placeholder="Start date"
                 :formatter="dateFormatter"
               />
               <bl-input
-                id="finishedAt"
+                id="finishAt"
                 type="date"
-                name="finishedAt"
+                name="finishAt"
                 label="Finish on"
                 placeholder="End date"
                 :formatter="dateFormatter"
@@ -249,19 +249,19 @@ function dateFormatter(date: Date | undefined): string | undefined {
   return date && toDefaultDate(date)
 }
 
-function getIntervalFromDateRange(): Pick<Goal, 'startedAt' | 'finishedAt'> {
+function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
   const renameKeys = curry(
     <T extends { start: string; end: string }>(
       obj: T,
-    ): Pick<Goal, 'startedAt' | 'finishedAt'> =>
+    ): Pick<Goal, 'startAt' | 'finishAt'> =>
       reduce(
         (acc, key) =>
           assoc(
-            { start: 'startedAt', end: 'finishedAt' }[key] || key,
+            { start: 'startAt', end: 'finishAt' }[key] || key,
             obj[key as keyof T],
             acc,
           ),
-        { startedAt: '', finishedAt: '' },
+        { startAt: '', finishAt: '' },
         Object.keys(obj),
       ),
   )
@@ -279,13 +279,13 @@ function getIntervalFromDateRange(): Pick<Goal, 'startedAt' | 'finishedAt'> {
       return renameKeys(getDateRange(new Date(), 'week'))
     case 'custom':
       return {
-        startedAt: goal.value?.startedAt || '',
-        finishedAt: goal.value?.finishedAt || '',
+        startAt: goal.value?.startAt || '',
+        finishAt: goal.value?.finishAt || '',
       }
     default:
       return {
-        startedAt: '',
-        finishedAt: '',
+        startAt: '',
+        finishAt: '',
       }
   }
 }

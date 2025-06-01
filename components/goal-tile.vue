@@ -28,8 +28,8 @@
         :color="getProgressColor(goal.status, 'bg')"
       />
       <div class="flex justify-between">
-        <p class="text-accent-darker">{{ toFullDate(goal.startedAt) }}</p>
-        <p class="text-accent-darker">{{ toFullDate(goal.finishedAt) }}</p>
+        <p class="text-accent-darker">{{ toFullDate(goal.startAt) }}</p>
+        <p class="text-accent-darker">{{ toFullDate(goal.finishAt) }}</p>
       </div>
     </div>
   </bl-tile>

@@ -103,11 +103,12 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     interval: dbGoal.interval,
     amount: dbGoal.amount,
     createdAt: dbGoal.created_at,
-    startedAt: toSimpleDate(dbGoal.started_at),
-    finishedAt: toSimpleDate(dbGoal.finished_at),
+    startAt: toSimpleDate(dbGoal.start_at),
+    finishAt: toSimpleDate(dbGoal.finish_at),
     status: dbGoal.status,
     author: dbGoal.author_id,
     genres: dbGoal.genres,
+    completedAt: dbGoal.completed_at,
   }
 }
 
@@ -118,11 +119,12 @@ export function goalToDbGoal(goal: Goal): Omit<GoalDB, 'created_at' | 'id'> {
     type: goal.type,
     interval: goal.interval,
     amount: goal.amount,
-    started_at: goal.startedAt,
-    finished_at: goal.finishedAt,
+    start_at: goal.startAt,
+    finish_at: goal.finishAt,
     status: goal.status,
     author_id: goal.author,
     genres: goal.genres || [],
+    completed_at: goal.completedAt || null,
   }
 }
 

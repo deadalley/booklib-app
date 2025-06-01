@@ -11,8 +11,9 @@ export type Goal = {
   interval: GoalInterval
   amount: number
   createdAt: string
-  startedAt: string
-  finishedAt: string
+  startAt: string
+  finishAt: string
+  completedAt: string | null
   status: GoalStatus
   author: string | null
   genres: string[]

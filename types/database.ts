@@ -42,8 +42,9 @@ export type GoalDB = {
   interval: GoalInterval
   amount: number
   created_at: string
-  started_at: string
-  finished_at: string
+  start_at: string
+  finish_at: string
+  completed_at: string | null
   status: GoalStatus
   author_id: string | null
   genres: string[]
