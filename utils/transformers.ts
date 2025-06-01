@@ -95,11 +95,39 @@ export function collectionToDbCollection(
   }
 }
 
+function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
+  if (dbGoal.type === 'books') {
+    return {
+      type: 'books',
+      entries: dbGoal.entries.map((entry) => ({
+        book: entry.book_id!,
+        createdAt: entry.created_at,
+      })),
+    }
+  } else if (dbGoal.type === 'pages') {
+    return {
+      type: 'pages',
+      entries: dbGoal.entries.map((entry) => ({
+        pages: entry.pages!,
+        createdAt: entry.created_at,
+      })),
+    }
+  } else if (dbGoal.type === 'hours') {
+    return {
+      type: 'hours',
+      entries: dbGoal.entries.map((entry) => ({
+        hours: entry.hours!,
+        createdAt: entry.created_at,
+      })),
+    }
+  }
+  throw new Error(`Unknown goal type: ${dbGoal.type}`)
+}
+
 export function dbGoalToGoal(dbGoal: GoalDB): Goal {
   return {
     id: dbGoal.id,
     title: dbGoal.title,
-    type: dbGoal.type,
     interval: dbGoal.interval,
     amount: dbGoal.amount,
     createdAt: dbGoal.created_at,
@@ -109,14 +137,44 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     author: dbGoal.author_id,
     genres: dbGoal.genres,
     completedAt: dbGoal.completed_at,
+    ...getGoalTypeAndEntries(dbGoal),
+  } as Goal
+}
+
+function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
+  if (goal.type === 'books') {
+    return {
+      type: 'books',
+      entries: (goal.entries || []).map((entry) => ({
+        book_id: entry.book,
+        created_at: entry.createdAt,
+      })),
+    }
+  } else if (goal.type === 'pages') {
+    return {
+      type: 'pages',
+      entries: (goal.entries || []).map((entry) => ({
+        pages: entry.pages,
+        created_at: entry.createdAt,
+      })),
+    }
+  } else if (goal.type === 'hours') {
+    return {
+      type: 'hours',
+      entries: (goal.entries || []).map((entry) => ({
+        hours: entry.hours,
+        created_at: entry.createdAt,
+      })),
+    }
   }
+  // @ts-expect-error unknown goal type
+  throw new Error(`Unknown goal type: ${goal.type}`)
 }
 
 export function goalToDbGoal(goal: Goal): Omit<GoalDB, 'created_at' | 'id'> {
   return {
     ...(goal.id ? { id: goal.id } : {}),
     title: goal.title,
-    type: goal.type,
     interval: goal.interval,
     amount: goal.amount,
     start_at: goal.startAt,
@@ -125,6 +183,7 @@ export function goalToDbGoal(goal: Goal): Omit<GoalDB, 'created_at' | 'id'> {
     author_id: goal.author,
     genres: goal.genres || [],
     completed_at: goal.completedAt || null,
+    ...getGoalTypeAndEntriesDb(goal),
   }
 }
 

@@ -48,4 +48,12 @@ export type GoalDB = {
   status: GoalStatus
   author_id: string | null
   genres: string[]
+  entries: GoalEntryDB[]
+}
+
+export type GoalEntryDB = {
+  book_id?: BookDB['id']
+  pages?: number
+  hours?: number
+  created_at: string
 }
