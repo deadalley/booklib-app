@@ -16,15 +16,9 @@
         />
       </div>
     </template>
-    <div
-      v-if="authors?.length === 0"
-      class="flex flex-col items-center justify-center gap-8 rounded-xl bg-accent-light px-4 py-16"
-    >
-      <IconFeather class="text-accent-dark" size="58" stroke="1" />
-      <div class="flex flex-col items-center justify-center gap-4">
-        There are no authors in your library
-      </div>
-    </div>
+    <bl-empty v-if="authors?.length === 0" icon="IconFeather">
+      <template #label> There are no authors in your library </template>
+    </bl-empty>
     <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
@@ -63,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconFeather } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
