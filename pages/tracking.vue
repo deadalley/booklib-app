@@ -42,44 +42,22 @@
       </bl-tile>
 
       <template v-if="sortedGoals?.length">
-        <bl-tile v-for="goal in sortedGoals" :key="goal.id" class="col-span-12">
-          <div class="flex items-center gap-2">
-            <component
-              :is="icons[GOAL_TYPE_MAP[goal.type].icon]"
-              class="text-main"
-              :size="ICON_SIZE_LARGE"
-              stroke="1.5"
-            />
-            <h5>{{ goal.title }}</h5>
-            <span class="ml-2">
-              <bl-total-tag
-                :variant="goal.status === 'tracking' ? 'primary' : 'secondary'"
-              >
-                <IconConfetti
-                  v-if="goal.status === 'finished'"
-                  class="text-main"
-                  :size="16"
-                />
-                {{ GOAL_STATUS_MAP[goal.status].description }}
-              </bl-total-tag>
-            </span>
-          </div>
-        </bl-tile>
+        <bl-goal-tile
+          v-for="goal in sortedGoals"
+          :key="goal.id"
+          :goal="goal"
+          class="col-span-12"
+        />
       </template>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import {
-  IconChartAreaLine,
-  IconConfetti,
-  IconPlus,
-  icons,
-} from '@tabler/icons-vue'
+import { IconChartAreaLine, IconPlus } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
-import type { Goal } from '~/types/goal'
+import type { ViewGoal, Goal } from '~/types/goal'
 
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
@@ -87,7 +65,19 @@ const { data: goals, refresh } = await useFetch<Goal[]>('/api/goals')
 
 const selectedGoal = ref<Goal | undefined>()
 
-const sortedGoals = computed(() => sortGoals(goals.value ?? []))
+const sortedGoals = computed(() =>
+  sortGoals(goals.value ?? []).map<ViewGoal>((goal) => ({
+    ...goal,
+    progress: getGoalTimeProgress(goal),
+  })),
+)
+
+function getGoalTimeProgress(goal: Goal): number {
+  return getElapsedTimePercentage(new Date(), {
+    start: goal.startedAt,
+    end: goal.finishedAt,
+  })
+}
 
 useHead({
   title: 'BookLib | Tracking',

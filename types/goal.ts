@@ -17,3 +17,7 @@ export type Goal = {
   author: string | null
   genres: string[]
 }
+
+export type ViewGoal = Goal & {
+  progress: number
+}

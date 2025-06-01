@@ -11,6 +11,10 @@ export function toDefaultDate(date: ConfigType) {
   return dayjs(date).format('L')
 }
 
+export function toFullDate(date: ConfigType) {
+  return dayjs(date).format('LL')
+}
+
 export function getDateRange(
   date: ConfigType,
   range: OpUnitType,
@@ -29,4 +33,25 @@ export function getSixMonthsRange(date: ConfigType): {
     start: dayjs(date).toISOString(),
     end: dayjs(date).add(6, 'month').toISOString(),
   }
+}
+
+export function getElapsedTimePercentage(
+  date: ConfigType,
+  { start, end }: { start: ConfigType; end: ConfigType },
+): number {
+  const startDate = dayjs(start)
+  const endDate = dayjs(end)
+  const currentDate = dayjs(date)
+
+  if (currentDate.isBefore(startDate)) {
+    return 0
+  }
+  if (currentDate.isAfter(endDate)) {
+    return 100
+  }
+
+  const totalDuration = endDate.diff(startDate)
+  const elapsedDuration = currentDate.diff(startDate)
+
+  return (elapsedDuration / totalDuration) * 100
 }
