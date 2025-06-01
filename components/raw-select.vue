@@ -21,7 +21,8 @@
           <SelectValue :placeholder="placeholder" />
         </div>
         <input class="w-0 opacity-0" />
-        <IconChevronDown
+        <component
+          :is="side === 'top' ? IconChevronUp : IconChevronDown"
           class="select-chevron transition-transform duration-300 ease-in"
           :size="ICON_SIZE_SMALL"
         />
@@ -93,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { icons, IconChevronDown } from '@tabler/icons-vue'
+import { icons, IconChevronDown, IconChevronUp } from '@tabler/icons-vue'
 import {
   SelectContent,
   SelectGroup,
@@ -154,6 +155,10 @@ const icon = computed(
 
 .popper.top [data-radix-popper-content-wrapper] {
   padding-bottom: 12px !important;
+}
+
+.popper-with-wrapper.top [data-radix-popper-content-wrapper] {
+  padding-bottom: 8px !important;
 }
 
 .select-trigger[data-state='open'] .select-chevron {
