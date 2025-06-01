@@ -37,7 +37,7 @@
         <bl-tab-option v-bind="options" value="progress"
           >Progress</bl-tab-option
         >
-        <bl-tab-option v-bind="options" value="tracked">Tracked</bl-tab-option>
+        <bl-tab-option v-bind="options" value="tracked">Entries</bl-tab-option>
       </template>
 
       <bl-tab value="progress">
