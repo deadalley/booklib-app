@@ -1,5 +1,5 @@
 <template>
-  <bl-tile v-if="goal" v-bind="$attrs">
+  <bl-tile v-if="goal" v-bind="$attrs" :default-open="defaultOpen">
     <template #title>
       <div class="flex items-center gap-2">
         <component
@@ -76,6 +76,8 @@
 <script setup lang="ts">
 import { icons, IconConfetti } from '@tabler/icons-vue'
 import type { ViewGoal } from '~/types/goal'
+
+defineProps<{ defaultOpen?: boolean }>()
 
 const goal = defineModel<ViewGoal>('goal')
 

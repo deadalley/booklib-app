@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <AccordionRoot
-    default-value="tile"
+    :default-value="defaultOpen ? 'tile' : undefined"
     class="flex flex-col gap-3 rounded-xl border border-accent bg-white px-8 py-6"
     type="single"
     :collapsible="true"
@@ -19,6 +19,7 @@
           <h5 v-if="$slots['title']"><slot name="title" /></h5>
           <slot name="actions" />
           <IconChevronDown
+            v-if="$slots['collapsible']"
             class="accordion-chevron text-accent-darker transition-transform duration-300 ease-in"
             :size="ICON_SIZE_SMALL"
           />
@@ -41,6 +42,8 @@ import {
   AccordionRoot,
   AccordionTrigger,
 } from 'radix-vue'
+
+withDefaults(defineProps<{ defaultOpen?: boolean }>(), { defaultOpen: true })
 </script>
 
 <style scoped>
