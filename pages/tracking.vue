@@ -44,7 +44,8 @@
       <template v-if="sortedGoals?.length">
         <bl-tile v-for="goal in sortedGoals" :key="goal.id" class="col-span-12">
           <div class="flex items-center gap-2">
-            <IconChartAreaLine
+            <component
+              :is="icons[GOAL_TYPE_MAP[goal.type].icon]"
               class="text-main"
               :size="ICON_SIZE_LARGE"
               stroke="1.5"
@@ -70,7 +71,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconChartAreaLine, IconConfetti, IconPlus } from '@tabler/icons-vue'
+import {
+  IconChartAreaLine,
+  IconConfetti,
+  IconPlus,
+  icons,
+} from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Goal } from '~/types/goal'
