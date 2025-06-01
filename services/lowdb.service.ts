@@ -14,6 +14,10 @@ import {
   DEFAULT_COLLECTIONS,
   DEFAULT_COLLECTIONS_INIT,
   PROGRESS_STATUS,
+  BOOK_FORMAT,
+  GOAL_TYPE,
+  GOAL_INTERVAL,
+  GOAL_STATUS,
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { difference, indexBy, prop, uniq } from 'ramda'
@@ -539,9 +543,12 @@ export class LowDBClient implements DBClient {
   async checkLibraryIntegrity() {
     await this.client.read()
 
+    const booksById = indexBy(prop('id'), this.client.data.books)
+    const collectionsById = indexBy(prop('id'), this.client.data.collections)
+
     const authorIds = this.client.data.authors.map(({ id }) => id)
-    const collectionIds = this.client.data.collections.map(({ id }) => id)
-    const bookIds = this.client.data.books.map(({ id }) => id)
+    const collectionIds = Object.keys(collectionsById)
+    const bookIds = Object.keys(booksById)
 
     const booksWithNonExistentCollections = this.client.data[
       'collection-book'
@@ -556,6 +563,22 @@ export class LowDBClient implements DBClient {
         progress_status && !PROGRESS_STATUS.includes(progress_status),
     )
 
+    const booksWithOutdatedFormat = this.client.data.books.filter(
+      ({ format }) => format && !BOOK_FORMAT.includes(format),
+    )
+
+    const goalsWithOutdatedType = this.client.data.goals.filter(
+      ({ type }) => type && !GOAL_TYPE.includes(type),
+    )
+
+    const goalsWithOutdatedInterval = this.client.data.goals.filter(
+      ({ interval }) => interval && !GOAL_INTERVAL.includes(interval),
+    )
+
+    const goalsWithOutdatedStatus = this.client.data.goals.filter(
+      ({ status }) => status && !GOAL_STATUS.includes(status),
+    )
+
     const collectionsWithNonExistentBooks = this.client.data[
       'collection-book'
     ].filter(({ book_id }) => !bookIds.includes(book_id))
@@ -564,7 +587,7 @@ export class LowDBClient implements DBClient {
       books: [
         ...booksWithNonExistentCollections.map(
           ({ book_id, collection_id }) =>
-            `Book ${book_id} is assigned collection ${collection_id}, which does not exist.`,
+            `Book ${booksById[book_id]?.title ?? book_id} is assigned collection ${collectionsById[collection_id]?.name ?? collection_id}, which does not exist.`,
         ),
         ...booksWithNonExistentAuthors.map(
           ({ title, author_id }) =>
@@ -574,12 +597,27 @@ export class LowDBClient implements DBClient {
           ({ title, progress_status }) =>
             `Book ${title} has invalid progress status ${progress_status}`,
         ),
+        ...booksWithOutdatedFormat.map(
+          ({ title, format }) => `Book ${title} has invalid format ${format}`,
+        ),
       ],
       collections: collectionsWithNonExistentBooks.map(
         ({ book_id, collection_id }) =>
-          `Collection ${collection_id} contains book ${book_id}, which does not exist`,
+          `Collection ${collectionsById[collection_id]?.name ?? collection_id} contains book ${booksById[book_id]?.title ?? book_id}, which does not exist`,
       ),
       authors: [],
+      goals: [
+        ...goalsWithOutdatedType.map(
+          ({ title, type }) => `Goal ${title} has invalid type ${type}`,
+        ),
+        ...goalsWithOutdatedInterval.map(
+          ({ title, interval }) =>
+            `Goal ${title} has invalid interval ${interval}`,
+        ),
+        ...goalsWithOutdatedStatus.map(
+          ({ title, status }) => `Goal ${title} has invalid status ${status}`,
+        ),
+      ],
     }
   }
 }
