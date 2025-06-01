@@ -94,11 +94,9 @@ export function getBooksByFormat(books: ViewBook[]) {
   return books.reduce<Record<string, ViewBook[]>>(
     (formatBooks, book) => ({
       ...formatBooks,
-      ...(book.bookFormat
+      ...(book.format
         ? {
-            [book.bookFormat]: (formatBooks[book.bookFormat] || []).concat(
-              book,
-            ),
+            [book.format]: (formatBooks[book.format] || []).concat(book),
           }
         : {}),
     }),

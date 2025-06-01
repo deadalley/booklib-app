@@ -19,7 +19,7 @@ export type BookDB = {
   original_title: string | null
   pages: number | null
   progress_status: BookProgressStatus | null
-  book_format: BookFormat | null
+  format: BookFormat | null
   publisher: string | null
   rating: number | null
   started_at: string | null

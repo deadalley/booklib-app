@@ -22,7 +22,7 @@ export function buildBook(overwrite?: Partial<BookDB>): BookDB {
     collections: [],
     author_id: faker.string.uuid(),
     progress_status: 'not-owned',
-    book_format: 'paperback',
+    format: 'paperback',
     ...overwrite,
   }
 }

@@ -221,7 +221,7 @@ const barChartPropertyOptions: SelectOption[] = [
   { label: 'Original language', value: 'originalLanguage' },
   { label: 'Publisher', value: 'publisher' },
   { label: 'Genre', value: 'genres' },
-  { label: 'Format', value: 'bookFormat' },
+  { label: 'Format', value: 'format' },
   { label: 'Average author rating', value: 'averageRatingAuthor' },
 ]
 const barChartProperty = ref<BooksBarChartProperty>('author')

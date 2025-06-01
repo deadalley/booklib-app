@@ -158,10 +158,10 @@
                 </div>
                 <div class="form-row">
                   <bl-select
-                    id="bookFormat"
+                    id="format"
                     type="select"
                     :editing="editing"
-                    name="bookFormat"
+                    name="format"
                     label="Format"
                     placeholder="Format"
                     :options="

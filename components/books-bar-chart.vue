@@ -21,7 +21,7 @@ export type BooksBarChartProperty =
       | 'originalLanguage'
       | 'publisher'
       | 'genres'
-      | 'bookFormat'
+      | 'format'
     >
   | 'averageRatingAuthor'
 
@@ -122,7 +122,7 @@ const series = computed(() => {
       .sort(({ value: aValue }, { value: bValue }) => bValue - aValue)
   }
 
-  if (props.bookProperty === 'bookFormat') {
+  if (props.bookProperty === 'format') {
     const booksByFormat = getBooksByFormat(props.books)
 
     return Object.entries(booksByFormat)

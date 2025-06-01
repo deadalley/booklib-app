@@ -178,10 +178,10 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       )
     })
 
-    const filterByFormat = filterByStatus.filter(({ bookFormat }) => {
+    const filterByFormat = filterByStatus.filter(({ format }) => {
       return (
         !selectedFormats.value.length ||
-        (bookFormat && selectedFormats.value.includes(bookFormat))
+        (format && selectedFormats.value.includes(format))
       )
     })
 

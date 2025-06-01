@@ -34,7 +34,7 @@ export type Book = {
   genres: string[] | null
   collections: Collection['id'][]
   progressStatus: BookProgressStatus | null
-  bookFormat: BookFormat | null
+  format: BookFormat | null
   startedAt: string | null
   finishedAt: string | null
   author: Author['id'] | null
