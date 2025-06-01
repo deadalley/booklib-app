@@ -32,6 +32,26 @@
         <p class="text-accent-darker">{{ toFullDate(goal.finishAt) }}</p>
       </div>
     </div>
+    <div v-if="goal.interval === 'total'" class="mt-4">
+      <bl-line-chart
+        :height="200"
+        :items="[
+          {
+            label: 'achieved',
+            color: tailwind.theme.colors.main,
+            values: [
+              { x: toFullDateCompact('2020-01-01'), y: 0 },
+              { x: toFullDateCompact('2020-02-01'), y: 11 },
+              { x: toFullDateCompact('2020-03-01'), y: 16 },
+              { x: toFullDateCompact('2020-04-01'), y: 18 },
+              { x: toFullDateCompact('2020-05-01'), y: 41 },
+              { x: toFullDateCompact('2020-06-01'), y: 41 },
+              { x: toFullDateCompact('2020-07-01'), y: 41 },
+            ],
+          },
+        ]"
+      />
+    </div>
   </bl-tile>
 </template>
 
