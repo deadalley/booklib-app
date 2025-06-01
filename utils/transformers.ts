@@ -100,6 +100,7 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'books',
       entries: dbGoal.entries.map((entry) => ({
+        id: entry.id,
         book: entry.book_id!,
         createdAt: entry.created_at,
       })),
@@ -108,6 +109,7 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'pages',
       entries: dbGoal.entries.map((entry) => ({
+        id: entry.id,
         pages: entry.pages!,
         createdAt: entry.created_at,
       })),
@@ -116,6 +118,7 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'hours',
       entries: dbGoal.entries.map((entry) => ({
+        id: entry.id,
         hours: entry.hours!,
         createdAt: entry.created_at,
       })),
@@ -146,6 +149,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'books',
       entries: (goal.entries || []).map((entry) => ({
+        id: entry.id,
         book_id: entry.book,
         created_at: entry.createdAt,
       })),
@@ -154,6 +158,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'pages',
       entries: (goal.entries || []).map((entry) => ({
+        id: entry.id,
         pages: entry.pages,
         created_at: entry.createdAt,
       })),
@@ -162,6 +167,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'hours',
       entries: (goal.entries || []).map((entry) => ({
+        id: entry.id,
         hours: entry.hours,
         created_at: entry.createdAt,
       })),

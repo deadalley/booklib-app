@@ -8,6 +8,7 @@
   <!-- @vue-skip -->
   <FormKit
     v-model="inputModel"
+    v-model:search-term="searchTerm"
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
@@ -40,9 +41,11 @@ const rawAutocomplete = createInput(AutocompleteForInput, {
     'canCreateNew',
     'notFoundLabel',
     'clearable',
+    'searchTerm',
   ],
 })
 
+const searchTerm = defineModel<string>()
 const inputModel = ref()
 const focused = ref(false)
 

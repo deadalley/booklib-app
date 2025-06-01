@@ -52,6 +52,7 @@ export type GoalDB = {
 }
 
 export type GoalEntryDB = {
+  id: string
   book_id?: BookDB['id']
   pages?: number
   hours?: number

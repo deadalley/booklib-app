@@ -1,6 +1,7 @@
 <template>
   <bl-raw-autocomplete
     v-model="selectValue"
+    v-model:search-term="searchTerm"
     :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
@@ -29,6 +30,7 @@ const props = withDefaults(
 )
 
 const selectValue = ref(props.context.node?._value)
+const searchTerm = defineModel<string>()
 
 watch(selectValue, (value) => {
   props.context.node?.input?.(value)

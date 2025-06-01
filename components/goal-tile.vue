@@ -37,12 +37,12 @@
     <template #collapsible>
       <bl-tabs default-value="progress" class="mt-4" full>
         <template #options="options">
-          <bl-tab-option v-bind="options" value="progress"
-            >Progress</bl-tab-option
-          >
-          <bl-tab-option v-bind="options" value="tracked"
-            >Entries</bl-tab-option
-          >
+          <bl-tab-option v-bind="options" value="progress">
+            Progress
+          </bl-tab-option>
+          <bl-tab-option v-bind="options" value="tracked">
+            Entries
+          </bl-tab-option>
         </template>
 
         <bl-tab value="progress">
@@ -67,7 +67,30 @@
             />
           </template>
         </bl-tab>
-        <bl-tab value="tracked">WIP</bl-tab>
+        <bl-tab value="tracked">
+          <div class="mt-2 flex flex-col gap-2">
+            <bl-empty
+              v-if="goal.entries.length === 0 && !entryModalOpen"
+              icon="IconNotebook"
+              class="py-4"
+            >
+              <template #label>This goal has no entries</template>
+              <template #action>
+                <bl-button @click="entryModalOpen = true">
+                  Create first entry
+                </bl-button>
+              </template>
+            </bl-empty>
+            <bl-goal-entry
+              v-if="entryModalOpen"
+              v-model:goal="goal"
+              v-model:entry="entry"
+              v-model:open="entryModalOpen"
+              :books="books"
+              :reload-goals="reloadGoals"
+            />
+          </div>
+        </bl-tab>
       </bl-tabs>
     </template>
   </bl-tile>
@@ -75,11 +98,23 @@
 
 <script setup lang="ts">
 import { icons, IconConfetti } from '@tabler/icons-vue'
-import type { ViewGoal } from '~/types/goal'
+import type { ViewBook } from '~/types/book'
+import type {
+  BookGoalEntry,
+  HourGoalEntry,
+  PageGoalEntry,
+  ViewGoal,
+} from '~/types/goal'
 
-defineProps<{ defaultOpen?: boolean }>()
+defineProps<{
+  defaultOpen?: boolean
+  books: ViewBook[]
+  reloadGoals: () => Promise<void>
+}>()
 
 const goal = defineModel<ViewGoal>('goal')
+const entry = ref<BookGoalEntry | PageGoalEntry | HourGoalEntry | undefined>()
+const entryModalOpen = ref<boolean>(false)
 
 function getProgressColor(
   status: string,

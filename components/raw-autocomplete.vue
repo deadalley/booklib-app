@@ -109,7 +109,7 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
 })
 
 const selectValue = defineModel<string>()
-const searchTerm = ref<string>()
+const searchTerm = defineModel<string>('searchTerm')
 const open = ref<boolean>(false)
 const focused = ref(false)
 const extendedOptions = ref(props.options!)

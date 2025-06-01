@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="$attrs"
     class="flex flex-col items-center justify-center gap-8 rounded-xl bg-accent-light px-4 py-16"
   >
     <component

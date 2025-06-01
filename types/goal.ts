@@ -6,32 +6,35 @@ export type GoalInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'total'
 
 export type GoalStatus = 'tracking' | 'not-tracking' | 'finished' | 'expired'
 
-type BookGoalEntry = {
+export type BookGoalEntry = {
+  id: string
   book: Book['id']
   createdAt: string
 }
 
-type PageGoalEntry = {
+export type PageGoalEntry = {
+  id: string
   pages: number
   createdAt: string
 }
 
-type HourGoalEntry = {
+export type HourGoalEntry = {
+  id: string
   hours: number
   createdAt: string
 }
 
-type BookGoal = {
+export type BookGoal = {
   type: 'books'
   entries: BookGoalEntry[]
 }
 
-type PageGoal = {
+export type PageGoal = {
   type: 'pages'
   entries: PageGoalEntry[]
 }
 
-type HourGoal = {
+export type HourGoal = {
   type: 'hours'
   entries: HourGoalEntry[]
 }

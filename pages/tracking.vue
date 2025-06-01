@@ -32,7 +32,7 @@
           v-model="selectedGoal"
           is-new
           :authors="authors"
-          :books="books"
+          :books="viewBooks"
           :reload-goals="refresh"
         >
           <template #trigger="triggerProps">
@@ -48,6 +48,8 @@
           :goal="goal"
           class="col-span-12"
           :default-open="index === 0"
+          :books="viewBooks ?? []"
+          :reload-goals="refresh"
         />
       </template>
     </div>
@@ -56,13 +58,20 @@
 
 <script setup lang="ts">
 import { IconChartAreaLine, IconPlus } from '@tabler/icons-vue'
+import { indexBy } from 'ramda'
 import type { Author } from '~/types/author'
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import type { ViewGoal, Goal } from '~/types/goal'
 
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
 const { data: goals, refresh } = await useFetch<Goal[]>('/api/goals')
+
+const authorsById = computed(() =>
+  authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
+)
+
+const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
 const selectedGoal = ref<Goal | undefined>()
 
@@ -78,6 +87,16 @@ function getGoalTimeProgress(goal: Goal): number {
     start: goal.startAt,
     end: goal.finishAt,
   })
+}
+
+// TODO: return author name with book from server
+function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
+  return (_books ?? []).map((book) => ({
+    ...book,
+    authorName: book.author
+      ? authorsById.value[String(book.author)]?.name
+      : undefined,
+  }))
 }
 
 useHead({
