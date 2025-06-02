@@ -76,7 +76,7 @@
           class="accordion-content relative flex size-max gap-x-6 p-4 transition duration-100 ease-out"
         >
           <bl-book-card
-            v-for="book in sortBooks(books)"
+            v-for="book in sortBooksByOrder(books)"
             :key="book.title"
             :book="book"
             class="!w-36"

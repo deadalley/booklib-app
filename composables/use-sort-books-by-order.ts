@@ -34,11 +34,11 @@ export const useSortBooksByOrder = <T extends ViewBook>(
   }
 
   const selectedBooks = computed(() =>
-    sortBooks((books.value ?? []).filter(({ selected }) => !!selected)),
+    sortBooksByOrder((books.value ?? []).filter(({ selected }) => !!selected)),
   )
 
   const notSelectedBooks = computed(() =>
-    sortBooks((books.value ?? []).filter(({ selected }) => !selected)),
+    sortBooksByOrder((books.value ?? []).filter(({ selected }) => !selected)),
   )
 
   return {

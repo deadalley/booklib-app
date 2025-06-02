@@ -199,7 +199,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
         )
       : filterByAuthor
 
-    const sorted = sortBooks(filterByCollections).map((book) => ({
+    const sorted = sortBooksByOrder(filterByCollections).map((book) => ({
       ...book,
       isFavorite: isBookInDefaultCollection(book, FAVORITE_COLLECTION_ID),
       isWishlist: isBookInDefaultCollection(book, WISHLIST_COLLECTION_ID),

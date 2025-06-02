@@ -26,7 +26,7 @@
         </AccordionTrigger>
       </AccordionHeader>
       <slot />
-      <AccordionContent>
+      <AccordionContent class="accordion-content">
         <slot name="collapsible" />
       </AccordionContent>
     </AccordionItem>
@@ -53,6 +53,7 @@ withDefaults(defineProps<{ defaultOpen?: boolean }>(), { defaultOpen: true })
 
 .accordion-content[data-state='open'] {
   animation: slideDown 300ms ease-out;
+  overflow: visible;
 }
 
 .accordion-content[data-state='closed'] {

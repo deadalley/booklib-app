@@ -8,7 +8,6 @@
   <!-- @vue-skip -->
   <FormKit
     v-model="inputModel"
-    v-model:search-term="searchTerm"
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
@@ -22,6 +21,7 @@
     :can-create-new="canCreateNew"
     :not-found-label="notFoundLabel"
     :clearable="clearable"
+    :on-update:search-term="(v) => onUpdateSearchTerm(v)"
     @focus="onFocus"
     @blur="onBlur"
   />
@@ -42,10 +42,12 @@ const rawAutocomplete = createInput(AutocompleteForInput, {
     'notFoundLabel',
     'clearable',
     'searchTerm',
+    'update:search-term',
+    'onUpdateSearchTerm',
   ],
 })
 
-const searchTerm = defineModel<string>()
+const searchTerm = defineModel<string>('searchTerm')
 const inputModel = ref()
 const focused = ref(false)
 
@@ -65,5 +67,9 @@ function onFocus() {
 
 function onBlur() {
   focused.value = false
+}
+
+function onUpdateSearchTerm(value: string | undefined) {
+  searchTerm.value = value
 }
 </script>

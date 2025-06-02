@@ -4,7 +4,7 @@ import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal, GoalStatus } from '~/types/goal'
 
-export function sortBooks(booksToBeSorted: ViewBook[]) {
+export function sortBooksByOrder(booksToBeSorted: ViewBook[]) {
   return booksToBeSorted.concat().sort((book1, book2) => {
     if (book1.order !== undefined && book2.order !== undefined) {
       return book1.order - book2.order
@@ -47,6 +47,26 @@ export function sortBooksBy<B extends Book>(
   })
 
   return count ? sortedBooks.slice(0, count) : sortedBooks
+}
+
+export function sortBooksByAuthor(books: ViewBook[]) {
+  return books.concat().sort((b1, b2) => {
+    if (b1.authorName === b2.authorName) {
+      return b1.title.localeCompare(b2.title, undefined, { numeric: true })
+    }
+
+    if (b1.authorName && !b2.authorName) {
+      return -1
+    }
+
+    if (!b1.authorName && b2.authorName) {
+      return 1
+    }
+
+    return b1.authorName!.localeCompare(b2.authorName!, undefined, {
+      numeric: true,
+    })
+  })
 }
 
 export function sortCollections(collections: Collection[]) {

@@ -19,7 +19,10 @@ import type { SelectOption } from './raw-select.vue'
 const props = withDefaults(
   defineProps<{
     context: AutocompleteProps & {
-      attrs?: { class?: string }
+      attrs?: {
+        class?: string
+        'on-update:search-term'?: (value: string | undefined) => void
+      }
       node: {
         input: (value: SelectOption['value']) => void
         _value: SelectOption['value']
@@ -34,5 +37,9 @@ const searchTerm = defineModel<string>()
 
 watch(selectValue, (value) => {
   props.context.node?.input?.(value)
+})
+
+watch(searchTerm, (value) => {
+  props.context.attrs?.['on-update:search-term']?.(value)
 })
 </script>
