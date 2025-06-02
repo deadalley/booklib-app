@@ -151,7 +151,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id,
         book_id: entry.book,
-        created_at: entry.createdAt,
+        created_at: entry.createdAt ?? new Date().toISOString(),
       })),
     }
   } else if (goal.type === 'pages') {
@@ -160,7 +160,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id,
         pages: entry.pages,
-        created_at: entry.createdAt,
+        created_at: entry.createdAt ?? new Date().toISOString(),
       })),
     }
   } else if (goal.type === 'hours') {
@@ -169,7 +169,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id,
         hours: entry.hours,
-        created_at: entry.createdAt,
+        created_at: entry.createdAt ?? new Date().toISOString(),
       })),
     }
   }

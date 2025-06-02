@@ -1,6 +1,10 @@
 <template>
-  <bl-tile v-if="goal" v-bind="$attrs" class="overflow-visible">
-    <ClientOnly>
+  <div
+    v-if="goal"
+    v-bind="$attrs"
+    class="overflow-visible rounded-xl border border-accent px-6 py-2"
+  >
+    <ClientOnly v-if="editing">
       <div class="flex flex-1 flex-col gap-16 overflow-visible">
         <FormKit
           id="entry"
@@ -48,10 +52,25 @@
         </FormKit>
       </div>
     </ClientOnly>
-  </bl-tile>
+    <template v-if="entry && !editing">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h6>{{ getEntryTitle() }}</h6>
+          <p>{{ toFullDateCompact(entry.createdAt) }}</p>
+        </div>
+        <bl-button @click="editing = true">
+          <template #prependIcon="iconProps">
+            <IconPencil v-bind="iconProps" />
+          </template>
+        </bl-button>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { IconPencil } from '@tabler/icons-vue'
+import { indexBy, prop } from 'ramda'
 import type { ViewBook } from '~/types/book'
 import type {
   BookGoalEntry,
@@ -69,7 +88,7 @@ const goal = defineModel<ViewGoal>('goal')
 const entry = defineModel<BookGoalEntry | PageGoalEntry | HourGoalEntry>(
   'entry',
 )
-const open = defineModel<boolean>('open')
+const editing = defineModel<boolean>('editing')
 
 const searchTerm = ref()
 
@@ -115,8 +134,9 @@ async function onSubmit() {
         } as ViewGoal,
       })
 
-      open.value = false
       props.reloadGoals()
+      editing.value = false
+      entry.value = undefined
     } catch (error) {
       console.error(error)
     }
@@ -124,7 +144,7 @@ async function onSubmit() {
 }
 
 function onCancel() {
-  open.value = false
+  editing.value = false
 }
 
 function getEntryValue() {
@@ -138,5 +158,21 @@ function getEntryValue() {
         return entry.value as HourGoalEntry
     }
   }
+}
+
+function getEntryTitle() {
+  if (entry.value && goal.value) {
+    switch (goal.value.type) {
+      case 'books': {
+        const booksById = indexBy(prop('id'), props.books)
+        return booksById[(entry.value as BookGoalEntry).book ?? '']?.title
+      }
+      case 'pages':
+        return 'Page entry'
+      case 'hours':
+        return 'Hour entry'
+    }
+  }
+  return ''
 }
 </script>

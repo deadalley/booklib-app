@@ -68,27 +68,45 @@
           </template>
         </bl-tab>
         <bl-tab value="tracked">
-          <div class="mt-2 flex flex-col gap-2">
+          <div class="mt-2 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
             <bl-empty
-              v-if="goal.entries.length === 0 && !entryModalOpen"
+              v-if="goal.entries.length === 0"
               icon="IconNotebook"
               class="py-4"
             >
               <template #label>This goal has no entries</template>
               <template #action>
-                <bl-button @click="entryModalOpen = true">
-                  Create first entry
-                </bl-button>
+                <bl-button> Create first entry </bl-button>
               </template>
             </bl-empty>
             <bl-goal-entry
-              v-if="entryModalOpen"
+              v-for="(_entry, index) in goal.entries"
+              :key="_entry.id"
               v-model:goal="goal"
-              v-model:entry="entry"
-              v-model:open="entryModalOpen"
+              v-model:entry="goal.entries[index]"
               :books="books"
               :reload-goals="reloadGoals"
             />
+            <bl-goal-entry
+              v-if="addingNew"
+              v-model:goal="goal"
+              v-model:entry="entry"
+              v-model:editing="addingNew"
+              :books="books"
+              :reload-goals="reloadGoals"
+            />
+            <div class="flex items-center justify-center">
+              <bl-button
+                class="w-full"
+                variant="tertiary"
+                @click="addingNew = true"
+              >
+                <template #prependIcon="iconProps">
+                  <IconPlus v-bind="iconProps" class="!text-main" />
+                </template>
+                Add new entry
+              </bl-button>
+            </div>
           </div>
         </bl-tab>
       </bl-tabs>
@@ -97,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { icons, IconConfetti } from '@tabler/icons-vue'
+import { icons, IconConfetti, IconPlus } from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 import type {
   BookGoalEntry,
@@ -114,7 +132,7 @@ defineProps<{
 
 const goal = defineModel<ViewGoal>('goal')
 const entry = ref<BookGoalEntry | PageGoalEntry | HourGoalEntry | undefined>()
-const entryModalOpen = ref<boolean>(false)
+const addingNew = ref<boolean>(false)
 
 function getProgressColor(
   status: string,
