@@ -9,8 +9,8 @@ export default defineEventHandler(async (event) => {
   const bookDb: BookDB = {
     ...bookToDbBook(book),
     id: book.id ?? uuidv4(),
-    author_id: book.author ?? null,
-    created_at: new Date().toISOString(),
+    author_id: book.author || null,
+    created_at: book.created_at || new Date().toISOString(),
     collections: book.collections.map(({ id }: { id: string }) => id),
   }
 

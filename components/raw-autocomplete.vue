@@ -5,6 +5,7 @@
     :class="{
       'popper-with-wrapper': withWrapper,
       popper: !withWrapper,
+      [side]: true,
     }"
   >
     <ComboboxRoot
@@ -38,7 +39,7 @@
         />
       </ComboboxAnchor>
 
-      <ComboboxContent position="popper">
+      <ComboboxContent position="popper" :align="align" :side="side">
         <ComboboxViewport
           class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
         >
@@ -98,6 +99,8 @@ export type AutocompleteProps = SelectProps & {
   hidden?: boolean
   canCreateNew?: boolean
   notFoundLabel?: string
+  align?: 'start' | 'center' | 'end'
+  side?: 'top' | 'right' | 'bottom' | 'left'
 }
 
 const props = withDefaults(defineProps<AutocompleteProps>(), {
@@ -106,6 +109,7 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
   editing: true,
   hidden: false,
   clearable: false,
+  side: 'bottom',
 })
 
 const selectValue = defineModel<string>()
@@ -155,18 +159,29 @@ function onClear() {
 <style scoped>
 [data-radix-popper-content-wrapper] {
   position: absolute !important;
-  transform: none !important;
-  top: var(--radix-popper-anchor-height) !important;
 }
 
 .popper-with-wrapper [data-radix-popper-content-wrapper] {
   width: 100%;
-  margin-top: 4px;
 }
 
 .popper [data-radix-popper-content-wrapper] {
   width: calc(100% + 30px);
+}
+
+.popper.bottom [data-radix-popper-content-wrapper] {
   margin-top: 8px !important;
-  margin-left: -15px !important;
+}
+
+.popper.top [data-radix-popper-content-wrapper] {
+  padding-bottom: 12px !important;
+}
+
+.popper-with-wrapper.top [data-radix-popper-content-wrapper] {
+  padding-bottom: 8px !important;
+}
+
+.select-trigger[data-state='open'] .select-chevron {
+  transform: rotate(180deg);
 }
 </style>

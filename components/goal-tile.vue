@@ -70,13 +70,13 @@
         <bl-tab value="tracked">
           <div class="mt-2 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
             <bl-empty
-              v-if="goal.entries.length === 0"
+              v-if="goal.entries.length === 0 && !addingNew"
               icon="IconNotebook"
               class="py-4"
             >
               <template #label>This goal has no entries</template>
               <template #action>
-                <bl-button> Create first entry </bl-button>
+                <bl-button @click="onCreateNew"> Create first entry </bl-button>
               </template>
             </bl-empty>
             <bl-goal-entry
@@ -95,18 +95,17 @@
               :books="books"
               :reload-goals="reloadGoals"
             />
-            <div class="flex items-center justify-center">
-              <bl-button
-                class="w-full"
-                variant="tertiary"
-                @click="addingNew = true"
-              >
-                <template #prependIcon="iconProps">
-                  <IconPlus v-bind="iconProps" class="!text-main" />
-                </template>
-                Add new entry
-              </bl-button>
-            </div>
+            <bl-button
+              v-if="goal.entries.length && !addingNew"
+              class="w-full"
+              variant="tertiary"
+              @click="onCreateNew"
+            >
+              <template #prependIcon="iconProps">
+                <IconPlus v-bind="iconProps" class="!text-main" />
+              </template>
+              Add new entry
+            </bl-button>
           </div>
         </bl-tab>
       </bl-tabs>
@@ -131,7 +130,9 @@ defineProps<{
 }>()
 
 const goal = defineModel<ViewGoal>('goal')
-const entry = ref<BookGoalEntry | PageGoalEntry | HourGoalEntry | undefined>()
+const entry = ref<
+  Partial<BookGoalEntry | PageGoalEntry | HourGoalEntry> | undefined
+>()
 const addingNew = ref<boolean>(false)
 
 function getProgressColor(
@@ -152,5 +153,12 @@ function getProgressColor(
   }
 
   return undefined
+}
+
+function onCreateNew() {
+  entry.value = {
+    createdAt: toSimpleDate(new Date().toISOString()),
+  }
+  addingNew.value = true
 }
 </script>

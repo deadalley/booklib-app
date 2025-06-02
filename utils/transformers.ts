@@ -5,6 +5,7 @@ import { toSimpleDate } from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
+import { v4 as uuidv4 } from 'uuid'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
@@ -149,7 +150,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'books',
       entries: (goal.entries || []).map((entry) => ({
-        id: entry.id,
+        id: entry.id ?? uuidv4(),
         book_id: entry.book,
         created_at: entry.createdAt ?? new Date().toISOString(),
       })),
@@ -158,7 +159,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'pages',
       entries: (goal.entries || []).map((entry) => ({
-        id: entry.id,
+        id: entry.id ?? uuidv4(),
         pages: entry.pages,
         created_at: entry.createdAt ?? new Date().toISOString(),
       })),
@@ -167,7 +168,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
     return {
       type: 'hours',
       entries: (goal.entries || []).map((entry) => ({
-        id: entry.id,
+        id: entry.id ?? uuidv4(),
         hours: entry.hours,
         created_at: entry.createdAt ?? new Date().toISOString(),
       })),

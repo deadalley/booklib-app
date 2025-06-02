@@ -1,5 +1,9 @@
 <template>
-  <div v-if="!editing && !hidden" class="formkit-wrapper flex-1">
+  <div
+    v-if="!editing && !hidden"
+    class="formkit-wrapper flex-1"
+    v-bind="$attrs"
+  >
     <label class="formkit-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel">{{ displayValue }}</h5>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
@@ -21,6 +25,8 @@
     :can-create-new="canCreateNew"
     :not-found-label="notFoundLabel"
     :clearable="clearable"
+    :align="align"
+    :side="side"
     :on-update:search-term="(v) => onUpdateSearchTerm(v)"
     @focus="onFocus"
     @blur="onBlur"
@@ -42,13 +48,13 @@ const rawAutocomplete = createInput(AutocompleteForInput, {
     'notFoundLabel',
     'clearable',
     'searchTerm',
-    'update:search-term',
-    'onUpdateSearchTerm',
+    'align',
+    'side',
   ],
 })
 
 const searchTerm = defineModel<string>('searchTerm')
-const inputModel = ref()
+const inputModel = defineModel<string | undefined>('input')
 const focused = ref(false)
 
 const props = withDefaults(defineProps<AutocompleteProps>(), {

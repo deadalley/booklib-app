@@ -31,12 +31,23 @@
                 <bl-input-autocomplete
                   v-if="bookSelectOptions.length"
                   id="book"
+                  v-model:input="bookValue"
                   v-model:search-term="searchTerm"
                   name="book"
                   label="Book"
                   placeholder="Book"
                   :options="bookSelectOptions"
                   clearable
+                  side="top"
+                />
+                <bl-input
+                  id="createdAt"
+                  type="date"
+                  name="createdAt"
+                  :label="goal.type === 'books' ? 'Finished on' : 'Read on'"
+                  placeholder="Date"
+                  clearable
+                  :formatter="dateFormatter"
                 />
               </div>
             </section>
@@ -78,6 +89,7 @@ import type {
   PageGoalEntry,
   ViewGoal,
 } from '~/types/goal'
+import { reset } from '@formkit/core'
 
 const props = defineProps<{
   books: ViewBook[]
@@ -85,11 +97,11 @@ const props = defineProps<{
 }>()
 
 const goal = defineModel<ViewGoal>('goal')
-const entry = defineModel<BookGoalEntry | PageGoalEntry | HourGoalEntry>(
-  'entry',
-)
+const entry =
+  defineModel<Partial<BookGoalEntry | PageGoalEntry | HourGoalEntry>>('entry')
 const editing = defineModel<boolean>('editing')
 
+const bookValue = defineModel<ViewBook['id']>('bookValue')
 const searchTerm = ref()
 
 const isNew = computed(() => !entry.value?.id)
@@ -103,10 +115,11 @@ const bookSelectOptions = computed(() =>
 
 const displayedBooks = computed(() => {
   if (searchTerm.value) {
-    return filterElementsBySearchParam(props.books, searchTerm.value, [
-      'title',
-      'authorName',
-    ]).slice(0, 50)
+    return filterElementsBySearchParam(
+      props.books,
+      searchTerm.value.split(' - ').at(-1),
+      ['title', 'authorName'],
+    ).slice(0, 50)
   }
   return props.books.slice(0, 10)
 })
@@ -115,6 +128,10 @@ function onBookSelect(bookId: ViewBook['id']) {
   if (goal.value && entry.value) {
     if (goal.value.type === 'books') {
       ;(entry.value as BookGoalEntry).book = bookId
+      bookValue.value = bookId
+      searchTerm.value = bookSelectOptions.value.find(
+        (option) => option.value === bookId,
+      )?.label
     }
   }
 }
@@ -135,8 +152,7 @@ async function onSubmit() {
       })
 
       props.reloadGoals()
-      editing.value = false
-      entry.value = undefined
+      clearState()
     } catch (error) {
       console.error(error)
     }
@@ -144,7 +160,15 @@ async function onSubmit() {
 }
 
 function onCancel() {
+  clearState()
+}
+
+function clearState() {
   editing.value = false
+  entry.value = undefined
+  bookValue.value = undefined
+  searchTerm.value = undefined
+  reset('entry')
 }
 
 function getEntryValue() {
@@ -174,5 +198,9 @@ function getEntryTitle() {
     }
   }
   return ''
+}
+
+function dateFormatter(date: Date | undefined): string | undefined {
+  return date && toDefaultDate(date)
 }
 </script>

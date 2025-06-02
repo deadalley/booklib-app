@@ -9,6 +9,8 @@
     :can-create-new="context.canCreateNew"
     :not-found-label="context.notFoundLabel"
     :clearable="context.clearable"
+    :align="context.align"
+    :side="context.side"
   />
 </template>
 
@@ -41,5 +43,9 @@ watch(selectValue, (value) => {
 
 watch(searchTerm, (value) => {
   props.context.attrs?.['on-update:search-term']?.(value)
+})
+
+watch(props.context, (v) => {
+  selectValue.value = v.node?._value
 })
 </script>
