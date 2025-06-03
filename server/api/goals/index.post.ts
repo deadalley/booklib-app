@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   const goal = await readBody(event)
 
   const dbGoal: GoalDB = goalToDbGoal(goal)
+  console.dir({ goal: goal.entries, dbGoal: dbGoal.entries }, { depth: null })
 
   const data = await db.createGoal(dbGoal)
 

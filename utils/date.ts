@@ -11,7 +11,17 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(localizedFormat)
 
-const userTimezone = dayjs.tz.guess()
+export function now() {
+  return dayjs().utc().toISOString()
+}
+
+export function getCurrentYear() {
+  return dayjs().utc().year()
+}
+
+export function fromSimpleDate(date: string) {
+  return dayjs(date, 'YYYY-MM-DD').utc(true).toISOString()
+}
 
 export function toISOString(date: ConfigType) {
   return dayjs(date).utc().toISOString()
@@ -57,8 +67,8 @@ export function getElapsedTimePercentage(
   date: ConfigType,
   { start, end }: { start: ConfigType; end: ConfigType },
 ): number {
-  const startDate = dayjs.tz(start, userTimezone)
-  const endDate = dayjs.tz(end, userTimezone)
+  const startDate = dayjs(start).utc()
+  const endDate = dayjs(end).utc()
   const currentDate = dayjs(date).utc()
 
   if (currentDate.isBefore(startDate)) {

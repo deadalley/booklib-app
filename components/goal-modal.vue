@@ -268,15 +268,15 @@ function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
 
   switch (dateRange.value) {
     case 'currentYear':
-      return renameKeys(getDateRange(new Date(), 'year'))
+      return renameKeys(getDateRange(now(), 'year'))
     case 'nextYear':
-      return renameKeys(getDateRange(new Date().getFullYear() + 1, 'year'))
+      return renameKeys(getDateRange(getCurrentYear() + 1, 'year'))
     case 'halfYear':
-      return renameKeys(getSixMonthsRange(new Date()))
+      return renameKeys(getSixMonthsRange(now()))
     case 'month':
-      return renameKeys(getDateRange(new Date(), 'month'))
+      return renameKeys(getDateRange(now(), 'month'))
     case 'week':
-      return renameKeys(getDateRange(new Date(), 'week'))
+      return renameKeys(getDateRange(now(), 'week'))
     case 'custom':
       return {
         startAt: goal.value?.startAt || '',

@@ -319,7 +319,7 @@ function getProgressInterval(): ManipulateType {
 
 function onCreateNew() {
   entry.value = {
-    createdAt: new Date().toISOString(),
+    createdAt: toSimpleDate(now()),
   }
   addingNew.value = true
 }

@@ -88,7 +88,7 @@ const sortedGoals = computed(() =>
 )
 
 function getGoalTimeProgress(goal: Goal): number {
-  return getElapsedTimePercentage(new Date(), {
+  return getElapsedTimePercentage(now(), {
     start: goal.startAt,
     end: goal.finishAt,
   })

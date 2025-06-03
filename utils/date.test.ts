@@ -1,6 +1,15 @@
-import { toISOString, getIntervalUnit } from './date'
+import { fromSimpleDate, toISOString, getIntervalUnit } from './date'
 
 describe('date', () => {
+  describe('fromSimpleDate', () => {
+    it('should convert simple date to ISO string', () => {
+      const date = '2020-10-01'
+      const isoDate = fromSimpleDate(date)
+
+      expect(isoDate).toBe('2020-10-01T00:00:00.000Z')
+    })
+  })
+
   describe('toISOString', () => {
     it('should format date to ISO string', () => {
       const date = '2020-10-01T12:00:00.000Z'
@@ -14,6 +23,13 @@ describe('date', () => {
       const isoString = toISOString(date)
 
       expect(isoString).toBe('2020-10-01T09:00:00.000Z')
+    })
+
+    it('should format date to ISO string when midnight', () => {
+      const date = '2020-10-01T00:00:00Z'
+      const isoString = toISOString(date)
+
+      expect(isoString).toBe('2020-10-01T00:00:00.000Z')
     })
   })
 

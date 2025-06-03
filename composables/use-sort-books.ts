@@ -56,7 +56,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const maxPages = computed(() => Math.max(...pages.value, 300))
 
   const minYear = computed(() => Math.min(...years.value, 0))
-  const maxYear = computed(() => new Date().getFullYear())
+  const maxYear = computed(() => getCurrentYear())
 
   const selectedCollections = ref<string[]>([])
   const selectedAuthor = ref<string | undefined>()

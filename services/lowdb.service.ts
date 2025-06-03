@@ -18,6 +18,7 @@ import {
   GOAL_TYPE,
   GOAL_INTERVAL,
   GOAL_STATUS,
+  now,
 } from '../utils'
 import type { ServerFile } from 'nuxt-file-storage'
 import { difference, indexBy, prop, uniq } from 'ramda'
@@ -155,7 +156,7 @@ export class LowDBClient implements DBClient {
         this.client.data.authors.push({
           id: authorId,
           name: book.author_id,
-          created_at: new Date().toISOString(),
+          created_at: now(),
         })
       }
     }
@@ -500,7 +501,7 @@ export class LowDBClient implements DBClient {
       data.books = []
       data.collections = DEFAULT_COLLECTIONS_INIT.map((c) => ({
         ...c,
-        created_at: new Date().toISOString(),
+        created_at: now(),
       }))
       data['collection-book'] = []
     })
@@ -526,7 +527,7 @@ export class LowDBClient implements DBClient {
         this.client.data.authors.push({
           id: uuidv4(),
           name: authorName,
-          created_at: new Date().toISOString(),
+          created_at: now(),
         })
       }
     })
@@ -537,7 +538,7 @@ export class LowDBClient implements DBClient {
       books.map(({ id, ...book }) => ({
         ...book,
         id: uuidv4(),
-        created_at: new Date().toISOString(),
+        created_at: now(),
         author_id:
           book.author_id && (allAuthorsByName[book.author_id]?.id ?? null),
       })),

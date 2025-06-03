@@ -1,5 +1,9 @@
 import { db } from '~/services/db.service'
-import { collectionToDbCollection, dbCollectionToCollection } from '~/utils'
+import {
+  collectionToDbCollection,
+  dbCollectionToCollection,
+  now,
+} from '~/utils'
 import { v4 as uuidv4 } from 'uuid'
 import type { CollectionDB } from '~/types/database'
 
@@ -9,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const collectionDb: CollectionDB = {
     ...collectionToDbCollection(collection),
     id: collection.id ?? uuidv4(),
-    created_at: new Date().toISOString(),
+    created_at: now(),
   }
 
   const data = await db.createCollection(collectionDb, collection.books)

@@ -1,6 +1,6 @@
 import { Low, Memory } from 'lowdb'
 import type { Database } from '~/types/api'
-import { buildAuthor, DEFAULT_COLLECTIONS_INIT } from '~/utils'
+import { buildAuthor, DEFAULT_COLLECTIONS_INIT, now } from '~/utils'
 import { LowDBClient } from './lowdb.service'
 import type { ServerFile } from 'nuxt-file-storage'
 
@@ -40,7 +40,7 @@ function getDbSeed({
     books: [...books],
     collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
       ...c,
-      created_at: new Date().toISOString(),
+      created_at: now(),
     })).concat(collections),
     'collection-book': [...collectionBooks],
     goals: [],
@@ -468,8 +468,10 @@ describe('lowdb', async () => {
     })
 
     describe('getCollectionCount', async () => {
-      const result = await db.getCollectionCount()
-      expect(result).toBe(3)
+      it('should return total collection count', async () => {
+        const result = await db.getCollectionCount()
+        expect(result).toBe(3)
+      })
     })
 
     describe('createCollection', async () => {
