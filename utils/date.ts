@@ -128,3 +128,11 @@ export function getIntervalUnit({
 
   return 'month'
 }
+
+export function isSameDateInUnit(
+  date1: ConfigType,
+  date2: ConfigType,
+  unit: ManipulateType,
+): boolean {
+  return dayjs(date1).utc().isSame(dayjs(date2).utc(), unit)
+}

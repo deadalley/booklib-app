@@ -228,53 +228,52 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
       case 'books': {
         const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
 
-        const entryDates = sortedEntries.value.map((entry, index) => ({
-          x: toStartOfDay(entry.createdAt),
-          y: index + 1,
-        }))
+        const interval = getProgressInterval()
 
         const dates = getDatesInInterval(
           { start: goal.value.startAt, end: goal.value.finishAt },
-          getProgressInterval(),
-        ).map((date) => {
-          const x = toStartOfDay(date)
-          const y =
-            entryDates.find(({ x }) => x === toStartOfDay(date))?.y ?? -1
-
-          return { x, y }
-        })
-
-        const mappedDates = dates.reduce<
-          [LineChartItem['values'], LineChartItem['values']]
-        >(
-          ([actualDates, projectedDates], { x, y }, index) => {
-            if (isBeforeDay(x, lastEntryDate)) {
-              actualDates.push({
-                y: y === -1 ? (actualDates[index - 1]?.y ?? 0) : y,
-                x,
-              })
-              projectedDates.push({ x, y: undefined })
-            } else if (isSameDay(x, lastEntryDate)) {
-              actualDates.push({ x, y })
-              projectedDates.push({ x, y })
-            } else {
-              projectedDates.push({
-                y:
-                  y === -1
-                    ? (projectedDates[index - 1]?.y ??
-                      actualDates[index - 1]?.y ??
-                      0)
-                    : y,
-                x,
-              })
-            }
-
-            return [actualDates, projectedDates]
-          },
-          [[], []],
+          interval,
         )
+          .map((date) => {
+            const entriesForDate = sortedEntries.value.filter((entry) =>
+              isSameDateInUnit(entry.createdAt, date, interval),
+            )
+            const x = toStartOfDay(date)
+            const y = entriesForDate.length || 0
 
-        return mappedDates
+            return { x, y }
+          })
+          .reduce<[LineChartItem['values'], LineChartItem['values']]>(
+            ([actualDates, projectedDates], { x, y }, index) => {
+              const accumulatedY = (actualDates[index - 1]?.y ?? 0) + y
+
+              if (isSameDateInUnit(x, lastEntryDate, interval)) {
+                actualDates.push({ x, y: accumulatedY })
+                projectedDates.push({ x, y: accumulatedY })
+              } else if (isBeforeDay(x, lastEntryDate)) {
+                actualDates.push({
+                  y: accumulatedY,
+                  x,
+                })
+                projectedDates.push({ x, y: undefined })
+              } else {
+                projectedDates.push({
+                  y:
+                    y === 0
+                      ? (projectedDates[index - 1]?.y ??
+                        actualDates[index - 1]?.y ??
+                        0)
+                      : y,
+                  x,
+                })
+              }
+
+              return [actualDates, projectedDates]
+            },
+            [[], []],
+          )
+
+        return dates
       }
       case 'pages':
       case 'hours':
