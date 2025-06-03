@@ -54,9 +54,11 @@
             </bl-button>
           </template>
           <template #title>
-            Are you sure you want to delete
-            <strong>{{ goal.title }}</strong>
-            ?
+            <div>
+              Are you sure you want to delete
+              <strong>{{ goal.title }}</strong>
+              ?
+            </div>
           </template>
           This action cannot be undone.
           <template #cancel-label> Cancel </template>
