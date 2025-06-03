@@ -1,7 +1,7 @@
 import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
-import {} from './date'
+import { toISOString } from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
@@ -152,7 +152,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         book_id: entry.book,
-        created_at: entry.createdAt ?? new Date().toISOString(),
+        created_at: entry.createdAt ?? toISOString(new Date()),
       })),
     }
   } else if (goal.type === 'pages') {
@@ -161,7 +161,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         pages: entry.pages,
-        created_at: entry.createdAt ?? new Date().toISOString(),
+        created_at: entry.createdAt ?? toISOString(new Date()),
       })),
     }
   } else if (goal.type === 'hours') {
@@ -170,7 +170,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         hours: entry.hours,
-        created_at: entry.createdAt ?? new Date().toISOString(),
+        created_at: entry.createdAt ?? toISOString(new Date()),
       })),
     }
   }
@@ -178,9 +178,10 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
   throw new Error(`Unknown goal type: ${goal.type}`)
 }
 
-export function goalToDbGoal(goal: Goal): Omit<GoalDB, 'created_at' | 'id'> {
+export function goalToDbGoal(goal: Goal): GoalDB {
   return {
-    ...(goal.id ? { id: goal.id } : {}),
+    id: goal.id ?? uuidv4(),
+    created_at: goal.createdAt || toISOString(new Date()),
     title: goal.title,
     interval: goal.interval,
     amount: goal.amount,

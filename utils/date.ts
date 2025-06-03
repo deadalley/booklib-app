@@ -12,7 +12,10 @@ dayjs.extend(timezone)
 dayjs.extend(localizedFormat)
 
 const userTimezone = dayjs.tz.guess()
-console.log(userTimezone)
+
+export function toISOString(date: ConfigType) {
+  return dayjs.tz(date, userTimezone).toISOString()
+}
 
 export function toSimpleDate(date: ConfigType) {
   return dayjs.tz(date, userTimezone).format('YYYY-MM-DD')
