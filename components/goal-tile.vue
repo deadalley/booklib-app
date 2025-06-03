@@ -25,26 +25,6 @@
     </template>
     <template #actions>
       <div class="flex items-center justify-between gap-2">
-        <bl-button
-          v-if="goal.status === 'tracking' || goal.status === 'not-tracking'"
-          variant="tertiary"
-          @click="onTrack"
-        >
-          <template #prependIcon="iconProps">
-            <IconPlayerPause
-              v-if="goal.status === 'tracking'"
-              v-bind="iconProps"
-              :size="ICON_SIZE_SMALL - 4"
-            />
-            <IconPlayerPlay
-              v-if="goal.status === 'not-tracking'"
-              v-bind="iconProps"
-              :size="ICON_SIZE_SMALL - 4"
-              class="!text-main"
-            />
-          </template>
-          {{ goal.status === 'tracking' ? 'Pause' : 'Track' }}
-        </bl-button>
         <bl-modal size="sm" @confirm="deleteGoal">
           <template #trigger="triggerProps">
             <bl-button variant="tertiary" v-bind="triggerProps">
@@ -80,6 +60,25 @@
             </bl-button>
           </template>
         </bl-goal-modal>
+        <bl-button
+          v-if="goal.status === 'tracking' || goal.status === 'not-tracking'"
+          :variant="goal.status === 'not-tracking' ? 'primary' : 'secondary'"
+          @click="onTrack"
+        >
+          <template #prependIcon="iconProps">
+            <IconPlayerPause
+              v-if="goal.status === 'tracking'"
+              v-bind="iconProps"
+              :size="ICON_SIZE_SMALL - 4"
+            />
+            <IconPlayerPlay
+              v-if="goal.status === 'not-tracking'"
+              v-bind="iconProps"
+              :size="ICON_SIZE_SMALL - 4"
+            />
+          </template>
+          {{ goal.status === 'tracking' ? 'Pause' : 'Track' }}
+        </bl-button>
       </div>
     </template>
     <div class="mt-8 flex flex-col gap-2">
