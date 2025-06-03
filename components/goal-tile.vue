@@ -24,22 +24,41 @@
       </div>
     </template>
     <template #actions>
-      <bl-goal-modal
-        v-if="authors && books"
-        v-model="goal"
-        is-new
-        :authors="authors"
-        :books="books"
-        :reload-goals="reloadGoals"
-      >
-        <template #trigger="triggerProps">
-          <bl-button v-bind="triggerProps">
-            <template #prependIcon="iconProps">
-              <IconPencil v-bind="iconProps" />
-            </template>
-          </bl-button>
-        </template>
-      </bl-goal-modal>
+      <div class="flex items-center justify-between gap-2">
+        <bl-modal size="sm" @confirm="deleteGoal">
+          <template #trigger="triggerProps">
+            <bl-button variant="tertiary" v-bind="triggerProps">
+              <template #prependIcon="iconProps">
+                <IconTrash v-bind="iconProps" />
+              </template>
+            </bl-button>
+          </template>
+          <template #title>
+            Are you sure you want to delete
+            <strong>{{ goal.title }}</strong>
+            ?
+          </template>
+          This action cannot be undone.
+          <template #cancel-label> Cancel </template>
+          <template #action-label> Delete </template>
+        </bl-modal>
+        <bl-goal-modal
+          v-if="authors && books"
+          v-model="goal"
+          is-new
+          :authors="authors"
+          :books="books"
+          :reload-goals="reloadGoals"
+        >
+          <template #trigger="triggerProps">
+            <bl-button v-bind="triggerProps">
+              <template #prependIcon="iconProps">
+                <IconPencil v-bind="iconProps" />
+              </template>
+            </bl-button>
+          </template>
+        </bl-goal-modal>
+      </div>
     </template>
     <div class="mt-8 flex flex-col gap-2">
       <bl-progress-bar
@@ -127,7 +146,13 @@
 </template>
 
 <script setup lang="ts">
-import { icons, IconConfetti, IconPlus, IconPencil } from '@tabler/icons-vue'
+import {
+  icons,
+  IconConfetti,
+  IconPlus,
+  IconPencil,
+  IconTrash,
+} from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 import type {
   BookGoalEntry,
@@ -138,7 +163,7 @@ import type {
 import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
 
-defineProps<{
+const props = defineProps<{
   defaultOpen?: boolean
   authors: Author[]
   books: ViewBook[]
@@ -260,5 +285,14 @@ function onCreateNew() {
     createdAt: toSimpleDate(new Date().toISOString()),
   }
   addingNew.value = true
+}
+
+async function deleteGoal() {
+  if (goal.value) {
+    await $fetch(`/api/goals/${goal.value.id}`, {
+      method: 'delete',
+    })
+  }
+  props.reloadGoals()
 }
 </script>

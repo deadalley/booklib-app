@@ -476,8 +476,16 @@ export class LowDBClient implements DBClient {
     return goal
   }
 
-  async deleteGoal() {
-    return null
+  async deleteGoal(id: GoalDB['id']) {
+    await this.client.read()
+
+    this.client.data.goals = this.client.data.goals.filter(
+      (goal) => goal.id !== id,
+    )
+
+    await this.client.write()
+
+    return id
   }
 
   async isLibraryEmpty() {
