@@ -1,7 +1,7 @@
 import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
-import { toISOString, fromSimpleDate } from './date'
+import { toISOString, fromSimpleDate, now } from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
