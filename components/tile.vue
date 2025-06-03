@@ -16,8 +16,10 @@
         <AccordionTrigger
           class="accordion-trigger flex flex-1 items-center justify-between gap-3"
         >
-          <h5 v-if="$slots['title']"><slot name="title" /></h5>
-          <slot name="actions" />
+          <div class="flex flex-1 items-center justify-between">
+            <h5 v-if="$slots['title']"><slot name="title" /></h5>
+            <slot name="actions" />
+          </div>
           <IconChevronDown
             v-if="$slots['collapsible']"
             class="accordion-chevron text-accent-darker transition-transform duration-300 ease-in"

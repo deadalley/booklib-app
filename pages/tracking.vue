@@ -49,6 +49,7 @@
           class="col-span-12"
           :default-open="index === 0"
           :books="viewBooks ?? []"
+          :authors="authors ?? []"
           :reload-goals="refresh"
         />
       </template>

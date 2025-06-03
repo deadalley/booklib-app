@@ -23,6 +23,24 @@
         </span>
       </div>
     </template>
+    <template #actions>
+      <bl-goal-modal
+        v-if="authors && books"
+        v-model="goal"
+        is-new
+        :authors="authors"
+        :books="books"
+        :reload-goals="reloadGoals"
+      >
+        <template #trigger="triggerProps">
+          <bl-button v-bind="triggerProps">
+            <template #prependIcon="iconProps">
+              <IconPencil v-bind="iconProps" />
+            </template>
+          </bl-button>
+        </template>
+      </bl-goal-modal>
+    </template>
     <div class="mt-8 flex flex-col gap-2">
       <bl-progress-bar
         v-model:progress-value="goal.progress"
@@ -109,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { icons, IconConfetti, IconPlus } from '@tabler/icons-vue'
+import { icons, IconConfetti, IconPlus, IconPencil } from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 import type {
   BookGoalEntry,
@@ -118,9 +136,11 @@ import type {
   ViewGoal,
 } from '~/types/goal'
 import type { LineChartItem } from './line-chart.client.vue'
+import type { Author } from '~/types/author'
 
 defineProps<{
   defaultOpen?: boolean
+  authors: Author[]
   books: ViewBook[]
   reloadGoals: () => Promise<void>
 }>()
