@@ -14,23 +14,23 @@ dayjs.extend(localizedFormat)
 const userTimezone = dayjs.tz.guess()
 
 export function toISOString(date: ConfigType) {
-  return dayjs.tz(date, userTimezone).toISOString()
+  return dayjs(date).utc().toISOString()
 }
 
 export function toSimpleDate(date: ConfigType) {
-  return dayjs.tz(date, userTimezone).format('YYYY-MM-DD')
+  return dayjs(date).utc().format('YYYY-MM-DD')
 }
 
 export function toDefaultDate(date: ConfigType) {
-  return dayjs.tz(date, userTimezone).format('L')
+  return dayjs(date).utc().format('L')
 }
 
 export function toFullDate(date: ConfigType) {
-  return dayjs.tz(date, userTimezone).format('LL')
+  return dayjs(date).utc().format('LL')
 }
 
 export function toFullDateCompact(date: ConfigType) {
-  return dayjs.tz(date, userTimezone).format('ll')
+  return dayjs(date).utc().format('ll')
 }
 
 export function getDateRange(
@@ -38,8 +38,8 @@ export function getDateRange(
   range: OpUnitType,
 ): { start: string; end: string } {
   return {
-    start: dayjs.tz(date, userTimezone).startOf(range).toISOString(),
-    end: dayjs.tz(date, userTimezone).endOf(range).toISOString(),
+    start: dayjs(date).utc().startOf(range).toISOString(),
+    end: dayjs(date).utc().endOf(range).toISOString(),
   }
 }
 
@@ -48,8 +48,8 @@ export function getSixMonthsRange(date: ConfigType): {
   end: string
 } {
   return {
-    start: dayjs.tz(date, userTimezone).toISOString(),
-    end: dayjs.tz(date, userTimezone).add(6, 'month').toISOString(),
+    start: dayjs(date).utc().toISOString(),
+    end: dayjs(date).utc().add(6, 'month').toISOString(),
   }
 }
 
@@ -59,7 +59,7 @@ export function getElapsedTimePercentage(
 ): number {
   const startDate = dayjs.tz(start, userTimezone)
   const endDate = dayjs.tz(end, userTimezone)
-  const currentDate = dayjs.tz(date, userTimezone)
+  const currentDate = dayjs(date).utc()
 
   if (currentDate.isBefore(startDate)) {
     return 0
@@ -71,7 +71,7 @@ export function getElapsedTimePercentage(
   const totalDuration = endDate.diff(startDate)
   const elapsedDuration = currentDate.diff(startDate)
 
-  return (elapsedDuration / totalDuration) * 100
+  return Math.round((elapsedDuration / totalDuration) * 100)
 }
 
 export function getDatesInInterval(
@@ -79,8 +79,8 @@ export function getDatesInInterval(
   unit: ManipulateType,
 ): string[] {
   const dates: string[] = []
-  let current = dayjs.tz(interval.start, userTimezone).startOf(unit)
-  const end = dayjs.tz(interval.end, userTimezone)
+  let current = dayjs(interval.start).utc().startOf(unit)
+  const end = dayjs(interval.end).utc()
 
   while (current.isBefore(end) || current.isSame(end, unit)) {
     dates.push(current.toISOString())
@@ -91,19 +91,15 @@ export function getDatesInInterval(
 }
 
 export function isSameDay(date1: ConfigType, date2: ConfigType): boolean {
-  return dayjs
-    .tz(date1, userTimezone)
-    .isSame(dayjs.tz(date2, userTimezone), 'day')
+  return dayjs(date1).utc().isSame(dayjs(date2).utc(), 'day')
 }
 
 export function isBeforeDay(date1: ConfigType, date2: ConfigType): boolean {
-  return dayjs
-    .tz(date1, userTimezone)
-    .isBefore(dayjs.tz(date2, userTimezone), 'day')
+  return dayjs(date1).utc().isBefore(dayjs(date2).utc(), 'day')
 }
 
 export function toStartOfDay(date: ConfigType): string {
-  return dayjs.tz(date, userTimezone).utc().startOf('day').toISOString()
+  return dayjs(date).utc().startOf('day').toISOString()
 }
 
 export function getIntervalUnit({
@@ -113,14 +109,12 @@ export function getIntervalUnit({
   start: ConfigType
   end: ConfigType
 }): ManipulateType {
-  const startDate = dayjs.tz(start, userTimezone)
-  const endDate = dayjs.tz(end, userTimezone)
+  const startDate = dayjs(start).utc()
+  const endDate = dayjs(end).utc()
 
-  if (startDate.isSame(endDate, 'year')) {
-    return 'month'
-  }
   if (startDate.isSame(endDate, 'month')) {
     return 'day'
   }
-  return 'year'
+
+  return 'month'
 }
