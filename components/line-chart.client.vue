@@ -62,7 +62,7 @@ const option = computed<EChartsOption>(() => ({
     top: 10,
     bottom: 10,
     left: 14,
-    right: 14,
+    right: 54,
     containLabel: true,
   },
   tooltip: {

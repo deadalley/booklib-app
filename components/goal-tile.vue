@@ -185,6 +185,7 @@ import type {
 } from '~/types/goal'
 import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
+import type { ManipulateType } from 'dayjs'
 
 const props = defineProps<{
   defaultOpen?: boolean
@@ -234,7 +235,7 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
 
         const dates = getDatesInInterval(
           { start: goal.value.startAt, end: goal.value.finishAt },
-          'day',
+          getProgressInterval(),
         ).map((date) => {
           const x = toStartOfDay(date)
           const y =
@@ -301,6 +302,19 @@ function getProgressColor(
   }
 
   return undefined
+}
+
+function getProgressInterval(): ManipulateType {
+  if (goal.value) {
+    if (goal.value.interval === 'total') {
+      return getIntervalUnit({
+        start: goal.value.startAt,
+        end: goal.value.finishAt,
+      })
+    }
+  }
+
+  return 'month'
 }
 
 function onCreateNew() {

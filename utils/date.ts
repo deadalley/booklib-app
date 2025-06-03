@@ -102,3 +102,22 @@ export function isBeforeDay(date1: ConfigType, date2: ConfigType): boolean {
 export function toStartOfDay(date: ConfigType): string {
   return dayjs.tz(date, userTimezone).utc().startOf('day').toISOString()
 }
+
+export function getIntervalUnit({
+  start,
+  end,
+}: {
+  start: ConfigType
+  end: ConfigType
+}): ManipulateType {
+  const startDate = dayjs.tz(start, userTimezone)
+  const endDate = dayjs.tz(end, userTimezone)
+
+  if (startDate.isSame(endDate, 'year')) {
+    return 'month'
+  }
+  if (startDate.isSame(endDate, 'month')) {
+    return 'day'
+  }
+  return 'year'
+}
