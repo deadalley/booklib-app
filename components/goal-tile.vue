@@ -35,9 +35,17 @@
       </div>
     </div>
     <template #collapsible>
-      <bl-tabs default-value="progress" class="mt-4" full>
+      <bl-tabs
+        :default-value="sortedEntries.length ? 'progress' : 'entries'"
+        class="mt-4"
+        full
+      >
         <template #options="options">
-          <bl-tab-option v-bind="options" value="progress">
+          <bl-tab-option
+            v-if="sortedEntries.length"
+            v-bind="options"
+            value="progress"
+          >
             Progress
           </bl-tab-option>
           <bl-tab-option v-bind="options" value="tracked">
@@ -45,32 +53,19 @@
           </bl-tab-option>
         </template>
 
-        <bl-tab value="progress">
+        <bl-tab v-if="sortedEntries.length" value="progress">
           <template v-if="goal.interval === 'total'">
             <bl-line-chart
               :height="200"
-              :items="[
-                {
-                  label: 'achieved',
-                  color: tailwind.theme.colors.main,
-                  values: [
-                    { x: toFullDateCompact('2020-01-01'), y: 0 },
-                    { x: toFullDateCompact('2020-02-01'), y: 11 },
-                    { x: toFullDateCompact('2020-03-01'), y: 16 },
-                    { x: toFullDateCompact('2020-04-01'), y: 18 },
-                    { x: toFullDateCompact('2020-05-01'), y: 41 },
-                    { x: toFullDateCompact('2020-06-01'), y: 41 },
-                    { x: toFullDateCompact('2020-07-01'), y: 41 },
-                  ],
-                },
-              ]"
+              :items="chartItems"
+              :x-axis-label-formatter="toFullDateCompact"
             />
           </template>
         </bl-tab>
         <bl-tab value="tracked">
           <div class="mt-2 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
             <bl-empty
-              v-if="goal.entries.length === 0 && !addingNew"
+              v-if="sortedEntries.length === 0 && !addingNew"
               icon="IconNotebook"
               class="py-4"
             >
@@ -80,10 +75,10 @@
               </template>
             </bl-empty>
             <bl-goal-entry
-              v-for="(_entry, index) in goal.entries"
+              v-for="(_entry, index) in sortedEntries"
               :key="_entry.id"
               v-model:goal="goal"
-              v-model:entry="goal.entries[index]"
+              v-model:entry="sortedEntries[index]"
               :books="books"
               :reload-goals="reloadGoals"
             />
@@ -96,7 +91,7 @@
               :reload-goals="reloadGoals"
             />
             <bl-button
-              v-if="goal.entries.length && !addingNew"
+              v-if="sortedEntries.length && !addingNew"
               class="w-full"
               variant="tertiary"
               @click="onCreateNew"
@@ -122,6 +117,7 @@ import type {
   PageGoalEntry,
   ViewGoal,
 } from '~/types/goal'
+import type { LineChartItem } from './line-chart.client.vue'
 
 defineProps<{
   defaultOpen?: boolean
@@ -134,6 +130,90 @@ const entry = ref<
   Partial<BookGoalEntry | PageGoalEntry | HourGoalEntry> | undefined
 >()
 const addingNew = ref<boolean>(false)
+
+const sortedEntries = computed(() => {
+  return (goal.value?.entries ?? []).concat().sort((a, b) => {
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  })
+})
+
+const chartItems = computed<LineChartItem[]>(() => {
+  const [actualDates, projectedDates] = getChartDates()
+  return [
+    {
+      label: 'actual',
+      color: tailwind.theme.colors.main,
+      values: actualDates,
+    },
+    {
+      label: 'projected',
+      color: tailwind.theme.colors.accent,
+      values: projectedDates,
+    },
+  ]
+})
+
+function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
+  if (goal.value) {
+    switch (goal.value.type) {
+      case 'books': {
+        const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
+
+        const entryDates = sortedEntries.value.map((entry, index) => ({
+          x: toStartOfDay(entry.createdAt),
+          y: index + 1,
+        }))
+
+        const dates = getDatesInInterval(
+          { start: goal.value.startAt, end: goal.value.finishAt },
+          'day',
+        ).map((date) => {
+          const x = toStartOfDay(date)
+          const y =
+            entryDates.find(({ x }) => x === toStartOfDay(date))?.y ?? -1
+
+          return { x, y }
+        })
+
+        const mappedDates = dates.reduce<
+          [LineChartItem['values'], LineChartItem['values']]
+        >(
+          ([actualDates, projectedDates], { x, y }, index) => {
+            if (isBeforeDay(x, lastEntryDate)) {
+              actualDates.push({
+                y: y === -1 ? (actualDates[index - 1]?.y ?? 0) : y,
+                x,
+              })
+              projectedDates.push({ x, y: undefined })
+            } else if (isSameDay(x, lastEntryDate)) {
+              actualDates.push({ x, y })
+              projectedDates.push({ x, y })
+            } else {
+              projectedDates.push({
+                y:
+                  y === -1
+                    ? (projectedDates[index - 1]?.y ??
+                      actualDates[index - 1]?.y ??
+                      0)
+                    : y,
+                x,
+              })
+            }
+
+            return [actualDates, projectedDates]
+          },
+          [[], []],
+        )
+
+        return mappedDates
+      }
+      case 'pages':
+      case 'hours':
+        return [[], []]
+    }
+  }
+  return [[], []]
+}
 
 function getProgressColor(
   status: string,

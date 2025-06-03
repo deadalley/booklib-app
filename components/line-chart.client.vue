@@ -25,7 +25,7 @@ export type LineChartItem = {
   label: string
   description?: string
   color?: string
-  values: { x: string; y: number }[]
+  values: { x: string; y?: number }[]
 }
 
 type EChartsOption = ComposeOption<
@@ -52,6 +52,7 @@ const props = withDefaults(
     height?: number
     unit?: string
     xAxisRange?: string[]
+    xAxisLabelFormatter?: (value: string) => string
   }>(),
   { height: 340 },
 )
@@ -91,6 +92,7 @@ const option = computed<EChartsOption>(() => ({
       fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
       fontSize: 14,
       color: tailwind.theme.colors['accent-darker'],
+      formatter: props.xAxisLabelFormatter,
     },
     axisLine: {
       lineStyle: {

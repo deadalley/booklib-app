@@ -1,7 +1,7 @@
 import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
-import { toSimpleDate } from './date'
+import {} from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
@@ -40,8 +40,8 @@ export function dbBookToBook(
     genres: dbBook.genres ?? [],
     progressStatus: dbBook.progress_status,
     format: dbBook.format,
-    startedAt: dbBook.started_at ? toSimpleDate(dbBook.started_at) : null,
-    finishedAt: dbBook.finished_at ? toSimpleDate(dbBook.finished_at) : null,
+    startedAt: dbBook.started_at ? dbBook.started_at : null,
+    finishedAt: dbBook.finished_at ? dbBook.finished_at : null,
     collections,
     author: dbBook.author_id,
   }
@@ -135,8 +135,8 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     interval: dbGoal.interval,
     amount: dbGoal.amount,
     createdAt: dbGoal.created_at,
-    startAt: toSimpleDate(dbGoal.start_at),
-    finishAt: toSimpleDate(dbGoal.finish_at),
+    startAt: dbGoal.start_at,
+    finishAt: dbGoal.finish_at,
     status: dbGoal.status,
     author: dbGoal.author_id,
     genres: dbGoal.genres,
