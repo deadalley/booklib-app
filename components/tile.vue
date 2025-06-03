@@ -11,18 +11,18 @@
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
-        class="flex w-full"
+        class="accordion-trigger flex w-full flex-1 items-center justify-between gap-3"
       >
-        <AccordionTrigger
-          class="accordion-trigger flex flex-1 items-center justify-between gap-3"
-        >
-          <div class="flex flex-1 items-center justify-between">
+        <div class="flex flex-1 items-center justify-between">
+          <AccordionTrigger class="flex-1 cursor-pointer">
             <h5 v-if="$slots['title']"><slot name="title" /></h5>
-            <slot name="actions" />
-          </div>
+          </AccordionTrigger>
+          <slot name="actions" />
+        </div>
+        <AccordionTrigger>
           <IconChevronDown
             v-if="$slots['collapsible']"
-            class="accordion-chevron text-accent-darker transition-transform duration-300 ease-in"
+            class="accordion-chevron cursor-pointer text-accent-darker transition-transform duration-300 ease-in"
             :size="ICON_SIZE_SMALL"
           />
         </AccordionTrigger>
