@@ -107,7 +107,6 @@ const option = computed<EChartsOption>(() => ({
     },
   },
   yAxis: {
-    show: false,
     axisLabel: {
       fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
       fontSize: 14,
@@ -118,11 +117,10 @@ const option = computed<EChartsOption>(() => ({
         color: tailwind.theme.colors['accent'],
       },
     },
-    axisTick: {
-      show: false,
-    },
     splitLine: {
-      show: false,
+      lineStyle: {
+        color: tailwind.theme.colors['accent'],
+      },
     },
   },
   series: props.items.map((item) => ({

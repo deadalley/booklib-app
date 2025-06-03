@@ -113,15 +113,17 @@
 
         <bl-tab v-if="sortedEntries.length" value="progress">
           <template v-if="goal.interval === 'total'">
-            <bl-line-chart
-              :height="200"
-              :items="chartItems"
-              :x-axis-label-formatter="toFullDateCompact"
-            />
+            <div class="mt-5">
+              <bl-line-chart
+                :height="200"
+                :items="chartItems"
+                :x-axis-label-formatter="toFullDateCompact"
+              />
+            </div>
           </template>
         </bl-tab>
         <bl-tab value="tracked">
-          <div class="mt-2 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
+          <div class="mt-5 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
             <bl-empty
               v-if="sortedEntries.length === 0 && !addingNew"
               icon="IconNotebook"
