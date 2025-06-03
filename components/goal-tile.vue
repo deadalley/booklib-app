@@ -25,6 +25,26 @@
     </template>
     <template #actions>
       <div class="flex items-center justify-between gap-2">
+        <bl-button
+          v-if="goal.status === 'tracking' || goal.status === 'not-tracking'"
+          variant="tertiary"
+          @click="onTrack"
+        >
+          <template #prependIcon="iconProps">
+            <IconPlayerPause
+              v-if="goal.status === 'tracking'"
+              v-bind="iconProps"
+              :size="ICON_SIZE_SMALL - 4"
+            />
+            <IconPlayerPlay
+              v-if="goal.status === 'not-tracking'"
+              v-bind="iconProps"
+              :size="ICON_SIZE_SMALL - 4"
+              class="!text-main"
+            />
+          </template>
+          {{ goal.status === 'tracking' ? 'Pause' : 'Track' }}
+        </bl-button>
         <bl-modal size="sm" @confirm="deleteGoal">
           <template #trigger="triggerProps">
             <bl-button variant="tertiary" v-bind="triggerProps">
@@ -152,6 +172,8 @@ import {
   IconPlus,
   IconPencil,
   IconTrash,
+  IconPlayerPause,
+  IconPlayerPlay,
 } from '@tabler/icons-vue'
 import type { ViewBook } from '~/types/book'
 import type {
@@ -294,5 +316,19 @@ async function deleteGoal() {
     })
   }
   props.reloadGoals()
+}
+
+async function onTrack() {
+  if (goal.value) {
+    const updatedGoal = await $fetch('/api/goals', {
+      method: 'POST',
+      body: {
+        ...goal.value,
+        status: goal.value.status === 'tracking' ? 'not-tracking' : 'tracking',
+      } as ViewGoal,
+    })
+
+    goal.value = { ...goal.value, ...updatedGoal }
+  }
 }
 </script>
