@@ -52,6 +52,7 @@ describe('lowdb', async () => {
   const books = [
     buildBook({
       id: 'Book1',
+      title: 'Book1',
       pages: 200,
       year: null,
       author_id: null,
@@ -59,6 +60,7 @@ describe('lowdb', async () => {
     }),
     buildBook({
       id: 'Book2',
+      title: 'Book2',
       pages: 800,
       year: 2020,
       author_id: null,
@@ -67,6 +69,7 @@ describe('lowdb', async () => {
     }),
     buildBook({
       id: 'Book3',
+      title: 'Book3',
       pages: null,
       year: 1976,
       author_id: authors[1].id,
@@ -74,13 +77,16 @@ describe('lowdb', async () => {
     }),
     buildBook({
       id: 'Book4',
+      title: 'Book4',
       pages: 80,
       year: 2025,
       author_id: authors[1].id,
       created_at: '2020-01-02T00:00:00Z',
     }),
   ]
-  const collections = [buildCollection({ id: 'Collection1' })]
+  const collections = [
+    buildCollection({ id: 'Collection1', name: 'Collection1' }),
+  ]
   const collectionBooks = [
     { collection_id: 'wishlist', book_id: books[0].id, order: 0 },
     { collection_id: 'favorite', book_id: books[0].id, order: 0 },
@@ -98,6 +104,11 @@ describe('lowdb', async () => {
   beforeEach(async () => {
     client.data = getDbSeed({ authors, books, collections, collectionBooks })
     await client.write()
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('authors', async () => {
@@ -397,7 +408,7 @@ describe('lowdb', async () => {
 
       it('should return undefined if book cover does not exist', async () => {
         const result = await db.getBookCover('non-existent-id')
-        expect(result).toBeUndefined()
+        expect(result).toBeNull()
       })
     })
 
@@ -586,7 +597,7 @@ describe('lowdb', async () => {
         await db.resetLibrary()
         expect(client.data.authors).toHaveLength(0)
         expect(client.data.books).toHaveLength(0)
-        expect(client.data.collections).toHaveLength(0)
+        expect(client.data.collections).toHaveLength(2)
         expect(client.data['collection-book']).toHaveLength(0)
       })
     })
@@ -610,6 +621,7 @@ describe('lowdb', async () => {
           authors: [],
           books: [],
           collections: [],
+          goals: [],
         })
       })
 
@@ -617,7 +629,11 @@ describe('lowdb', async () => {
         client.data = getDbSeed({
           authors,
           books: books.concat([
-            buildBook({ id: 'Book5', author_id: 'non-existent' }),
+            buildBook({
+              id: 'Book5',
+              title: 'Book5',
+              author_id: 'non-existent',
+            }),
           ]),
           collections,
           collectionBooks: [
@@ -640,6 +656,7 @@ describe('lowdb', async () => {
           collections: [
             'Collection Collection1 contains book non-existent, which does not exist',
           ],
+          goals: [],
         })
       })
     })
