@@ -120,10 +120,10 @@
                 v-model="dateRange"
                 align="end"
                 side="top"
-                :options="dataRangeOptions"
+                :options="dateRangeOptions"
               />
             </div>
-            <div v-if="dateRange === 'custom'" class="form-row">
+            <div v-if="dateRange === 'custom' || !isNew" class="form-row">
               <bl-input
                 id="startAt"
                 type="date"
@@ -178,8 +178,14 @@ const goal = defineModel<Goal | undefined>()
 const open = ref<boolean>(false)
 const trackingGoal = ref<boolean>(false)
 const dateRange = ref<
-  'currentYear' | 'nextYear' | 'month' | 'week' | 'halfYear' | 'custom'
->('currentYear')
+  | 'currentYear'
+  | 'nextYear'
+  | 'month'
+  | 'week'
+  | 'halfYear'
+  | 'custom'
+  | undefined
+>(undefined)
 
 const authorSelectOptions = computed(() =>
   props.authors
@@ -204,7 +210,7 @@ const genreSelectOptions = computed(() => {
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2))
 })
 
-const dataRangeOptions: SelectOption[] = [
+const dateRangeOptions: SelectOption[] = [
   { label: 'This year', value: 'currentYear' },
   { label: 'Next year', value: 'nextYear' },
   { label: 'The next six months', value: 'halfYear' },

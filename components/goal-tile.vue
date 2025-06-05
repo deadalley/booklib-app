@@ -47,7 +47,6 @@
         <bl-goal-modal
           v-if="authors && books"
           v-model="goal"
-          is-new
           :authors="authors"
           :books="books"
           :reload-goals="reloadGoals"
