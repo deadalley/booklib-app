@@ -117,6 +117,7 @@
                 :height="200"
                 :items="chartItems"
                 :x-axis-label-formatter="toFullDateCompact"
+                :tooltip-formatter="tooltipFormatter"
               />
             </div>
           </template>
@@ -187,6 +188,7 @@ import type {
 import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
 import type { ManipulateType } from 'dayjs'
+import { indexBy } from 'ramda'
 
 const props = defineProps<{
   defaultOpen?: boolean
@@ -201,10 +203,40 @@ const entry = ref<
 >()
 const addingNew = ref<boolean>(false)
 
+const booksById = computed(() =>
+  props.books ? indexBy(({ id }) => String(id), props.books) : {},
+)
+
 const sortedEntries = computed(() => {
   return (goal.value?.entries ?? []).concat().sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   })
+})
+
+const interval = computed<ManipulateType>(() => {
+  if (goal.value) {
+    return getProgressInterval()
+  }
+  return 'month'
+})
+
+const dates = computed(() => {
+  if (goal.value && interval.value) {
+    return getDatesInInterval(
+      { start: goal.value.startAt, end: goal.value.finishAt },
+      interval.value,
+    ).map((date) => {
+      const entriesForDate = sortedEntries.value.filter((entry) =>
+        isSameDateInUnit(entry.createdAt, date, interval.value),
+      )
+      const x = toStartOfDay(date)
+      const y = entriesForDate.length || 0
+
+      return { x, y, entries: entriesForDate }
+    })
+  }
+
+  return []
 })
 
 const chartItems = computed<LineChartItem[]>(() => {
@@ -229,52 +261,37 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
       case 'books': {
         const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
 
-        const interval = getProgressInterval()
+        return dates.value.reduce<
+          [LineChartItem['values'], LineChartItem['values']]
+        >(
+          ([actualDates, projectedDates], { x, y }, index) => {
+            const accumulatedY = (actualDates[index - 1]?.y ?? 0) + y
 
-        const dates = getDatesInInterval(
-          { start: goal.value.startAt, end: goal.value.finishAt },
-          interval,
+            if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
+              actualDates.push({ x, y: accumulatedY })
+              projectedDates.push({ x, y: accumulatedY })
+            } else if (isBeforeDay(x, lastEntryDate)) {
+              actualDates.push({
+                y: accumulatedY,
+                x,
+              })
+              projectedDates.push({ x, y: undefined })
+            } else {
+              projectedDates.push({
+                y:
+                  y === 0
+                    ? (projectedDates[index - 1]?.y ??
+                      actualDates[index - 1]?.y ??
+                      0)
+                    : y,
+                x,
+              })
+            }
+
+            return [actualDates, projectedDates]
+          },
+          [[], []],
         )
-          .map((date) => {
-            const entriesForDate = sortedEntries.value.filter((entry) =>
-              isSameDateInUnit(entry.createdAt, date, interval),
-            )
-            const x = toStartOfDay(date)
-            const y = entriesForDate.length || 0
-
-            return { x, y }
-          })
-          .reduce<[LineChartItem['values'], LineChartItem['values']]>(
-            ([actualDates, projectedDates], { x, y }, index) => {
-              const accumulatedY = (actualDates[index - 1]?.y ?? 0) + y
-
-              if (isSameDateInUnit(x, lastEntryDate, interval)) {
-                actualDates.push({ x, y: accumulatedY })
-                projectedDates.push({ x, y: accumulatedY })
-              } else if (isBeforeDay(x, lastEntryDate)) {
-                actualDates.push({
-                  y: accumulatedY,
-                  x,
-                })
-                projectedDates.push({ x, y: undefined })
-              } else {
-                projectedDates.push({
-                  y:
-                    y === 0
-                      ? (projectedDates[index - 1]?.y ??
-                        actualDates[index - 1]?.y ??
-                        0)
-                      : y,
-                  x,
-                })
-              }
-
-              return [actualDates, projectedDates]
-            },
-            [[], []],
-          )
-
-        return dates
       }
       case 'pages':
       case 'hours':
@@ -345,5 +362,40 @@ async function onTrack() {
 
     goal.value = { ...goal.value, ...updatedGoal }
   }
+}
+
+function getUnit(value: number): string | undefined {
+  if (goal.value) {
+    switch (goal.value.type) {
+      case 'books':
+        return value > 1 ? 'books' : 'book'
+      case 'pages':
+        return value > 1 ? 'pages' : 'page'
+      case 'hours':
+        return value > 1 ? 'hours' : 'hour'
+    }
+  }
+  return undefined
+}
+
+function tooltipFormatter({ x }: { x: string; y?: number }): string {
+  const entriesForDate = dates.value.find((date) => date.x === x)?.entries
+
+  if (entriesForDate?.length) {
+    const listItems = entriesForDate
+      .map((entry) => {
+        if ((entry as BookGoalEntry).book) {
+          return booksById.value[(entry as BookGoalEntry).book]?.title
+        }
+
+        return ''
+      })
+      .map((v) => `‣ ${v}`)
+      .join('<br />')
+
+    return `<b>${entriesForDate.length} ${getUnit(entriesForDate.length)}</b><br /><div class='text-start'>${listItems}</div>`
+  }
+
+  return `No ${getUnit(10)}`
 }
 </script>

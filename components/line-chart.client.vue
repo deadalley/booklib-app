@@ -52,10 +52,15 @@ const props = withDefaults(
     height?: number
     unit?: string
     xAxisRange?: string[]
-    xAxisLabelFormatter?: (value: string) => string
+    xAxisLabelFormatter?: (value?: string) => string
+    tooltipFormatter?: (value: { x: string; y?: number }) => string
   }>(),
   { height: 340 },
 )
+
+const xAxisData =
+  props.xAxisRange ??
+  uniq(props.items.flatMap((item) => item.values.map(({ x }) => x)))
 
 const option = computed<EChartsOption>(() => ({
   grid: {
@@ -83,9 +88,7 @@ const option = computed<EChartsOption>(() => ({
     backgroundColor: tailwind.theme.colors['accent-light'],
   },
   xAxis: {
-    data:
-      props.xAxisRange ??
-      uniq(props.items.flatMap((item) => item.values.map(({ x }) => x))),
+    data: xAxisData,
     type: 'category',
     boundaryGap: false,
     axisLabel: {
@@ -130,8 +133,16 @@ const option = computed<EChartsOption>(() => ({
     color: item.color ?? tailwind.theme.colors.main,
     smooth: true,
     tooltip: {
-      formatter: `<b>{b}</b><br />{c} ${props.unit ?? ''}`,
       color: tailwind.theme.colors.black,
+      formatter: (params) => {
+        if (props.tooltipFormatter) {
+          return props.tooltipFormatter({
+            x: xAxisData[params.dataIndex],
+            y: (params.value as number) ?? undefined,
+          })
+        }
+        return `<b>${props.xAxisLabelFormatter?.(xAxisData[params.dataIndex]) ?? xAxisData[params.dataIndex]}</b><br />${params.value} ${props.unit ?? ''}`
+      },
     },
     itemStyle: {
       borderRadius: 6,
