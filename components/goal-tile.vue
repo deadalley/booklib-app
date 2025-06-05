@@ -265,25 +265,30 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
           [LineChartItem['values'], LineChartItem['values']]
         >(
           ([actualDates, projectedDates], { x, y }, index) => {
-            const accumulatedY = (actualDates[index - 1]?.y ?? 0) + y
+            const accumulatedYActual = (actualDates[index - 1]?.y ?? 0) + y
+            const accumulatedYProjected =
+              (projectedDates[index - 1]?.y ?? 0) + y
 
+            // connect the actual and projected lines
             if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
-              actualDates.push({ x, y: accumulatedY })
-              projectedDates.push({ x, y: accumulatedY })
+              actualDates.push({ x, y: accumulatedYActual })
+              projectedDates.push({ x, y: accumulatedYActual })
+              // push actual values
             } else if (isBeforeDay(x, lastEntryDate)) {
               actualDates.push({
-                y: accumulatedY,
+                y: accumulatedYActual,
                 x,
               })
               projectedDates.push({ x, y: undefined })
+              // push projected values
             } else {
               projectedDates.push({
-                y:
-                  y === 0
-                    ? (projectedDates[index - 1]?.y ??
-                      actualDates[index - 1]?.y ??
-                      0)
-                    : y,
+                y: getProjectedValue(
+                  dates.value.length - index,
+                  goal.value!.entries.length,
+                  goal.value!.amount,
+                  accumulatedYProjected,
+                ),
                 x,
               })
             }
@@ -334,6 +339,61 @@ function getProgressInterval(): ManipulateType {
   return 'month'
 }
 
+function getUnit(value: number): string | undefined {
+  if (goal.value) {
+    switch (goal.value.type) {
+      case 'books':
+        return value > 1 || value === 0 ? 'books' : 'book'
+      case 'pages':
+        return value > 1 || value === 0 ? 'pages' : 'page'
+      case 'hours':
+        return value > 1 || value === 0 ? 'hours' : 'hour'
+    }
+  }
+  return undefined
+}
+
+function getProjectedValue(
+  intervalLength: number,
+  currentValue: number,
+  finalValue: number,
+  accumulatedValue: number,
+): number {
+  console.log({ intervalLength, currentValue, finalValue, accumulatedValue })
+  if (currentValue >= finalValue) return currentValue
+
+  const remainingSteps = intervalLength
+
+  if (remainingSteps <= 0) return finalValue
+
+  const increment = Math.ceil((finalValue - accumulatedValue) / remainingSteps)
+
+  return accumulatedValue + increment
+}
+
+function tooltipFormatter({ x, y }: { x: string; y?: number }): string {
+  const entriesForDate = dates.value.find((date) => date.x === x)?.entries
+
+  const accumulatedValue = `<b>${y} ${getUnit(+(y ?? 0))} read in total</b>`
+
+  if (entriesForDate?.length) {
+    const listItems = entriesForDate
+      .map((entry) => {
+        if ((entry as BookGoalEntry).book) {
+          return booksById.value[(entry as BookGoalEntry).book]?.title
+        }
+
+        return ''
+      })
+      .map((v) => `‣ ${v}`)
+      .join('<br />')
+
+    return `${accumulatedValue}<br /><div class='text-start'>Books read on ${toFullDateCompact(x)}:</div><div class='text-start'>${listItems}</div>`
+  }
+
+  return `${accumulatedValue}<br />No ${getUnit(10)} read on ${toFullDateCompact(x)}`
+}
+
 function onCreateNew() {
   entry.value = {
     createdAt: toSimpleDate(now()),
@@ -362,40 +422,5 @@ async function onTrack() {
 
     goal.value = { ...goal.value, ...updatedGoal }
   }
-}
-
-function getUnit(value: number): string | undefined {
-  if (goal.value) {
-    switch (goal.value.type) {
-      case 'books':
-        return value > 1 ? 'books' : 'book'
-      case 'pages':
-        return value > 1 ? 'pages' : 'page'
-      case 'hours':
-        return value > 1 ? 'hours' : 'hour'
-    }
-  }
-  return undefined
-}
-
-function tooltipFormatter({ x }: { x: string; y?: number }): string {
-  const entriesForDate = dates.value.find((date) => date.x === x)?.entries
-
-  if (entriesForDate?.length) {
-    const listItems = entriesForDate
-      .map((entry) => {
-        if ((entry as BookGoalEntry).book) {
-          return booksById.value[(entry as BookGoalEntry).book]?.title
-        }
-
-        return ''
-      })
-      .map((v) => `‣ ${v}`)
-      .join('<br />')
-
-    return `<b>${entriesForDate.length} ${getUnit(entriesForDate.length)}</b><br /><div class='text-start'>${listItems}</div>`
-  }
-
-  return `No ${getUnit(10)}`
 }
 </script>
