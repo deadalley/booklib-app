@@ -83,15 +83,19 @@ const selectedGoal = ref<Goal | undefined>()
 const sortedGoals = computed(() =>
   sortGoals(goals.value ?? []).map<ViewGoal>((goal) => ({
     ...goal,
-    progress: getGoalTimeProgress(goal),
+    progress: getGoalProgress(goal),
   })),
 )
 
-function getGoalTimeProgress(goal: Goal): number {
-  return getElapsedTimePercentage(now(), {
-    start: goal.startAt,
-    end: goal.finishAt,
-  })
+// function getGoalTimeProgress(goal: Goal): number {
+//   return getElapsedTimePercentage(now(), {
+//     start: goal.startAt,
+//     end: goal.finishAt,
+//   })
+// }
+
+function getGoalProgress(goal: Goal): number {
+  return Math.round((goal.entries.length / goal.amount) * 100)
 }
 
 // TODO: return author name with book from server

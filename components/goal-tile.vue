@@ -9,7 +9,7 @@
           stroke="1.5"
         />
         <h5>{{ goal.title }}</h5>
-        <span class="ml-2">
+        <span class="mb-1 ml-2">
           <bl-total-tag
             :variant="goal.status === 'tracking' ? 'primary' : 'secondary'"
           >
