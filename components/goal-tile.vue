@@ -261,6 +261,9 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
       case 'books': {
         const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
 
+        const isCurrentGoalReached =
+          goal.value.entries.length >= goal.value.amount
+
         return dates.value.reduce<
           [LineChartItem['values'], LineChartItem['values']]
         >(
@@ -272,7 +275,9 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
             // connect the actual and projected lines
             if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
               actualDates.push({ x, y: accumulatedYActual })
-              projectedDates.push({ x, y: accumulatedYActual })
+              if (!isCurrentGoalReached) {
+                projectedDates.push({ x, y: accumulatedYActual })
+              }
               // push actual values
             } else if (isBeforeDay(x, lastEntryDate)) {
               actualDates.push({
@@ -285,9 +290,9 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
               projectedDates.push({
                 y: getProjectedValue(
                   dates.value.length - index,
-                  goal.value!.entries.length,
                   goal.value!.amount,
                   accumulatedYProjected,
+                  isCurrentGoalReached,
                 ),
                 x,
               })
@@ -355,12 +360,11 @@ function getUnit(value: number): string | undefined {
 
 function getProjectedValue(
   intervalLength: number,
-  currentValue: number,
   finalValue: number,
   accumulatedValue: number,
-): number {
-  console.log({ intervalLength, currentValue, finalValue, accumulatedValue })
-  if (currentValue >= finalValue) return currentValue
+  isCurrentGoalReached: boolean,
+): number | undefined {
+  if (isCurrentGoalReached) return undefined
 
   const remainingSteps = intervalLength
 
