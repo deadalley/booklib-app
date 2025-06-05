@@ -1,6 +1,6 @@
 <template>
   <div class="w-full" :style="{ height: `${height}px` }">
-    <VChart :option="option" />
+    <VChart :option="option" :autoresize="true" />
   </div>
 </template>
 
