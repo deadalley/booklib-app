@@ -14,7 +14,9 @@
         class="accordion-trigger flex w-full flex-1 items-center justify-between gap-3"
       >
         <div class="flex flex-1 items-center justify-between">
-          <AccordionTrigger class="flex-1 cursor-pointer">
+          <AccordionTrigger
+            class="flex flex-1 cursor-pointer items-center justify-start"
+          >
             <h5 v-if="$slots['title']"><slot name="title" /></h5>
           </AccordionTrigger>
           <slot name="actions" />
