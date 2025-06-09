@@ -435,6 +435,7 @@ async function onTrack() {
     })
 
     goal.value = { ...goal.value, ...updatedGoal }
+    props.reloadGoals()
   }
 }
 </script>
