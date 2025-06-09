@@ -114,7 +114,7 @@
           <template v-if="goal.interval === 'total'">
             <div class="mt-5">
               <bl-line-chart
-                :height="200"
+                :height="320"
                 :items="chartItems"
                 :x-axis-label-formatter="toFullDateCompact"
                 :tooltip-formatter="tooltipFormatter"
@@ -246,11 +246,13 @@ const chartItems = computed<LineChartItem[]>(() => {
       label: 'actual',
       color: tailwind.theme.colors.main,
       values: actualDates,
+      markPoint: 'max',
     },
     {
       label: 'projected',
       color: tailwind.theme.colors.accent,
       values: projectedDates,
+      markPoint: 'max',
     },
   ]
 })

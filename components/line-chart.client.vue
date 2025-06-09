@@ -12,10 +12,12 @@ import {
   type DatasetComponentOption,
   type VisualMapComponentOption,
   type GridComponentOption,
+  type MarkLineComponentOption,
   type MarkPointComponentOption,
   type TooltipComponentOption,
   DatasetComponent,
   GridComponent,
+  MarkLineComponent,
   MarkPointComponent,
   TooltipComponent,
 } from 'echarts/components'
@@ -26,12 +28,15 @@ export type LineChartItem = {
   description?: string
   color?: string
   values: { x: string; y?: number }[]
+  markPoint?: 'max' | 'min' | 'average'
+  markLine?: 'max' | 'min' | 'average'
 }
 
 type EChartsOption = ComposeOption<
   | DatasetComponentOption
   | VisualMapComponentOption
   | GridComponentOption
+  | MarkLineComponentOption
   | MarkPointComponentOption
   | TooltipComponentOption
   | LineSeriesOption
@@ -42,6 +47,7 @@ use([
   LineChart,
   DatasetComponent,
   GridComponent,
+  MarkLineComponent,
   MarkPointComponent,
   TooltipComponent,
 ])
@@ -132,6 +138,74 @@ const option = computed<EChartsOption>(() => ({
     name: item.label,
     color: item.color ?? tailwind.theme.colors.main,
     smooth: true,
+    ...(item.markPoint
+      ? {
+          markPoint: {
+            data: [{ type: item.markPoint, name: item.markPoint }],
+            symbol: 'roundRect',
+            symbolSize: 20,
+            label: {
+              fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+              fontSize: 14,
+              color:
+                item.color === tailwind.theme.colors.main
+                  ? tailwind.theme.colors['white']
+                  : tailwind.theme.colors['accent-darker'],
+            },
+            itemStyle: {
+              color: item.color,
+            },
+            tooltip: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter: (params: any) => {
+                if (props.tooltipFormatter) {
+                  return props.tooltipFormatter({
+                    x: xAxisData[params.dataIndex],
+                    y: (params.value as number) ?? undefined,
+                  })
+                }
+                return `<b>${props.xAxisLabelFormatter?.(xAxisData[params.dataIndex]) ?? xAxisData[params.dataIndex]}</b><br />${params.value} ${props.unit ?? ''}`
+              },
+            },
+          },
+        }
+      : {}),
+    ...(item.markLine
+      ? {
+          markLine: {
+            data: [{ type: item.markLine, name: item.markLine }],
+            symbol: ['none', 'none'],
+            silent: true,
+            lineStyle: {
+              color: tailwind.theme.colors['accent-dark'],
+            },
+            symbolSize: 20,
+            label: {
+              fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+              fontSize: 14,
+              color: tailwind.theme.colors['accent-darker'],
+              backgroundColor: tailwind.theme.colors['accent'],
+              padding: [4, 6],
+              borderRadius: 6,
+            },
+            itemStyle: {
+              color: tailwind.theme.colors['main'],
+            },
+            tooltip: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter: (params: any) => {
+                if (props.tooltipFormatter) {
+                  return props.tooltipFormatter({
+                    x: xAxisData[params.dataIndex],
+                    y: (params.value as number) ?? undefined,
+                  })
+                }
+                return `<b>${props.xAxisLabelFormatter?.(xAxisData[params.dataIndex]) ?? xAxisData[params.dataIndex]}</b><br />${params.value} ${props.unit ?? ''}`
+              },
+            },
+          },
+        }
+      : {}),
     tooltip: {
       color: tailwind.theme.colors.black,
       formatter: (params) => {
