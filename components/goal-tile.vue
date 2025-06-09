@@ -52,7 +52,7 @@
           :reload-goals="reloadGoals"
         >
           <template #trigger="triggerProps">
-            <bl-button v-bind="triggerProps">
+            <bl-button v-bind="triggerProps" variant="tertiary">
               <template #prependIcon="iconProps">
                 <IconPencil v-bind="iconProps" />
               </template>
@@ -61,7 +61,7 @@
         </bl-goal-modal>
         <bl-button
           v-if="goal.status === 'tracking' || goal.status === 'not-tracking'"
-          :variant="goal.status === 'not-tracking' ? 'primary' : 'secondary'"
+          variant="secondary"
           @click="onTrack"
         >
           <template #prependIcon="iconProps">
