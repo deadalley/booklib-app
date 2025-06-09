@@ -284,9 +284,9 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
 
             // connect the actual and projected lines
             if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
-              actualDates.push({ x, y: accumulatedYActual })
+              actualDates.push({ y: accumulatedYActual, x })
               if (!isCurrentGoalReached) {
-                projectedDates.push({ x, y: accumulatedYActual })
+                projectedDates.push({ y: accumulatedYActual, x })
               }
               // push actual values
             } else if (isBeforeDay(x, lastEntryDate)) {
@@ -299,10 +299,10 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
             } else {
               projectedDates.push({
                 y: getProjectedValue(
-                  dates.value.length - index,
-                  goal.value!.amount,
+                  dates.value.length - actualDates.length,
+                  projectedDates.length - actualDates.length + 1,
                   accumulatedYProjected,
-                  isCurrentGoalReached,
+                  goal.value!.amount,
                 ),
                 x,
               })
@@ -369,20 +369,20 @@ function getUnit(value: number): string | undefined {
 }
 
 function getProjectedValue(
-  intervalLength: number,
-  finalValue: number,
+  totalSteps: number,
+  currentStep: number,
   accumulatedValue: number,
-  isCurrentGoalReached: boolean,
-): number | undefined {
-  if (isCurrentGoalReached) return undefined
+  finalValue: number,
+): number {
+  if (totalSteps <= 0) return finalValue
 
-  const remainingSteps = intervalLength
+  const increments = finalValue - accumulatedValue
+  if (increments <= 0) return accumulatedValue
 
-  if (remainingSteps <= 0) return finalValue
+  const stepsPerIncrement = totalSteps / increments
+  const value = accumulatedValue + Math.floor(currentStep / stepsPerIncrement)
 
-  const increment = Math.ceil((finalValue - accumulatedValue) / remainingSteps)
-
-  return accumulatedValue + increment
+  return Math.min(value, finalValue)
 }
 
 function tooltipFormatter({ x, y }: { x: string; y?: number }): string {

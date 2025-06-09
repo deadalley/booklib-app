@@ -160,7 +160,7 @@ const option = computed<EChartsOption>(() => ({
               formatter: (params: any) => {
                 if (props.tooltipFormatter) {
                   return props.tooltipFormatter({
-                    x: xAxisData[params.dataIndex],
+                    x: xAxisData[item.values.length - 1],
                     y: (params.value as number) ?? undefined,
                   })
                 }
