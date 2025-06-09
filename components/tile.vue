@@ -11,7 +11,7 @@
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
-        class="accordion-trigger flex w-full flex-1 items-center justify-between gap-3"
+        class="accordion-header flex w-full flex-1 items-center justify-between gap-3"
       >
         <div class="flex flex-1 items-center justify-between">
           <AccordionTrigger
@@ -67,7 +67,7 @@ withDefaults(defineProps<{ defaultOpen?: boolean }>(), { defaultOpen: true })
 .accordion-chevron {
   transition: transform 300ms;
 }
-.accordion-trigger[data-state='open'] > .accordion-chevron {
+.accordion-header[data-state='open'] .accordion-chevron {
   transform: rotate(180deg);
 }
 
