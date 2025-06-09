@@ -41,7 +41,7 @@
     </div>
     <div v-if="!isEmpty" class="flex flex-col gap-10">
       <h1>Welcome to your library!</h1>
-      <div class="flex w-full gap-4">
+      <div class="flex w-full flex-col gap-4 md:flex-row">
         <NuxtLink
           to="/library/books"
           class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
