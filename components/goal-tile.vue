@@ -116,7 +116,7 @@
               <bl-line-chart
                 :height="320"
                 :items="chartItems"
-                :x-axis-label-formatter="toFullDateCompact"
+                :x-axis-label-formatter="xAxisLabelFormatter"
                 :tooltip-formatter="tooltipFormatter"
               />
             </div>
@@ -218,6 +218,14 @@ const interval = computed<ManipulateType>(() => {
     return getProgressInterval()
   }
   return 'month'
+})
+
+const xAxisLabelFormatter = computed(() => {
+  if (interval.value === 'month') {
+    return toMonthYearCompact
+  }
+
+  return toFullDateCompact
 })
 
 const dates = computed(() => {

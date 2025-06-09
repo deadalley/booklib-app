@@ -19,12 +19,12 @@ export function getCurrentYear() {
   return dayjs().utc().year()
 }
 
-export function fromSimpleDate(date: string) {
-  return dayjs(date, 'YYYY-MM-DD').utc(true).toISOString()
-}
-
 export function toISOString(date: ConfigType) {
   return dayjs(date).utc().toISOString()
+}
+
+export function fromSimpleDate(date: string) {
+  return dayjs(date, 'YYYY-MM-DD').utc(true).toISOString()
 }
 
 export function toSimpleDate(date: ConfigType) {
@@ -41,6 +41,9 @@ export function toFullDate(date: ConfigType) {
 
 export function toFullDateCompact(date: ConfigType) {
   return dayjs(date).utc().format('ll')
+}
+export function toMonthYearCompact(date: ConfigType) {
+  return dayjs(date).utc().format('MMM YYYY')
 }
 
 export function getDateRange(
