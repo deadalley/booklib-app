@@ -121,6 +121,7 @@
                 align="end"
                 side="top"
                 :options="dateRangeOptions"
+                placeholder="Select date range"
               />
             </div>
             <div v-if="dateRange === 'custom' || !isNew" class="form-row">
@@ -176,7 +177,7 @@ const props = defineProps<{
 const goal = defineModel<Goal | undefined>()
 
 const open = ref<boolean>(false)
-const trackingGoal = ref<boolean>(false)
+const trackingGoal = ref<boolean>(goal.value?.status === 'tracking')
 const dateRange = ref<
   | 'currentYear'
   | 'nextYear'
@@ -185,7 +186,7 @@ const dateRange = ref<
   | 'halfYear'
   | 'custom'
   | undefined
->(undefined)
+>()
 
 const authorSelectOptions = computed(() =>
   props.authors
@@ -295,4 +296,11 @@ function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
       }
   }
 }
+
+onBeforeMount(() => {
+  if (goal.value) {
+    goal.value.startAt = toSimpleDate(goal.value.startAt)
+    goal.value.finishAt = toSimpleDate(goal.value.finishAt)
+  }
+})
 </script>
