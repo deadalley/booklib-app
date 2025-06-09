@@ -2,6 +2,7 @@
   <bl-raw-autocomplete
     v-model="selectValue"
     v-model:search-term="searchTerm"
+    v-model:focused="focused"
     :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
@@ -24,6 +25,7 @@ const props = withDefaults(
       attrs?: {
         class?: string
         'on-update:search-term'?: (value: string | undefined) => void
+        'on-focus'?: (value: boolean) => void
       }
       node: {
         input: (value: SelectOption['value']) => void
@@ -36,6 +38,7 @@ const props = withDefaults(
 
 const selectValue = ref(props.context.node?._value)
 const searchTerm = defineModel<string>()
+const focused = ref(false)
 
 watch(selectValue, (value) => {
   props.context.node?.input?.(value)
@@ -43,6 +46,10 @@ watch(selectValue, (value) => {
 
 watch(searchTerm, (value) => {
   props.context.attrs?.['on-update:search-term']?.(value)
+})
+
+watch(focused, (value) => {
+  props.context.attrs?.['on-focus']?.(value)
 })
 
 watch(props.context, (v) => {

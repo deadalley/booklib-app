@@ -13,7 +13,7 @@
     :classes="{
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
       label: 'ml-4',
-      inner: '!gap-0 relative',
+      inner: `!gap-0 relative ${focused ? '!border-main' : 'border-accent'}`,
     }"
     :type="rawSelect"
     :options="options"
@@ -22,8 +22,7 @@
     :with-wrapper="withWrapper"
     :align="align"
     :side="side"
-    @focus="onFocus"
-    @blur="onBlur"
+    :on-focus="(v) => onFocus(v)"
   />
 </template>
 
@@ -59,11 +58,7 @@ const displayValue = computed(() => {
   return props.options.find(({ value }) => value === inputModel.value)?.label
 })
 
-function onFocus() {
-  focused.value = true
-}
-
-function onBlur() {
-  focused.value = false
+function onFocus(value: boolean) {
+  focused.value = value
 }
 </script>

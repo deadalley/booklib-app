@@ -14,7 +14,10 @@
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'formkit-inner': withWrapper,
+          '!border-main': focused,
         }"
+        @focus="onFocus"
+        @blur="onBlur"
       >
         <div class="flex flex-1 items-center gap-1">
           <component :is="icons[icon]" v-if="icon" :size="16" stroke="1.5" />
@@ -129,10 +132,19 @@ const props = withDefaults(defineProps<SelectProps>(), {
 })
 
 const selectValue = defineModel<string>()
+const focused = defineModel<boolean>('focused')
 
 const icon = computed(
   () => props.options?.find(({ value }) => selectValue.value === value)?.icon,
 )
+
+function onFocus() {
+  focused.value = true
+}
+
+function onBlur() {
+  focused.value = false
+}
 </script>
 
 <style scoped>

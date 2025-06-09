@@ -22,11 +22,13 @@
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'formkit-inner': withWrapper,
+          '!border-main': focused,
         }"
       >
         <ComboboxInput
           v-bind="$attrs"
-          :class="{ hidden: !(editing && !hidden), 'w-full': true }"
+          class="w-full"
+          :class="{ hidden: !(editing && !hidden) }"
           :placeholder="placeholder"
           @focus="onFocus"
           @blur="onBlur"
@@ -39,10 +41,14 @@
         />
       </ComboboxAnchor>
 
-      <ComboboxContent position="popper" :align="align" :side="side">
-        <ComboboxViewport
-          class="base-container z-10 max-h-96 w-full max-w-full overflow-y-auto overflow-x-hidden"
-        >
+      <ComboboxContent
+        :align="align"
+        :side="side"
+        :avoid-collisions="false"
+        position="popper"
+        class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
+      >
+        <ComboboxViewport class="w-full">
           <ComboboxEmpty as-child>
             <div
               class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-accent-light"
@@ -114,8 +120,8 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
 
 const selectValue = defineModel<string>()
 const searchTerm = defineModel<string>('searchTerm')
+const focused = defineModel<boolean>('focused')
 const open = ref<boolean>(false)
-const focused = ref(false)
 const extendedOptions = ref(props.options!)
 
 const labelByValue = computed<Record<string, string>>(() =>
