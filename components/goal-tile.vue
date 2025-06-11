@@ -93,7 +93,7 @@
     </div>
     <template #collapsible>
       <bl-tabs
-        :default-value="sortedEntries.length ? 'progress' : 'entries'"
+        :default-value="sortedEntries.length ? 'progress' : 'tracked'"
         class="mt-4"
         full
       >
