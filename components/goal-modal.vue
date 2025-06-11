@@ -166,6 +166,7 @@ import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { SelectOption } from './raw-select.vue'
 import { getDateRange, getSixMonthsRange } from '~/utils/date'
+import dayjs from 'dayjs'
 
 const props = defineProps<{
   isNew?: boolean
@@ -279,7 +280,7 @@ function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
     case 'currentYear':
       return renameKeys(getDateRange(now(), 'year'))
     case 'nextYear':
-      return renameKeys(getDateRange(getCurrentYear() + 1, 'year'))
+      return renameKeys(getDateRange(dayjs(now()).add(1, 'year'), 'year'))
     case 'halfYear':
       return renameKeys(getSixMonthsRange(now()))
     case 'month':
