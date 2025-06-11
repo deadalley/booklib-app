@@ -299,11 +299,4 @@ function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
       }
   }
 }
-
-onBeforeMount(() => {
-  if (goal.value) {
-    goal.value.startAt = toSimpleDate(goal.value.startAt)
-    goal.value.finishAt = toSimpleDate(goal.value.finishAt)
-  }
-})
 </script>
