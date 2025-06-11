@@ -115,6 +115,10 @@ export function toStartOfDay(date: ConfigType): string {
   return dayjs(date).utc().startOf('day').toISOString()
 }
 
+export function toEndOfDay(date: ConfigType): string {
+  return dayjs(date).utc().endOf('day').toISOString()
+}
+
 export function getIntervalUnit({
   start,
   end,
