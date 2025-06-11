@@ -15,8 +15,8 @@
       class="relative"
       :filter-function="filterFunction"
       :display-value="(v) => labelByValue[v]"
-      reset-search-term-on-select
-      reset-search-term-on-blur
+      :reset-search-term-on-select="false"
+      :reset-search-term-on-blur="false"
     >
       <ComboboxAnchor
         :class="{
