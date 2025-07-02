@@ -12,7 +12,7 @@
       <div class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto">
         <FormKit
           id="goal"
-          v-model="goal"
+          v-model="goalForm"
           type="form"
           :actions="false"
           @submit="onSaveChanges"
@@ -48,62 +48,65 @@
               />
               Goal
             </h6>
-            <div class="form-row items-end">
-              <bl-input
-                id="amount"
-                type="number"
-                name="amount"
-                placeholder="Amount"
-              />
-              <bl-select
-                id="type"
-                type="select"
-                name="type"
-                placeholder="Type"
-                :options="
-                  Object.values(GOAL_TYPE_MAP).map(
-                    ({ id, description, icon }) => ({
-                      label: description,
-                      value: id,
-                      icon,
-                    }),
-                  )
-                "
-              />
-              <bl-select
-                id="interval"
-                type="select"
-                name="interval"
-                placeholder="Interval"
-                :options="
-                  Object.values(GOAL_INTERVAL_MAP).map(
-                    ({ id, description }) => ({
-                      label: description,
-                      value: id,
-                    }),
-                  )
-                "
-              />
-            </div>
-            <div class="form-row">
-              <bl-input-autocomplete
-                v-if="authorSelectOptions.length"
-                id="author"
-                name="author"
-                label="From author"
-                placeholder="Author"
-                :options="authorSelectOptions"
-                clearable
-              />
-              <bl-input-autocomplete
-                v-if="genreSelectOptions.length"
-                id="genres"
-                name="genres"
-                label="From genres"
-                placeholder="Genres"
-                :options="genreSelectOptions"
-                clearable
-              />
+            <div class="form-section">
+              <div class="form-row items-end">
+                <bl-input
+                  id="amount"
+                  type="number"
+                  name="amount"
+                  placeholder="Amount"
+                />
+                <bl-select
+                  id="type"
+                  type="select"
+                  name="type"
+                  placeholder="Type"
+                  :options="
+                    Object.values(GOAL_TYPE_MAP).map(
+                      ({ id, description, icon }) => ({
+                        label: description,
+                        value: id,
+                        icon,
+                      }),
+                    )
+                  "
+                />
+                <bl-select
+                  id="interval"
+                  type="select"
+                  name="interval"
+                  placeholder="Interval"
+                  :options="
+                    Object.values(GOAL_INTERVAL_MAP).map(
+                      ({ id, description }) => ({
+                        label: description,
+                        value: id,
+                      }),
+                    )
+                  "
+                />
+              </div>
+              <div class="form-row">
+                <bl-input-autocomplete
+                  v-if="authorSelectOptions.length"
+                  id="author"
+                  name="author"
+                  label="From author"
+                  placeholder="Author"
+                  :options="authorSelectOptions"
+                  clearable
+                />
+                <bl-input-autocomplete
+                  v-if="genreSelectOptions.length"
+                  id="genres"
+                  name="genres"
+                  label="From genres"
+                  placeholder="Genres"
+                  :options="genreSelectOptions"
+                  clearable
+                  multiple
+                />
+              </div>
             </div>
           </section>
           <section class="book-section">
@@ -115,32 +118,34 @@
               />
               Duration
             </h6>
-            <div class="form-row">
-              <bl-raw-select
-                v-model="dateRange"
-                align="end"
-                side="top"
-                :options="dateRangeOptions"
-                placeholder="Select date range"
-              />
-            </div>
-            <div v-if="dateRange === 'custom' || !isNew" class="form-row">
-              <bl-input
-                id="startAt"
-                type="date"
-                name="startAt"
-                label="Start on"
-                placeholder="Start date"
-                :formatter="dateFormatter"
-              />
-              <bl-input
-                id="finishAt"
-                type="date"
-                name="finishAt"
-                label="Finish on"
-                placeholder="End date"
-                :formatter="dateFormatter"
-              />
+            <div class="form-section">
+              <div class="form-row">
+                <bl-raw-select
+                  v-model="dateRange"
+                  align="end"
+                  side="top"
+                  :options="dateRangeOptions"
+                  placeholder="Select date range"
+                />
+              </div>
+              <div v-if="dateRange === 'custom' || !isNew" class="form-row">
+                <bl-input
+                  id="startAt"
+                  type="date"
+                  name="startAt"
+                  label="Start on"
+                  placeholder="Start date"
+                  :formatter="dateFormatter"
+                />
+                <bl-input
+                  id="finishAt"
+                  type="date"
+                  name="finishAt"
+                  label="Finish on"
+                  placeholder="End date"
+                  :formatter="dateFormatter"
+                />
+              </div>
             </div>
           </section>
           <div class="flex items-baseline justify-end gap-2">
@@ -176,6 +181,15 @@ const props = defineProps<{
 }>()
 
 const goal = defineModel<Goal | undefined>()
+const goalForm = ref<Goal | undefined>(
+  goal.value
+    ? {
+        ...goal.value,
+        startAt: toSimpleDate(goal.value.startAt),
+        finishAt: toSimpleDate(goal.value.finishAt),
+      }
+    : undefined,
+)
 
 const open = ref<boolean>(false)
 const trackingGoal = ref<boolean>(goal.value?.status === 'tracking')
@@ -222,8 +236,8 @@ const dateRangeOptions: SelectOption[] = [
 ]
 
 async function onSaveChanges() {
-  if (goal.value) {
-    await onSubmit(goal.value)
+  if (goalForm.value) {
+    await onSubmit(goalForm.value as Goal)
   }
 }
 

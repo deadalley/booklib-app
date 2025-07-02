@@ -2,21 +2,24 @@
   <div
     v-show="!newGenre || editing"
     ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-1 text-base"
+    class="relative flex w-fit items-center gap-2 rounded-xl"
     :class="{
       'cursor-pointer hover:bg-main/90': !!attrs.onClick,
       'bg-main-dark': !!selected,
       'bg-white text-main ring-1 ring-inset ring-main': editing,
       'bg-main text-white': !editing,
+      'px-4 py-1 text-base': !compact,
+      'px-3 py-1 text-sm font-medium': compact,
     }"
     @click="onClick"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
-    @keydown.enter="_onCommit"
+    @keydown.enter="onCommit"
     @keydown.escape="onCancel"
   >
     <span v-if="!editing">{{ initialContent }}</span>
     <input
+      v-if="editable && !editing"
       ref="genre-input"
       v-model="content"
       class="max-w-24 text-black"
@@ -25,17 +28,17 @@
       }"
     />
     <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-main" />
-    <IconCircleXFilled
-      v-if="!loading && removable && hovered"
-      :size="18"
-      stroke="1.5"
-      class="cursor-pointer opacity-0"
-      :class="{ 'opacity-100': hovered }"
-      @click="_onRemove"
+    <IconCircleX
+      v-if="!loading && removable"
+      :size="16"
+      stroke="1.8"
+      class="cursor-pointer"
+      @click="onRemove"
     />
-    <IconTagFilled
+    <slot
       v-if="!removable || (!loading && !hovered)"
-      :size="18"
+      name="icon"
+      :size="16"
       stroke="1.5"
     />
   </div>
@@ -50,11 +53,8 @@
 </template>
 
 <script setup lang="ts">
-/**
- * @deprecated Use `bl-removable-tag` instead.
- */
 import { useTemplateRef } from 'vue'
-import { IconCircleXFilled, IconPlus, IconTagFilled } from '@tabler/icons-vue'
+import { IconCircleX, IconPlus } from '@tabler/icons-vue'
 import { onClickOutside } from '@vueuse/core'
 
 const attrs = useAttrs()
@@ -66,8 +66,12 @@ const props = defineProps<{
   removable?: boolean
   newGenre?: boolean
   selected?: boolean
-  onCommit?: (value: string | undefined, index: number) => void
-  onRemove?: (index: number) => void
+  compact?: boolean
+}>()
+
+const emits = defineEmits<{
+  (e: 'commit', value: string | undefined, index: number): void
+  (e: 'remove', index: number): void
 }>()
 
 const loading = ref(false)
@@ -91,11 +95,11 @@ function onCancel() {
   content.value = initialContent.value
 }
 
-async function _onCommit() {
+async function onCommit() {
   loading.value = true
   inputRef.value?.blur()
 
-  await props.onCommit?.(content.value, props.index)
+  emits('commit', content.value, props.index)
 
   loading.value = false
 
@@ -106,7 +110,7 @@ async function _onCommit() {
   }
 }
 
-async function _onRemove(event: Event) {
+async function onRemove(event: Event) {
   event.preventDefault()
   event.stopPropagation()
 
@@ -115,7 +119,7 @@ async function _onRemove(event: Event) {
   if (props.newGenre && inputRef.value) {
     onCancel()
   } else {
-    await props.onRemove?.(props.index)
+    emits('remove', props.index)
   }
 
   loading.value = false

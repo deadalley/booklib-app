@@ -13,7 +13,7 @@
         class="select-trigger relative"
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
-          'formkit-inner': withWrapper,
+          'form-inner': withWrapper,
           '!border-main': focused,
         }"
         @focus="onFocus"

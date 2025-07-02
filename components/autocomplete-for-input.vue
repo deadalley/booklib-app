@@ -6,12 +6,12 @@
     :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
-    :with-wrapper="false"
     :can-create-new="context.canCreateNew"
     :not-found-label="context.notFoundLabel"
     :clearable="context.clearable"
     :align="context.align"
     :side="context.side"
+    :multiple="context.multiple"
   />
 </template>
 
@@ -37,7 +37,7 @@ const props = withDefaults(
 )
 
 const selectValue = ref(props.context.node?._value)
-const searchTerm = defineModel<string>()
+const searchTerm = ref<string>()
 const focused = ref(false)
 
 watch(selectValue, (value) => {

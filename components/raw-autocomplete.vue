@@ -13,15 +13,16 @@
       v-model:search-term="searchTerm"
       v-model:open="open"
       class="relative"
+      :multiple="multiple"
       :filter-function="filterFunction"
-      :display-value="(v) => labelByValue[v]"
+      :display-value="getDisplayValue"
       :reset-search-term-on-select="false"
       :reset-search-term-on-blur="false"
     >
       <ComboboxAnchor
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
-          'formkit-inner': withWrapper,
+          'form-inner': withWrapper,
           '!border-main': focused,
         }"
       >
@@ -40,6 +41,17 @@
           @click="onClear"
         />
       </ComboboxAnchor>
+
+      <div v-if="multiple" class="mt-2 flex flex-wrap gap-1">
+        <bl-removable-tag
+          v-for="(item, index) in selectValue"
+          :key="item"
+          :value="item"
+          :index="index"
+          removable
+          @remove="onRemoveItem"
+        />
+      </div>
 
       <ComboboxContent
         :align="align"
@@ -107,6 +119,7 @@ export type AutocompleteProps = SelectProps & {
   notFoundLabel?: string
   align?: 'start' | 'center' | 'end'
   side?: 'top' | 'right' | 'bottom' | 'left'
+  multiple?: boolean
 }
 
 const props = withDefaults(defineProps<AutocompleteProps>(), {
@@ -116,9 +129,10 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
   hidden: false,
   clearable: false,
   side: 'bottom',
+  multiple: false,
 })
 
-const selectValue = defineModel<string>()
+const selectValue = defineModel<string | string[]>()
 const searchTerm = defineModel<string>('searchTerm')
 const focused = defineModel<boolean>('focused')
 const open = ref<boolean>(false)
@@ -152,13 +166,38 @@ function onAddNew() {
       label: searchTerm.value,
     })
 
-    selectValue.value = searchTerm.value
-    open.value = false
+    if (props.multiple) {
+      if (!Array.isArray(selectValue.value)) {
+        selectValue.value = []
+      }
+      selectValue.value.push(searchTerm.value)
+    } else {
+      selectValue.value = searchTerm.value
+    }
   }
 }
 
 function onClear() {
-  selectValue.value = undefined
+  if (props.multiple) {
+    selectValue.value = []
+  } else {
+    selectValue.value = undefined
+  }
+}
+
+function onRemoveItem(index: number) {
+  if (props.multiple) {
+    if (Array.isArray(selectValue.value)) {
+      selectValue.value = selectValue.value.filter((_, i) => i !== index)
+    }
+  } else {
+    throw new Error('Tried to remove item from single select')
+  }
+}
+
+// This function is not executed when multiple is true
+function getDisplayValue(value: string) {
+  return labelByValue.value[value] ?? value
 }
 </script>
 

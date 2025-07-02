@@ -79,7 +79,7 @@
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <ClientOnly>
         <div
-          class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2] [&>.formkit-form]:h-full"
+          class="flex flex-col gap-16 overflow-y-auto md:flex-1 lg:flex-[2] [&>.form-form]:h-full"
         >
           <FormKit
             v-model="collection"

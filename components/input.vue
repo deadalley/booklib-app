@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!editing && !hidden" class="formkit-wrapper flex-1">
-    <label class="formkit-label">{{ $attrs.label }}</label>
+  <div v-if="!editing && !hidden" class="form-wrapper flex-1">
+    <label class="form-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel && $attrs.type !== 'textarea'">{{ displayValue }}</h5>
     <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
       {{ displayValue }}
@@ -12,10 +12,11 @@
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `flex-1 ${editing ? '' : '!hidden'}`,
-      wrapper: 'flex-1',
-      label: 'ml-4',
-      inner: `${focused ? '!border-main' : 'border-accent'}`,
+      outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
+      wrapper: 'form-wrapper flex-1',
+      label: 'form-label ml-4',
+      inner: `form-inner ${focused ? '!border-main' : 'border-accent'}`,
+      input: 'form-input',
     }"
     @focus="onFocus"
     @blur="onBlur"

@@ -2,8 +2,8 @@
 :before,
 :after,
 * {
-  .formkit-form,
-  .formkit-form section,
+  .form-form,
+  .form-form section,
   .form-section {
     @apply relative flex flex-col gap-3;
   }
@@ -18,6 +18,9 @@
     @apply pb-2;
   }
 
+  .book-section {
+    @apply pb-2;
+  }
   .book-section:not(:first-child) {
     @apply border-t border-t-accent pt-12;
   }
@@ -26,33 +29,33 @@
     @apply flex flex-col gap-4 sm:flex-row;
   }
 
-  .formkit-label {
+  .form-label {
     @apply font-ReemKufi text-base text-accent-darker;
   }
 
-  .formkit-inner {
+  .form-inner {
     @apply flex h-min w-full items-center gap-3 rounded-xl border border-accent bg-white px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in placeholder:text-accent;
   }
 
-  select.formkit-input {
+  select.form-input {
     @apply w-full cursor-pointer bg-white;
   }
 
-  input.formkit-input,
-  textarea.formkit-input {
+  input.form-input,
+  textarea.form-input {
     @apply w-full;
   }
 
-  input:focus.formkit-input,
-  textarea:focus.formkit-input {
+  input:focus.form-input,
+  textarea:focus.form-input {
     @apply border-accent-dark;
   }
 
-  .formkit-wrapper {
+  .form-wrapper {
     @apply flex flex-1 flex-col gap-1;
   }
 
-  .formkit-outer {
+  .form-outer {
     @apply flex;
   }
 }

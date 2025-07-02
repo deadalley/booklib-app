@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!editing && !hidden" class="formkit-wrapper flex-1">
-    <label class="formkit-label">{{ $attrs.label }}</label>
+  <div v-if="!editing && !hidden" class="form-wrapper flex-1">
+    <label class="form-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel">{{ displayValue }}</h5>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
   </div>
@@ -11,9 +11,11 @@
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `flex-1 ${editing ? '' : '!hidden'}`,
-      label: 'ml-4',
-      inner: `!gap-0 relative ${focused ? '!border-main' : 'border-accent'}`,
+      outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
+      label: 'form-label ml-4',
+      inner: `form-inner !gap-0 relative ${focused ? '!border-main' : 'border-accent'}`,
+      wrapper: 'form-wrapper',
+      input: 'form-input',
     }"
     :type="rawSelect"
     :options="options"

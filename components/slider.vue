@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <div class="formkit-wrapper flex-1">
-    <label v-if="!!label" for="default-range" class="formkit-label">{{
+  <div class="form-wrapper flex-1">
+    <label v-if="!!label" for="default-range" class="form-label">{{
       label
     }}</label>
 
