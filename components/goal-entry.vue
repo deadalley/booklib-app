@@ -52,6 +52,52 @@
               </div>
             </section>
           </template>
+          <template v-if="goal.type === 'hours'">
+            <section class="book-section">
+              <div class="form-row">
+                <bl-input
+                  id="hours"
+                  type="number"
+                  name="hours"
+                  label="Hours"
+                  placeholder="Hours"
+                  clearable
+                />
+                <bl-input
+                  id="createdAt"
+                  type="date"
+                  name="createdAt"
+                  label="Read on"
+                  placeholder="Date"
+                  clearable
+                  :formatter="dateFormatter"
+                />
+              </div>
+            </section>
+          </template>
+          <template v-if="goal.type === 'pages'">
+            <section class="book-section">
+              <div class="form-row">
+                <bl-input
+                  id="pages"
+                  type="number"
+                  name="pages"
+                  label="Pages"
+                  placeholder="Pages"
+                  clearable
+                />
+                <bl-input
+                  id="createdAt"
+                  type="date"
+                  name="createdAt"
+                  label="Read on"
+                  placeholder="Date"
+                  clearable
+                  :formatter="dateFormatter"
+                />
+              </div>
+            </section>
+          </template>
           <div class="flex items-baseline justify-end gap-2">
             <bl-button variant="secondary" @click="onCancel">
               {{ isNew ? 'Cancel' : 'Discard changes' }}
@@ -191,10 +237,14 @@ function getEntryTitle() {
         const booksById = indexBy(prop('id'), props.books)
         return booksById[(entry.value as BookGoalEntry).book ?? '']?.title
       }
-      case 'pages':
-        return 'Page entry'
-      case 'hours':
-        return 'Hour entry'
+      case 'pages': {
+        const pages = (entry.value as PageGoalEntry).pages
+        return `${pages} ${getGoalUnit(goal.value, pages)}`
+      }
+      case 'hours': {
+        const hours = (entry.value as HourGoalEntry).hours
+        return `${hours} ${getGoalUnit(goal.value, hours)}`
+      }
     }
   }
   return ''
