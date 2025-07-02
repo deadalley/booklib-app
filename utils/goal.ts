@@ -4,7 +4,6 @@ export function getGoalProgressColor(
   status: string,
   type: 'bg' | 'text',
 ): string | undefined {
-  console.log(status)
   if (status === 'not-tracking' || status === 'expired') {
     return `${type}-accent-dark`
   }
@@ -44,10 +43,7 @@ export function getGoalProgress(goal: Goal): number {
 }
 
 export function getGoalProgressPercentage(goal: Goal): number {
-  console.log(getGoalProgress(goal), goal.amount)
-  const f = Math.round((getGoalProgress(goal) / goal.amount) * 100)
-  console.log(f)
-  return f
+  return Math.round((getGoalProgress(goal) / goal.amount) * 100)
 }
 
 export function getGoalTimeProgressPercentage(goal: Goal): number {

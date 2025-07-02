@@ -180,7 +180,7 @@ import type {
 import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
 import type { ManipulateType } from 'dayjs'
-import { indexBy } from 'ramda'
+import { indexBy, sum } from 'ramda'
 
 const props = defineProps<{
   defaultOpen?: boolean
@@ -230,7 +230,19 @@ const dates = computed(() => {
         isSameDateInUnit(entry.createdAt, date, interval.value),
       )
       const x = toStartOfDay(date)
-      const y = entriesForDate.length || 0
+      let y = 0
+
+      switch (goal.value!.type) {
+        case 'books':
+          y = entriesForDate.length
+          break
+        case 'pages':
+          y = sum(entriesForDate.map((entry) => (entry as PageGoalEntry).pages))
+          break
+        case 'hours':
+          y = sum(entriesForDate.map((entry) => (entry as HourGoalEntry).hours))
+          break
+      }
 
       return { x, y, entries: entriesForDate }
     })
@@ -259,56 +271,47 @@ const chartItems = computed<LineChartItem[]>(() => {
 
 function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
   if (goal.value) {
-    switch (goal.value.type) {
-      case 'books': {
-        const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
+    const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
 
-        const isCurrentGoalReached =
-          goal.value.entries.length >= goal.value.amount
+    const isCurrentGoalReached = goal.value.entries.length >= goal.value.amount
 
-        return dates.value.reduce<
-          [LineChartItem['values'], LineChartItem['values']]
-        >(
-          ([actualDates, projectedDates], { x, y }, index) => {
-            const accumulatedYActual = (actualDates[index - 1]?.y ?? 0) + y
-            const accumulatedYProjected =
-              (projectedDates[index - 1]?.y ?? 0) + y
+    return dates.value.reduce<
+      [LineChartItem['values'], LineChartItem['values']]
+    >(
+      ([actualDates, projectedDates], { x, y }, index) => {
+        const accumulatedYActual = (actualDates[index - 1]?.y ?? 0) + y
+        const accumulatedYProjected = (projectedDates[index - 1]?.y ?? 0) + y
 
-            // connect the actual and projected lines
-            if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
-              actualDates.push({ y: accumulatedYActual, x })
-              if (!isCurrentGoalReached) {
-                projectedDates.push({ y: accumulatedYActual, x })
-              }
-              // push actual values
-            } else if (isBeforeDay(x, lastEntryDate)) {
-              actualDates.push({
-                y: accumulatedYActual,
-                x,
-              })
-              projectedDates.push({ x, y: undefined })
-              // push projected values
-            } else {
-              projectedDates.push({
-                y: getProjectedValue(
-                  dates.value.length - actualDates.length,
-                  projectedDates.length - actualDates.length + 1,
-                  accumulatedYProjected,
-                  goal.value!.amount,
-                ),
-                x,
-              })
-            }
+        // connect the actual and projected lines
+        if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
+          actualDates.push({ y: accumulatedYActual, x })
+          if (!isCurrentGoalReached) {
+            projectedDates.push({ y: accumulatedYActual, x })
+          }
+          // push actual values
+        } else if (isBeforeDay(x, lastEntryDate)) {
+          actualDates.push({
+            y: accumulatedYActual,
+            x,
+          })
+          projectedDates.push({ x, y: undefined })
+          // push projected values
+        } else {
+          projectedDates.push({
+            y: getProjectedValue(
+              dates.value.length - actualDates.length,
+              projectedDates.length - actualDates.length + 1,
+              accumulatedYProjected,
+              goal.value!.amount,
+            ),
+            x,
+          })
+        }
 
-            return [actualDates, projectedDates]
-          },
-          [[], []],
-        )
-      }
-      case 'pages':
-      case 'hours':
-        return [[], []]
-    }
+        return [actualDates, projectedDates]
+      },
+      [[], []],
+    )
   }
   return [[], []]
 }
