@@ -8,6 +8,8 @@
       'h-4': size === 'lg',
     }"
     style="transform: translateZ(0)"
+    @mouseenter="hovered = true"
+    @mouseleave="hovered = false"
   >
     <ProgressIndicator
       class="size-full rounded-full transition-transform duration-[660ms] ease-in"
@@ -29,6 +31,8 @@ withDefaults(
   }>(),
   { size: 'md', color: 'bg-main' },
 )
+
+const hovered = ref(false)
 
 const progressValue = defineModel<number>('progressValue', {
   default: 0,

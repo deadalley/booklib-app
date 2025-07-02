@@ -1,7 +1,7 @@
 <template>
   <TooltipProvider>
     <TooltipRoot :delay-duration="150">
-      <TooltipTrigger>
+      <TooltipTrigger v-bind="$attrs">
         <slot />
       </TooltipTrigger>
       <TooltipPortal>

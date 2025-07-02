@@ -4,7 +4,7 @@
       <div class="flex items-center gap-2">
         <component
           :is="icons[GOAL_TYPE_MAP[goal.type].icon]"
-          :class="getProgressColor(goal.status, 'text')"
+          :class="getGoalProgressColor(goal.status, 'text')"
           :size="ICON_SIZE_LARGE"
           stroke="1.5"
         />
@@ -80,16 +80,8 @@
         </bl-button>
       </div>
     </template>
-    <div class="mt-8 flex flex-col gap-2">
-      <bl-progress-bar
-        v-model:progress-value="goal.progress"
-        size="sm"
-        :color="getProgressColor(goal.status, 'bg')"
-      />
-      <div class="flex justify-between">
-        <p class="text-accent-darker">{{ toFullDate(goal.startAt) }}</p>
-        <p class="text-accent-darker">{{ toFullDate(goal.finishAt) }}</p>
-      </div>
+    <div class="pt-8">
+      <bl-goal-progress-bar :goal="goal" />
     </div>
     <template #collapsible>
       <bl-tabs
@@ -183,7 +175,7 @@ import type {
   BookGoalEntry,
   HourGoalEntry,
   PageGoalEntry,
-  ViewGoal,
+  Goal,
 } from '~/types/goal'
 import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
@@ -197,7 +189,7 @@ const props = defineProps<{
   reloadGoals: () => Promise<void>
 }>()
 
-const goal = defineModel<ViewGoal>('goal')
+const goal = defineModel<Goal>('goal')
 const entry = ref<
   Partial<BookGoalEntry | PageGoalEntry | HourGoalEntry> | undefined
 >()
@@ -321,26 +313,6 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
   return [[], []]
 }
 
-function getProgressColor(
-  status: string,
-  type: 'bg' | 'text',
-): string | undefined {
-  if (status === 'not-tracking' || status === 'expired') {
-    return `${type}-accent-dark`
-  }
-
-  if (status === 'tracking') {
-    return `${type}-main`
-  }
-
-  // bg-main-light text-main-light
-  if (status === 'finished') {
-    return `${type}-main-light`
-  }
-
-  return undefined
-}
-
 function getProgressInterval(): ManipulateType {
   if (goal.value) {
     if (goal.value.interval === 'total') {
@@ -352,20 +324,6 @@ function getProgressInterval(): ManipulateType {
   }
 
   return 'month'
-}
-
-function getUnit(value: number): string | undefined {
-  if (goal.value) {
-    switch (goal.value.type) {
-      case 'books':
-        return value > 1 || value === 0 ? 'books' : 'book'
-      case 'pages':
-        return value > 1 || value === 0 ? 'pages' : 'page'
-      case 'hours':
-        return value > 1 || value === 0 ? 'hours' : 'hour'
-    }
-  }
-  return undefined
 }
 
 function getProjectedValue(
@@ -386,9 +344,13 @@ function getProjectedValue(
 }
 
 function tooltipFormatter({ x, y }: { x: string; y?: number }): string {
+  if (!goal.value) {
+    return ''
+  }
+
   const entriesForDate = dates.value.find((date) => date.x === x)?.entries
 
-  const accumulatedValue = `<b>${y} ${getUnit(+(y ?? 0))} read in total</b>`
+  const accumulatedValue = `<b>${y} ${getGoalUnit(goal.value, +(y ?? 0))} read in total</b>`
 
   if (entriesForDate?.length) {
     const listItems = entriesForDate
@@ -405,7 +367,7 @@ function tooltipFormatter({ x, y }: { x: string; y?: number }): string {
     return `${accumulatedValue}<br /><div class='text-start'>Books read on ${toFullDateCompact(x)}:</div><div class='text-start'>${listItems}</div>`
   }
 
-  return `${accumulatedValue}<br />No ${getUnit(10)} read on ${toFullDateCompact(x)}`
+  return `${accumulatedValue}<br />No ${getGoalUnit(goal.value, 10)} read on ${toFullDateCompact(x)}`
 }
 
 function onCreateNew() {
@@ -431,7 +393,7 @@ async function onTrack() {
       body: {
         ...goal.value,
         status: goal.value.status === 'tracking' ? 'not-tracking' : 'tracking',
-      } as ViewGoal,
+      } as Goal,
     })
 
     goal.value = { ...goal.value, ...updatedGoal }

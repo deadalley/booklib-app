@@ -52,7 +52,3 @@ export type Goal = (BookGoal | PageGoal | HourGoal) & {
   author: string | null
   genres: string[]
 }
-
-export type ViewGoal = Goal & {
-  progress: number
-}

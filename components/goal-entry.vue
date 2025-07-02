@@ -87,7 +87,7 @@ import type {
   BookGoalEntry,
   HourGoalEntry,
   PageGoalEntry,
-  ViewGoal,
+  Goal,
 } from '~/types/goal'
 import { reset } from '@formkit/core'
 
@@ -96,7 +96,7 @@ const props = defineProps<{
   reloadGoals: () => Promise<void>
 }>()
 
-const goal = defineModel<ViewGoal>('goal')
+const goal = defineModel<Goal>('goal')
 const entry =
   defineModel<Partial<BookGoalEntry | PageGoalEntry | HourGoalEntry>>('entry')
 const editing = defineModel<boolean>('editing')
@@ -141,14 +141,14 @@ async function onSubmit() {
 
   if (goal.value && newEntry) {
     try {
-      await $fetch<ViewGoal>('/api/goals', {
+      await $fetch<Goal>('/api/goals', {
         method: 'POST',
         body: {
           ...goal.value,
           entries: isNew.value
             ? goal.value.entries.concat(newEntry)
             : goal.value.entries,
-        } as ViewGoal,
+        } as Goal,
       })
 
       props.reloadGoals()

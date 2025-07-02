@@ -66,7 +66,7 @@ import { IconChartAreaLine, IconPlus } from '@tabler/icons-vue'
 import { indexBy } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
-import type { ViewGoal, Goal } from '~/types/goal'
+import type { Goal } from '~/types/goal'
 
 const { data: authors } = await useFetch<Author[]>('/api/authors')
 const { data: books } = await useFetch<Book[]>('/api/books')
@@ -80,23 +80,7 @@ const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
 const selectedGoal = ref<Goal | undefined>()
 
-const sortedGoals = computed(() =>
-  sortGoals(goals.value ?? []).map<ViewGoal>((goal) => ({
-    ...goal,
-    progress: getGoalProgress(goal),
-  })),
-)
-
-// function getGoalTimeProgress(goal: Goal): number {
-//   return getElapsedTimePercentage(now(), {
-//     start: goal.startAt,
-//     end: goal.finishAt,
-//   })
-// }
-
-function getGoalProgress(goal: Goal): number {
-  return Math.round((goal.entries.length / goal.amount) * 100)
-}
+const sortedGoals = computed(() => sortGoals(goals.value ?? []))
 
 // TODO: return author name with book from server
 function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
