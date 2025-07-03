@@ -244,6 +244,7 @@ async function onSaveChanges() {
 async function onSubmit(goalValues: Goal) {
   try {
     const dateInterval = getIntervalFromDateRange()
+
     const updatedGoal = await $fetch<Goal>('/api/goals', {
       method: 'POST',
       body: {
@@ -256,7 +257,7 @@ async function onSubmit(goalValues: Goal) {
     reset('goal')
     open.value = false
     dateRange.value = undefined
-    props.reloadGoals()
+    // await props.reloadGoals()
     goal.value = updatedGoal
     return updatedGoal
   } catch (error) {

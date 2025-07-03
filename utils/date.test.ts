@@ -35,7 +35,7 @@ describe('date', () => {
 
   describe('toSimpleDate', () => {
     it('should format date to simple date', () => {
-      const date = '2020-10-01T12:00:00.000Z'
+      const date = '2020-10-01T00:00:00.000Z'
       const simpleDate = toSimpleDate(date)
 
       expect(simpleDate).toBe('2020-10-01')

@@ -1,3 +1,4 @@
+import { sum } from 'ramda'
 import type { Goal } from '~/types/goal'
 
 export function getGoalProgressColor(
@@ -36,9 +37,9 @@ export function getGoalProgress(goal: Goal): number {
     case 'books':
       return goal.entries.length
     case 'pages':
-      return goal.entries.reduce((acc, entry) => acc + entry.pages, 0)
+      return sum(goal.entries.map((entry) => entry.pages))
     case 'hours':
-      return goal.entries.reduce((acc, entry) => acc + entry.hours, 0)
+      return sum(goal.entries.map((entry) => entry.hours))
   }
 }
 
