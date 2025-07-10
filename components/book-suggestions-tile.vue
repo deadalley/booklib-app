@@ -115,7 +115,7 @@ const options = computed(() => {
     },
     {
       id: 'resumePausedBook',
-      title: `Want to ${pausedBook?.title} another try?`,
+      title: `Want to give ${pausedBook?.title} another try?`,
       icon: icons[PROGRESS_STATUS_MAP.paused.icon],
       buttonLabel: 'Resume reading',
       book: pausedBook,
