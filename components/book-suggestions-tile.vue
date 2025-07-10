@@ -19,7 +19,7 @@
           <p>Rate {{ selectedOption.book.title }}</p>
         </template>
       </div>
-      <template v-if="!loading && !success && !rating">
+      <div v-if="!loading && !success && !rating" class="flex flex-col gap-3">
         <NuxtLink
           :to="`/library/books/${selectedOption.book.id}`"
           class="w-full"
@@ -38,7 +38,7 @@
             <component :is="selectedOption.icon" v-bind="iconProps" />
           </template>
         </bl-button>
-      </template>
+      </div>
     </bl-tile>
   </transition>
 </template>
@@ -95,14 +95,14 @@ const options = computed(() => {
     {
       id: 'startNewBook',
       title: 'How about starting a new book?',
-      icon: icons[PROGRESS_STATUS_MAP.read.icon],
+      icon: icons[PROGRESS_STATUS_MAP.reading.icon],
       buttonLabel: 'Start reading',
       book: unreadBook,
     },
     {
       id: 'finishCurrentBook',
       title: `Are you still reading ${readingBook?.title}?`,
-      icon: icons[PROGRESS_STATUS_MAP.reading.icon],
+      icon: icons[PROGRESS_STATUS_MAP.read.icon],
       buttonLabel: 'Mark as finished',
       book: readingBook,
     },
@@ -116,7 +116,7 @@ const options = computed(() => {
     {
       id: 'resumePausedBook',
       title: `Want to give ${pausedBook?.title} another try?`,
-      icon: icons[PROGRESS_STATUS_MAP.paused.icon],
+      icon: icons[PROGRESS_STATUS_MAP.reading.icon],
       buttonLabel: 'Resume reading',
       book: pausedBook,
     },

@@ -7,7 +7,7 @@
     :collapsible="true"
     :disabled="!$slots['collapsible']"
   >
-    <AccordionItem value="tile">
+    <AccordionItem class="h-full" value="tile">
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
@@ -30,7 +30,7 @@
         </AccordionTrigger>
       </AccordionHeader>
       <slot />
-      <AccordionContent class="accordion-content">
+      <AccordionContent class="accordion-content h-full">
         <slot name="collapsible" />
       </AccordionContent>
     </AccordionItem>
