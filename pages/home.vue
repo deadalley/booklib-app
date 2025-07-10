@@ -42,47 +42,39 @@
     <div v-if="!isEmpty" class="flex flex-col gap-10">
       <h1>Welcome to your library!</h1>
       <div class="flex w-full flex-col gap-4 md:flex-row">
-        <NuxtLink
-          to="/library/books"
-          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
-        >
-          <IconBooks class="text-main" size="50" stroke="1.5" />
-          <h5>Books</h5>
-          <bl-total-tag v-if="books?.length">
-            {{ books?.length }} {{ books?.length > 1 ? 'books' : 'book' }}
-          </bl-total-tag>
-          <NuxtLink to="/library/books/new">
-            <bl-button v-if="!books?.length">Create a book</bl-button>
+        <bl-section-tile icon="IconBooks" href="/library/books">
+          <template #label>Books</template>
+          <template #total>
+            {{ books?.length }}
+            {{ (books?.length ?? 0) > 1 ? 'books' : 'book' }}
+          </template>
+          <NuxtLink v-if="!books?.length" to="/library/books/new">
+            <bl-button>Create a book</bl-button>
           </NuxtLink>
-        </NuxtLink>
-        <NuxtLink
-          to="/library/collections"
-          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
-        >
-          <IconArchive class="text-main" size="50" stroke="1.5" />
-          <h5>Collections</h5>
-          <bl-total-tag v-if="collections?.length">
+        </bl-section-tile>
+        <bl-section-tile icon="IconArchive" href="/library/collections">
+          <template #label>Collections</template>
+          <template #total>
             {{ collections?.length }}
-            {{ collections?.length > 1 ? 'collections' : 'collection' }}
-          </bl-total-tag>
-          <NuxtLink to="/library/collections/new">
-            <bl-button v-if="!collections?.length"
-              >Create a collection</bl-button
-            >
+            {{ (collections?.length ?? 0) > 1 ? 'collections' : 'collection' }}
+          </template>
+          <NuxtLink v-if="!collections?.length" to="/library/collections/new">
+            <bl-button>Create a collection</bl-button>
           </NuxtLink>
-        </NuxtLink>
-        <NuxtLink
-          to="/library/authors"
-          class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-accent bg-white px-4 py-8 hover:bg-accent-light"
-        >
-          <IconFeather class="text-main" size="50" stroke="1.5" />
-          <h5>Authors</h5>
-          <bl-total-tag v-if="authors?.length">
-            {{ authors?.length }}
-            {{ authors?.length > 1 ? 'authors' : 'author' }}
-          </bl-total-tag>
-          <bl-total-tag v-if="!authors?.length"> No authors </bl-total-tag>
-        </NuxtLink>
+        </bl-section-tile>
+        <bl-section-tile icon="IconFeather" href="/library/authors">
+          <template #label>Authors</template>
+          <template #total>
+            <template v-if="authors?.length">
+              {{ authors?.length }}
+              {{ (authors?.length ?? 0) > 1 ? 'authors' : 'author' }}
+            </template>
+            <template v-if="!authors?.length"> No authors </template>
+          </template>
+          <NuxtLink v-if="!authors?.length" to="/library/authors/new">
+            <bl-button>Create a author</bl-button>
+          </NuxtLink>
+        </bl-section-tile>
       </div>
       <div class="flex flex-col gap-8">
         <bl-tile>
@@ -132,13 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconArchive,
-  IconBooks,
-  IconFeather,
-  IconPlus,
-  IconUpload,
-} from '@tabler/icons-vue'
+import { IconPlus, IconUpload } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
