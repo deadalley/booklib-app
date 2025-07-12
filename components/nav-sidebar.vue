@@ -139,14 +139,14 @@ const buttons = [
 const collapsed = ref(true)
 
 onMounted(() => {
-  if (isMobile()) {
+  if (!isMobile()) {
     collapsed.value = false
   }
 })
 
 function isMobile(): boolean {
   if (typeof window !== 'undefined') {
-    return window.innerWidth >= 640
+    return window.innerWidth < 640
   }
   return false
 }

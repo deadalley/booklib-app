@@ -1,7 +1,7 @@
 <template>
   <div class="relative flex h-screen w-screen flex-col sm:flex-row">
     <bl-nav-sidebar />
-    <bl-sidebar :open="sidebarOpen" @close="sidebarOpen = false">
+    <bl-sidebar :open="sidebarOpen" title=" " @close="sidebarOpen = false">
       <ul v-if="!!navItems?.length" class="flex flex-col gap-5">
         <li
           v-for="item of navItems"
