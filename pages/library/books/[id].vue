@@ -5,7 +5,7 @@
   >
     <header class="flex flex-col gap-6">
       <button
-        class="flex items-center gap-2 hover:text-main"
+        class="hidden items-center gap-2 hover:text-main sm:flex"
         @click="$router.back()"
       >
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
@@ -13,55 +13,99 @@
       </button>
       <div class="flex flex-col">
         <div
-          class="flex flex-col items-center justify-between gap-3 md:flex-row md:items-center"
+          class="flex flex-col items-start justify-between gap-3 md:flex-row"
         >
-          <div class="flex flex-1 items-center gap-5">
-            <h2 class="flex items-end leading-none">
-              {{ isNew ? 'New Book' : book.title }}
-            </h2>
-            <bl-rating
-              :editing="editing"
-              :rating="book.rating ?? 0"
-              :on-commit="onSelectRating"
-            />
-          </div>
-          <div class="flex gap-2">
-            <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button variant="secondary" @click="onCancel">
-                {{ isNew ? 'Cancel' : 'Discard changes' }}
-              </bl-button>
-              <bl-button @click="onSaveChanges()">
-                {{ isNew ? 'Create book' : 'Save changes' }}
-              </bl-button>
+          <div class="flex flex-col">
+            <div class="flex w-full flex-1 items-center gap-5 sm:w-[unset]">
+              <h2 class="flex items-end leading-none">
+                {{ isNew ? 'New Book' : book.title }}
+              </h2>
+              <bl-rating
+                :editing="editing"
+                :rating="book.rating ?? 0"
+                :on-commit="onSelectRating"
+              />
+              <div class="flex gap-2">
+                <bl-button
+                  v-if="!editing"
+                  variant="secondary"
+                  @click="onEdit(true)"
+                >
+                  <template #prependIcon>
+                    <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+                  </template>
+                </bl-button>
+                <bl-modal
+                  v-if="!isNew && !editing"
+                  size="sm"
+                  @confirm="deleteBook"
+                >
+                  <template #trigger>
+                    <bl-button variant="secondary">
+                      <template #prependIcon>
+                        <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+                      </template>
+                    </bl-button>
+                  </template>
+                  <template #title>
+                    Are you sure you want to delete
+                    <strong>{{ book.title }}</strong>
+                    ?
+                  </template>
+                  This action cannot be undone.
+                  <template #cancel-label> Cancel </template>
+                  <template #action-label> Delete </template>
+                </bl-modal>
+              </div>
             </div>
-
-            <bl-button
-              v-if="!editing"
-              variant="secondary"
-              @click="onEdit(true)"
-            >
-              Edit
-            </bl-button>
-            <bl-modal v-if="!isNew && !editing" size="sm" @confirm="deleteBook">
-              <template #trigger>
-                <bl-button>Delete</bl-button>
-              </template>
-              <template #title>
-                Are you sure you want to delete
-                <strong>{{ book.title }}</strong>
-                ?
-              </template>
-              This action cannot be undone.
-              <template #cancel-label> Cancel </template>
-              <template #action-label> Delete </template>
-            </bl-modal>
+            <h5 v-if="authorName">{{ authorName }}</h5>
           </div>
-          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
-            <p>Added on</p>
-            <h6 class="w-max">{{ formattedDate }}</h6>
+          <div
+            class="flex w-full flex-col-reverse items-start gap-3 sm:w-[unset] sm:flex-row"
+          >
+            <div class="flex w-full">
+              <div v-if="editing" class="flex w-full justify-start gap-2">
+                <bl-button expand variant="secondary" @click="onCancel">
+                  {{ isNew ? 'Cancel' : 'Discard changes' }}
+                </bl-button>
+                <bl-button expand @click="onSaveChanges()">
+                  {{ isNew ? 'Create book' : 'Save changes' }}
+                </bl-button>
+              </div>
+
+              <div class="hidden gap-2 sm:flex">
+                <bl-button
+                  v-if="!editing"
+                  variant="secondary"
+                  @click="onEdit(true)"
+                >
+                  Edit
+                </bl-button>
+                <bl-modal
+                  v-if="!isNew && !editing"
+                  size="sm"
+                  @confirm="deleteBook"
+                >
+                  <template #trigger>
+                    <bl-button>Delete</bl-button>
+                  </template>
+                  <template #title>
+                    Are you sure you want to delete
+                    <strong>{{ book.title }}</strong>
+                    ?
+                  </template>
+                  This action cannot be undone.
+                  <template #cancel-label> Cancel </template>
+                  <template #action-label> Delete </template>
+                </bl-modal>
+              </div>
+            </div>
+            <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
+              <p>Added on</p>
+              <h6 class="w-max">{{ formattedDate }}</h6>
+            </div>
           </div>
         </div>
-        <h5 v-if="authorName">{{ authorName }}</h5>
       </div>
     </header>
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
@@ -365,7 +409,7 @@ import { faker } from '@faker-js/faker'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
-import { IconArrowLeft, icons } from '@tabler/icons-vue'
+import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 import type { Author } from '~/types/author'
 
