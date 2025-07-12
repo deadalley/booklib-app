@@ -1,0 +1,39 @@
+name: "[📊] CI"
+
+concurrency:
+  cancel-in-progress: true
+  group: ci-booklib-app-${{ github.ref }}
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.2
+
+      - name: install dependencies
+        run: yarn install
+
+      - name: typecheck
+        run: yarn lint:ts
+
+      - name: eslint
+        run: yarn lint:js
+
+      - name: prettier
+        run: yarn lint:prettier
+
+      - name: tests
+        run: yarn test
