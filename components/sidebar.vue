@@ -7,7 +7,7 @@
       <div class="flex justify-between">
         <h4 v-if="!!title">{{ title }}</h4>
 
-        <bl-icon-button variant="tertiary" @click="open = false">
+        <bl-icon-button variant="tertiary" @click="$emit('close')">
           <template #default="iconProps">
             <IconX v-bind="iconProps" />
           </template>
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { IconX } from '@tabler/icons-vue'
 
-defineProps<{ title?: string }>()
+defineProps<{ title?: string; open?: boolean }>()
 
-const open = defineModel<boolean>()
+defineEmits(['close'])
 </script>

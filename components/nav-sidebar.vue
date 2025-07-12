@@ -138,8 +138,6 @@ const buttons = [
 
 const collapsed = ref(true)
 
-watch(collapsed, (v) => console.log(v))
-
 onMounted(() => {
   if (isMobile()) {
     collapsed.value = false

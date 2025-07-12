@@ -1,7 +1,19 @@
 <template>
   <div class="relative flex h-screen w-screen flex-col sm:flex-row">
-    <bl-nav-sidebar :open="sidebarOpen" />
-    <bl-sidebar :open="sidebarOpen"></bl-sidebar>
+    <bl-nav-sidebar />
+    <bl-sidebar :open="sidebarOpen" @close="sidebarOpen = false">
+      <ul v-if="!!navItems?.length" class="flex flex-col gap-5">
+        <li
+          v-for="item of navItems"
+          :key="item.label"
+          class="text-xl hover:text-main"
+        >
+          <NuxtLink :to="item.to" @click="sidebarOpen = false">{{
+            item.label
+          }}</NuxtLink>
+        </li>
+      </ul>
+    </bl-sidebar>
     <main
       class="relative flex h-0 w-full flex-1 flex-col sm:h-screen sm:flex-[unset]"
     >
@@ -26,6 +38,7 @@
           :size="ICON_SIZE_MEDIUM"
           stroke="1.5"
           class="cursor-pointer hover:text-main sm:hidden"
+          @click="sidebarOpen = !sidebarOpen"
         />
       </nav>
       <div
