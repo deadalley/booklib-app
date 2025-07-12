@@ -65,7 +65,7 @@
           class="text-main"
         />
         <h6
-          class="overflow-hidden"
+          class="overflow-hidden !p-0"
           :style="{
             display: '-webkit-box',
             '-webkit-line-clamp': 2,
