@@ -1,7 +1,12 @@
 <template>
   <div class="relative flex h-screen w-screen flex-col sm:flex-row">
     <bl-nav-sidebar />
-    <bl-sidebar :open="sidebarOpen" title=" " @close="sidebarOpen = false">
+    <bl-sidebar
+      v-if="!!navItems?.length"
+      :open="sidebarOpen"
+      title=" "
+      @close="sidebarOpen = false"
+    >
       <ul v-if="!!navItems?.length" class="flex flex-col gap-5">
         <li
           v-for="item of navItems"
@@ -35,6 +40,7 @@
         <slot name="action-btn" />
 
         <IconMenu2
+          v-if="!!navItems?.length"
           :size="ICON_SIZE_MEDIUM"
           stroke="1.5"
           class="cursor-pointer hover:text-main sm:hidden"

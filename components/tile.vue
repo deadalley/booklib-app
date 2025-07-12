@@ -11,7 +11,7 @@
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
-        class="accordion-header flex w-full flex-1 items-center justify-between gap-3"
+        class="accordion-header flex w-full flex-1 items-start justify-between gap-3 sm:items-center"
       >
         <div
           class="flex w-full flex-1 items-center justify-between"
@@ -30,7 +30,7 @@
         </div>
         <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
-            class="accordion-chevron cursor-pointer text-accent-darker transition-transform duration-300 ease-in"
+            class="accordion-chevron mt-2 cursor-pointer text-accent-darker transition-transform duration-300 ease-in sm:mt-0"
             :size="ICON_SIZE_SMALL"
           />
         </AccordionTrigger>

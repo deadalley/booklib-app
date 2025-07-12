@@ -27,16 +27,6 @@
                   placeholder="Title"
                 />
               </div>
-              <div class="form-row">
-                <bl-checkbox
-                  id="isActive"
-                  v-model="trackingGoal"
-                  name="isActive"
-                  align="left"
-                >
-                  Active
-                </bl-checkbox>
-              </div>
             </div>
           </section>
           <section class="book-section">
@@ -49,7 +39,17 @@
               Goal
             </h6>
             <div class="form-section">
-              <div class="form-row items-end">
+              <div class="form-row">
+                <bl-checkbox
+                  id="isActive"
+                  v-model="trackingGoal"
+                  name="isActive"
+                  align="left"
+                >
+                  Create goal as active
+                </bl-checkbox>
+              </div>
+              <div class="form-row sm:items-end">
                 <bl-input
                   id="amount"
                   type="number"

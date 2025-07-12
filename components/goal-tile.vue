@@ -1,14 +1,19 @@
 <template>
-  <bl-tile v-if="goal" v-bind="$attrs" :default-open="defaultOpen">
+  <bl-tile
+    v-if="goal"
+    v-bind="$attrs"
+    :default-open="defaultOpen"
+    align-header-vertical-on-small-screens
+  >
     <template #title>
-      <div class="flex items-center gap-2">
+      <div class="flex max-w-80 flex-1 items-center gap-2 sm:max-w-[unset]">
         <component
           :is="icons[GOAL_TYPE_MAP[goal.type].icon]"
           :class="getGoalProgressColor(goal.status, 'text')"
           :size="ICON_SIZE_LARGE"
           stroke="1.5"
         />
-        <h5>{{ goal.title }}</h5>
+        <h5 class="truncate">{{ goal.title }}</h5>
         <span class="mb-1 ml-2">
           <bl-total-tag
             :variant="goal.status === 'tracking' ? 'primary' : 'secondary'"
@@ -24,10 +29,10 @@
       </div>
     </template>
     <template #actions>
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex w-full items-center gap-1 sm:justify-end">
         <bl-modal size="sm" @confirm="deleteGoal">
           <template #trigger="triggerProps">
-            <bl-button variant="tertiary" v-bind="triggerProps">
+            <bl-button variant="secondary" v-bind="triggerProps">
               <template #prependIcon="iconProps">
                 <IconTrash v-bind="iconProps" />
               </template>
@@ -52,7 +57,7 @@
           :reload-goals="reloadGoals"
         >
           <template #trigger="triggerProps">
-            <bl-button v-bind="triggerProps" variant="tertiary">
+            <bl-button v-bind="triggerProps" variant="secondary">
               <template #prependIcon="iconProps">
                 <IconPencil v-bind="iconProps" />
               </template>
@@ -62,18 +67,17 @@
         <bl-button
           v-if="goal.status === 'tracking' || goal.status === 'not-tracking'"
           variant="secondary"
+          class="h-full"
           @click="onTrack"
         >
           <template #prependIcon="iconProps">
             <IconPlayerPause
               v-if="goal.status === 'tracking'"
               v-bind="iconProps"
-              :size="ICON_SIZE_SMALL - 4"
             />
             <IconPlayerPlay
               v-if="goal.status === 'not-tracking'"
               v-bind="iconProps"
-              :size="ICON_SIZE_SMALL - 4"
             />
           </template>
           {{ goal.status === 'tracking' ? 'Pause' : 'Track' }}
