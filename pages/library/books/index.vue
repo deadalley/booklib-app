@@ -78,11 +78,7 @@
       @book-select="onBookSelect"
     />
   </NuxtLayout>
-  <bl-sidebar
-    :title="sidebarContent"
-    :is-open="!!sidebarContent"
-    :on-close="onCloseSidebar"
-  >
+  <bl-sidebar :title="sidebarContent" :open="!!sidebarContent">
     <bl-book-table-columns-selector
       v-if="sidebarContent === 'Table'"
       v-model:selected-table-columns="selectedTableColumns"

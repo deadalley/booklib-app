@@ -1,13 +1,13 @@
 <template>
   <transition name="sidebar-slide-right">
     <div
-      v-show="isOpen"
+      v-show="open"
       class="absolute inset-x-0 top-0 z-50 flex h-full flex-col gap-8 overflow-auto border-l border-l-accent bg-background px-8 pb-16 pt-8 text-black shadow-md md:left-[unset] md:w-[355px]"
     >
       <div class="flex justify-between">
         <h4 v-if="!!title">{{ title }}</h4>
 
-        <bl-icon-button variant="tertiary" @click="onClose">
+        <bl-icon-button variant="tertiary" @click="open = false">
           <template #default="iconProps">
             <IconX v-bind="iconProps" />
           </template>
@@ -23,5 +23,7 @@
 <script setup lang="ts">
 import { IconX } from '@tabler/icons-vue'
 
-defineProps<{ title?: string; isOpen: boolean; onClose: () => void }>()
+defineProps<{ title?: string }>()
+
+const open = defineModel<boolean>()
 </script>

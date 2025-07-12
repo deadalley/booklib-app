@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="hidden h-full flex-col gap-6 overflow-hidden border-r border-r-accent bg-background pb-8 pt-16 transition-all duration-500 md:flex"
+    class="order-last flex w-full flex-col gap-6 overflow-hidden border-r border-t border-accent bg-background py-2 transition-all duration-500 sm:order-none sm:h-full sm:w-[unset] sm:border-t-0 sm:pb-8 sm:pt-16"
     :class="{
       'px-6': !collapsed,
       'px-2': collapsed,
@@ -8,7 +8,7 @@
     :style="{ 'min-width': collapsed ? '0px' : '255px' }"
   >
     <div
-      class="flex items-center"
+      class="hidden items-center sm:flex"
       :class="{
         'justify-center': collapsed,
         'justify-between': !collapsed,
@@ -33,8 +33,12 @@
         @click="onCollapse"
       />
     </div>
-    <div class="flex flex-1 flex-col justify-between">
-      <div class="flex flex-1 flex-col gap-3">
+    <div
+      class="flex flex-1 justify-center gap-3 sm:flex-col sm:justify-between"
+    >
+      <div
+        class="flex justify-center gap-3 sm:flex-1 sm:flex-col sm:justify-start"
+      >
         <bl-nav-sidebar-button
           v-for="button in buttons"
           :key="button.label"
@@ -60,7 +64,7 @@
           </template>
         </bl-nav-sidebar-button>
       </div>
-      <div class="flex flex-col gap-3">
+      <div class="flex gap-3 sm:flex-col">
         <bl-nav-sidebar-button
           to="/settings"
           :active="route.path.includes('settings')"
@@ -132,7 +136,22 @@ const buttons = [
   },
 ]
 
-const collapsed = useState<boolean>('collapsed', () => false)
+const collapsed = ref(true)
+
+watch(collapsed, (v) => console.log(v))
+
+onMounted(() => {
+  if (isMobile()) {
+    collapsed.value = false
+  }
+})
+
+function isMobile(): boolean {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth >= 640
+  }
+  return false
+}
 
 function onCollapse() {
   collapsed.value = !collapsed.value
