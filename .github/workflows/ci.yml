@@ -1,4 +1,4 @@
-name: "[📊] CI"
+name: '[📊] CI'
 
 concurrency:
   cancel-in-progress: true
@@ -23,17 +23,17 @@ jobs:
         with:
           node-version: 20.12.2
 
-      - name: install dependencies
+      - name: Install dependencies
         run: yarn install
 
-      - name: typecheck
+      - name: Run typecheck
         run: yarn lint:ts
 
-      - name: eslint
+      - name: Run ESLint
         run: yarn lint:js
 
-      - name: prettier
+      - name: Run Prettier
         run: yarn lint:prettier
 
-      - name: tests
+      - name: Run tests
         run: yarn test
