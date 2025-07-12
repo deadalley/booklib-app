@@ -3,10 +3,19 @@
     class="order-last flex w-full flex-col gap-6 overflow-hidden border-r border-t border-accent bg-background py-2 transition-all duration-500 sm:order-none sm:h-full sm:w-[unset] sm:border-t-0 sm:pb-8 sm:pt-16"
     :class="{
       'px-6': !collapsed,
-      'px-2': collapsed,
+      'items-center px-2': collapsed,
     }"
     :style="{ 'min-width': collapsed ? '0px' : '255px' }"
   >
+    <NuxtImg
+      src="/logo.svg"
+      alt="BookLib"
+      class="w-6 transition-all duration-500"
+      :class="{
+        'max-w-0 opacity-0': !collapsed,
+        'max-w-[200px] opacity-100': collapsed,
+      }"
+    />
     <div
       class="hidden items-center sm:flex"
       :class="{
@@ -21,7 +30,10 @@
           'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
         }"
       >
-        <NuxtLink to="/">BOOKLIB</NuxtLink>
+        <NuxtLink class="flex gap-2" to="/">
+          <NuxtImg src="/logo.svg" alt="BookLib" class="w-6" />
+          BOOKLIB
+        </NuxtLink>
       </h3>
       <IconChevronLeftPipe
         class="cursor-pointer text-accent-darker transition-all duration-100 hover:text-main"
