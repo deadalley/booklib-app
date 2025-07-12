@@ -3,7 +3,7 @@
 }
 
 .switch-option {
-  @apply flex cursor-pointer items-center justify-center border border-accent bg-white text-black ring-inset transition-all first:rounded-l-xl last:rounded-r-xl hover:bg-accent-light active:bg-accent lg:w-full;
+  @apply flex w-full cursor-pointer items-center justify-center border border-accent bg-white text-black ring-inset transition-all first:rounded-l-xl last:rounded-r-xl hover:bg-accent-light active:bg-accent;
 }
 
 .switch-option-inner {

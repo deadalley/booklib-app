@@ -10,14 +10,30 @@
     :loading="loading"
   >
     <template #navbar>
-      <div class="flex w-full items-start gap-3 xl:flex-row">
-        <bl-search-bar @input="onSearch" />
+      <bl-search-bar @input="onSearch" />
+      <NuxtLink class="flex md:inline-flex lg:order-6" to="/library/books/new">
+        <bl-button expand>
+          <template #prependIcon="prependIcon">
+            <IconPlus v-bind="prependIcon" />
+          </template>
+          Book
+        </bl-button>
+      </NuxtLink>
+      <div class="flex justify-end gap-3">
         <bl-view-switch v-model:view="view" />
         <bl-tooltip>
           <template #tooltip-content>Filter</template>
           <bl-button variant="tertiary" @click="onFilterOpen">
             <template #appendIcon="iconProps">
               <IconFilter v-bind="iconProps" />
+            </template>
+          </bl-button>
+        </bl-tooltip>
+        <bl-tooltip v-if="view === 'table'">
+          <template #tooltip-content>Table</template>
+          <bl-button variant="tertiary" @click="onTableSettingsOpen">
+            <template #appendIcon="iconProps">
+              <IconTable v-bind="iconProps" />
             </template>
           </bl-button>
         </bl-tooltip>
@@ -29,37 +45,15 @@
             </template>
           </bl-button>
         </bl-tooltip>
-        <bl-tooltip>
-          <template #tooltip-content>Table</template>
-          <bl-button
-            v-if="view === 'table'"
-            variant="tertiary"
-            @click="onTableSettingsOpen"
-          >
-            <template #appendIcon="iconProps">
-              <IconTable v-bind="iconProps" />
-            </template>
-          </bl-button>
-        </bl-tooltip>
-        <bl-button v-if="editing" expand variant="secondary" @click="onCancel">
+      </div>
+      <div v-if="editing" class="flex justify-end gap-3">
+        <bl-button expand variant="secondary" @click="onCancel">
           Cancel
         </bl-button>
-        <bl-dropdown
-          v-if="editing"
-          :items="dropdownItems"
-          @click="onActionSelect"
-        >
+        <bl-dropdown :items="dropdownItems" @click="onActionSelect">
           Select action
         </bl-dropdown>
       </div>
-      <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-        <bl-button expand>
-          <template #prependIcon="prependIcon">
-            <IconPlus v-bind="prependIcon" />
-          </template>
-          Book
-        </bl-button>
-      </NuxtLink>
     </template>
     <div
       v-if="books?.length === 0"
