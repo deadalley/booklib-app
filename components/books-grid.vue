@@ -2,7 +2,7 @@
   <draggable
     :list="books"
     :item-key="(book: ViewBook) => book.id"
-    class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+    class="grid size-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 sm:h-min md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     :animation="200"
     :disabled="!props.draggable"
     @change="
