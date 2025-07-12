@@ -2,28 +2,28 @@
   <NuxtLayout name="dashboard" title="Statistics">
     <h3 class="mb-3">Overview</h3>
     <div class="grid grid-cols-12 gap-4">
-      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+      <bl-kpi-tile class="col-span-6 lg:col-span-3">
         <template #icon="iconProps">
           <IconBooks v-bind="iconProps" />
         </template>
         <template #value>{{ totalReadBooks }}</template>
         <template #unit>books read</template>
       </bl-kpi-tile>
-      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+      <bl-kpi-tile class="col-span-6 lg:col-span-3">
         <template #icon="iconProps">
           <IconBook v-bind="iconProps" />
         </template>
         <template #value>{{ totalReadPages }}</template>
         <template #unit>pages read</template>
       </bl-kpi-tile>
-      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+      <bl-kpi-tile class="col-span-6 lg:col-span-3">
         <template #icon="iconProps">
           <IconFeather v-bind="iconProps" />
         </template>
         <template #value>{{ totalReadAuthors }}</template>
         <template #unit>authors read</template>
       </bl-kpi-tile>
-      <bl-kpi-tile class="col-span-12 lg:col-span-3">
+      <bl-kpi-tile class="col-span-6 lg:col-span-3">
         <template #icon="iconProps">
           <IconHeartFilled v-bind="iconProps" />
         </template>
@@ -42,7 +42,7 @@
               v-model="pieChartProperty"
               align="end"
               :options="pieChartPropertyOptions"
-              class="ml-4"
+              class="w-full sm:ml-4"
             />
           </div>
         </template>
@@ -57,21 +57,26 @@
           "
         />
       </bl-tile>
-      <bl-tile class="col-span-12 lg:col-span-6">
+      <bl-tile
+        class="col-span-12 lg:col-span-6"
+        align-header-vertical-on-small-screens
+      >
         <template #title>{{ getRankedTitle() }}</template>
         <template #actions>
-          <div class="flex justify-end gap-1">
+          <div
+            class="flex w-full justify-end gap-1 sm:w-[unset] [&_div:last-child_.form-inner]:!w-28"
+          >
             <bl-raw-select
               v-model="rankingChartProperty"
               align="end"
               :options="rankingChartPropertyOptions"
-              class="ml-4 !w-32"
+              class="!min-w-0 sm:min-w-[unset]"
             />
             <bl-raw-select
               v-model="rankingChartPropertyOrder"
               align="end"
               :options="rankingChartPropertyOrderOptions"
-              class="!w-32"
+              class="!min-w-0 sm:min-w-[unset]"
             />
             <bl-input
               id="rankingChartQuantity"
@@ -97,7 +102,7 @@
               v-model="barChartProperty"
               align="end"
               :options="barChartPropertyOptions"
-              class="ml-4"
+              class="w-full sm:ml-4"
             />
           </div>
         </template>

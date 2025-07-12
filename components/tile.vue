@@ -13,17 +13,23 @@
         as="div"
         class="accordion-header flex w-full flex-1 items-center justify-between gap-3"
       >
-        <div class="flex flex-1 items-center justify-between">
+        <div
+          class="flex w-full flex-1 items-center justify-between"
+          :class="{
+            'flex-col gap-3 sm:flex-row': alignHeaderVerticalOnSmallScreens,
+          }"
+        >
           <AccordionTrigger
-            class="flex flex-1 cursor-pointer items-center justify-start"
+            class="flex w-full flex-1 cursor-pointer items-center justify-start"
           >
-            <h5 v-if="$slots['title']"><slot name="title" /></h5>
+            <h5 v-if="$slots['title']" class="truncate">
+              <slot name="title" />
+            </h5>
           </AccordionTrigger>
           <slot name="actions" />
         </div>
-        <AccordionTrigger>
+        <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
-            v-if="$slots['collapsible']"
             class="accordion-chevron cursor-pointer text-accent-darker transition-transform duration-300 ease-in"
             :size="ICON_SIZE_SMALL"
           />
@@ -47,7 +53,13 @@ import {
   AccordionTrigger,
 } from 'radix-vue'
 
-withDefaults(defineProps<{ defaultOpen?: boolean }>(), { defaultOpen: true })
+withDefaults(
+  defineProps<{
+    defaultOpen?: boolean
+    alignHeaderVerticalOnSmallScreens?: boolean
+  }>(),
+  { defaultOpen: true },
+)
 </script>
 
 <style scoped>
