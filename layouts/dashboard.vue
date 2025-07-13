@@ -63,6 +63,4 @@ import { IconMenu2 } from '@tabler/icons-vue'
 defineProps<{ title: string; navItems?: { to?: string; label: string }[] }>()
 
 const sidebarOpen = ref(false)
-
-watch(sidebarOpen, (v) => console.log(v))
 </script>

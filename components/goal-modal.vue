@@ -15,7 +15,7 @@
           v-model="goalForm"
           type="form"
           :actions="false"
-          @submit="onSaveChanges"
+          @submit="onSubmit"
         >
           <section class="book-section">
             <div class="form-section">
@@ -128,7 +128,7 @@
                   placeholder="Select date range"
                 />
               </div>
-              <div v-if="dateRange === 'custom' || !isNew" class="form-row">
+              <div class="form-row">
                 <bl-input
                   id="startAt"
                   type="date"
@@ -152,7 +152,7 @@
             <bl-button variant="secondary" @click="onCancel">
               {{ isNew ? 'Cancel' : 'Discard changes' }}
             </bl-button>
-            <bl-button @click="onSaveChanges">{{
+            <bl-button @click="onSubmit">{{
               isNew ? 'Create goal' : 'Save changes'
             }}</bl-button>
           </div>
@@ -172,6 +172,15 @@ import type { Author } from '~/types/author'
 import type { SelectOption } from './raw-select.vue'
 import { getDateRange, getSixMonthsRange } from '~/utils/date'
 import dayjs from 'dayjs'
+
+const dateRangeOptions: SelectOption[] = [
+  { label: 'This year', value: 'currentYear' },
+  { label: 'Next year', value: 'nextYear' },
+  { label: 'The next six months', value: 'halfYear' },
+  { label: 'This month', value: 'month' },
+  { label: 'Next month', value: 'nextMonth' },
+  { label: 'This week', value: 'week' },
+]
 
 const props = defineProps<{
   isNew?: boolean
@@ -197,9 +206,9 @@ const dateRange = ref<
   | 'currentYear'
   | 'nextYear'
   | 'month'
+  | 'nextMonth'
   | 'week'
   | 'halfYear'
-  | 'custom'
   | undefined
 >()
 
@@ -226,42 +235,36 @@ const genreSelectOptions = computed(() => {
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2))
 })
 
-const dateRangeOptions: SelectOption[] = [
-  { label: 'This year', value: 'currentYear' },
-  { label: 'Next year', value: 'nextYear' },
-  { label: 'The next six months', value: 'halfYear' },
-  { label: 'This month', value: 'month' },
-  { label: 'This week', value: 'week' },
-  { label: 'Set custom duration', value: 'custom' },
-]
-
-async function onSaveChanges() {
+watch(dateRange, () => {
   if (goalForm.value) {
-    await onSubmit(goalForm.value as Goal)
-  }
-}
-
-async function onSubmit(goalValues: Goal) {
-  try {
     const dateInterval = getIntervalFromDateRange()
 
-    const updatedGoal = await $fetch<Goal>('/api/goals', {
-      method: 'POST',
-      body: {
-        ...goalValues,
-        status: trackingGoal.value ? 'tracking' : 'not-tracking',
-        ...(goal.value ? {} : dateInterval),
-      } as Goal,
-    })
+    goalForm.value.startAt = toSimpleDate(dateInterval.startAt)
+    goalForm.value.finishAt = toSimpleDate(dateInterval.finishAt)
+  }
+})
 
-    reset('goal')
-    open.value = false
-    dateRange.value = undefined
-    await props.reloadGoals()
-    goal.value = updatedGoal
-    return updatedGoal
-  } catch (error) {
-    console.error(error)
+async function onSubmit() {
+  if (goalForm.value) {
+    try {
+      const updatedGoal = await $fetch<Goal>('/api/goals', {
+        method: 'POST',
+        body: {
+          ...goalForm.value,
+          status: trackingGoal.value ? 'tracking' : 'not-tracking',
+        } as Goal,
+      })
+
+      reset('goal')
+      open.value = false
+      dateRange.value = undefined
+      await props.reloadGoals()
+      goal.value = updatedGoal
+      goalForm.value = undefined
+      return updatedGoal
+    } catch (error) {
+      console.error(error)
+    }
   }
 }
 
@@ -290,13 +293,10 @@ function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
       return renameGoalKeys(getSixMonthsRange(now()))
     case 'month':
       return renameGoalKeys(getDateRange(now(), 'month'))
+    case 'nextMonth':
+      return renameGoalKeys(getDateRange(dayjs(now()).add(1, 'month'), 'month'))
     case 'week':
       return renameGoalKeys(getDateRange(now(), 'week'))
-    case 'custom':
-      return {
-        startAt: goal.value?.startAt || '',
-        finishAt: goal.value?.finishAt || '',
-      }
     default:
       return {
         startAt: '',
