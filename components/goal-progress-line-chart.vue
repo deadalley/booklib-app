@@ -142,12 +142,14 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
           // push projected values
         } else {
           projectedDates.push({
-            y: getProjectedValue(
-              dates.value.length - actualDates.length,
-              projectedDates.length - actualDates.length + 1,
-              accumulatedYProjected,
-              props.goal!.amount,
-            ),
+            y: isCurrentGoalReached
+              ? props.goal.entries.length
+              : getProjectedValue(
+                  dates.value.length - actualDates.length,
+                  projectedDates.length - actualDates.length + 1,
+                  accumulatedYProjected,
+                  props.goal!.amount,
+                ),
             x,
           })
         }
