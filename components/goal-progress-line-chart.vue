@@ -119,6 +119,17 @@ function getProgressInterval(): ManipulateType {
         start: props.goal.startAt,
         end: props.goal.finishAt,
       })
+    } else {
+      switch (props.goal.interval) {
+        case 'daily':
+          return 'day'
+        case 'weekly':
+          return 'week'
+        case 'monthly':
+          return 'month'
+        case 'yearly':
+          return 'year'
+      }
     }
   }
 
