@@ -4,6 +4,12 @@ export default defineVitestConfig({
   test: {
     environment: 'nuxt',
     globals: true,
+    exclude: [
+      '**/node_modules/**',
+      '**/.output/**',
+      '**/dist/**',
+      '**/tests/**',
+    ],
     // you can optionally set Nuxt-specific environment options
     // environmentOptions: {
     //   nuxt: {
