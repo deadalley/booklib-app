@@ -257,7 +257,7 @@ async function onSubmit(goalValues: Goal) {
     reset('goal')
     open.value = false
     dateRange.value = undefined
-    // await props.reloadGoals()
+    await props.reloadGoals()
     goal.value = updatedGoal
     return updatedGoal
   } catch (error) {
