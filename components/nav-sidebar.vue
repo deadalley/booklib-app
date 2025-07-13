@@ -10,7 +10,7 @@
     <NuxtImg
       src="/logo.svg"
       alt="BookLib"
-      class="w-6 transition-all duration-500"
+      class="hidden w-6 transition-all duration-500 sm:block"
       :class="{
         'max-w-0 opacity-0': !collapsed,
         'max-w-[200px] opacity-100': collapsed,
