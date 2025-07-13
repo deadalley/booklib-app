@@ -166,7 +166,7 @@
 import type { Goal } from '~/types/goal'
 import { reset } from '@formkit/core'
 import { IconLicense, IconTimeDuration30 } from '@tabler/icons-vue'
-import { assoc, curry, reduce, uniq } from 'ramda'
+import { uniq } from 'ramda'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { SelectOption } from './raw-select.vue'
@@ -276,33 +276,22 @@ function dateFormatter(date: Date | undefined): string | undefined {
 }
 
 function getIntervalFromDateRange(): Pick<Goal, 'startAt' | 'finishAt'> {
-  const renameKeys = curry(
-    <T extends { start: string; end: string }>(
-      obj: T,
-    ): Pick<Goal, 'startAt' | 'finishAt'> =>
-      reduce(
-        (acc, key) =>
-          assoc(
-            { start: 'startAt', end: 'finishAt' }[key] || key,
-            obj[key as keyof T],
-            acc,
-          ),
-        { startAt: '', finishAt: '' },
-        Object.keys(obj),
-      ),
-  )
+  const renameGoalKeys = renameKeys({
+    start: 'startAt',
+    end: 'finishAt',
+  })
 
   switch (dateRange.value) {
     case 'currentYear':
-      return renameKeys(getDateRange(now(), 'year'))
+      return renameGoalKeys(getDateRange(now(), 'year'))
     case 'nextYear':
-      return renameKeys(getDateRange(dayjs(now()).add(1, 'year'), 'year'))
+      return renameGoalKeys(getDateRange(dayjs(now()).add(1, 'year'), 'year'))
     case 'halfYear':
-      return renameKeys(getSixMonthsRange(now()))
+      return renameGoalKeys(getSixMonthsRange(now()))
     case 'month':
-      return renameKeys(getDateRange(now(), 'month'))
+      return renameGoalKeys(getDateRange(now(), 'month'))
     case 'week':
-      return renameKeys(getDateRange(now(), 'week'))
+      return renameGoalKeys(getDateRange(now(), 'week'))
     case 'custom':
       return {
         startAt: goal.value?.startAt || '',
