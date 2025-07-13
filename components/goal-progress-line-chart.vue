@@ -1,10 +1,17 @@
 <template>
   <div class="mt-5">
     <bl-line-chart
+      v-if="goal.interval === 'total'"
       :height="320"
-      :items="chartItems"
+      :items="lineChartItems"
       :x-axis-label-formatter="xAxisLabelFormatter"
       :tooltip-formatter="tooltipFormatter"
+    />
+    <bl-bar-chart
+      v-else
+      :height="320"
+      :items="barChartItems"
+      :unit="getGoalUnit(goal, 10)"
     />
   </div>
 </template>
@@ -24,6 +31,7 @@ import type {
 } from '~/types/goal'
 import type { LineChartItem } from './line-chart.client.vue'
 import type { ManipulateType } from 'dayjs'
+import type { BarChartItem } from './bar-chart.client.vue'
 
 const props = defineProps<{
   goal: Goal
@@ -51,8 +59,8 @@ const interval = computed<ManipulateType>(() => {
   return 'month'
 })
 
-const chartItems = computed<LineChartItem[]>(() => {
-  const [actualDates, projectedDates] = getChartDates()
+const lineChartItems = computed<LineChartItem[]>(() => {
+  const [actualDates, projectedDates] = getChartDatesForTotalGoalType()
   return [
     {
       label: 'actual',
@@ -67,6 +75,10 @@ const chartItems = computed<LineChartItem[]>(() => {
       markPoint: 'max',
     },
   ]
+})
+
+const barChartItems = computed<BarChartItem[]>(() => {
+  return getChartDatesForPeriodicGoalType()
 })
 
 const dates = computed(() => {
@@ -113,7 +125,10 @@ function getProgressInterval(): ManipulateType {
   return 'month'
 }
 
-function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
+function getChartDatesForTotalGoalType(): [
+  LineChartItem['values'],
+  LineChartItem['values'],
+] {
   if (props.goal) {
     const lastEntryDate = props.sortedEntries.at(-1)?.createdAt
 
@@ -160,6 +175,36 @@ function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
     )
   }
   return [[], []]
+}
+
+function getChartDatesForPeriodicGoalType(): BarChartItem[] {
+  if (props.goal) {
+    const lastEntryDate = props.sortedEntries.at(-1)?.createdAt
+
+    return dates.value.reduce<BarChartItem[]>((actualDates, { x, y }) => {
+      if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
+        actualDates.push({
+          value: y,
+          label: toFullDateCompact(x),
+        })
+
+        // push actual values
+      } else if (isBeforeDay(x, lastEntryDate)) {
+        actualDates.push({
+          value: y,
+          label: toFullDateCompact(x),
+        })
+      } else {
+        actualDates.push({
+          value: 0,
+          label: toFullDateCompact(x),
+        })
+      }
+
+      return actualDates
+    }, [])
+  }
+  return []
 }
 
 function getProjectedValue(
