@@ -30,7 +30,7 @@
         </div>
         <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
-            class="accordion-chevron mt-2 cursor-pointer text-accent-darker transition-transform duration-300 ease-in sm:mt-0"
+            class="accordion-chevron mt-2 cursor-pointer text-accent-darker transition-transform duration-300 ease-in hover:text-main sm:mt-0"
             :size="ICON_SIZE_SMALL"
           />
         </AccordionTrigger>
