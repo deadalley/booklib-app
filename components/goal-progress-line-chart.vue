@@ -195,12 +195,31 @@ function tooltipFormatter({ x, y }: { x: string; y?: number }): string {
           return booksById.value[(entry as BookGoalEntry).book]?.title
         }
 
+        if ((entry as PageGoalEntry).pages) {
+          return `${(entry as PageGoalEntry).pages} pages`
+        }
+
         return ''
       })
       .map((v) => `‣ ${v}`)
       .join('<br />')
 
-    return `${accumulatedValue}<br /><div class='text-start'>Books read on ${toFullDateCompact(x)}:</div><div class='text-start'>${listItems}</div>`
+    if (props.goal.type === 'books') {
+      return `${accumulatedValue}<br /><div class='text-start'>${capitalize(getGoalUnit(props.goal, 10))} read on ${toFullDateCompact(x)}:</div><div class='text-start'>${listItems}</div>`
+    } else {
+      const accumulatedValueForDate = sum(
+        (entriesForDate || []).map((entry) => {
+          if (props.goal!.type === 'pages') {
+            return (entry as PageGoalEntry).pages
+          } else if (props.goal!.type === 'hours') {
+            return (entry as HourGoalEntry).hours
+          }
+          return 0
+        }),
+      )
+
+      return `${accumulatedValue}<br /><div class='text-start'>${accumulatedValueForDate} ${getGoalUnit(props.goal, accumulatedValueForDate)} read on ${toFullDateCompact(x)}</div>`
+    }
   }
 
   return `${accumulatedValue}<br />No ${getGoalUnit(props.goal, 10)} read on ${toFullDateCompact(x)}`
