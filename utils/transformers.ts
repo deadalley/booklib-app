@@ -1,13 +1,7 @@
 import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
-import {
-  toISOString,
-  fromSimpleDate,
-  now,
-  toStartOfDay,
-  toEndOfDay,
-} from './date'
+import { toISOString, fromSimpleDate, now } from './date'
 import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
@@ -191,8 +185,8 @@ export function goalToDbGoal(goal: Goal): GoalDB {
     title: goal.title,
     interval: goal.interval,
     amount: +goal.amount,
-    start_at: toStartOfDay(fromSimpleDate(goal.startAt)),
-    finish_at: toEndOfDay(fromSimpleDate(goal.finishAt)),
+    start_at: goal.startAt,
+    finish_at: goal.finishAt,
     status: goal.status,
     author_id: goal.author,
     genres: goal.genres || [],

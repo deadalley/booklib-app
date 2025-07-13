@@ -235,6 +235,18 @@ const genreSelectOptions = computed(() => {
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2))
 })
 
+watch(goal, (newGoal) => {
+  goalForm.value = newGoal
+    ? {
+        ...newGoal,
+        startAt: toSimpleDate(newGoal.startAt),
+        finishAt: toSimpleDate(newGoal.finishAt),
+      }
+    : undefined
+
+  trackingGoal.value = newGoal?.status === 'tracking'
+})
+
 watch(dateRange, () => {
   if (goalForm.value) {
     const dateInterval = getIntervalFromDateRange()
@@ -250,7 +262,10 @@ async function onSubmit() {
       const updatedGoal = await $fetch<Goal>('/api/goals', {
         method: 'POST',
         body: {
+          ...goal.value,
           ...goalForm.value,
+          startAt: toStartOfDay(fromSimpleDate(goalForm.value.startAt)),
+          finishAt: toEndOfDay(fromSimpleDate(goalForm.value.finishAt)),
           status: trackingGoal.value ? 'tracking' : 'not-tracking',
         } as Goal,
       })
