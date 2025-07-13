@@ -107,16 +107,12 @@
         </template>
 
         <bl-tab v-if="sortedEntries.length" value="progress">
-          <template v-if="goal.interval === 'total'">
-            <div class="mt-5">
-              <bl-line-chart
-                :height="320"
-                :items="chartItems"
-                :x-axis-label-formatter="xAxisLabelFormatter"
-                :tooltip-formatter="tooltipFormatter"
-              />
-            </div>
-          </template>
+          <bl-goal-line-chart
+            :goal="goal"
+            :books="books"
+            :sorted-entries="sortedEntries"
+            :reload-goals="reloadGoals"
+          />
         </bl-tab>
         <bl-tab value="tracked">
           <div class="mt-5 flex max-h-[502px] flex-col gap-2 overflow-y-auto">
@@ -181,10 +177,7 @@ import type {
   PageGoalEntry,
   Goal,
 } from '~/types/goal'
-import type { LineChartItem } from './line-chart.client.vue'
 import type { Author } from '~/types/author'
-import type { ManipulateType } from 'dayjs'
-import { indexBy, sum } from 'ramda'
 
 const props = defineProps<{
   defaultOpen?: boolean
@@ -199,183 +192,11 @@ const entry = ref<
 >()
 const addingNew = ref<boolean>(false)
 
-const booksById = computed(() =>
-  props.books ? indexBy(({ id }) => String(id), props.books) : {},
-)
-
 const sortedEntries = computed(() => {
   return (goal.value?.entries ?? []).concat().sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   })
 })
-
-const interval = computed<ManipulateType>(() => {
-  if (goal.value) {
-    return getProgressInterval()
-  }
-  return 'month'
-})
-
-const xAxisLabelFormatter = computed(() => {
-  if (interval.value === 'month') {
-    return toMonthYearCompact
-  }
-
-  return toFullDateCompact
-})
-
-const dates = computed(() => {
-  if (goal.value && interval.value) {
-    return getDatesInInterval(
-      { start: goal.value.startAt, end: goal.value.finishAt },
-      interval.value,
-    ).map((date) => {
-      const entriesForDate = sortedEntries.value.filter((entry) =>
-        isSameDateInUnit(entry.createdAt, date, interval.value),
-      )
-      const x = toStartOfDay(date)
-      let y = 0
-
-      switch (goal.value!.type) {
-        case 'books':
-          y = entriesForDate.length
-          break
-        case 'pages':
-          y = sum(entriesForDate.map((entry) => (entry as PageGoalEntry).pages))
-          break
-        case 'hours':
-          y = sum(entriesForDate.map((entry) => (entry as HourGoalEntry).hours))
-          break
-      }
-
-      return { x, y, entries: entriesForDate }
-    })
-  }
-
-  return []
-})
-
-const chartItems = computed<LineChartItem[]>(() => {
-  const [actualDates, projectedDates] = getChartDates()
-  return [
-    {
-      label: 'actual',
-      color: tailwind.theme.colors.main,
-      values: actualDates,
-      markPoint: 'max',
-    },
-    {
-      label: 'projected',
-      color: tailwind.theme.colors.accent,
-      values: projectedDates,
-      markPoint: 'max',
-    },
-  ]
-})
-
-function getChartDates(): [LineChartItem['values'], LineChartItem['values']] {
-  if (goal.value) {
-    const lastEntryDate = sortedEntries.value.at(-1)?.createdAt
-
-    const isCurrentGoalReached = goal.value.entries.length >= goal.value.amount
-
-    return dates.value.reduce<
-      [LineChartItem['values'], LineChartItem['values']]
-    >(
-      ([actualDates, projectedDates], { x, y }, index) => {
-        const accumulatedYActual = (actualDates[index - 1]?.y ?? 0) + y
-        const accumulatedYProjected = (projectedDates[index - 1]?.y ?? 0) + y
-
-        // connect the actual and projected lines
-        if (isSameDateInUnit(x, lastEntryDate, interval.value)) {
-          actualDates.push({ y: accumulatedYActual, x })
-          if (!isCurrentGoalReached) {
-            projectedDates.push({ y: accumulatedYActual, x })
-          }
-          // push actual values
-        } else if (isBeforeDay(x, lastEntryDate)) {
-          actualDates.push({
-            y: accumulatedYActual,
-            x,
-          })
-          projectedDates.push({ x, y: undefined })
-          // push projected values
-        } else {
-          projectedDates.push({
-            y: getProjectedValue(
-              dates.value.length - actualDates.length,
-              projectedDates.length - actualDates.length + 1,
-              accumulatedYProjected,
-              goal.value!.amount,
-            ),
-            x,
-          })
-        }
-
-        return [actualDates, projectedDates]
-      },
-      [[], []],
-    )
-  }
-  return [[], []]
-}
-
-function getProgressInterval(): ManipulateType {
-  if (goal.value) {
-    if (goal.value.interval === 'total') {
-      return getIntervalUnit({
-        start: goal.value.startAt,
-        end: goal.value.finishAt,
-      })
-    }
-  }
-
-  return 'month'
-}
-
-function getProjectedValue(
-  totalSteps: number,
-  currentStep: number,
-  accumulatedValue: number,
-  finalValue: number,
-): number {
-  if (totalSteps <= 0) return finalValue
-
-  const increments = finalValue - accumulatedValue
-  if (increments <= 0) return accumulatedValue
-
-  const stepsPerIncrement = totalSteps / increments
-  const value = accumulatedValue + Math.floor(currentStep / stepsPerIncrement)
-
-  return Math.min(value, finalValue)
-}
-
-function tooltipFormatter({ x, y }: { x: string; y?: number }): string {
-  if (!goal.value) {
-    return ''
-  }
-
-  const entriesForDate = dates.value.find((date) => date.x === x)?.entries
-
-  const accumulatedValue = `<b>${y} ${getGoalUnit(goal.value, +(y ?? 0))} read in total</b>`
-
-  if (entriesForDate?.length) {
-    const listItems = entriesForDate
-      .map((entry) => {
-        if ((entry as BookGoalEntry).book) {
-          return booksById.value[(entry as BookGoalEntry).book]?.title
-        }
-
-        return ''
-      })
-      .map((v) => `‣ ${v}`)
-      .join('<br />')
-
-    return `${accumulatedValue}<br /><div class='text-start'>Books read on ${toFullDateCompact(x)}:</div><div class='text-start'>${listItems}</div>`
-  }
-
-  return `${accumulatedValue}<br />No ${getGoalUnit(goal.value, 10)} read on ${toFullDateCompact(x)}`
-}
 
 function onCreateNew() {
   entry.value = {
