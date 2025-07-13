@@ -3,9 +3,9 @@ import dayjs, {
   type ManipulateType,
   type OpUnitType,
 } from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
+import localizedFormat from 'dayjs/plugin/localizedFormat.js'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

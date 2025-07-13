@@ -1,0 +1,90 @@
+{
+  "authors": [],
+  "books": [
+    {
+      "author_id": null,
+      "id": "3f30d719-0211-41d3-a499-85ca960f54d8",
+      "original_title": null,
+      "cover_src": null,
+      "original_language": null,
+      "isbn": null,
+      "language": null,
+      "pages": null,
+      "publisher": null,
+      "rating": null,
+      "summary": null,
+      "title": "Book 1",
+      "year": null,
+      "genres": [],
+      "progress_status": "not-read",
+      "format": null,
+      "started_at": null,
+      "finished_at": null,
+      "collections": [],
+      "created_at": "2025-07-13T13:20:42.705Z"
+    },
+    {
+      "author_id": null,
+      "id": "159c8387-4c81-40da-a34f-c9ba3bf3031d",
+      "original_title": null,
+      "cover_src": null,
+      "original_language": null,
+      "isbn": null,
+      "language": null,
+      "pages": null,
+      "publisher": null,
+      "rating": null,
+      "summary": null,
+      "title": "Book 2",
+      "year": null,
+      "genres": [],
+      "progress_status": "not-read",
+      "format": null,
+      "started_at": null,
+      "finished_at": null,
+      "collections": [],
+      "created_at": "2025-07-13T13:20:47.628Z"
+    },
+    {
+      "author_id": null,
+      "id": "2d9f3b28-7a8c-4046-9021-e4c1a8d818ff",
+      "original_title": null,
+      "cover_src": null,
+      "original_language": null,
+      "isbn": null,
+      "language": null,
+      "pages": null,
+      "publisher": null,
+      "rating": null,
+      "summary": null,
+      "title": "Book 3",
+      "year": null,
+      "genres": [],
+      "progress_status": "not-read",
+      "format": null,
+      "started_at": null,
+      "finished_at": null,
+      "collections": [],
+      "created_at": "2025-07-13T13:20:51.349Z"
+    }
+  ],
+  "collections": [
+    {
+      "id": "wishlist",
+      "name": "Wishlist",
+      "created_at": "2025-07-13T13:18:42.236Z"
+    },
+    {
+      "id": "favorite",
+      "name": "Favorites",
+      "created_at": "2025-07-13T13:18:42.236Z"
+    },
+    {
+      "name": "Collection 1",
+      "id": "97340c9d-68fe-4910-89f6-63d5e4b59245",
+      "created_at": "2025-07-13T13:20:31.515Z"
+    }
+  ],
+  "collection-book": [],
+  "goals": []
+}
