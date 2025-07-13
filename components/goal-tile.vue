@@ -107,7 +107,7 @@
         </template>
 
         <bl-tab v-if="sortedEntries.length" value="progress">
-          <bl-goal-line-chart
+          <bl-goal-progress-line-chart
             :goal="goal"
             :books="books"
             :sorted-entries="sortedEntries"
