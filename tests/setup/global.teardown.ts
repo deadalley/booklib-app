@@ -11,14 +11,18 @@ teardown('teardown database', async () => {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = path.dirname(__filename)
 
-  const targetPath = path.join(
+  const targetPath1 = path.join(
     __dirname,
     '..',
     '..',
     './.output',
     process.env.USER_DB_PATH,
   )
-  if (existsSync(targetPath)) {
-    unlinkSync(targetPath)
+  const targetPath2 = path.join(__dirname, '..', '..', process.env.USER_DB_PATH)
+  if (existsSync(targetPath1)) {
+    unlinkSync(targetPath1)
+  }
+  if (existsSync(targetPath2)) {
+    unlinkSync(targetPath2)
   }
 })

@@ -13,12 +13,14 @@ setup('setup database', async () => {
 
   const sourceFile = 'booklib-test-base.json'
   const sourcePath = path.join(__dirname, sourceFile)
-  const targetPath = path.join(
+  const targetPath1 = path.join(
     __dirname,
     '..',
     '..',
     './.output',
     process.env.USER_DB_PATH,
   )
-  copyFileSync(sourcePath, targetPath)
+  const targetPath2 = path.join(__dirname, '..', '..', process.env.USER_DB_PATH)
+  copyFileSync(sourcePath, targetPath1)
+  copyFileSync(sourcePath, targetPath2)
 })
