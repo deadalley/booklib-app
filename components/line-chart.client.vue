@@ -103,6 +103,9 @@ const option = computed<EChartsOption>(() => ({
       fontSize: 14,
       color: tailwind.theme.colors['accent-darker'],
       formatter: props.xAxisLabelFormatter,
+      showMinLabel: true,
+      showMaxLabel: true,
+      interval: 'auto',
     },
     axisLine: {
       lineStyle: {
