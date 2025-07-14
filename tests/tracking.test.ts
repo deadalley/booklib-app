@@ -48,7 +48,12 @@ test.describe('create goal', async () => {
       await page.locator('a').filter({ hasText: 'Book 3' }).first().click()
 
       await page.getByRole('tab', { name: 'Progress' }).click()
-      await expect(page.locator('canvas')).toBeVisible()
+
+      const chart = await page.getByLabel('Progress').getByRole('img')
+      await expect(chart).toContainText('Jan 2025')
+      await expect(chart).toContainText('Jul 2025')
+      await expect(chart).toContainText('3')
+      await expect(chart).toContainText('10')
     })
 
     test('by year', async ({ page }) => {

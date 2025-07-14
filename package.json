@@ -19,7 +19,7 @@
     "test:start-app": "nuxt preview --port 3001 --dotenv .env.test",
     "test:e2e": "yarn playwright test --project=chromium",
     "test:e2e:ui": "yarn playwright test --ui",
-    "test:e2e:codegen": "yarn playwright codegen",
+    "test:e2e:codegen": "concurrently 'yarn test:start-app' 'playwright codegen'",
     "test:e2e:report": "playwright show-report",
     "coverage": "vitest run --coverage",
     "story:dev": "histoire dev",
