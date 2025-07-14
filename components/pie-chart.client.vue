@@ -1,10 +1,11 @@
 <template>
   <div class="w-full" :style="{ height: `${height}px` }">
-    <VChart :option="option" />
+    <VChart renderer="svg" :option="option" />
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends OptionDataValueNumeric">
+import VChart from 'vue-echarts'
 import { SVGRenderer } from 'echarts/renderers'
 import { type ComposeOption, use } from 'echarts/core'
 import { type PieSeriesOption, PieChart } from 'echarts/charts'

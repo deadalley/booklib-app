@@ -1,10 +1,11 @@
 <template>
   <div class="w-full" :style="{ height: `${height}px` }">
-    <VChart :option="option" :autoresize="true" />
+    <VChart renderer="svg" :option="option" :autoresize="true" />
   </div>
 </template>
 
 <script setup lang="ts">
+import VChart from 'vue-echarts'
 import { SVGRenderer } from 'echarts/renderers'
 import { type ComposeOption, use } from 'echarts/core'
 import { type BarSeriesOption, BarChart } from 'echarts/charts'
