@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/test-utils/module',
     'nuxt-echarts',
-    'nuxt-electron',
+    ...(process.env.ELECTRON_ENABLED === 'true' ? ['nuxt-electron'] : []),
     'nuxt-file-storage',
   ],
 

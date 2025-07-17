@@ -78,7 +78,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'nuxt dev --open --host --port 3001 --dotenv .env.test',
+    command: 'nuxt dev --host --port 3001 --dotenv .env.test',
     url: 'http://127.0.0.1:3001',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
