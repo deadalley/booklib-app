@@ -58,6 +58,7 @@
                 />
                 <bl-select
                   id="type"
+                  data-testid="tracking-goal-type"
                   type="select"
                   name="type"
                   placeholder="Type"

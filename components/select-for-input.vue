@@ -2,6 +2,7 @@
   <bl-raw-select
     v-model="selectValue"
     v-model:focused="focused"
+    :data-testid="context.attrs?.['data-testid']"
     :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
@@ -17,7 +18,11 @@ import type { SelectOption, SelectProps } from './raw-select.vue'
 const props = withDefaults(
   defineProps<{
     context: {
-      attrs?: { class?: string; 'on-focus'?: (value: boolean) => void }
+      attrs?: {
+        class?: string
+        'data-testid'?: string
+        'on-focus'?: (value: boolean) => void
+      }
       options: SelectOption[]
       node: { input: (value: string) => void; _value: string }
     } & SelectProps

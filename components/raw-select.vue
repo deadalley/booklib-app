@@ -1,6 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
+    :data-testid="dataTestid"
     class="relative w-full"
     :class="{
       'popper-with-wrapper': withWrapper,
@@ -118,6 +119,7 @@ export type SelectOption = {
   icon?: keyof typeof icons
 }
 export type SelectProps = {
+  dataTestid?: string
   options?: SelectOption[]
   groups?: { label?: string; options: SelectOption[] }[]
   placeholder?: string

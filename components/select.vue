@@ -22,6 +22,7 @@
     :groups="groups"
     :placeholder="placeholder"
     :with-wrapper="withWrapper"
+    :data-testid="dataTestid"
     :align="align"
     :side="side"
     :on-focus="(v) => onFocus(v)"
@@ -36,7 +37,14 @@ import type { SelectOption, SelectProps } from './raw-select.vue'
 import SelectForInput from '../components/select-for-input.vue'
 
 const rawSelect = createInput(SelectForInput, {
-  props: ['options', 'placeholder', 'align', 'side', 'withWrapper'],
+  props: [
+    'options',
+    'placeholder',
+    'align',
+    'side',
+    'withWrapper',
+    'data-testid',
+  ],
 })
 
 const inputModel = ref()

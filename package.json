@@ -16,7 +16,7 @@
     "lint": "yarn lint:js && yarn lint:ts && yarn lint:prettier",
     "lint:fix": "prettier . --write --list-different && yarn lint:js --fix",
     "test": "vitest",
-    "test:start-app": "nuxt preview --port 3001 --dotenv .env.test",
+    "test:start-app": "nuxt dev --port 3002 --dotenv .env.test",
     "test:e2e": "yarn playwright test --project=chromium",
     "test:e2e:ui": "yarn playwright test --ui",
     "test:e2e:codegen": "concurrently 'yarn test:start-app' 'playwright codegen'",

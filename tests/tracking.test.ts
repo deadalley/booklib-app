@@ -1,4 +1,16 @@
 import { test, expect } from '@playwright/test'
+import {
+  createBookEntry,
+  createFirstGoalEntry,
+  createGoal,
+  createNewGoalEntry,
+  setAmount,
+  setAsActive,
+  setDateRange,
+  setInterval,
+  setTitle,
+  setType,
+} from './tracking.utils'
 
 test.describe('create goal', async () => {
   test.beforeEach(async ({ page }) => {
@@ -8,49 +20,29 @@ test.describe('create goal', async () => {
 
   test.describe('books', async () => {
     test('total', async ({ page }) => {
+      const goalTitle = '10 books in total in a year'
       await page.getByText('Goal', { exact: true }).click()
 
-      await page.getByRole('textbox', { name: 'Goal title' }).click()
-      await page
-        .getByRole('textbox', { name: 'Goal title' })
-        .fill('10 books in total in a year')
+      await setTitle(page, goalTitle)
+      await setAsActive(page)
+      await setAmount(page, 10)
+      await setType(page, 'Books')
+      await setInterval(page, 'in total')
+      await setDateRange(page, 'This year')
+      await createGoal(page)
 
-      await page.getByText('Create goal as active').click()
+      const main = page.getByRole('main')
+      await expect(main).toContainText(goalTitle)
+      await expect(main).toContainText('Active')
+      await expect(main).toContainText('January 1, 2025')
+      await expect(main).toContainText('December 31, 2025')
 
-      await page.getByPlaceholder('Amount').click()
-      await page.getByPlaceholder('Amount').fill('10')
-
-      await page
-        .locator('div')
-        .filter({ hasText: /^TypeBooksPagesHours$/ })
-        .nth(2)
-        .click()
-      await page.getByLabel('Books').getByText('Books').click()
-
-      await page.getByRole('combobox').filter({ hasText: 'Interval' }).click()
-      await page.getByLabel('in total').getByText('in total').click()
-
-      await page
-        .getByRole('combobox')
-        .filter({ hasText: 'Select date range' })
-        .click()
-      await page.getByLabel('This year').getByText('This year').click()
-
-      await page.getByRole('button', { name: 'Create goal' }).click()
-
-      await expect(page.getByRole('main')).toContainText(
-        '10 books in total in a year',
-      )
-      await expect(page.getByRole('main')).toContainText('Active')
-      await expect(page.getByRole('main')).toContainText('January 1, 2025')
-      await expect(page.getByRole('main')).toContainText('December 31, 2025')
-
-      await page.getByRole('button', { name: 'Create first entry' }).click()
-      await page.locator('a').filter({ hasText: 'Book 1' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page.locator('a').filter({ hasText: 'Book 2' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page.locator('a').filter({ hasText: 'Book 3' }).first().click()
+      await createFirstGoalEntry(page)
+      await createBookEntry(page, 'Book 1')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 2')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 3')
 
       await page.getByRole('tab', { name: 'Progress' }).click()
 
@@ -64,114 +56,67 @@ test.describe('create goal', async () => {
     })
 
     test('by year', async ({ page }) => {
+      const goalTitle = '10 books per year in two years'
       await page.getByText('Goal', { exact: true }).click()
 
-      await page.getByRole('textbox', { name: 'Goal title' }).click()
-      await page
-        .getByRole('textbox', { name: 'Goal title' })
-        .fill('10 books per year in two years')
-
-      await page.getByText('Create goal as active').click()
-
-      await page.getByPlaceholder('Amount').click()
-      await page.getByPlaceholder('Amount').fill('10')
-
-      await page
-        .locator('div')
-        .filter({ hasText: /^TypeBooksPagesHours$/ })
-        .nth(2)
-        .click()
-      await page.getByLabel('Books').getByText('Books').click()
-
-      await page.getByRole('combobox').filter({ hasText: 'Interval' }).click()
-      await page.getByLabel('per year').getByText('per year').click()
+      await setTitle(page, goalTitle)
+      await setAsActive(page)
+      await setAmount(page, 10)
+      await setType(page, 'Books')
+      await setInterval(page, 'per year')
 
       await page.getByRole('textbox', { name: 'Start on' }).fill('2025-01-01')
       await page.getByRole('textbox', { name: 'Finish on' }).fill('2026-12-31')
+      await createGoal(page)
 
-      await page.getByRole('button', { name: 'Create goal' }).click()
+      const main = page.getByRole('main')
+      await expect(main).toContainText(goalTitle)
+      await expect(main).toContainText('Active')
+      await expect(main).toContainText('January 1, 2025')
+      await expect(main).toContainText('December 31, 2026')
 
-      await expect(page.getByRole('main')).toContainText(
-        '10 books per year in two years',
-      )
-      await expect(page.getByRole('main')).toContainText('Active')
-      await expect(page.getByRole('main')).toContainText('January 1, 2025')
-      await expect(page.getByRole('main')).toContainText('December 31, 2026')
-
-      await page.getByRole('button', { name: 'Create first entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-02-01')
-      await page.locator('a').filter({ hasText: 'Book 1' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2026-02-01')
-      await page.locator('a').filter({ hasText: 'Book 2' }).first().click()
+      await createFirstGoalEntry(page)
+      await createBookEntry(page, 'Book 1', '2025-02-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 2', '2026-02-01')
 
       await page.getByRole('tab', { name: 'Progress' }).click()
+
       const xAxisLabels = page.getByLabel('Progress').locator('g')
+
       await expect(xAxisLabels).toContainText('Jan 1, 2025')
       await expect(xAxisLabels).toContainText('Jan 1, 2026')
     })
 
     test('by month', async ({ page }) => {
+      const goalTitle = '10 books per month in a year'
       await page.getByText('Goal', { exact: true }).click()
 
-      await page.getByRole('textbox', { name: 'Goal title' }).click()
-      await page
-        .getByRole('textbox', { name: 'Goal title' })
-        .fill('10 books per month in a year')
+      await setTitle(page, goalTitle)
+      await setAsActive(page)
+      await setAmount(page, 10)
+      await setType(page, 'Books')
+      await setInterval(page, 'per month')
+      await setDateRange(page, 'This year')
+      await createGoal(page)
 
-      await page.getByText('Create goal as active').click()
+      const main = page.getByRole('main')
+      await expect(main).toContainText(goalTitle)
+      await expect(main).toContainText('Active')
+      await expect(main).toContainText('January 1, 2025')
+      await expect(main).toContainText('December 31, 2025')
 
-      await page.getByPlaceholder('Amount').click()
-      await page.getByPlaceholder('Amount').fill('10')
-
-      await page
-        .locator('div')
-        .filter({ hasText: /^TypeBooksPagesHours$/ })
-        .nth(2)
-        .click()
-      await page.getByLabel('Books').getByText('Books').click()
-
-      await page.getByRole('combobox').filter({ hasText: 'Interval' }).click()
-      await page.getByLabel('per month').getByText('per month').click()
-
-      await page
-        .getByRole('combobox')
-        .filter({ hasText: 'Select date range' })
-        .click()
-      await page.getByLabel('This year').getByText('This year').click()
-
-      await page.getByRole('button', { name: 'Create goal' }).click()
-
-      await expect(page.getByRole('main')).toContainText(
-        '10 books per month in a year',
-      )
-      await expect(page.getByRole('main')).toContainText('Active')
-      await expect(page.getByRole('main')).toContainText('January 1, 2025')
-      await expect(page.getByRole('main')).toContainText('December 31, 2025')
-
-      await page.getByRole('button', { name: 'Create first entry' }).click()
-
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-01-01')
-      await page.locator('a').filter({ hasText: 'Book 1' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-06-01')
-      await page.locator('a').filter({ hasText: 'Book 2' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-12-01')
-      await page.locator('a').filter({ hasText: 'Book 3' }).first().click()
+      await createFirstGoalEntry(page)
+      await createBookEntry(page, 'Book 1', '2025-01-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 2', '2025-06-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 3', '2025-12-01')
 
       await page.getByRole('tab', { name: 'Progress' }).click()
+
       const xAxisLabels = page.getByLabel('Progress').locator('g')
+
       await expect(xAxisLabels).toContainText('Jan 1, 2025')
       await expect(xAxisLabels).toContainText('Feb 1, 2025')
       await expect(xAxisLabels).toContainText('Mar 1, 2025')
@@ -187,62 +132,82 @@ test.describe('create goal', async () => {
     })
 
     test('by week', async ({ page }) => {
+      const goalTitle = '10 books per week in a month'
       await page.getByText('Goal', { exact: true }).click()
 
-      await page.getByRole('textbox', { name: 'Goal title' }).click()
-      await page
-        .getByRole('textbox', { name: 'Goal title' })
-        .fill('10 books per week in a month')
+      await setTitle(page, goalTitle)
+      await setAsActive(page)
+      await setAmount(page, 10)
+      await setType(page, 'Books')
+      await setInterval(page, 'per week')
+      await setDateRange(page, 'This month')
+      await createGoal(page)
 
-      await page.getByText('Create goal as active').click()
+      const main = page.getByRole('main')
+      await expect(main).toContainText(goalTitle)
+      await expect(main).toContainText('Active')
+      await expect(main).toContainText('July 1, 2025')
+      await expect(main).toContainText('July 7, 2025')
 
-      await page.getByPlaceholder('Amount').click()
-      await page.getByPlaceholder('Amount').fill('10')
-
-      await page
-        .locator('div')
-        .filter({ hasText: /^TypeBooksPagesHours$/ })
-        .nth(2)
-        .click()
-      await page.getByLabel('Books').getByText('Books').click()
-
-      await page.getByRole('combobox').filter({ hasText: 'Interval' }).click()
-      await page.getByLabel('per week').getByText('per week').click()
-
-      await page
-        .getByRole('combobox')
-        .filter({ hasText: 'Select date range' })
-        .click()
-      await page.getByLabel('This month').getByText('This month').click()
-
-      await page.getByRole('button', { name: 'Create goal' }).click()
-
-      await expect(page.getByRole('main')).toContainText(
-        '10 books per week in a month',
-      )
-      await expect(page.getByRole('main')).toContainText('Active')
-      await expect(page.getByRole('main')).toContainText('July 1, 2025')
-      await expect(page.getByRole('main')).toContainText('July 7, 2025')
-
-      await page.getByRole('button', { name: 'Create first entry' }).click()
-
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-01-01')
-      await page.locator('a').filter({ hasText: 'Book 1' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-06-01')
-      await page.locator('a').filter({ hasText: 'Book 2' }).first().click()
-      await page.getByRole('button', { name: 'Add new entry' }).click()
-      await page
-        .getByRole('textbox', { name: 'Finished on' })
-        .fill('2025-12-01')
-      await page.locator('a').filter({ hasText: 'Book 3' }).first().click()
+      await createFirstGoalEntry(page)
+      await createBookEntry(page, 'Book 1', '2025-01-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 2', '2025-06-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 3', '2025-12-01')
 
       await page.getByRole('tab', { name: 'Progress' }).click()
+
       const xAxisLabels = page.getByLabel('Progress').locator('g')
+
+      await expect(xAxisLabels).toContainText('Jan 1, 2025')
+      await expect(xAxisLabels).toContainText('Feb 1, 2025')
+      await expect(xAxisLabels).toContainText('Mar 1, 2025')
+      await expect(xAxisLabels).toContainText('Apr 1, 2025')
+      await expect(xAxisLabels).toContainText('May 1, 2025')
+      await expect(xAxisLabels).toContainText('Jun 1, 2025')
+      await expect(xAxisLabels).toContainText('Jul 1, 2025')
+      await expect(xAxisLabels).toContainText('Aug 1, 2025')
+      await expect(xAxisLabels).toContainText('Sep 1, 2025')
+      await expect(xAxisLabels).toContainText('Oct 1, 2025')
+      await expect(xAxisLabels).toContainText('Nov 1, 2025')
+      await expect(xAxisLabels).toContainText('Dec 1, 2025')
+    })
+
+    test('by day', async ({ page }) => {
+      const goalTitle = '10 books per day in a week'
+      await page.getByText('Goal', { exact: true }).click()
+
+      await setTitle(page, goalTitle)
+      await setAsActive(page)
+      await setAmount(page, 10)
+      await setType(page, 'Books')
+      await setInterval(page, 'per day')
+      await setDateRange(page, 'This week')
+      await createGoal(page)
+
+      const main = page.getByRole('main')
+      await expect(main).toContainText(goalTitle)
+      await expect(main).toContainText('Active')
+      await expect(main).toContainText('July 1, 2025')
+      await expect(main).toContainText('July 2, 2025')
+      await expect(main).toContainText('July 3, 2025')
+      await expect(main).toContainText('July 4, 2025')
+      await expect(main).toContainText('July 5, 2025')
+      await expect(main).toContainText('July 6, 2025')
+      await expect(main).toContainText('July 7, 2025')
+
+      await createFirstGoalEntry(page)
+      await createBookEntry(page, 'Book 1', '2025-01-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 2', '2025-06-01')
+      await createNewGoalEntry(page)
+      await createBookEntry(page, 'Book 3', '2025-12-01')
+
+      await page.getByRole('tab', { name: 'Progress' }).click()
+
+      const xAxisLabels = page.getByLabel('Progress').locator('g')
+
       await expect(xAxisLabels).toContainText('Jan 1, 2025')
       await expect(xAxisLabels).toContainText('Feb 1, 2025')
       await expect(xAxisLabels).toContainText('Mar 1, 2025')
