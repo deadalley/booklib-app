@@ -15,13 +15,11 @@ export async function setAmount(page: Page, amount: number): Promise<void> {
 }
 
 export async function setType(page: Page, type: string): Promise<void> {
-  // await page.getByRole('combobox').filter({ hasText: 'Type' }).click()
-  // await page
-  //   .locator('div')
-  //   .filter({ hasText: /^TypeBooksPagesHours$/ })
-  //   .nth(2)
-  //   .click()
-  await page.getByTestId('tracking-goal-type').click()
+  await page
+    .locator('div')
+    .filter({ hasText: /^TypeBooksPagesHours$/ })
+    .nth(2)
+    .click()
   await page.getByLabel(type).getByText(type).click()
 }
 
@@ -39,6 +37,15 @@ export async function setDateRange(
     .filter({ hasText: 'Select date range' })
     .click()
   await page.getByLabel(dateRange).getByText(dateRange).click()
+}
+
+export async function setDateRangeDates(
+  page: Page,
+  startDate: string,
+  endDate: string,
+): Promise<void> {
+  await page.getByRole('textbox', { name: 'Start on' }).fill(startDate)
+  await page.getByRole('textbox', { name: 'Finish on' }).fill(endDate)
 }
 
 export async function createGoal(page: Page): Promise<void> {

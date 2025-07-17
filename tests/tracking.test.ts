@@ -6,7 +6,7 @@ import {
   createNewGoalEntry,
   setAmount,
   setAsActive,
-  setDateRange,
+  setDateRangeDates,
   setInterval,
   setTitle,
   setType,
@@ -14,7 +14,6 @@ import {
 
 test.describe('create goal', async () => {
   test.beforeEach(async ({ page }) => {
-    await page.clock.setFixedTime(new Date('2025-07-01T00:00:00Z'))
     await page.goto('/#/tracking')
   })
 
@@ -28,7 +27,7 @@ test.describe('create goal', async () => {
       await setAmount(page, 10)
       await setType(page, 'Books')
       await setInterval(page, 'in total')
-      await setDateRange(page, 'This year')
+      await setDateRangeDates(page, '2025-01-01', '2025-12-31')
       await createGoal(page)
 
       const main = page.getByRole('main')
@@ -64,9 +63,7 @@ test.describe('create goal', async () => {
       await setAmount(page, 10)
       await setType(page, 'Books')
       await setInterval(page, 'per year')
-
-      await page.getByRole('textbox', { name: 'Start on' }).fill('2025-01-01')
-      await page.getByRole('textbox', { name: 'Finish on' }).fill('2026-12-31')
+      await setDateRangeDates(page, '2025-01-01', '2026-12-31')
       await createGoal(page)
 
       const main = page.getByRole('main')
@@ -97,7 +94,7 @@ test.describe('create goal', async () => {
       await setAmount(page, 10)
       await setType(page, 'Books')
       await setInterval(page, 'per month')
-      await setDateRange(page, 'This year')
+      await setDateRangeDates(page, '2025-01-01', '2025-12-31')
       await createGoal(page)
 
       const main = page.getByRole('main')
@@ -140,14 +137,14 @@ test.describe('create goal', async () => {
       await setAmount(page, 10)
       await setType(page, 'Books')
       await setInterval(page, 'per week')
-      await setDateRange(page, 'This month')
+      await setDateRangeDates(page, '2025-01-01', '2025-01-31')
       await createGoal(page)
 
       const main = page.getByRole('main')
       await expect(main).toContainText(goalTitle)
       await expect(main).toContainText('Active')
-      await expect(main).toContainText('July 1, 2025')
-      await expect(main).toContainText('July 7, 2025')
+      await expect(main).toContainText('January 1, 2025')
+      await expect(main).toContainText('January 31, 2025')
 
       await createFirstGoalEntry(page)
       await createBookEntry(page, 'Book 1', '2025-01-01')
@@ -161,17 +158,10 @@ test.describe('create goal', async () => {
       const xAxisLabels = page.getByLabel('Progress').locator('g')
 
       await expect(xAxisLabels).toContainText('Jan 1, 2025')
-      await expect(xAxisLabels).toContainText('Feb 1, 2025')
-      await expect(xAxisLabels).toContainText('Mar 1, 2025')
-      await expect(xAxisLabels).toContainText('Apr 1, 2025')
-      await expect(xAxisLabels).toContainText('May 1, 2025')
-      await expect(xAxisLabels).toContainText('Jun 1, 2025')
-      await expect(xAxisLabels).toContainText('Jul 1, 2025')
-      await expect(xAxisLabels).toContainText('Aug 1, 2025')
-      await expect(xAxisLabels).toContainText('Sep 1, 2025')
-      await expect(xAxisLabels).toContainText('Oct 1, 2025')
-      await expect(xAxisLabels).toContainText('Nov 1, 2025')
-      await expect(xAxisLabels).toContainText('Dec 1, 2025')
+      await expect(xAxisLabels).toContainText('Jan 8, 2025')
+      await expect(xAxisLabels).toContainText('Jan 15, 2025')
+      await expect(xAxisLabels).toContainText('Jan 22, 2025')
+      await expect(xAxisLabels).toContainText('Jan 29, 2025')
     })
 
     test('by day', async ({ page }) => {
@@ -183,19 +173,14 @@ test.describe('create goal', async () => {
       await setAmount(page, 10)
       await setType(page, 'Books')
       await setInterval(page, 'per day')
-      await setDateRange(page, 'This week')
+      await setDateRangeDates(page, '2025-01-01', '2025-01-07')
       await createGoal(page)
 
       const main = page.getByRole('main')
       await expect(main).toContainText(goalTitle)
       await expect(main).toContainText('Active')
-      await expect(main).toContainText('July 1, 2025')
-      await expect(main).toContainText('July 2, 2025')
-      await expect(main).toContainText('July 3, 2025')
-      await expect(main).toContainText('July 4, 2025')
-      await expect(main).toContainText('July 5, 2025')
-      await expect(main).toContainText('July 6, 2025')
-      await expect(main).toContainText('July 7, 2025')
+      await expect(main).toContainText('January 1, 2025')
+      await expect(main).toContainText('January 7, 2025')
 
       await createFirstGoalEntry(page)
       await createBookEntry(page, 'Book 1', '2025-01-01')
@@ -209,17 +194,12 @@ test.describe('create goal', async () => {
       const xAxisLabels = page.getByLabel('Progress').locator('g')
 
       await expect(xAxisLabels).toContainText('Jan 1, 2025')
-      await expect(xAxisLabels).toContainText('Feb 1, 2025')
-      await expect(xAxisLabels).toContainText('Mar 1, 2025')
-      await expect(xAxisLabels).toContainText('Apr 1, 2025')
-      await expect(xAxisLabels).toContainText('May 1, 2025')
-      await expect(xAxisLabels).toContainText('Jun 1, 2025')
-      await expect(xAxisLabels).toContainText('Jul 1, 2025')
-      await expect(xAxisLabels).toContainText('Aug 1, 2025')
-      await expect(xAxisLabels).toContainText('Sep 1, 2025')
-      await expect(xAxisLabels).toContainText('Oct 1, 2025')
-      await expect(xAxisLabels).toContainText('Nov 1, 2025')
-      await expect(xAxisLabels).toContainText('Dec 1, 2025')
+      await expect(xAxisLabels).toContainText('Jan 2, 2025')
+      await expect(xAxisLabels).toContainText('Jan 3, 2025')
+      await expect(xAxisLabels).toContainText('Jan 4, 2025')
+      await expect(xAxisLabels).toContainText('Jan 5, 2025')
+      await expect(xAxisLabels).toContainText('Jan 6, 2025')
+      await expect(xAxisLabels).toContainText('Jan 7, 2025')
     })
   })
 })
