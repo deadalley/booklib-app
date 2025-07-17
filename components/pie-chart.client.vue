@@ -7,9 +7,12 @@
 <script setup lang="ts" generic="T extends OptionDataValueNumeric">
 import VChart from 'vue-echarts'
 import { SVGRenderer } from 'echarts/renderers'
-import { type ComposeOption, use } from 'echarts/core'
-import { type PieSeriesOption, PieChart } from 'echarts/charts'
-import { type TitleComponentOption, TitleComponent } from 'echarts/components'
+import { use } from 'echarts/core'
+import type { ComposeOption } from 'echarts/core'
+import { PieChart } from 'echarts/charts'
+import type { PieSeriesOption } from 'echarts/charts'
+import { TitleComponent } from 'echarts/components'
+import type { TitleComponentOption } from 'echarts/components'
 import type { OptionDataValueNumeric } from 'echarts/types/src/util/types.js'
 import Color from 'color'
 

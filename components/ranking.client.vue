@@ -7,16 +7,20 @@
 <script setup lang="ts">
 import VChart from 'vue-echarts'
 import { SVGRenderer } from 'echarts/renderers'
-import { type ComposeOption, use } from 'echarts/core'
-import { type BarSeriesOption, BarChart } from 'echarts/charts'
+import { use } from 'echarts/core'
+import type { ComposeOption } from 'echarts/core'
+import { BarChart } from 'echarts/charts'
+import type { BarSeriesOption } from 'echarts/charts'
 import {
-  type DatasetComponentOption,
-  type VisualMapComponentOption,
-  type GridComponentOption,
-  type MarkPointComponentOption,
   DatasetComponent,
   GridComponent,
   MarkPointComponent,
+} from 'echarts/components'
+import type {
+  DatasetComponentOption,
+  VisualMapComponentOption,
+  GridComponentOption,
+  MarkPointComponentOption,
 } from 'echarts/components'
 
 export type RankingItem = {

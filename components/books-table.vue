@@ -10,11 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  createColumnHelper,
-  type CellContext,
-  type ColumnDef,
-  type RowSelectionState,
+import { createColumnHelper } from '@tanstack/vue-table'
+import type {
+  CellContext,
+  ColumnDef,
+  RowSelectionState,
 } from '@tanstack/vue-table'
 import type { Book, ViewBook } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'

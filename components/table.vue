@@ -102,14 +102,16 @@
 >
 import {
   useVueTable,
-  type ColumnDef,
-  type ColumnOrderState,
   getCoreRowModel,
   getSortedRowModel,
   FlexRender,
-  type RowSelectionState,
-  type CellContext,
-  type HeaderContext,
+} from '@tanstack/vue-table'
+import type {
+  ColumnDef,
+  ColumnOrderState,
+  RowSelectionState,
+  CellContext,
+  HeaderContext,
 } from '@tanstack/vue-table'
 import { IconSelector, IconChevronUp, IconChevronDown } from '@tabler/icons-vue'
 import { BlCheckbox } from '#components'

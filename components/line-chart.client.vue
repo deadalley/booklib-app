@@ -7,20 +7,24 @@
 <script setup lang="ts">
 import VChart from 'vue-echarts'
 import { SVGRenderer } from 'echarts/renderers'
-import { type ComposeOption, use } from 'echarts/core'
-import { type LineSeriesOption, LineChart } from 'echarts/charts'
+import { use } from 'echarts/core'
+import type { ComposeOption } from 'echarts/core'
+import { LineChart } from 'echarts/charts'
+import type { LineSeriesOption } from 'echarts/charts'
 import {
-  type DatasetComponentOption,
-  type VisualMapComponentOption,
-  type GridComponentOption,
-  type MarkLineComponentOption,
-  type MarkPointComponentOption,
-  type TooltipComponentOption,
   DatasetComponent,
   GridComponent,
   MarkLineComponent,
   MarkPointComponent,
   TooltipComponent,
+} from 'echarts/components'
+import type {
+  DatasetComponentOption,
+  VisualMapComponentOption,
+  GridComponentOption,
+  MarkLineComponentOption,
+  MarkPointComponentOption,
+  TooltipComponentOption,
 } from 'echarts/components'
 import { uniq } from 'ramda'
 
