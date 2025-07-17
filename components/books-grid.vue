@@ -12,6 +12,8 @@
           newIndex,
           oldIndex,
         },
+      }: {
+        moved: { element: { id: string }; newIndex: number; oldIndex: number }
       }) => emit('drag', { bookId: id, newOrder: newIndex, oldOrder: oldIndex })
     "
   >
