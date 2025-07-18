@@ -19,7 +19,7 @@ import type {
 import type { Book, ViewBook } from '~/types/book'
 import BlBookImageSmall from './book-image-small.vue'
 import BlRating from './rating.vue'
-import languageOptions from '~/public/languages-2.json' with { type: 'json' }
+import languageOptions from '~/public/languages-2.json'
 import { BlProgressStatusIcon } from '#components'
 
 type DataType = ViewBook

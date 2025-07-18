@@ -10,7 +10,7 @@
 import type { Book, BookFormat } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { Collection } from '~/types/collection'
-import languageOptions from '~/public/languages-2.json' with { type: 'json' }
+import languageOptions from '~/public/languages-2.json'
 
 export type BooksBarChartProperty =
   | keyof Pick<

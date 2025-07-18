@@ -408,7 +408,7 @@
 import { faker } from '@faker-js/faker'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import languageOptions from '~/public/languages-2.json' with { type: 'json' }
+import languageOptions from '~/public/languages-2.json'
 import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 import type { Author } from '~/types/author'

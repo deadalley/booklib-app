@@ -1,7 +1,7 @@
 import type { Author } from '~/types/author'
 import type { BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import languageOptions from '~/public/languages-2.json' with { type: 'json' }
+import languageOptions from '~/public/languages-2.json'
 import { sum, uniq } from 'ramda'
 
 export function getBooksByAuthor(books: ViewBook[], authors: Author[]) {

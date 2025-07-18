@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import languageOptions from '~/public/languages-2.json' with { type: 'json' }
+import languageOptions from '~/public/languages-2.json'
 
 defineProps<{
   title: string
