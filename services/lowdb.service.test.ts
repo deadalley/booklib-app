@@ -1,15 +1,17 @@
 import { Low, Memory } from 'lowdb'
 import type { Database } from '~/types/api'
-import { buildAuthor, DEFAULT_COLLECTIONS_INIT, now } from '~/utils'
+import { buildAuthor } from '~/utils'
 import { LowDBClient } from './lowdb.service'
 import type { ServerFile } from 'nuxt-file-storage'
+import { getDbSeed } from './db.service'
 
-const getAllFileNamesMock = vi.fn(() =>
-  Promise.resolve(['Book1.jpg', 'Book2.jpg']),
-)
-const getFileMock = vi.fn(() => Promise.resolve(''))
-const saveFileMock = vi.fn(() => Promise.resolve(''))
-const deleteFileMock = vi.fn(() => Promise.resolve(''))
+// Use vi.hoisted() to ensure these are available during mock setup
+const { getAllFileNamesMock, getFileMock, saveFileMock, deleteFileMock } = vi.hoisted(() => ({
+  getAllFileNamesMock: vi.fn(() => Promise.resolve(['Book1.jpg', 'Book2.jpg'])),
+  getFileMock: vi.fn(() => Promise.resolve('')),
+  saveFileMock: vi.fn(() => Promise.resolve('')),
+  deleteFileMock: vi.fn(() => Promise.resolve('')),
+}))
 
 vi.mock('./file-storage.service', () => ({
   FileStorageService: vi.fn(() => ({
@@ -22,29 +24,6 @@ vi.mock('./file-storage.service', () => ({
 
 function ids<T extends { id: string }>(items: T[]): string[] {
   return items.map(({ id }) => id)
-}
-
-function getDbSeed({
-  authors,
-  books,
-  collections,
-  collectionBooks,
-}: {
-  authors: Database['authors']
-  books: Database['books']
-  collections: Database['collections']
-  collectionBooks: Database['collection-book']
-}): Database {
-  return {
-    authors: [...authors],
-    books: [...books],
-    collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
-      ...c,
-      created_at: now(),
-    })).concat(collections),
-    'collection-book': [...collectionBooks],
-    goals: [],
-  }
 }
 
 describe('lowdb', async () => {

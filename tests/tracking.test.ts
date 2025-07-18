@@ -4,6 +4,7 @@ import {
   createFirstGoalEntry,
   createGoal,
   createNewGoalEntry,
+  deleteGoal,
   setAmount,
   setAsActive,
   setDateRangeDates,
@@ -18,6 +19,10 @@ test.describe('create goal', async () => {
   })
 
   test.describe('books', async () => {
+    test.afterEach(async ({ page }) => {
+      await deleteGoal(page)
+    })
+
     test('total', async ({ page }) => {
       const goalTitle = '10 books in total in a year'
       await page.getByText('Goal', { exact: true }).click()

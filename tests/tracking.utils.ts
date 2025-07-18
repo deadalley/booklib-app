@@ -70,3 +70,13 @@ export async function createBookEntry(
   }
   await page.locator('a').filter({ hasText: book }).first().click()
 }
+
+export async function deleteGoal(page: Page): Promise<void> {
+  await page
+    .locator('[id="__nuxt"]')
+    .getByRole('button')
+    .filter({ hasText: /^$/ })
+    .nth(1)
+    .click()
+  await page.getByText('Delete', { exact: true }).click()
+}

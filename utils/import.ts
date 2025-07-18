@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import type { Book } from '~/types/book'
-import languageOptions from '~/public/languages-2.json'
+import languageOptions from '~/public/languages-2.json' with { type: 'json' }
 
 export async function parseCsvFile(file: File): Promise<Book[]> {
   return new Promise((resolve, reject) => {

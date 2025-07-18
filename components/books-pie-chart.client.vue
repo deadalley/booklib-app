@@ -14,7 +14,7 @@
 >
 import type { Book, BookProgressStatus } from '~/types/book'
 import { groupBy } from 'ramda'
-import languageOptions from '~/public/languages-2.json'
+import languageOptions from '~/public/languages-2.json' with { type: 'json' }
 import type { PieChartItem } from './pie-chart.client.vue'
 
 const props = withDefaults(

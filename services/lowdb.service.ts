@@ -489,6 +489,16 @@ export class LowDBClient implements DBClient {
     return id
   }
 
+  async deleteGoals() {
+    await this.client.read()
+
+    this.client.data.goals = []
+
+    await this.client.write()
+
+    return null
+  }
+
   async isLibraryEmpty() {
     await this.client.read()
 

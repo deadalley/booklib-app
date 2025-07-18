@@ -7,15 +7,34 @@ if (!process.env.USER_DB_PATH) {
   throw new Error('USER_DB_PATH environment variable is not set.')
 }
 
-const client = await JSONFilePreset<Database>(process.env.USER_DB_PATH, {
-  authors: [],
-  books: [],
-  collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
-    ...c,
-    created_at: now(),
-  })),
-  'collection-book': [],
-  goals: [],
-})
+console.log(`Starting database at: ${process.env.USER_DB_PATH}`)
+
+export function getDbSeed({
+  authors = [],
+  books = [],
+  collections = [],
+  collectionBooks = [],
+}: {
+  authors?: Database['authors']
+  books?: Database['books']
+  collections?: Database['collections']
+  collectionBooks?: Database['collection-book']
+}): Database {
+  return {
+    authors: [...authors],
+    books: [...books],
+    collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
+      ...c,
+      created_at: now(),
+    })).concat(collections),
+    'collection-book': [...collectionBooks],
+    goals: [],
+  }
+}
+
+const client = await JSONFilePreset<Database>(
+  process.env.USER_DB_PATH,
+  getDbSeed({}),
+)
 
 export const db = new LowDBClient(client)
