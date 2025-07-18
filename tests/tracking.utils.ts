@@ -71,6 +71,32 @@ export async function createBookEntry(
   await page.locator('a').filter({ hasText: book }).first().click()
 }
 
+export async function createPageEntry(
+  page: Page,
+  pages: number,
+  date?: string,
+): Promise<void> {
+  if (date) {
+    await page.getByRole('textbox', { name: 'Read on' }).fill(date)
+  }
+  await page.getByRole('spinbutton', { name: 'Pages' }).click()
+  await page.getByRole('spinbutton', { name: 'Pages' }).fill(pages.toString())
+  await page.getByRole('button', { name: 'Create entry' }).click()
+}
+
+export async function createHourEntry(
+  page: Page,
+  hours: number,
+  date?: string,
+): Promise<void> {
+  if (date) {
+    await page.getByRole('textbox', { name: 'Read on' }).fill(date)
+  }
+  await page.getByRole('spinbutton', { name: 'Hours' }).click()
+  await page.getByRole('spinbutton', { name: 'Hours' }).fill(hours.toString())
+  await page.getByRole('button', { name: 'Create entry' }).click()
+}
+
 export async function deleteGoal(page: Page): Promise<void> {
   await page
     .locator('[id="__nuxt"]')
