@@ -37,14 +37,19 @@ export default defineNuxtConfig({
     ],
   },
 
-  electron: {
-    build: [
-      {
-        entry: 'electron/main.ts',
-      },
-    ],
-    disableDefaultOptions: true,
-  },
+  ...(process.env.ELECTRON_ENABLED === 'true'
+    ? {
+        electron: {
+          build: [
+            {
+              entry: 'electron/main.ts',
+            },
+          ],
+          disableDefaultOptions: true,
+        },
+      }
+    : {}),
+
   ssr: false,
   router: {
     options: {
