@@ -92,7 +92,7 @@ export function getDatesInInterval(
   unit: ManipulateType,
 ): string[] {
   const dates: string[] = []
-  let current = dayjs(interval.start).utc().startOf(unit)
+  let current = dayjs(interval.start).utc()
   const end = dayjs(interval.end).utc()
 
   while (current.isBefore(end) || current.isSame(end, unit)) {
