@@ -6,12 +6,15 @@ import type { ServerFile } from 'nuxt-file-storage'
 import { getDbSeed } from './db.service'
 
 // Use vi.hoisted() to ensure these are available during mock setup
-const { getAllFileNamesMock, getFileMock, saveFileMock, deleteFileMock } = vi.hoisted(() => ({
-  getAllFileNamesMock: vi.fn(() => Promise.resolve(['Book1.jpg', 'Book2.jpg'])),
-  getFileMock: vi.fn(() => Promise.resolve('')),
-  saveFileMock: vi.fn(() => Promise.resolve('')),
-  deleteFileMock: vi.fn(() => Promise.resolve('')),
-}))
+const { getAllFileNamesMock, getFileMock, saveFileMock, deleteFileMock } =
+  vi.hoisted(() => ({
+    getAllFileNamesMock: vi.fn(() =>
+      Promise.resolve(['Book1.jpg', 'Book2.jpg']),
+    ),
+    getFileMock: vi.fn(() => Promise.resolve('')),
+    saveFileMock: vi.fn(() => Promise.resolve('')),
+    deleteFileMock: vi.fn(() => Promise.resolve('')),
+  }))
 
 vi.mock('./file-storage.service', () => ({
   FileStorageService: vi.fn(() => ({
