@@ -1,11 +1,13 @@
 {
-  "name": "nuxt-app",
+  "name": "booklib",
   "private": true,
   "type": "module",
   "main": "dist-electron/main.js",
   "version": "0.1.0",
+  "description": "BookLib is an application for managing your book collection.",
+  "author": "Jessica Aissa <deadalley31@gmail.com>",
   "scripts": {
-    "build": "nuxt build",
+    "build": "cross-env ELECTRON_ENABLED=true nuxt build",
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -25,10 +27,13 @@
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview",
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "electron:dir": "electron-builder --dir",
+    "electron:dist": "electron-builder",
+    "electron:build": "electron-builder",
+    "electron:build:win": "electron-builder --win",
+    "electron:build:mac": "electron-builder --mac",
+    "electron:build:linux": "electron-builder --linux",
+    "electron:publish": "electron-builder --publish=always"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.9",
@@ -55,14 +60,6 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.8.1",
-    "@electron-forge/maker-deb": "^7.8.1",
-    "@electron-forge/maker-rpm": "^7.8.1",
-    "@electron-forge/maker-squirrel": "^7.8.1",
-    "@electron-forge/maker-zip": "^7.8.1",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
-    "@electron-forge/plugin-fuses": "^7.8.1",
-    "@electron/fuses": "^1.8.0",
     "@faker-js/faker": "^9.9.0",
     "@histoire/plugin-nuxt": "^0.17.17",
     "@histoire/plugin-vue": "^0.17.17",
@@ -80,6 +77,7 @@
     "concurrently": "^9.2.0",
     "cross-env": "^7.0.3",
     "electron": "^37.2.3",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.31.0",
     "eslint-plugin-tailwindcss": "^3.18.2",
     "happy-dom": "^18.0.1",

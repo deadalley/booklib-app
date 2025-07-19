@@ -31,3 +31,6 @@ usr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Electron
+dist-packaged

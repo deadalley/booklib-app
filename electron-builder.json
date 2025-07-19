@@ -1,0 +1,111 @@
+{
+  "appId": "com.booklib.app",
+  "productName": "BookLib",
+  "directories": {
+    "output": "dist-packaged"
+  },
+  "asar": false,
+  "files": [
+    "dist-electron/**/*",
+    ".output/public/**/*",
+    ".output/server/**/*",
+    "!node_modules/**/*",
+    "!src/**/*",
+    "!tests/**/*",
+    "!.git/**/*",
+    "!.output/nitro.json",
+    "!.output/.nuxt/**/*",
+    "!**/*.map",
+    "!**/*.ts",
+    "!**/*.d.ts"
+  ],
+  "extraResources": [
+    {
+      "from": "public/",
+      "to": "public/",
+      "filter": ["**/*"]
+    }
+  ],
+  "compression": "maximum",
+  "removePackageScripts": true,
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "public/logo.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "BookLib"
+  },
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "public/logo.icns",
+    "category": "public.app-category.productivity"
+  },
+  "dmg": {
+    "title": "BookLib",
+    "icon": "public/logo.icns"
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+      {
+        "target": "rpm",
+        "arch": ["x64"]
+      },
+      {
+        "target": "tar.gz",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "public/logo.png",
+    "category": "Office",
+    "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
+    "vendor": "Jessica Aissa",
+    "description": "BookLib is an application for managing your book collection.",
+    "synopsis": "Manage your personal book library",
+    "desktop": {
+      "entry": {
+        "Name": "BookLib",
+        "Comment": "Manage your personal book library",
+        "Keywords": "books;library;reading;collection;",
+        "StartupWMClass": "BookLib",
+        "Categories": "Office;Education;"
+      }
+    }
+  },
+  "deb": {
+    "packageName": "booklib",
+    "packageCategory": "utils",
+    "priority": "optional",
+    "description": "BookLib is an application for managing your book collection.",
+    "synopsis": "Manage your personal book library",
+    "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
+    "vendor": "Jessica Aissa",
+    "icon": "public/logo.png"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "deadalley",
+    "repo": "booklib-app"
+  }
+}
