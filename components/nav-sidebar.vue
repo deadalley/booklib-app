@@ -117,9 +117,14 @@ import {
 
 const route = useRoute()
 
-const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+const { isLibraryEmpty } = useBookLibrary()
+const isEmpty = ref<boolean>(false)
 
-const buttons = [
+onMounted(async () => {
+  isEmpty.value = await isLibraryEmpty()
+})
+
+const buttons = computed(() => [
   { label: 'Home', icon: IconHome, to: '/home', disabled: false },
   {
     label: 'Library',
@@ -146,7 +151,7 @@ const buttons = [
     to: '/export',
     disabled: !!isEmpty.value,
   },
-]
+])
 
 const collapsed = ref(true)
 
