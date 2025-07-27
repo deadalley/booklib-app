@@ -3,5 +3,5 @@ useHead({
   title: 'BookLib',
 })
 
-navigateTo('/home')
+await navigateTo('/home')
 </script>

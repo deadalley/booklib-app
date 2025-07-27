@@ -39,6 +39,22 @@ export default defineNuxtConfig({
 
   ...(process.env.ELECTRON_ENABLED === 'true'
     ? {
+        app: {
+          baseURL: './',
+          buildAssetsDir: '_nuxt/',
+          cdnURL: './',
+        },
+        router: {
+          options: {
+            hashMode: true,
+          },
+        },
+        image: {
+          dir: 'public',
+          format: ['webp', 'jpg', 'png', 'svg'],
+          provider: 'static',
+          staticFilename: './{name}.{format}',
+        },
         electron: {
           build: [
             {

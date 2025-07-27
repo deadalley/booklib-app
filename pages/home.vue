@@ -3,8 +3,8 @@
     <div v-if="isEmpty" class="flex flex-col">
       <h1 class="mb-8">Welcome to your new library!</h1>
       <div class="flex flex-col items-center gap-4">
-        <NuxtImg
-          src="/book-graphics.svg"
+        <img
+          :src="getAssetPath('/book-graphics.svg')"
           alt="Book"
           class="h-96 object-cover object-center"
         />
@@ -129,6 +129,7 @@ import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import { useBookLibrary } from '~/composables/use-book-library'
+import { getAssetPath } from '~/utils/assets'
 
 const { isLibraryEmpty, getAuthors, getBooks, getCollections, getLatestBooks } =
   useBookLibrary()

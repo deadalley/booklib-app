@@ -7,8 +7,8 @@
     }"
     :style="{ 'min-width': collapsed ? '0px' : '255px' }"
   >
-    <NuxtImg
-      src="/logo.svg"
+    <img
+      :src="getAssetPath('/logo.svg')"
       alt="BookLib"
       class="hidden w-6 transition-all duration-500 sm:block"
       :class="{
@@ -31,7 +31,7 @@
         }"
       >
         <NuxtLink class="flex gap-2" to="/">
-          <NuxtImg src="/logo.svg" alt="BookLib" class="w-6" />
+          <img :src="getAssetPath('/logo.svg')" alt="BookLib" class="w-6" />
           BOOKLIB
         </NuxtLink>
       </h3>
@@ -114,6 +114,7 @@ import {
   IconSettings,
   IconChevronLeftPipe,
 } from '@tabler/icons-vue'
+import { getAssetPath } from '~/utils/assets'
 
 const route = useRoute()
 
