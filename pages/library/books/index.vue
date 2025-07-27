@@ -127,10 +127,19 @@ import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 
-const { data: books, refresh } = await useFetch<Book[]>('/api/books', {
-  query: { withBookCovers: true },
-})
-const { data: authors } = await useFetch<Author[]>('/api/authors')
+const { getBooks, getAuthors, deleteBooks } = useBookLibrary()
+
+const books = ref<Book[]>([])
+const authors = ref<Author[]>([])
+
+const loadData = async () => {
+  books.value = await getBooks({ withBookCovers: true })
+  authors.value = await getAuthors()
+}
+
+const refresh = loadData
+
+onMounted(loadData)
 
 const authorsById = computed(() =>
   authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
@@ -189,12 +198,9 @@ async function onActionSelect(action: string) {
   try {
     loading.value = true
     if (action === 'delete') {
-      await $fetch<Book['id']>('/api/books', {
-        method: 'delete',
-        body: viewBooks.value
-          .filter(({ selected }) => selected)
-          .map(({ id }) => id),
-      })
+      await deleteBooks(
+        viewBooks.value.filter(({ selected }) => selected).map(({ id }) => id),
+      )
     }
   } catch (error) {
     console.error(error)

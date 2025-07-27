@@ -128,14 +128,31 @@ import { IconPlus, IconUpload } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import { useBookLibrary } from '~/composables/use-book-library'
 
-const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
-const { data: authors } = await useFetch<Author[]>('/api/authors')
-const { data: books, refresh } = await useFetch<Book[]>('/api/books')
-const { data: collections } = await useFetch<Collection[]>('/api/collections')
-const { data: latestBooks } = await useFetch<
-  Pick<Book, 'id' | 'title' | 'coverSrc'>[]
->('/api/library/latest-books')
+const { isLibraryEmpty, getAuthors, getBooks, getCollections, getLatestBooks } =
+  useBookLibrary()
+
+const isEmpty = ref<boolean>(false)
+const authors = ref<Author[]>([])
+const books = ref<Book[]>([])
+const collections = ref<Collection[]>([])
+const latestBooks = ref<Pick<Book, 'id' | 'title' | 'coverSrc'>[]>([])
+
+const loadData = async () => {
+  isEmpty.value = await isLibraryEmpty()
+  authors.value = await getAuthors()
+  books.value = await getBooks()
+  collections.value = await getCollections()
+  latestBooks.value = (await getLatestBooks()) as Pick<
+    Book,
+    'id' | 'title' | 'coverSrc'
+  >[]
+}
+
+const refresh = loadData
+
+onMounted(loadData)
 
 const authorsByRatings = computed(() =>
   sortAuthorsByBookRatings(books.value ?? [], authors.value ?? [], 4).map(

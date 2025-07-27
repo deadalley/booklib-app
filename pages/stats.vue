@@ -133,9 +133,19 @@ import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
-const { data: authors } = await useFetch<Author[]>('/api/authors')
-const { data: books } = await useFetch<Book[]>('/api/books')
-const { data: collections } = await useFetch<Collection[]>('/api/collections')
+const { getAuthors, getBooks, getCollections } = useBookLibrary()
+
+const authors = ref<Author[]>([])
+const books = ref<Book[]>([])
+const collections = ref<Collection[]>([])
+
+const loadData = async () => {
+  authors.value = await getAuthors()
+  books.value = await getBooks()
+  collections.value = await getCollections()
+}
+
+onMounted(loadData)
 
 const totalReadBooks = computed(() => {
   const totalBooks =

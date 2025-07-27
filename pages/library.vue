@@ -17,10 +17,17 @@
 
 <script setup lang="ts">
 import { IconPlus } from '@tabler/icons-vue'
+import { useBookLibrary } from '~/composables/use-book-library'
 
 const route = useRoute()
 
-const { data: isEmpty } = await useFetch<number>('/api/library/is-empty')
+const { isLibraryEmpty } = useBookLibrary()
+
+const isEmpty = ref<boolean>(false)
+
+onMounted(async () => {
+  isEmpty.value = await isLibraryEmpty()
+})
 
 const navItems = [
   {

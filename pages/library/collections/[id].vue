@@ -140,9 +140,18 @@
 
 <script setup lang="ts">
 import { IconArrowLeft } from '@tabler/icons-vue'
+import { useBookLibrary } from '~/composables/use-book-library'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
+
+const {
+  getCollection,
+  getBooks,
+  getAuthors,
+  deleteCollection: deleteCollectionService,
+  createCollection,
+} = useBookLibrary()
 
 const route = useRoute()
 
@@ -175,28 +184,19 @@ async function fetchCollection() {
   if (route.params.id === 'new') {
     collection.value = {} as Collection
   } else {
-    const data = await $fetch<Collection>(
-      `/api/collections/${route.params.id}`,
-      {},
-    )
-    collection.value = data
+    const data = await getCollection(route.params.id as string)
+    collection.value = data || ({} as Collection)
   }
 
-  const books = await $fetch<Book[]>('/api/books', {
-    query: { withBookCovers: true },
-  })
+  const books = await getBooks({ withBookCovers: true })
+  const authors = await getAuthors()
 
-  const authors = await $fetch<Author[]>('/api/authors')
-
-  allBooks.value = getBooksFromCollection(collection.value, books, authors)
+  allBooks.value = getBooksFromCollection(collection.value!, books, authors)
   loading.value = false
 }
 
 async function deleteCollection() {
-  await $fetch<Collection>(`/api/collections/${route.params.id}`, {
-    method: 'delete',
-  })
-
+  await deleteCollectionService(route.params.id as string)
   navigateTo('/library/collections')
 }
 
@@ -210,11 +210,8 @@ async function onCancel() {
     navigateTo('/library/collections')
   } else {
     if (collection.value) {
-      const books = await $fetch<Book[]>('/api/books', {
-        query: { withBookCovers: true },
-      })
-
-      const authors = await $fetch<Author[]>('/api/authors')
+      const books = await getBooks({ withBookCovers: true })
+      const authors = await getAuthors()
 
       allBooks.value = getBooksFromCollection(collection.value, books, authors)
     }
@@ -228,10 +225,10 @@ async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
       .filter(({ selected }) => !!selected)
       .map(({ id, order }) => ({ id, order }))
 
-    const updatedCollection = await $fetch<Collection>('/api/collections', {
-      method: 'post',
-      body: { ...collection, books: booksInCollection },
-    })
+    const updatedCollection = await createCollection({
+      ...collection,
+      books: booksInCollection,
+    } as Collection)
 
     if (updatedCollection) {
       navigateTo('/library/collections')

@@ -57,13 +57,21 @@
 </template>
 
 <script setup lang="ts">
+import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
-const { data: books } = await useFetch<Book[]>('/api/books', {
-  query: { withBookCovers: true },
-})
-const { data: authors } = await useFetch<Author[]>('/api/authors')
+const { getBooks, getAuthors } = useBookLibrary()
+
+const books = ref<Book[]>([])
+const authors = ref<Author[]>([])
+
+const loadData = async () => {
+  books.value = await getBooks({ withBookCovers: true })
+  authors.value = await getAuthors()
+}
+
+onMounted(loadData)
 
 const booksByAuthorId = computed(() =>
   getBooksByAuthor(books.value ?? [], authors.value ?? []),

@@ -406,12 +406,22 @@
 
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
+import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
 import type { Author } from '~/types/author'
+
+const {
+  getCollections,
+  getAuthors,
+  getBook,
+  deleteBook: deleteBookService,
+  createBook,
+  searchGoogleBooks,
+} = useBookLibrary()
 
 const route = useRoute()
 
@@ -426,8 +436,15 @@ const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
-const { data: collections } = await useFetch<Collection[]>('/api/collections')
-const { data: authors } = await useFetch<Author[]>('/api/authors')
+const collections = ref<Collection[]>([])
+const authors = ref<Author[]>([])
+
+const loadData = async () => {
+  collections.value = await getCollections()
+  authors.value = await getAuthors()
+}
+
+onMounted(loadData)
 
 const collectionsDisplayed = computed(() => {
   return managingCollections.value
@@ -489,8 +506,8 @@ async function fetchBook() {
     book.value = {} as Book
   } else {
     loading.value = true
-    const data = await $fetch<Book>(`/api/books/${route.params.id}`, {})
-    book.value = data
+    const data = await getBook(route.params.id as string)
+    book.value = data || ({} as Book)
     loading.value = false
   }
 
@@ -511,10 +528,7 @@ async function fetchBook() {
 }
 
 async function deleteBook() {
-  await $fetch<Book>(`/api/books/${route.params.id}`, {
-    method: 'delete',
-  })
-
+  await deleteBookService(route.params.id as string)
   navigateTo('/library/books')
 }
 
@@ -537,19 +551,16 @@ function onCancel() {
 
 async function onSubmit(bookValues: Book) {
   try {
-    const updatedBook = await $fetch<Book>('/api/books', {
-      method: 'post',
-      body: {
-        ...bookValues,
-        collections: allCollections.value
-          .filter(({ selected }) => !!selected)
-          .map(({ id }) => ({ id })),
-        tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
-        genres: book.value?.genres ?? [],
-        rating: book.value?.rating,
-        progressStatus: book.value?.progressStatus,
-      },
-    })
+    const updatedBook = await createBook({
+      ...bookValues,
+      collections: allCollections.value
+        .filter(({ selected }) => !!selected)
+        .map(({ id }) => id),
+      tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
+      genres: book.value?.genres ?? [],
+      rating: book.value?.rating,
+      progressStatus: book.value?.progressStatus,
+    } as Book)
 
     return updatedBook
   } catch (error) {
@@ -656,10 +667,8 @@ function dateFormatter(date: Date | undefined): string | undefined {
 async function fetchBooksFromGoogle() {
   try {
     if (book.value) {
-      const books = await $fetch('/api/external/google', {
-        query: { title: book.value.title, pageSize: 10 },
-      })
-      externalBooks.value = books
+      const books = await searchGoogleBooks(book.value.title || '')
+      externalBooks.value = books as Book[]
     }
   } catch (error) {
     console.error(error)

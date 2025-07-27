@@ -71,14 +71,13 @@
 <script setup lang="ts">
 import type { LibraryIntegrityResult } from '~/types/api'
 
+const { resetLibrary: resetLib, checkLibraryIntegrity } = useBookLibrary()
+
 const libraryIntegrityResult = ref<LibraryIntegrityResult | undefined>()
 
 async function resetLibrary() {
   try {
-    await $fetch<string | undefined>('/api/library/reset', {
-      method: 'post',
-    })
-
+    await resetLib()
     navigateTo('/library')
   } catch (error) {
     console.error(error)
@@ -87,12 +86,7 @@ async function resetLibrary() {
 
 async function checkLibrary() {
   try {
-    libraryIntegrityResult.value = await $fetch(
-      '/api/library/check-integrity',
-      {
-        method: 'post',
-      },
-    )
+    libraryIntegrityResult.value = await checkLibraryIntegrity()
   } catch (error) {
     console.error(error)
   }

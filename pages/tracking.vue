@@ -68,9 +68,21 @@ import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Goal } from '~/types/goal'
 
-const { data: authors } = await useFetch<Author[]>('/api/authors')
-const { data: books } = await useFetch<Book[]>('/api/books')
-const { data: goals, refresh } = await useFetch<Goal[]>('/api/goals')
+const { getAuthors, getBooks, getGoals } = useBookLibrary()
+
+const authors = ref<Author[]>([])
+const books = ref<Book[]>([])
+const goals = ref<Goal[]>([])
+
+const loadData = async () => {
+  authors.value = await getAuthors()
+  books.value = await getBooks()
+  goals.value = await getGoals()
+}
+
+const refresh = loadData
+
+onMounted(loadData)
 
 const authorsById = computed(() =>
   authors.value ? indexBy(({ id }) => String(id), authors.value) : {},

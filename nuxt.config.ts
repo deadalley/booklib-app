@@ -69,12 +69,7 @@ export default defineNuxtConfig({
       }
     : {}),
 
-  ssr: true,
-  router: {
-    options: {
-      hashMode: true,
-    },
-  },
+  ssr: false,
 
   fileStorage: {
     mount: 'usr',

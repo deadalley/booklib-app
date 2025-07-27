@@ -113,6 +113,7 @@
 
 <script setup lang="ts">
 import { IconDownload, IconUpload } from '@tabler/icons-vue'
+import { useBookLibrary } from '~/composables/use-book-library'
 import type { SelectOption } from '~/components/raw-select.vue'
 import type { Book } from '~/types/book'
 import { parseCsvFile } from '~/utils/import'
@@ -192,10 +193,26 @@ async function onFileChange(e: Event) {
 async function onSubmit() {
   try {
     if (importedBooks.value?.length) {
-      await $fetch('/api/library/import', {
-        method: 'post',
-        body: selectedBooksForUpload.value,
-      })
+      const { importLibrary } = useBookLibrary()
+      // Convert books array to Database format
+      const databaseData = {
+        authors: [],
+        books: selectedBooksForUpload.value.map((book) => ({
+          ...book,
+          created_at: book.createdAt,
+          author_id: book.author,
+          progress_status: book.progressStatus,
+          cover_src: book.coverSrc,
+          original_title: book.originalTitle,
+          original_language: book.originalLanguage,
+          started_at: book.startedAt,
+          finished_at: book.finishedAt,
+        })),
+        collections: [],
+        'collection-book': [],
+        goals: [],
+      }
+      await importLibrary(databaseData)
 
       navigateTo('/library')
     }
