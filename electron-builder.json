@@ -4,21 +4,8 @@
   "directories": {
     "output": "dist-packaged"
   },
-  "asar": false,
-  "files": [
-    "dist-electron/**/*",
-    ".output/public/**/*",
-    ".output/server/**/*",
-    "!node_modules/**/*",
-    "!src/**/*",
-    "!tests/**/*",
-    "!.git/**/*",
-    "!.output/nitro.json",
-    "!.output/.nuxt/**/*",
-    "!**/*.map",
-    "!**/*.ts",
-    "!**/*.d.ts"
-  ],
+  "asar": true,
+  "files": [".output/**/*", "dist-electron"],
   "extraResources": [
     {
       "from": "public/",
@@ -26,8 +13,7 @@
       "filter": ["**/*"]
     }
   ],
-  "compression": "maximum",
-  "removePackageScripts": true,
+  "compression": "store",
   "win": {
     "target": [
       {
@@ -67,14 +53,6 @@
       {
         "target": "deb",
         "arch": ["x64"]
-      },
-      {
-        "target": "rpm",
-        "arch": ["x64"]
-      },
-      {
-        "target": "tar.gz",
-        "arch": ["x64"]
       }
     ],
     "icon": "public/logo.png",
@@ -89,7 +67,8 @@
         "Comment": "Manage your personal book library",
         "Keywords": "books;library;reading;collection;",
         "StartupWMClass": "BookLib",
-        "Categories": "Office;Education;"
+        "Categories": "Office;Education;",
+        "StartupNotify": "true"
       }
     }
   },
@@ -101,7 +80,23 @@
     "synopsis": "Manage your personal book library",
     "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
     "vendor": "Jessica Aissa",
-    "icon": "public/logo.png"
+    "icon": "public/logo.png",
+    "depends": [
+      "libgtk-3-0",
+      "libnotify4",
+      "libnss3",
+      "libxss1",
+      "libxtst6",
+      "xdg-utils",
+      "libatspi2.0-0",
+      "libdrm2",
+      "libxcomposite1",
+      "libxdamage1",
+      "libxrandr2",
+      "libgbm1",
+      "libxkbcommon0",
+      "libasound2"
+    ]
   },
   "publish": {
     "provider": "github",

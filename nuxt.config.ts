@@ -43,14 +43,33 @@ export default defineNuxtConfig({
           build: [
             {
               entry: 'electron/main.ts',
+              vite: {
+                build: {
+                  rollupOptions: {
+                    external: ['electron'],
+                  },
+                },
+              },
+            },
+            {
+              entry: 'electron/preload.ts',
+              onstart(args: { reload: () => void }) {
+                // Notify the Renderer-Process to reload the page when the Preload-Scripts build is complete,
+                // instead of restarting the entire Electron App.
+                args.reload()
+              },
             },
           ],
+          // Ployfill the Electron and Node.js API for Renderer process.
+          // If you want use Node.js in Renderer process, the `nodeIntegration` needs to be enabled in the Main process.
+          // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
+          renderer: {},
           disableDefaultOptions: true,
         },
       }
     : {}),
 
-  ssr: false,
+  ssr: true,
   router: {
     options: {
       hashMode: true,

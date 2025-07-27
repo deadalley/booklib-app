@@ -1,7 +1,6 @@
 {
   "name": "booklib",
   "private": true,
-  "type": "module",
   "main": "dist-electron/main.js",
   "version": "0.1.0",
   "description": "BookLib is an application for managing your book collection.",
@@ -9,7 +8,7 @@
   "scripts": {
     "build": "cross-env ELECTRON_ENABLED=true nuxt build",
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
-    "generate": "nuxt generate",
+    "generate": "cross-env ELECTRON_ENABLED=true nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint:js": "eslint .",
@@ -33,7 +32,8 @@
     "electron:build:win": "electron-builder --win",
     "electron:build:mac": "electron-builder --mac",
     "electron:build:linux": "electron-builder --linux",
-    "electron:publish": "electron-builder --publish=always"
+    "electron:publish": "electron-builder --publish=always",
+    "electron:test": "yarn generate && yarn electron:dir && ./dist-packaged/linux-unpacked/booklib --enable-logging --v=1"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.9",
