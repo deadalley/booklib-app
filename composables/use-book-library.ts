@@ -130,6 +130,10 @@ export function useBookLibrary() {
     return await service.importLibrary(data)
   }
 
+  const exportLibrary = async (): Promise<Database> => {
+    return await service.exportLibrary()
+  }
+
   const searchGoogleBooks = async (query: string): Promise<unknown> => {
     return await service.searchGoogleBooks(query)
   }
@@ -165,6 +169,7 @@ export function useBookLibrary() {
     resetLibrary,
     checkLibraryIntegrity,
     importLibrary,
+    exportLibrary,
     // External API
     searchGoogleBooks,
   }

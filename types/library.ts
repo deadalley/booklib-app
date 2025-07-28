@@ -1,4 +1,3 @@
-import type { Book } from './book'
-import type { Collection } from './collection'
+import type { BookDB, CollectionDB } from './database'
 
-export type LibraryData = { collections: Collection[]; books: Book[] }
+export type LibraryData = { collections: CollectionDB[]; books: BookDB[] }

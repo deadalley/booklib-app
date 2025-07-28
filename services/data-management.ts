@@ -603,6 +603,14 @@ export class BookLibDataManagementService {
     await this.client.write()
   }
 
+  async exportLibrary(): Promise<Database> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    await this.client.read()
+    return this.client.data
+  }
+
   // External API (Google Books)
   async searchGoogleBooks(query: string): Promise<unknown> {
     // This would need to be implemented using client-side fetch

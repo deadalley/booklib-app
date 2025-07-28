@@ -57,10 +57,9 @@
 
 <script setup lang="ts">
 import { IconDownload } from '@tabler/icons-vue'
+import dayjs from 'dayjs'
 import { pick } from 'ramda'
 import type { SelectOption } from '~/components/raw-select.vue'
-import type { Book } from '~/types/book'
-import type { Collection } from '~/types/collection'
 import type { LibraryData } from '~/types/library'
 
 type ExportType = '.csv' | '.json'
@@ -82,12 +81,11 @@ const exportType = ref<ExportType>()
 const exportCollection = ref<ExportCollectionType>()
 
 async function fetchLibrary(): Promise<LibraryData> {
-  const { getBooks, getCollections } = useBookLibrary()
+  const { exportLibrary } = useBookLibrary()
 
-  const books = await getBooks()
-  const collections = await getCollections()
+  const data = await exportLibrary()
 
-  return { books, collections }
+  return data as LibraryData
 }
 
 async function downloadFile() {
@@ -105,29 +103,24 @@ async function downloadFile() {
 }
 
 async function downloadAsJson(collectionType: ExportCollectionType) {
-  const userName = 'username'
-
   const libraryData = await fetchLibrary()
   const exportData =
     collectionType === 'all' ? libraryData : pick([collectionType], libraryData)
   const data = JSON.stringify(exportData)
 
-  createDownloadLink(userName, collectionType, '.json', data)
+  createDownloadLink(collectionType, '.json', data)
 }
 
 async function downloadAsCsv(collectionType: keyof LibraryData) {
-  const userName = 'username'
-
   const libraryData = await fetchLibrary()
   const exportData = libraryData[collectionType]
   // @ts-expect-error wrong typing
   const data = createCsvFile(exportData)
 
-  createDownloadLink(userName, collectionType, '.csv', data)
+  createDownloadLink(collectionType, '.csv', data)
 }
 
 function createDownloadLink(
-  userName: string,
   collectionType: ExportCollectionType,
   exportType: ExportType,
   data: string,
@@ -136,7 +129,7 @@ function createDownloadLink(
 
   const link = document.createElement('a')
   link.href = window.URL.createObjectURL(blob)
-  link.download = `${userName}_book_lib_${collectionType}_export${exportType}`
+  link.download = `${dayjs().format('YYYY-MM-DD')}_booklib_${collectionType}_export${exportType}`
   link.dataset.downloadurl = ['text/json', link.download, link.href].join(':')
   link.target = '_blank'
   link.click()
