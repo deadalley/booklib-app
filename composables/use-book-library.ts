@@ -1,4 +1,4 @@
-import { useBookLibService } from '~/services/storage.service'
+import { useBookLibService } from '~/services/data-management'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { Collection } from '~/types/collection'

@@ -53,8 +53,3 @@ export class ElectronAdapter<T> implements Adapter<T> {
     }
   }
 }
-
-// Factory function to create ElectronAdapter
-export function createElectronAdapter<T>(filePath: string): ElectronAdapter<T> {
-  return new ElectronAdapter<T>(filePath)
-}

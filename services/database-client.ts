@@ -3,9 +3,8 @@ import type { Low } from 'lowdb'
 import { LocalStoragePreset } from 'lowdb/browser'
 import { JSONFilePreset } from 'lowdb/node'
 import { Low as LowClass } from 'lowdb'
-import { createElectronAdapter } from './electron-adapter'
+import { ElectronAdapter } from './electron-adapter'
 
-// Unified client interface that handles both sync and async operations
 export interface DatabaseClient {
   data: Database
   read(): Promise<void>
@@ -17,7 +16,7 @@ class ElectronDatabaseClient implements DatabaseClient {
   private defaultData: Database
 
   constructor(filePath: string, defaultData: Database) {
-    const adapter = createElectronAdapter<Database>(filePath)
+    const adapter = new ElectronAdapter<Database>(filePath)
     this.lowClient = new LowClass(adapter, defaultData)
     this.defaultData = defaultData
   }
@@ -118,18 +117,21 @@ export async function createDatabaseClient(
 ): Promise<DatabaseClient> {
   // Check if we're in Electron environment
   if (typeof window !== 'undefined' && 'electronAPI' in window) {
+    console.log('Creating ElectronDatabaseClient with path:', dbPath)
     const client = new ElectronDatabaseClient(dbPath, defaultData)
     await client.read()
     return client
   }
   // Check if we're in Node.js environment (local development)
   else if (typeof window === 'undefined' && typeof process !== 'undefined') {
+    console.log('Creating JSONFileDatabaseClient with path:', dbPath)
     const client = new JSONFileDatabaseClient(dbPath, defaultData)
     await client.read()
     return client
   }
   // Fallback to LocalStorage for browser environment
   else {
+    console.log('Creating LocalStorageDatabaseClient with key:', dbPath)
     const client = new LocalStorageDatabaseClient('booklib-data', defaultData)
     await client.read()
     return client

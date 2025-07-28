@@ -1,4 +1,4 @@
-import { useBookLibService } from '~/services/storage.service'
+import { useBookLibService } from '~/services/data-management'
 
 export default defineNuxtPlugin(async () => {
   if (import.meta.client) {

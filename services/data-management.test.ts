@@ -4,7 +4,10 @@ import type { Database } from '~/types/api'
 import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
-import { StorageService, useBookLibService } from './storage.service'
+import {
+  BookLibDataManagementService,
+  useBookLibService,
+} from './data-management'
 import type { BookDB, AuthorDB, CollectionDB, GoalDB } from '~/types/database'
 
 // Mock LowDB LocalStorage
@@ -97,11 +100,11 @@ vi.mock('../utils', () => ({
 }))
 
 describe('StorageService', () => {
-  let service: StorageService
+  let service: BookLibDataManagementService
 
   beforeEach(() => {
     vi.clearAllMocks()
-    service = new StorageService()
+    service = new BookLibDataManagementService()
   })
 
   describe('initialization', () => {

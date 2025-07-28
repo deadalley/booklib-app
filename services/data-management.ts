@@ -26,7 +26,7 @@ import {
   goalToDbGoal,
 } from '../utils'
 
-export class StorageService {
+export class BookLibDataManagementService {
   private client: DatabaseClient | null = null
   private dbPath: string | null = null
   private isInitialized = false
@@ -77,12 +77,10 @@ export class StorageService {
     if (this.isInitialized) return
 
     try {
-      // Set dbPath if not already set
       if (!this.dbPath) {
         this.dbPath = await this.getDefaultDbPath()
       }
 
-      // Create unified database client that handles both Electron and web environments
       this.client = await createDatabaseClient(this.dbPath, this.getDbSeed({}))
 
       this.isInitialized = true
@@ -622,11 +620,12 @@ export class StorageService {
 }
 
 // Create a singleton instance
-let storageService: StorageService | null = null
+let dataManagementService: BookLibDataManagementService | null = null
 
-export function useBookLibService(): StorageService {
-  if (!storageService) {
-    storageService = new StorageService()
+export function useBookLibService(): BookLibDataManagementService {
+  console.log({ dataManagementService })
+  if (!dataManagementService) {
+    dataManagementService = new BookLibDataManagementService()
   }
-  return storageService
+  return dataManagementService
 }
