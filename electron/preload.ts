@@ -22,3 +22,13 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // You can expose other APTs you need here.
   // ...
 })
+
+// Expose Electron file system API
+contextBridge.exposeInMainWorld('electronAPI', {
+  readFile: (filePath: string) => ipcRenderer.invoke('file:read', filePath),
+  writeFile: (filePath: string, data: string) =>
+    ipcRenderer.invoke('file:write', filePath, data),
+  fileExists: (filePath: string) => ipcRenderer.invoke('file:exists', filePath),
+  getDbPath: () => ipcRenderer.invoke('db:getPath'),
+  ensureDir: (dirPath: string) => ipcRenderer.invoke('dir:ensure', dirPath),
+})

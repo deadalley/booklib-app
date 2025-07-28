@@ -11,8 +11,8 @@ import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
-import type { LowSync } from 'lowdb'
-import { LocalStoragePreset } from 'lowdb/browser'
+import type { DatabaseClient } from './database-client'
+import { createDatabaseClient } from './database-client'
 import { v4 as uuidv4 } from 'uuid'
 import {
   logger,
@@ -27,22 +27,26 @@ import {
 } from '../utils'
 
 export class StorageService {
-  private client: LowSync<Database> | null = null
-  private dbPath: string
+  private client: DatabaseClient | null = null
+  private dbPath: string | null = null
   private isInitialized = false
 
   constructor(dbPath?: string) {
-    this.dbPath = dbPath || this.getDefaultDbPath()
+    if (dbPath) {
+      this.dbPath = dbPath
+    }
   }
 
-  private getDefaultDbPath(): string {
+  private async getDefaultDbPath(): Promise<string> {
     // For Electron app, use app data directory
     if (import.meta.client && 'electronAPI' in window) {
-      return (
-        window as { electronAPI: { getDbPath: () => string } }
-      ).electronAPI.getDbPath()
+      return window.electronAPI.getDbPath()
     }
-    // For web app, use localStorage or IndexedDB
+    // For Node.js environment (local development), use a local file
+    if (typeof window === 'undefined' && typeof process !== 'undefined') {
+      return './booklib-data.json'
+    }
+    // For web app, use localStorage fallback (this path won't be used but needed for consistency)
     return 'booklib-data.json'
   }
 
@@ -73,8 +77,14 @@ export class StorageService {
     if (this.isInitialized) return
 
     try {
-      // Use LocalStoragePreset for browser compatibility
-      this.client = LocalStoragePreset<Database>('booklib-data', this.getDbSeed({}))
+      // Set dbPath if not already set
+      if (!this.dbPath) {
+        this.dbPath = await this.getDefaultDbPath()
+      }
+
+      // Create unified database client that handles both Electron and web environments
+      this.client = await createDatabaseClient(this.dbPath, this.getDbSeed({}))
+
       this.isInitialized = true
     } catch (error) {
       logger.error('Failed to initialize database:', error)
@@ -141,7 +151,7 @@ export class StorageService {
       )
     }
 
-    this.client.write()
+    await this.client.write()
     return id
   }
 
@@ -234,7 +244,7 @@ export class StorageService {
       })
     })
 
-    this.client.write()
+    await this.client.write()
 
     return this.getBook(bookDb.id)
   }
@@ -261,7 +271,7 @@ export class StorageService {
     // Delete book cover
     await this.deleteBookCover(id)
 
-    this.client.write()
+    await this.client.write()
     return id
   }
 
@@ -292,7 +302,7 @@ export class StorageService {
       'collection-book'
     ].filter(({ book_id }) => !ids.includes(book_id))
 
-    this.client.write()
+    await this.client.write()
     return deletedIds
   }
 
@@ -450,7 +460,7 @@ export class StorageService {
       })
     })
 
-    this.client.write()
+    await this.client.write()
 
     return this.getCollection(collectionDb.id)
   }
@@ -489,7 +499,7 @@ export class StorageService {
       'collection-book'
     ].filter(({ collection_id }) => collection_id !== id)
 
-    this.client.write()
+    await this.client.write()
     return id
   }
 
@@ -514,7 +524,7 @@ export class StorageService {
 
     this.client.read()
     this.client.data.goals.push(goalDb)
-    this.client.write()
+    await this.client.write()
 
     const createdGoal = this.client.data.goals.find((g) => g.id === goalDb.id)
     return createdGoal ? dbGoalToGoal(createdGoal) : null
@@ -534,7 +544,7 @@ export class StorageService {
     if (!this.client) throw new Error('Database not initialized')
 
     this.client.data = this.getDbSeed({})
-    this.client.write()
+    await this.client.write()
   }
 
   async checkLibraryIntegrity(): Promise<LibraryIntegrityResult> {
@@ -592,7 +602,7 @@ export class StorageService {
     if (!this.client) throw new Error('Database not initialized')
 
     this.client.data = data
-    this.client.write()
+    await this.client.write()
   }
 
   // External API (Google Books)

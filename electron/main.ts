@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
+import fs from 'node:fs/promises'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -84,6 +85,45 @@ function createWindow() {
 
 function initIpc() {
   ipcMain.handle('app-start-time', () => new Date().toLocaleString())
+
+  // Database file operations
+  ipcMain.handle('db:getPath', () => {
+    const userDataPath = app.getPath('userData')
+    return path.join(userDataPath, 'booklib-data.json')
+  })
+
+  ipcMain.handle('file:read', async (_, filePath: string) => {
+    try {
+      return await fs.readFile(filePath, 'utf-8')
+    } catch (error) {
+      throw new Error(`Failed to read file: ${error}`)
+    }
+  })
+
+  ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
+    try {
+      await fs.writeFile(filePath, data, 'utf-8')
+    } catch (error) {
+      throw new Error(`Failed to write file: ${error}`)
+    }
+  })
+
+  ipcMain.handle('file:exists', async (_, filePath: string) => {
+    try {
+      await fs.access(filePath)
+      return true
+    } catch {
+      return false
+    }
+  })
+
+  ipcMain.handle('dir:ensure', async (_, dirPath: string) => {
+    try {
+      await fs.mkdir(dirPath, { recursive: true })
+    } catch (error) {
+      throw new Error(`Failed to create directory: ${error}`)
+    }
+  })
 }
 
 app.on('window-all-closed', () => {
