@@ -521,11 +521,35 @@ export class BookLibDataManagementService {
     }
 
     this.client.read()
-    this.client.data.goals.push(goalDb)
+
+    const existingGoalIndex = this.client.data.goals.findIndex(
+      (g) => g.id === goalDb.id,
+    )
+    if (existingGoalIndex >= 0) {
+      this.client.data.goals[existingGoalIndex] = goalDb
+    } else {
+      this.client.data.goals.push(goalDb)
+    }
+
     await this.client.write()
 
     const createdGoal = this.client.data.goals.find((g) => g.id === goalDb.id)
     return createdGoal ? dbGoalToGoal(createdGoal) : null
+  }
+
+  async deleteGoal(id: GoalDB['id']): Promise<GoalDB['id'] | null> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    this.client.read()
+
+    const goalExists = this.client.data.goals.some((g) => g.id === id)
+    if (!goalExists) return null
+
+    this.client.data.goals = this.client.data.goals.filter((g) => g.id !== id)
+    await this.client.write()
+
+    return id
   }
 
   // Library Management

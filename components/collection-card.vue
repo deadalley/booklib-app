@@ -102,15 +102,14 @@ const props = defineProps<{
   icon?: keyof typeof icons
 }>()
 
+const { getBook } = useBookLibrary()
+
 const { data: books, refresh } = await useAsyncData(
   `${props.collection.id}-books`,
   async () =>
-    Promise.all<Book>(
-      props.collection.books
-        .slice(0, 4)
-        // @ts-expect-error throws depth error
-        .map(({ id }) => $fetch(`/api/books/${id}`)),
-    ),
+    Promise.all<Book | null>(
+      props.collection.books.slice(0, 4).map(({ id }) => getBook(id)),
+    ).then((books) => books.filter((book): book is Book => book !== null)),
   {
     lazy: true,
     immediate: true,

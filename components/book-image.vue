@@ -76,7 +76,8 @@ const coverSrc = ref<string | null>(
 )
 const hovered = ref(false)
 
-const { handleFileInput, files } = useFileStorage()
+const { handleFileInput } = useFileStorage()
+const { updateBookCover, deleteBookCover } = useBookLibrary()
 
 function setHovered(value: boolean) {
   hovered.value = value
@@ -89,25 +90,19 @@ function onUploadClick() {
 async function onFileChange(e: Event) {
   await handleFileInput(e)
   loading.value = true
-  // const file = (e.target as HTMLInputElement)?.files?.[0] as File
-
-  // const formData = new FormData()
-  // formData.append('bookId', file, `${props.book.id ?? props.tempCoverSrc}`)
 
   try {
-    const newCoverSrc = await $fetch(
-      `/api/books/${props.book.id ?? props.tempCoverSrc}/cover`,
-      {
-        method: 'post',
-        body: {
-          bookId: props.book.id ?? props.tempCoverSrc,
-          file: files.value[0],
-        },
-        // body: formData,
-      },
+    const file = (e.target as HTMLInputElement)?.files?.[0]
+    if (!file) return
+
+    const newCoverSrc = await updateBookCover(
+      props.book.id ?? props.tempCoverSrc!,
+      file,
     )
 
-    coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
+    if (newCoverSrc) {
+      coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
+    }
   } catch (error) {
     console.error(error)
   } finally {
@@ -119,10 +114,7 @@ async function onRemoveClick() {
   loading.value = true
 
   try {
-    await $fetch(`/api/books/${props.book.id ?? props.tempCoverSrc}/cover`, {
-      method: 'delete',
-    })
-
+    await deleteBookCover(props.book.id ?? props.tempCoverSrc!)
     coverSrc.value = null
   } catch (error) {
     console.error(error)

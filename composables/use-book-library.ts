@@ -114,6 +114,10 @@ export function useBookLibrary() {
     return await service.createGoal(goal)
   }
 
+  const deleteGoal = async (id: string): Promise<string | null> => {
+    return await service.deleteGoal(id)
+  }
+
   const isLibraryEmpty = async (): Promise<boolean> => {
     return await service.isLibraryEmpty()
   }
@@ -164,6 +168,7 @@ export function useBookLibrary() {
     // Goals
     getGoals,
     createGoal,
+    deleteGoal,
     // Library Management
     isLibraryEmpty,
     resetLibrary,

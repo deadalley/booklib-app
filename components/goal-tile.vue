@@ -192,6 +192,8 @@ const entry = ref<
 >()
 const addingNew = ref<boolean>(false)
 
+const { deleteGoal: deleteGoalService, createGoal } = useBookLibrary()
+
 const sortedEntries = computed(() => {
   return (goal.value?.entries ?? []).concat().sort((a, b) => {
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -207,24 +209,21 @@ function onCreateNew() {
 
 async function deleteGoal() {
   if (goal.value) {
-    await $fetch(`/api/goals/${goal.value.id}`, {
-      method: 'delete',
-    })
+    await deleteGoalService(goal.value.id)
   }
   props.reloadGoals()
 }
 
 async function onTrack() {
   if (goal.value) {
-    const updatedGoal = await $fetch('/api/goals', {
-      method: 'POST',
-      body: {
-        ...goal.value,
-        status: goal.value.status === 'tracking' ? 'not-tracking' : 'tracking',
-      } as Goal,
-    })
+    const updatedGoal = await createGoal({
+      ...goal.value,
+      status: goal.value.status === 'tracking' ? 'not-tracking' : 'tracking',
+    } as Goal)
 
-    goal.value = { ...goal.value, ...updatedGoal }
+    if (updatedGoal) {
+      goal.value = updatedGoal
+    }
     props.reloadGoals()
   }
 }

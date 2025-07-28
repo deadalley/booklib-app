@@ -165,6 +165,8 @@ const editing = defineModel<boolean>('editing')
 const bookValue = defineModel<ViewBook['id']>('bookValue')
 const searchTerm = ref()
 
+const { createGoal } = useBookLibrary()
+
 const isNew = computed(() => !entry.value?.id)
 
 const bookSelectOptions = computed(() =>
@@ -202,15 +204,12 @@ async function onSubmit() {
 
   if (goal.value && newEntry) {
     try {
-      await $fetch<Goal>('/api/goals', {
-        method: 'POST',
-        body: {
-          ...goal.value,
-          entries: isNew.value
-            ? goal.value.entries.concat(newEntry)
-            : goal.value.entries,
-        } as Goal,
-      })
+      await createGoal({
+        ...goal.value,
+        entries: isNew.value
+          ? goal.value.entries.concat(newEntry)
+          : goal.value.entries,
+      } as Goal)
 
       props.reloadGoals()
       clearState()

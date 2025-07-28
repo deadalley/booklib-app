@@ -128,22 +128,18 @@ defineEmits(['delete'])
 const deleteModalRef = ref()
 const deleteBooks = ref(false)
 
+const { deleteCollection: _deleteCollection, deleteAuthor } = useBookLibrary()
+
 function openDeleteModal() {
   deleteModalRef.value.setIsOpen(true)
 }
 
 async function deleteCollection() {
-  const url = {
-    collections: `/api/collections/${props.collection.id}`,
-    authors: `/api/authors/${props.collection.id}`,
-  }[props.collectionType]
-
-  await $fetch(url, {
-    method: 'delete',
-    query: {
-      deleteBooks: deleteBooks.value,
-    },
-  })
+  if (props.collectionType === 'collections') {
+    await _deleteCollection(props.collection.id as string, deleteBooks.value)
+  } else {
+    await deleteAuthor(props.collection.id as string, deleteBooks.value)
+  }
 
   navigateTo(`/library/${props.collectionType}`)
 }

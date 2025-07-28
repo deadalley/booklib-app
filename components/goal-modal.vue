@@ -213,6 +213,8 @@ const dateRange = ref<
   | undefined
 >()
 
+const { createGoal } = useBookLibrary()
+
 const authorSelectOptions = computed(() =>
   props.authors
     .map((author) => ({
@@ -260,22 +262,21 @@ watch(dateRange, () => {
 async function onSubmit() {
   if (goalForm.value) {
     try {
-      const updatedGoal = await $fetch<Goal>('/api/goals', {
-        method: 'POST',
-        body: {
-          ...goal.value,
-          ...goalForm.value,
-          startAt: toStartOfDay(fromSimpleDate(goalForm.value.startAt)),
-          finishAt: toEndOfDay(fromSimpleDate(goalForm.value.finishAt)),
-          status: trackingGoal.value ? 'tracking' : 'not-tracking',
-        } as Goal,
-      })
+      const updatedGoal = await createGoal({
+        ...goal.value,
+        ...goalForm.value,
+        startAt: toStartOfDay(fromSimpleDate(goalForm.value.startAt)),
+        finishAt: toEndOfDay(fromSimpleDate(goalForm.value.finishAt)),
+        status: trackingGoal.value ? 'tracking' : 'not-tracking',
+      } as Goal)
 
       reset('goal')
       open.value = false
       dateRange.value = undefined
       await props.reloadGoals()
-      goal.value = updatedGoal
+      if (updatedGoal) {
+        goal.value = updatedGoal
+      }
       goalForm.value = undefined
       return updatedGoal
     } catch (error) {

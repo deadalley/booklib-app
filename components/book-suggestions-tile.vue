@@ -65,6 +65,8 @@ const loading = ref<boolean>(false)
 const success = ref<boolean>(false)
 const rating = ref<boolean>(false)
 
+const { createBook } = useBookLibrary()
+
 const options = computed(() => {
   const _books = viewBooks.value ?? []
 
@@ -176,10 +178,7 @@ async function onClick() {
 async function onUpdateBook(bookValues: Book) {
   loading.value = true
   try {
-    const updatedBook = await $fetch<Book>('/api/books', {
-      method: 'post',
-      body: bookValues,
-    })
+    const updatedBook = await createBook(bookValues)
 
     await props.reloadBooks()
     success.value = true

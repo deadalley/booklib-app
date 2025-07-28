@@ -71,9 +71,6 @@
             </template>
             <template v-if="!authors?.length"> No authors </template>
           </template>
-          <NuxtLink v-if="!authors?.length" to="/library/authors/new">
-            <bl-button>Create a author</bl-button>
-          </NuxtLink>
         </bl-section-tile>
       </div>
       <div class="flex flex-col gap-8">
