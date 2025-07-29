@@ -4,7 +4,7 @@
   "directories": {
     "output": "dist-packaged"
   },
-  "asar": true,
+  "asar": false,
   "files": [".output/**/*", "dist-electron"],
   "extraResources": [
     {
@@ -13,7 +13,7 @@
       "filter": ["**/*"]
     }
   ],
-  "compression": "store",
+  "compression": "normal",
   "win": {
     "target": [
       {

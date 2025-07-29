@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build Nuxt app for Electron
+      - name: Build app for Electron
         run: yarn build:electron
 
       - name: Upload build artifacts
@@ -90,6 +90,21 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
@@ -98,20 +113,20 @@ jobs:
         with:
           name: nuxt-build
 
-      - name: Package Electron app
+      - name: Package and publish Electron app
         run: yarn electron:build:${{ matrix.platform }} --publish=onTag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts (Linux)
-        if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-builds
-          path: |
-            dist-packaged/*.AppImage
-            dist-packaged/*.deb
-          retention-days: 5
+      # - name: Upload artifacts (Linux)
+      #   if: matrix.platform == 'linux'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: linux-builds
+      #     path: |
+      #       dist-packaged/*.AppImage
+      #       dist-packaged/*.deb
+      #     retention-days: 5
 
       # - name: Upload artifacts (Windows)
       #   if: matrix.platform == 'win'
@@ -131,108 +146,108 @@ jobs:
       #       dist-packaged/*.dmg
       #     retention-days: 5
 
-  release:
-    needs: package
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  # release:
+  #   needs: package
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history for git operations
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0 # Fetch full history for git operations
 
-      - name: Get version
-        id: version
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          # Ensure version starts with 'v'
-          if [[ ! "$VERSION" =~ ^v ]]; then
-            VERSION="v$VERSION"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+  #     - name: Get version
+  #       id: version
+  #       run: |
+  #         VERSION="${{ github.event.inputs.version }}"
+  #         # Ensure version starts with 'v'
+  #         if [[ ! "$VERSION" =~ ^v ]]; then
+  #           VERSION="v$VERSION"
+  #         fi
+  #         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create and push tag
-        if: github.event.inputs.create_tag == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+  #     - name: Create and push tag
+  #       if: github.event.inputs.create_tag == 'true'
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Check if tag already exists
-          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag ${{ steps.version.outputs.version }} already exists"
-          else
-            git tag "${{ steps.version.outputs.version }}"
-            git push origin "${{ steps.version.outputs.version }}"
-            echo "Created and pushed tag ${{ steps.version.outputs.version }}"
-          fi
+  #         # Check if tag already exists
+  #         if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+  #           echo "Tag ${{ steps.version.outputs.version }} already exists"
+  #         else
+  #           git tag "${{ steps.version.outputs.version }}"
+  #           git push origin "${{ steps.version.outputs.version }}"
+  #           echo "Created and pushed tag ${{ steps.version.outputs.version }}"
+  #         fi
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: ./artifacts
 
-      - name: Read package.json version
-        id: package_version
-        run: |
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+  #     - name: Read package.json version
+  #       id: package_version
+  #       run: |
+  #         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Generate changelog
-        id: changelog
-        run: |
-          # Create a simple changelog from recent commits
-          CHANGELOG="## What's Changed\n\n"
+  #     - name: Generate changelog
+  #       id: changelog
+  #       run: |
+  #         # Create a simple changelog from recent commits
+  #         CHANGELOG="## What's Changed\n\n"
 
-          # Get commits since last tag (or last 10 commits if no previous tag)
-          if git describe --tags --abbrev=0 HEAD~1 >/dev/null 2>&1; then
-            LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1)
-            COMMITS=$(git log --oneline --pretty=format:"* %s" $LAST_TAG..HEAD)
-          else
-            COMMITS=$(git log --oneline --pretty=format:"* %s" -10)
-          fi
+  #         # Get commits since last tag (or last 10 commits if no previous tag)
+  #         if git describe --tags --abbrev=0 HEAD~1 >/dev/null 2>&1; then
+  #           LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1)
+  #           COMMITS=$(git log --oneline --pretty=format:"* %s" $LAST_TAG..HEAD)
+  #         else
+  #           COMMITS=$(git log --oneline --pretty=format:"* %s" -10)
+  #         fi
 
-          if [ -n "$COMMITS" ]; then
-            CHANGELOG="$CHANGELOG$COMMITS\n\n"
-          else
-            CHANGELOG="${CHANGELOG}* Initial release\n\n"
-          fi
+  #         if [ -n "$COMMITS" ]; then
+  #           CHANGELOG="$CHANGELOG$COMMITS\n\n"
+  #         else
+  #           CHANGELOG="${CHANGELOG}* Initial release\n\n"
+  #         fi
 
-          CHANGELOG="${CHANGELOG}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
+  #         CHANGELOG="${CHANGELOG}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
 
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+  #         echo "changelog<<EOF" >> $GITHUB_OUTPUT
+  #         echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+  #         echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Release Linux
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: BookLib ${{ steps.version.outputs.version }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: true
-          prerelease: false
-          files: |
-            ./artifacts/linux-builds/*.AppImage
-            ./artifacts/linux-builds/*.deb
-          token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Release Linux
+  #       uses: softprops/action-gh-release@v2
+  #       with:
+  #         tag_name: ${{ steps.version.outputs.version }}
+  #         name: BookLib ${{ steps.version.outputs.version }}
+  #         body: ${{ steps.changelog.outputs.changelog }}
+  #         draft: true
+  #         prerelease: false
+  #         files: |
+  #           ./artifacts/linux-builds/*.AppImage
+  #           ./artifacts/linux-builds/*.deb
+  #         token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Upload Windows Installer
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./artifacts/windows-builds/BookLib Setup ${{ steps.package_version.outputs.version }}.exe
-      #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-windows-x64-setup.exe
-      #     asset_content_type: application/octet-stream
+  # - name: Upload Windows Installer
+  #   uses: actions/upload-release-asset@v1
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   with:
+  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #     asset_path: ./artifacts/windows-builds/BookLib Setup ${{ steps.package_version.outputs.version }}.exe
+  #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-windows-x64-setup.exe
+  #     asset_content_type: application/octet-stream
 
-      # - name: Upload macOS DMG
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./artifacts/macos-builds/BookLib-${{ steps.package_version.outputs.version }}.dmg
-      #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-macos-universal.dmg
-      #     asset_content_type: application/octet-stream
+  # - name: Upload macOS DMG
+  #   uses: actions/upload-release-asset@v1
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   with:
+  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #     asset_path: ./artifacts/macos-builds/BookLib-${{ steps.package_version.outputs.version }}.dmg
+  #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-macos-universal.dmg
+  #     asset_content_type: application/octet-stream
