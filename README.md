@@ -20,8 +20,6 @@
   </a>
 </div>
 
----
-
 <div>
   <div align="center">
     <h3>📖 Book Management</h3>
