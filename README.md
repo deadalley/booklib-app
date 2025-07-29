@@ -9,7 +9,15 @@
   [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC.svg)](https://www.typescriptlang.org)
   [![Electron](https://img.shields.io/badge/Electron-9FEAF9.svg)](https://www.electronjs.org)
   
-  [Documentation](#-features) | [Getting Started](#-quick-start) | [Development](#-development)
+  [Getting Started](#quick-start) | [Development](#development)
+</div>
+
+---
+
+<div align="center">
+  <a href="https://booklib-app.netlify.app" target="_blank">
+    <img src="https://img.shields.io/badge/📖%20Live%20Demo-Try%20Now-4285f4?style=for-the-badge&logoColor=white&labelColor=2d3748" alt="BookLib Live Demo"/>
+  </a>
 </div>
 
 ---
