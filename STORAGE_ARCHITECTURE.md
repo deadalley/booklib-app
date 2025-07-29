@@ -36,13 +36,6 @@ The StorageService has been updated to support multiple storage backends: Electr
 - Automatic directory creation
 - Persistent storage across app launches
 
-### Node.js Environment (Local Development)
-
-- Uses JSONFilePreset from LowDB for file-based storage
-- Stores data in `./booklib-data.json` in the project directory
-- Full async read/write operations
-- Perfect for development and testing
-
 ### Web Environment
 
 - Falls back to LocalStorage for browser compatibility
@@ -57,11 +50,7 @@ The StorageService has been updated to support multiple storage backends: Electr
 - **macOS**: `~/Library/Application Support/booklib-app/booklib-data.json`
 - **Linux**: `~/.config/booklib-app/booklib-data.json`
 
-**Local Development (Node.js):**
-
-- `./booklib-data.json` (in project root)
-
-**Web Environment:**
+**Web Environment & Local Development:**
 
 - Browser LocalStorage
 
@@ -82,8 +71,7 @@ const books = await storageService.getBooks({})
 The service detects the environment in this order:
 
 1. **Electron**: Checks for `window.electronAPI`
-2. **Node.js**: Checks for `typeof window === 'undefined' && typeof process !== 'undefined'`
-3. **Browser**: Falls back to LocalStorage
+2. **Browser**: Falls back to LocalStorage
 
 ## Migration
 
