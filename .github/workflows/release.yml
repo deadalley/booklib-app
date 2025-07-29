@@ -126,11 +126,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Update package.json version
-        run: |
-          # Update the version in package.json
-          npm version ${{ steps.version.outputs.version_no_v }} --no-git-tag-version
-          echo "Updated package.json version to ${{ steps.version.outputs.version_no_v }}"
+      # - name: Update package.json version
+      #   run: |
+      #     # Update the version in package.json
+      #     npm version ${{ steps.version.outputs.version_no_v }} --no-git-tag-version
+      #     echo "Updated package.json version to ${{ steps.version.outputs.version_no_v }}"
 
       - name: Commit version update
         run: |
