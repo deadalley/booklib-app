@@ -113,23 +113,23 @@ jobs:
             dist-packaged/*.deb
           retention-days: 5
 
-      - name: Upload artifacts (Windows)
-        if: matrix.platform == 'win'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-builds
-          path: |
-            dist-packaged/*.exe
-          retention-days: 5
+      # - name: Upload artifacts (Windows)
+      #   if: matrix.platform == 'win'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: windows-builds
+      #     path: |
+      #       dist-packaged/*.exe
+      #     retention-days: 5
 
-      - name: Upload artifacts (macOS)
-        if: matrix.platform == 'mac'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-builds
-          path: |
-            dist-packaged/*.dmg
-          retention-days: 5
+      # - name: Upload artifacts (macOS)
+      #   if: matrix.platform == 'mac'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: macos-builds
+      #     path: |
+      #       dist-packaged/*.dmg
+      #     retention-days: 5
 
   release:
     needs: package
