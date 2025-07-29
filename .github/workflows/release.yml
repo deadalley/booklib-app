@@ -14,7 +14,7 @@ env:
 
 jobs:
   build:
-    name: Build Nuxt App
+    name: build app
     runs-on: ubuntu-latest
 
     steps:
@@ -58,7 +58,7 @@ jobs:
           retention-days: 1
 
   package:
-    name: Package Electron App (${{ matrix.platform }})
+    name: package app (${{ matrix.platform }})
     needs: build
     strategy:
       matrix:
@@ -126,6 +126,7 @@ jobs:
           retention-days: 5
 
   release:
+    name: release
     needs: package
     runs-on: ubuntu-latest
     permissions:
