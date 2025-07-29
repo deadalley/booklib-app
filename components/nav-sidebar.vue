@@ -76,6 +76,26 @@
           </template>
         </bl-nav-sidebar-button>
       </div>
+      <bl-warning-badge class="max-w-[255px]">
+        <template #icon="iconProps">
+          <IconAlertTriangle v-bind="iconProps" />
+        </template>
+        <template #title>Important</template>
+        <template #content>
+          You are running a <b>demo</b> version of BookLib.
+          <br />
+          Your data is stored in the browser session and will not be available
+          elsewhere. To use BookLib fully, please download the app at
+          <NuxtLink
+            to="https://github.com/deadalley/booklib-app/releases/latest"
+            class="font-semibold underline hover:text-main"
+            target="_blank"
+          >
+            @deadalley/booklib-app
+          </NuxtLink>
+          .
+        </template>
+      </bl-warning-badge>
       <div class="flex gap-3 sm:flex-col">
         <bl-nav-sidebar-button
           to="/settings"
@@ -113,6 +133,7 @@ import {
   IconBookDownload,
   IconSettings,
   IconChevronLeftPipe,
+  IconAlertTriangle,
 } from '@tabler/icons-vue'
 import { getAssetPath } from '~/utils/assets'
 
