@@ -7,11 +7,6 @@ on:
         description: 'Version to release (e.g., v1.0.0)'
         required: true
         type: string
-      build_platforms:
-        description: 'Platforms to build (comma-separated: linux,windows,all)'
-        required: true
-        default: 'all'
-        type: string
 
 env:
   BASE_URL: http://127.0.0.1:3001
@@ -21,7 +16,6 @@ jobs:
   build-linux:
     name: Build Linux
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.inputs.build_platforms, 'linux') || contains(github.event.inputs.build_platforms, 'all') }}
 
     steps:
       - name: Checkout code
@@ -87,7 +81,6 @@ jobs:
   build-windows:
     name: Build Windows (Docker + Wine)
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.inputs.build_platforms, 'windows') || contains(github.event.inputs.build_platforms, 'all') }}
 
     steps:
       - name: Checkout code
@@ -320,7 +313,6 @@ jobs:
           echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Platforms:** ${{ github.event.inputs.build_platforms }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Check Linux build
