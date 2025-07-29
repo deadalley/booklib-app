@@ -1,18 +1,23 @@
-import { copyFileSync } from 'fs'
-import { test as setup } from '@playwright/test'
+import { test as setup, expect } from '@playwright/test'
+import { readFileSync } from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { useBookLibService } from '../../services/data-management'
+import type { Database } from '../../types/api'
 
-setup('setup database', async () => {
-  if (!process.env.USER_DB_PATH) {
-    throw new Error('USER_DB_PATH environment variable is not set')
-  }
+setup('setup database', async ({ page }) => {
+  const testDataPath = path.join(__dirname, 'booklib-test-base.json')
+  const testDataContent = readFileSync(testDataPath, 'utf8')
 
-  const __filename = fileURLToPath(import.meta.url)
-  const __dirname = path.dirname(__filename)
+  const data = JSON.parse(testDataContent) as Database
 
-  const sourceFile = 'booklib-test-base.json'
-  const sourcePath = path.join(__dirname, sourceFile)
-  const targetPath = path.join(__dirname, '..', '..', process.env.USER_DB_PATH)
-  copyFileSync(sourcePath, targetPath)
+  const service = useBookLibService()
+
+  await service.initialize()
+  await service.importLibrary(data)
+
+  const exportedData = await service.exportLibrary()
+
+  await page.goto('/#/tracking')
+
+  expect(exportedData).toEqual(data)
 })
