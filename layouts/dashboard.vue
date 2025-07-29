@@ -50,6 +50,24 @@
       <div
         class="relative flex w-full flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
       >
+        <bl-warning-badge v-if="isWebEnvironment" class="mb-4 hidden md:flex">
+          <template #icon="iconProps">
+            <IconAlertTriangle v-bind="iconProps" />
+          </template>
+          <template #content>
+            You are running a <b>demo</b> version of BookLib. Your data is
+            stored in the browser session and will not be available elsewhere.
+            To use BookLib fully, please download the app at
+            <NuxtLink
+              to="https://github.com/deadalley/booklib-app/releases/latest"
+              class="font-semibold underline hover:text-main"
+              target="_blank"
+            >
+              @deadalley/booklib-app
+            </NuxtLink>
+            .
+          </template>
+        </bl-warning-badge>
         <slot />
         <NuxtLoadingIndicator color="#985858" />
       </div>
@@ -58,9 +76,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconMenu2 } from '@tabler/icons-vue'
+import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
 
 defineProps<{ title: string; navItems?: { to?: string; label: string }[] }>()
 
 const sidebarOpen = ref(false)
+const isWebEnvironment = ref<boolean>(
+  typeof window !== 'undefined' && !('electronAPI' in window),
+)
 </script>
