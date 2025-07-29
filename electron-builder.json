@@ -21,7 +21,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/favicon.ico"
+    "icon": "public/icon.svg"
   },
   "nsis": {
     "oneClick": false,
@@ -29,20 +29,6 @@
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "BookLib"
-  },
-  "mac": {
-    "target": [
-      {
-        "target": "dmg",
-        "arch": ["x64", "arm64"]
-      }
-    ],
-    "icon": "public/logo.icns",
-    "category": "public.app-category.productivity"
-  },
-  "dmg": {
-    "title": "BookLib",
-    "icon": "public/logo.icns"
   },
   "linux": {
     "target": [
@@ -53,9 +39,13 @@
       {
         "target": "deb",
         "arch": ["x64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64"]
       }
     ],
-    "icon": "public/logo.svg",
+    "icon": "public/icon.svg",
     "category": "Office",
     "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
     "vendor": "Jessica Aissa",

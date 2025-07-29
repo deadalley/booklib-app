@@ -66,6 +66,7 @@ jobs:
           ls -la dist-packaged/ || echo "dist-packaged directory not found"
           find dist-packaged/ -name "*.AppImage" -exec echo "Found AppImage: {}" \;
           find dist-packaged/ -name "*.deb" -exec echo "Found DEB: {}" \;
+          find dist-packaged/ -name "*.zip" -exec echo "Found ZIP: {}" \;
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
@@ -74,6 +75,7 @@ jobs:
           path: |
             dist-packaged/*.AppImage
             dist-packaged/*.deb
+            dist-packaged/*.zip
           retention-days: 5
 
   release:
@@ -126,11 +128,22 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # - name: Update package.json version
-      #   run: |
-      #     # Update the version in package.json
-      #     npm version ${{ steps.version.outputs.version_no_v }} --no-git-tag-version
-      #     echo "Updated package.json version to ${{ steps.version.outputs.version_no_v }}"
+      - name: Update package.json version
+        run: |
+          # Check current version in package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          TARGET_VERSION="${{ steps.version.outputs.version_no_v }}"
+
+          echo "Current version: $CURRENT_VERSION"
+          echo "Target version: $TARGET_VERSION"
+
+          if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+            echo "Version is already $TARGET_VERSION, no update needed"
+          else
+            # Update the version in package.json
+            npm version $TARGET_VERSION --no-git-tag-version
+            echo "Updated package.json version to $TARGET_VERSION"
+          fi
 
       - name: Commit version update
         run: |
@@ -193,4 +206,5 @@ jobs:
           files: |
             ./artifacts/linux-builds/*.AppImage
             ./artifacts/linux-builds/*.deb
+            ./artifacts/linux-builds/*.zip
           token: ${{ secrets.GITHUB_TOKEN }}
