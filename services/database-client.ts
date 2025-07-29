@@ -1,7 +1,6 @@
 import type { Database } from '~/types/api'
 import type { Low } from 'lowdb'
 import { LocalStoragePreset } from 'lowdb/browser'
-import { JSONFilePreset } from 'lowdb/node'
 import { Low as LowClass } from 'lowdb'
 import { ElectronAdapter } from './electron-adapter'
 
@@ -68,49 +67,6 @@ class LocalStorageDatabaseClient implements DatabaseClient {
   }
 }
 
-class JSONFileDatabaseClient implements DatabaseClient {
-  private lowClient: Low<Database> | null = null
-  private filePath: string
-  private defaultData: Database
-
-  constructor(filePath: string, defaultData: Database) {
-    this.filePath = filePath
-    this.defaultData = defaultData
-  }
-
-  get data(): Database {
-    if (!this.lowClient) {
-      throw new Error('Database not initialized. Call read() first.')
-    }
-    return this.lowClient.data!
-  }
-
-  set data(value: Database) {
-    if (!this.lowClient) {
-      throw new Error('Database not initialized. Call read() first.')
-    }
-    this.lowClient.data = value
-  }
-
-  async read(): Promise<void> {
-    if (!this.lowClient) {
-      this.lowClient = await JSONFilePreset<Database>(
-        this.filePath,
-        this.defaultData,
-      )
-    } else {
-      await this.lowClient.read()
-    }
-  }
-
-  async write(): Promise<void> {
-    if (!this.lowClient) {
-      throw new Error('Database not initialized. Call read() first.')
-    }
-    await this.lowClient.write()
-  }
-}
-
 export async function createDatabaseClient(
   dbPath: string,
   defaultData: Database,
@@ -119,13 +75,6 @@ export async function createDatabaseClient(
   if (typeof window !== 'undefined' && 'electronAPI' in window) {
     console.log('Creating ElectronDatabaseClient with path:', dbPath)
     const client = new ElectronDatabaseClient(dbPath, defaultData)
-    await client.read()
-    return client
-  }
-  // Check if we're in Node.js environment (local development)
-  else if (typeof window === 'undefined' && typeof process !== 'undefined') {
-    console.log('Creating JSONFileDatabaseClient with path:', dbPath)
-    const client = new JSONFileDatabaseClient(dbPath, defaultData)
     await client.read()
     return client
   }

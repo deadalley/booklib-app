@@ -6,9 +6,9 @@
   "description": "BookLib is an application for managing your book collection.",
   "author": "Jessica Aissa <deadalley31@gmail.com>",
   "scripts": {
-    "build": "cross-env ELECTRON_ENABLED=true nuxt build",
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
-    "generate": "cross-env ELECTRON_ENABLED=true nuxt generate",
+    "build": "cross-env ELECTRON_ENABLED=true nuxt generate",
+    "build:web": "cross-env ELECTRON_ENABLED=false nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint:js": "eslint .",
