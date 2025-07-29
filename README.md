@@ -37,6 +37,37 @@
   </div>
 </div>
 
+---
+
+- [Quick Start](#quick-start)
+  - [Installation](#installation)
+- [Development](#development)
+  - [Available Scripts](#available-scripts)
+    - [Development](#development-1)
+    - [Building](#building)
+    - [Testing](#testing)
+    - [Linting](#linting)
+    - [Histoire](#histoire)
+    - [Electron Distribution](#electron-distribution)
+- [Architecture](#architecture)
+  - [Tech Stack](#tech-stack)
+  - [Project Structure](#project-structure)
+  - [Storage Architecture](#storage-architecture)
+- [Usage](#usage)
+  - [Getting Started](#getting-started)
+- [Testing](#testing-1)
+- [Tools](#tools)
+- [Screenshots](#screenshots)
+  - [Start page](#start-page)
+  - [Home page](#home-page)
+  - [Library page](#library-page)
+  - [Stats page](#stats-page)
+  - [Tracking page](#tracking-page)
+  - [Import page](#import-page)
+- [License](#license)
+
+---
+
 ## Quick Start
 
 ### Installation
@@ -84,7 +115,7 @@ yarn test:e2e:ui     # Run e2e tests with UI
 yarn coverage        # Generate test coverage report
 ```
 
-#### Linting & Code Quality
+#### Linting
 ```bash
 yarn lint            # Run all linters
 yarn lint:fix        # Fix linting issues
@@ -93,7 +124,7 @@ yarn lint:ts         # TypeScript type checking
 yarn lint:prettier   # Prettier formatting check
 ```
 
-#### Histoire (Component Development)
+#### Histoire
 ```bash
 yarn story:dev       # Start Storybook development server
 yarn story:build     # Build Storybook
@@ -154,13 +185,6 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 2. **Create collections** - Organize books into custom collections
 3. **Set reading goals** - Track your reading progress with customizable goals
 4. **Import your library** - Bulk import books from CSV or other formats
-
-### Key Features Walkthrough
-- **Dashboard**: Overview of your library with statistics and reading suggestions
-- **Library**: Browse all books with advanced filtering and search
-- **Collections**: Organize books into custom groups
-- **Tracking**: Set and monitor reading goals
-- **Analytics**: Visualize your reading habits and statistics
 
 ## Testing
 
