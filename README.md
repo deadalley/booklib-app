@@ -71,12 +71,14 @@
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/deadalley/booklib-app.git
    cd booklib-app
    ```
 
 2. **Install dependencies**
+
    ```bash
    yarn install
    ```
@@ -94,11 +96,13 @@ The web application will be available at `http://localhost:3000`
 ### Available Scripts
 
 #### Development
+
 ```bash
 yarn dev              # Start web development server
 ```
 
 #### Building
+
 ```bash
 yarn build:electron  # Build for Electron (desktop app)
 yarn build:web       # Build for web deployment
@@ -106,6 +110,7 @@ yarn preview         # Preview production build
 ```
 
 #### Testing
+
 ```bash
 yarn test            # Run unit tests
 yarn test:e2e        # Run end-to-end tests
@@ -114,6 +119,7 @@ yarn coverage        # Generate test coverage report
 ```
 
 #### Linting
+
 ```bash
 yarn lint            # Run all linters
 yarn lint:fix        # Fix linting issues
@@ -123,6 +129,7 @@ yarn lint:prettier   # Prettier formatting check
 ```
 
 #### Histoire
+
 ```bash
 yarn story:dev       # Start Storybook development server
 yarn story:build     # Build Storybook
@@ -130,6 +137,7 @@ yarn story:preview   # Preview built Storybook
 ```
 
 #### Electron Distribution
+
 ```bash
 yarn electron:build        # Build for current platform
 yarn electron:build:win    # Build for Windows
@@ -141,6 +149,7 @@ yarn electron:publish      # Build and publish
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: Vue 3 + Nuxt 3 + TypeScript
 - **Styling**: Tailwind CSS
 - **Charts**: ECharts with vue-echarts
@@ -152,6 +161,7 @@ yarn electron:publish      # Build and publish
 - **Database**: LowDB (JSON-based)
 
 ### Project Structure
+
 ```
 booklib-app/
 ├── components/         # Vue components
@@ -169,6 +179,7 @@ booklib-app/
 ```
 
 ### Storage Architecture
+
 BookLib uses a flexible storage system that adapts to the environment:
 
 - **Electron**: File-based storage in user data directory
@@ -179,6 +190,7 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 ## Usage
 
 ### Getting Started
+
 1. **Add your first book** - Use the "+" button to manually add books or search Google Books
 2. **Create collections** - Organize books into custom collections
 3. **Set reading goals** - Track your reading progress with customizable goals
@@ -191,6 +203,7 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 - **Visual testing** with Histoire
 
 Run tests:
+
 ```bash
 yarn test           # Unit tests
 yarn test:e2e       # E2E tests
@@ -211,21 +224,27 @@ yarn lint:ts        # Type checking
 <summary>View screenshots</summary>
 
 ### Start page
+
 <img src="./screenshots/BookLib-1.png" alt="BookLib Dashboard" width="800"/>
 
 ### Home page
+
 <img src="./screenshots/BookLib-3.png" alt="Book Details" width="800"/>
 
 ### Library page
+
 <img src="./screenshots/BookLib-2.png" alt="BookLib Library" width="800"/>
 
 ### Stats page
+
 <img src="./screenshots/BookLib-4.png" alt="Collections" width="800"/>
 
 ### Tracking page
+
 <img src="./screenshots/BookLib-5.png" alt="Goal Tracking" width="800"/>
 
 ### Import page
+
 <img src="./screenshots/BookLib-6.png" alt="Analytics" width="800"/>
 
 </details>
