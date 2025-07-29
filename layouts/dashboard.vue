@@ -55,12 +55,12 @@
             <IconAlertTriangle v-bind="iconProps" />
           </template>
           <template #content>
-            You are running a <b>demo</b> version of BookLib. Your data is
-            stored in the browser session and will not be available elsewhere.
-            To use BookLib fully, please download the app at
+            You are running a <b class="contents">demo</b> version of BookLib.
+            Your data is stored in the browser session and will not be available
+            elsewhere. To use BookLib fully, please download the app at
             <NuxtLink
               to="https://github.com/deadalley/booklib-app/releases/latest"
-              class="font-semibold underline hover:text-main"
+              class="contents font-semibold underline hover:text-main"
               target="_blank"
             >
               @deadalley/booklib-app
