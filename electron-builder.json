@@ -21,7 +21,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/logo.ico"
+    "icon": "public/favicon.ico"
   },
   "nsis": {
     "oneClick": false,
@@ -55,7 +55,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/logo.png",
+    "icon": "public/logo.svg",
     "category": "Office",
     "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
     "vendor": "Jessica Aissa",
@@ -80,7 +80,7 @@
     "synopsis": "Manage your personal book library",
     "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
     "vendor": "Jessica Aissa",
-    "icon": "public/logo.png",
+    "icon": "public/icon.svg",
     "depends": [
       "libgtk-3-0",
       "libnotify4",
