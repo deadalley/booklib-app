@@ -21,7 +21,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/icon.svg"
+    "icon": "public/icon.png"
   },
   "nsis": {
     "oneClick": false,
