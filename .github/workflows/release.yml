@@ -7,11 +7,6 @@ on:
         description: 'Version to release (e.g., v1.0.0)'
         required: true
         type: string
-      create_tag:
-        description: 'Create and push git tag'
-        required: false
-        type: boolean
-        default: true
 
 env:
   BASE_URL: http://127.0.0.1:3001
@@ -19,6 +14,7 @@ env:
 
 jobs:
   build:
+    name: Build Nuxt App
     runs-on: ubuntu-latest
 
     steps:
@@ -62,6 +58,7 @@ jobs:
           retention-days: 1
 
   package:
+    name: Package Electron App (${{ matrix.platform }})
     needs: build
     strategy:
       matrix:
@@ -114,7 +111,7 @@ jobs:
           name: nuxt-build
 
       - name: Package and publish Electron app
-        run: yarn electron:build:${{ matrix.platform }} --publish=always
+        run: yarn electron:build:${{ matrix.platform }} --publish=never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -128,126 +125,87 @@ jobs:
             dist-packaged/*.deb
           retention-days: 5
 
-      # - name: Upload artifacts (Windows)
-      #   if: matrix.platform == 'win'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: windows-builds
-      #     path: |
-      #       dist-packaged/*.exe
-      #     retention-days: 5
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-      # - name: Upload artifacts (macOS)
-      #   if: matrix.platform == 'mac'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: macos-builds
-      #     path: |
-      #       dist-packaged/*.dmg
-      #     retention-days: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for git operations
 
-  # release:
-  #   needs: package
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
+      - name: Get version
+        id: version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          # Ensure version starts with 'v'
+          if [[ ! "$VERSION" =~ ^v ]]; then
+            VERSION="v$VERSION"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0 # Fetch full history for git operations
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-  #     - name: Get version
-  #       id: version
-  #       run: |
-  #         VERSION="${{ github.event.inputs.version }}"
-  #         # Ensure version starts with 'v'
-  #         if [[ ! "$VERSION" =~ ^v ]]; then
-  #           VERSION="v$VERSION"
-  #         fi
-  #         echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # Check if tag already exists
+          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.version }} already exists"
+          else
+            git tag "${{ steps.version.outputs.version }}"
+            git push origin "${{ steps.version.outputs.version }}"
+            echo "Created and pushed tag ${{ steps.version.outputs.version }}"
+          fi
 
-  #     - name: Create and push tag
-  #       if: github.event.inputs.create_tag == 'true'
-  #       run: |
-  #         git config user.name "github-actions[bot]"
-  #         git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
 
-  #         # Check if tag already exists
-  #         if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-  #           echo "Tag ${{ steps.version.outputs.version }} already exists"
-  #         else
-  #           git tag "${{ steps.version.outputs.version }}"
-  #           git push origin "${{ steps.version.outputs.version }}"
-  #           echo "Created and pushed tag ${{ steps.version.outputs.version }}"
-  #         fi
+      - name: Read package.json version
+        id: package_version
+        run: |
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-  #     - name: Download all artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: ./artifacts
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Create a simple changelog from recent commits
+          CHANGELOG="## What's Changed\n\n"
 
-  #     - name: Read package.json version
-  #       id: package_version
-  #       run: |
-  #         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          # Get commits since last tag (or last 10 commits if no previous tag)
+          if git describe --tags --abbrev=0 HEAD~1 >/dev/null 2>&1; then
+            LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1)
+            COMMITS=$(git log --oneline --pretty=format:"* %s" $LAST_TAG..HEAD)
+          else
+            COMMITS=$(git log --oneline --pretty=format:"* %s" -10)
+          fi
 
-  #     - name: Generate changelog
-  #       id: changelog
-  #       run: |
-  #         # Create a simple changelog from recent commits
-  #         CHANGELOG="## What's Changed\n\n"
+          if [ -n "$COMMITS" ]; then
+            CHANGELOG="$CHANGELOG$COMMITS\n\n"
+          else
+            CHANGELOG="${CHANGELOG}* Initial release\n\n"
+          fi
 
-  #         # Get commits since last tag (or last 10 commits if no previous tag)
-  #         if git describe --tags --abbrev=0 HEAD~1 >/dev/null 2>&1; then
-  #           LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1)
-  #           COMMITS=$(git log --oneline --pretty=format:"* %s" $LAST_TAG..HEAD)
-  #         else
-  #           COMMITS=$(git log --oneline --pretty=format:"* %s" -10)
-  #         fi
+          CHANGELOG="${CHANGELOG}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
 
-  #         if [ -n "$COMMITS" ]; then
-  #           CHANGELOG="$CHANGELOG$COMMITS\n\n"
-  #         else
-  #           CHANGELOG="${CHANGELOG}* Initial release\n\n"
-  #         fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-  #         CHANGELOG="${CHANGELOG}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
-
-  #         echo "changelog<<EOF" >> $GITHUB_OUTPUT
-  #         echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
-  #         echo "EOF" >> $GITHUB_OUTPUT
-
-  #     - name: Release Linux
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         tag_name: ${{ steps.version.outputs.version }}
-  #         name: BookLib ${{ steps.version.outputs.version }}
-  #         body: ${{ steps.changelog.outputs.changelog }}
-  #         draft: true
-  #         prerelease: false
-  #         files: |
-  #           ./artifacts/linux-builds/*.AppImage
-  #           ./artifacts/linux-builds/*.deb
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-
-  # - name: Upload Windows Installer
-  #   uses: actions/upload-release-asset@v1
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #   with:
-  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #     asset_path: ./artifacts/windows-builds/BookLib Setup ${{ steps.package_version.outputs.version }}.exe
-  #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-windows-x64-setup.exe
-  #     asset_content_type: application/octet-stream
-
-  # - name: Upload macOS DMG
-  #   uses: actions/upload-release-asset@v1
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #   with:
-  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #     asset_path: ./artifacts/macos-builds/BookLib-${{ steps.package_version.outputs.version }}.dmg
-  #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-macos-universal.dmg
-  #     asset_content_type: application/octet-stream
+      - name: Release Linux
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: BookLib ${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: true
+          prerelease: false
+          files: |
+            ./artifacts/linux-builds/*.AppImage
+            ./artifacts/linux-builds/*.deb
+          token: ${{ secrets.GITHUB_TOKEN }}
