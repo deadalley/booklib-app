@@ -143,6 +143,10 @@ jobs:
             /bin/bash -c "cd /project && \
               echo 'Upgrading Yarn to latest version...' && \
               npm install -g yarn@latest && \
+              echo 'Installing dependencies...' && \
+              yarn install --frozen-lockfile --network-timeout 300000 && \
+              echo 'Building Electron app...' && \
+              yarn build:electron && \
               echo 'Building Windows executable...' && \
               yarn electron:build:win --publish=never --config.nativeRebuilder=legacy"
 
