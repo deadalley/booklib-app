@@ -7,7 +7,7 @@
   "author": "Jessica Aissa <deadalley31@gmail.com>",
   "scripts": {
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
-    "build": "cross-env ELECTRON_ENABLED=true nuxt generate",
+    "build:electron": "cross-env ELECTRON_ENABLED=true nuxt generate",
     "build:web": "cross-env ELECTRON_ENABLED=false nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -31,8 +31,7 @@
     "electron:build:win": "electron-builder --win",
     "electron:build:mac": "electron-builder --mac",
     "electron:build:linux": "electron-builder --linux",
-    "electron:publish": "electron-builder --publish=always",
-    "electron:test": "yarn generate && yarn electron:dir && ./dist-packaged/linux-unpacked/booklib --enable-logging --v=1"
+    "electron:publish": "electron-builder --publish=always"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.9",

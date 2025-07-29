@@ -1,65 +1,39 @@
-# BookLib 📚
+<div align="center">
+  <img src="https://raw.githubusercontent.com/deadalley/booklib-app/main/public/icon.svg" alt="BookLib Logo" width="200"/>
+  <h1>BookLib</h1>
+  <p>A comprehensive personal book library management application</p>
+  
+  [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/deadalley/booklib-app)
+  [![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00C58E.svg)](https://nuxt.com)
+  [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D.svg)](https://vuejs.org)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC.svg)](https://www.typescriptlang.org)
+  [![Electron](https://img.shields.io/badge/Electron-9FEAF9.svg)](https://www.electronjs.org)
+  
+  [Documentation](#-features) | [Getting Started](#-quick-start) | [Development](#-development)
+</div>
 
-**BookLib** is a comprehensive personal book library management application that helps you organize, track, and analyze your reading collection. Built with Nuxt 3 and Vue 3, it offers both web and desktop (Electron) versions for seamless book management across platforms.
+---
 
-![BookLib Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
-![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00C58E.svg)
-![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC.svg)
-![Electron](https://img.shields.io/badge/Electron-9FEAF9.svg)
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <h3>📖 Book Management</h3>
+        <p>Manage your book collection, find your favorite books, organize them in collections, and so much more.</p>
+      </td>
+      <td align="center" width="33%">
+        <h3>🎯 Goal Tracking</h3>
+        <p>Tracking your reading goals by books, pages, or hours and achieve your reading targets.</p>
+      </td>
+      <td align="center" width="33%">
+        <h3>📦 Import & Export</h3>
+        <p>Export and import your library in CSV and JSON formats for easy portability.</p>
+      </td>
+    </tr>
+  </table>
+</div>
 
-## ✨ Features
-
-### 📖 Book Management
-- **Complete book database** with title, author, ISBN, publisher, year, pages, and more
-- **Custom book covers** with image upload and management
-- **Reading progress tracking** (Not Read, Reading, Paused, Finished)
-- **Rating system** with 5-star ratings
-- **Genre categorization** with custom tags
-- **Multiple formats support** (Physical, Digital, Audiobook)
-- **Reading dates tracking** (started/finished dates)
-- **Google Books API integration** for book search and metadata
-
-### 📊 Collections & Organization
-- **Custom collections** for organizing books by themes, series, or preferences
-- **Built-in smart collections** (Favorites, Wishlist)
-- **Drag-and-drop reordering** within collections
-- **Collection-based filtering** and views
-- **Author management** with author-based book grouping
-
-### 🎯 Reading Goals & Analytics
-- **Flexible goal setting** (books, pages, or hours)
-- **Multiple goal intervals** (daily, weekly, monthly, yearly, or total)
-- **Visual progress tracking** with charts and graphs
-- **Goal completion analytics** with projections
-- **Reading statistics** and insights
-
-### 📈 Data Visualization
-- **Interactive charts** powered by ECharts
-- **Reading progress visualization** (line charts, bar charts, pie charts)
-- **Book statistics** by genre, author, publication year
-- **Reading habit analytics** and trends
-- **KPI tiles** for quick overview
-
-### 🔍 Advanced Features
-- **Powerful search** with full-text search across all book data
-- **Advanced filtering** by status, genre, author, rating, and more
-- **Table views** with sortable columns and pagination
-- **Data import/export** for backup and migration
-- **Library integrity checking** for data validation
-- **Responsive design** for mobile and desktop
-
-### 🖥️ Multi-Platform Support
-- **Web application** for browser-based access
-- **Desktop app** (Electron) for offline use
-- **Cross-platform storage** with automatic data synchronization
-- **Local data storage** with LowDB for privacy and speed
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js (v18 or higher)
-- Package manager: npm, pnpm, yarn, or bun
+## Quick Start
 
 ### Installation
 
@@ -71,26 +45,13 @@
 
 2. **Install dependencies**
    ```bash
-   # Using yarn (recommended)
    yarn install
-   
-   # Or using npm
-   npm install
-   
-   # Or using pnpm
-   pnpm install
-   
-   # Or using bun
-   bun install
    ```
 
 3. **Start development server**
    ```bash
    # Web version
    yarn dev
-   
-   # Desktop version (Electron)
-   yarn electron:test
    ```
 
 The web application will be available at `http://localhost:3000`
@@ -102,12 +63,11 @@ The web application will be available at `http://localhost:3000`
 #### Development
 ```bash
 yarn dev              # Start web development server
-yarn electron:test    # Start Electron development version
 ```
 
 #### Building
 ```bash
-yarn build           # Build for Electron (desktop app)
+yarn build:electron  # Build for Electron (desktop app)
 yarn build:web       # Build for web deployment
 yarn preview         # Preview production build
 ```
@@ -145,7 +105,7 @@ yarn electron:build:linux  # Build for Linux
 yarn electron:publish      # Build and publish
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### Tech Stack
 - **Frontend**: Vue 3 + Nuxt 3 + TypeScript
@@ -183,7 +143,7 @@ BookLib uses a flexible storage system that adapts to the environment:
 
 See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 
-## 📱 Usage
+## Usage
 
 ### Getting Started
 1. **Add your first book** - Use the "+" button to manually add books or search Google Books
@@ -219,10 +179,6 @@ yarn lint:ts        # Type checking
 - [ECharts](https://echarts.apache.org/)
 - [Electron](https://www.electronjs.org/)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Jessica Aissa** - [deadalley31@gmail.com](mailto:deadalley31@gmail.com)
