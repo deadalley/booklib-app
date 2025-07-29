@@ -114,19 +114,19 @@ jobs:
           name: nuxt-build
 
       - name: Package and publish Electron app
-        run: yarn electron:build:${{ matrix.platform }} --publish=onTag
+        run: yarn electron:build:${{ matrix.platform }} --publish=always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Upload artifacts (Linux)
-      #   if: matrix.platform == 'linux'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: linux-builds
-      #     path: |
-      #       dist-packaged/*.AppImage
-      #       dist-packaged/*.deb
-      #     retention-days: 5
+      - name: Upload artifacts (Linux)
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-builds
+          path: |
+            dist-packaged/*.AppImage
+            dist-packaged/*.deb
+          retention-days: 5
 
       # - name: Upload artifacts (Windows)
       #   if: matrix.platform == 'win'
