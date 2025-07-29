@@ -98,7 +98,7 @@ jobs:
         with:
           name: nuxt-build
 
-      - name: Build Electron app
+      - name: Package Electron app
         run: yarn electron:build:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
