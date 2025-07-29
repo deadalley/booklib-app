@@ -14,23 +14,19 @@
 
 ---
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="33%">
-        <h3>📖 Book Management</h3>
-        <p>Manage your book collection, find your favorite books, organize them in collections, and so much more.</p>
-      </td>
-      <td align="center" width="33%">
-        <h3>🎯 Goal Tracking</h3>
-        <p>Tracking your reading goals by books, pages, or hours and achieve your reading targets.</p>
-      </td>
-      <td align="center" width="33%">
-        <h3>📦 Import & Export</h3>
-        <p>Export and import your library in CSV and JSON formats for easy portability.</p>
-      </td>
-    </tr>
-  </table>
+<div>
+  <div align="center">
+    <h3>📖 Book Management</h3>
+    <p>Manage your book collection, find your favorite books, organize them in collections, and so much more.</p>
+  </div>
+  <div align="center">
+    <h3>🎯 Goal Tracking</h3>
+    <p>Tracking your reading goals by books, pages, or hours and achieve your reading targets.</p>
+  </div>
+  <div align="center">
+    <h3>📦 Importing & Exporting</h3>
+    <p>Export and import your library in CSV and JSON formats for easy portability.</p>
+  </div>
 </div>
 
 ## Quick Start
@@ -56,7 +52,7 @@
 
 The web application will be available at `http://localhost:3000`
 
-## 🛠️ Development
+## Development
 
 ### Available Scripts
 
@@ -89,7 +85,7 @@ yarn lint:ts         # TypeScript type checking
 yarn lint:prettier   # Prettier formatting check
 ```
 
-#### Storybook (Component Development)
+#### Histoire (Component Development)
 ```bash
 yarn story:dev       # Start Storybook development server
 yarn story:build     # Build Storybook
@@ -158,7 +154,7 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 - **Tracking**: Set and monitor reading goals
 - **Analytics**: Visualize your reading habits and statistics
 
-## 🧪 Testing
+## Testing
 
 - **Unit tests** with Vitest
 - **End-to-end tests** with Playwright
@@ -171,7 +167,7 @@ yarn test:e2e       # E2E tests
 yarn lint:ts        # Type checking
 ```
 
-## 🔨 Tools
+## Tools
 
 - [Nuxt 3](https://nuxt.com/)
 - [Vue 3](https://vuejs.org/)
