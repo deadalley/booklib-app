@@ -76,7 +76,7 @@
           </template>
         </bl-nav-sidebar-button>
       </div>
-      <bl-warning-badge class="max-w-[255px]">
+      <bl-warning-badge v-if="isWebEnvironment" class="max-w-[255px]">
         <template #icon="iconProps">
           <IconAlertTriangle v-bind="iconProps" />
         </template>
@@ -141,6 +141,9 @@ const route = useRoute()
 
 const { isLibraryEmpty } = useBookLibrary()
 const isEmpty = ref<boolean>(false)
+const isWebEnvironment = ref<boolean>(
+  typeof window !== 'undefined' && !('electronAPI' in window),
+)
 
 onMounted(async () => {
   isEmpty.value = await isLibraryEmpty()
