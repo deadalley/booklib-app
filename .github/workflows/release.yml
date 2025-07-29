@@ -17,21 +17,7 @@ env:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-          - os: windows-latest
-            platform: win
-            arch: x64
-          - os: macos-latest
-            platform: mac
-            arch: universal
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -63,6 +49,51 @@ jobs:
 
       - name: Build Nuxt app for Electron
         run: yarn build:electron
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuxt-build
+          path: |
+            .output
+            dist-electron
+          retention-days: 1
+
+  package:
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          - os: windows-latest
+            platform: win
+            arch: x64
+          - os: macos-latest
+            platform: mac
+            arch: universal
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nuxt-build
 
       - name: Build Electron app
         run: yarn electron:build:${{ matrix.platform }}
@@ -98,7 +129,7 @@ jobs:
           retention-days: 5
 
   release:
-    needs: build
+    needs: package
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -205,13 +236,10 @@ jobs:
           asset_content_type: application/octet-stream
 
   publish:
-    needs: [build, release]
+    needs: [package, release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    environment:
-      name: production
-      url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_version.outputs.version }}
 
     steps:
       - name: Checkout code
