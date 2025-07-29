@@ -1,15 +1,17 @@
 name: '[🚀] Release'
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to release (e.g., v1.0.0)'
         required: true
         type: string
+      create_tag:
+        description: 'Create and push git tag'
+        required: false
+        type: boolean
+        default: true
 
 env:
   BASE_URL: http://127.0.0.1:3001
@@ -137,20 +139,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for git operations
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          # Ensure version starts with 'v'
+          if [[ ! "$VERSION" =~ ^v ]]; then
+            VERSION="v$VERSION"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        if: github.event.inputs.create_tag == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if tag already exists
+          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.version }} already exists"
+          else
+            git tag "${{ steps.version.outputs.version }}"
+            git push origin "${{ steps.version.outputs.version }}"
+            echo "Created and pushed tag ${{ steps.version.outputs.version }}"
+          fi
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-
-      - name: Get version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
 
       - name: Read package.json version
         id: package_version
@@ -248,11 +268,12 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          VERSION="${{ github.event.inputs.version }}"
+          # Ensure version starts with 'v'
+          if [[ ! "$VERSION" =~ ^v ]]; then
+            VERSION="v$VERSION"
           fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -263,8 +284,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build Nuxt app for Electron
-        run: yarn build:electron
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nuxt-build
 
       - name: Publish to GitHub Releases
         run: yarn electron:publish
