@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/deadalley/booklib-app/main/public/icon.svg" alt="BookLib Logo" width="200"/>
+  <img src="./public/icon.svg" alt="BookLib Logo" width="200"/>
   <h1>BookLib</h1>
   <p>A comprehensive personal book library management application</p>
   
@@ -182,6 +182,31 @@ yarn lint:ts        # Type checking
 - [Tailwind CSS](https://tailwindcss.com/)
 - [ECharts](https://echarts.apache.org/)
 - [Electron](https://www.electronjs.org/)
+
+## Screenshots
+
+<details>
+<summary>View screenshots</summary>
+
+### Start page
+<img src="./screenshots/BookLib-1.png" alt="BookLib Dashboard" width="800"/>
+
+### Home page
+<img src="./screenshots/BookLib-3.png" alt="Book Details" width="800"/>
+
+### Library page
+<img src="./screenshots/BookLib-2.png" alt="BookLib Library" width="800"/>
+
+### Stats page
+<img src="./screenshots/BookLib-4.png" alt="Collections" width="800"/>
+
+### Tracking page
+<img src="./screenshots/BookLib-5.png" alt="Goal Tracking" width="800"/>
+
+### Import page
+<img src="./screenshots/BookLib-6.png" alt="Analytics" width="800"/>
+
+</details>
 
 ## License
 
