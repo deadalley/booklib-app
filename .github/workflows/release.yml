@@ -7,15 +7,21 @@ on:
         description: 'Version to release (e.g., v1.0.0)'
         required: true
         type: string
+      build_platforms:
+        description: 'Platforms to build (comma-separated: linux,windows,all)'
+        required: true
+        default: 'all'
+        type: string
 
 env:
   BASE_URL: http://127.0.0.1:3001
   USER_DB_PATH: ./booklib.json
 
 jobs:
-  build-and-package:
-    name: build and package app
+  build-linux:
+    name: Build Linux
     runs-on: ubuntu-latest
+    if: ${{ contains(github.event.inputs.build_platforms, 'linux') || contains(github.event.inputs.build_platforms, 'all') }}
 
     steps:
       - name: Checkout code
@@ -78,9 +84,95 @@ jobs:
             dist-packaged/*.zip
           retention-days: 5
 
+  build-windows:
+    name: Build Windows (Docker + Wine)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.inputs.build_platforms, 'windows') || contains(github.event.inputs.build_platforms, 'all') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build app for Electron
+        run: yarn build:electron
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Pull Docker image
+        run: docker pull electronuserland/builder:wine
+
+      - name: Build Windows executable with Docker
+        run: |
+          docker run --rm \
+            --env ELECTRON_CACHE="/root/.cache/electron" \
+            --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+            --env GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            --env YARN_CACHE_FOLDER="/root/.cache/yarn" \
+            --env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="true" \
+            --env ELECTRON_SKIP_BINARY_DOWNLOAD="true" \
+            -v ${{ github.workspace }}:/project \
+            -v ${{ github.workspace }}-node-modules:/project/node_modules \
+            -v ~/.cache/yarn:/root/.cache/yarn \
+            electronuserland/builder:wine \
+            /bin/bash -c "cd /project && \
+              echo 'Upgrading Yarn to latest version...' && \
+              npm install -g yarn@latest && \
+              echo 'Building Windows executable...' && \
+              yarn electron:build:win --publish=never --config.nativeRebuilder=legacy"
+
+      - name: Verify Windows build artifacts
+        run: |
+          echo "Checking Windows build artifacts..."
+          ls -la dist-packaged/ || echo "dist-packaged directory not found"
+          find dist-packaged/ -name "*.exe" -exec echo "Found EXE: {}" \;
+          find dist-packaged/ -name "*.msi" -exec echo "Found MSI: {}" \;
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-builds
+          path: |
+            dist-packaged/*.exe
+            dist-packaged/*.msi
+            dist-packaged/*Setup*.exe
+          retention-days: 5
+
   release:
     name: release
-    needs: build-and-package
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -195,7 +287,7 @@ jobs:
           echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Release Linux
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
@@ -207,4 +299,62 @@ jobs:
             ./artifacts/linux-builds/*.AppImage
             ./artifacts/linux-builds/*.deb
             ./artifacts/linux-builds/*.zip
+            ./artifacts/windows-builds/*.exe
+            ./artifacts/windows-builds/*.msi
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  summary:
+    name: Release Summary
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-windows, release]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Display release summary
+        run: |
+          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms:** ${{ github.event.inputs.build_platforms }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check Linux build
+          if [ -d "./artifacts/linux-builds" ]; then
+            echo "### ✅ Linux Build Successful" >> $GITHUB_STEP_SUMMARY
+            echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+            ls -la ./artifacts/linux-builds/ | tail -n +2 | while read line; do
+              filename=$(echo "$line" | awk '{print $NF}')
+              size=$(echo "$line" | awk '{print $5}')
+              echo "- \`$filename\` ($size bytes)" >> $GITHUB_STEP_SUMMARY
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Linux Build Failed or Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Check Windows build
+          if [ -d "./artifacts/windows-builds" ]; then
+            echo "### ✅ Windows Build Successful" >> $GITHUB_STEP_SUMMARY
+            echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+            ls -la ./artifacts/windows-builds/ | tail -n +2 | while read line; do
+              filename=$(echo "$line" | awk '{print $NF}')
+              size=$(echo "$line" | awk '{print $5}')
+              echo "- \`$filename\` ($size bytes)" >> $GITHUB_STEP_SUMMARY
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Windows Build Failed or Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Release status
+          echo "### 📦 Release Status" >> $GITHUB_STEP_SUMMARY
+          echo "The release has been created as a **draft**. Please review and publish manually." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }})" >> $GITHUB_STEP_SUMMARY
