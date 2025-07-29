@@ -30,8 +30,7 @@
     "electron:build": "electron-builder",
     "electron:build:win": "electron-builder --win",
     "electron:build:mac": "electron-builder --mac",
-    "electron:build:linux": "electron-builder --linux",
-    "electron:publish": "electron-builder --publish=always"
+    "electron:build:linux": "electron-builder --linux"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.9",

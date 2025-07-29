@@ -99,7 +99,7 @@ jobs:
           name: nuxt-build
 
       - name: Package Electron app
-        run: yarn electron:build:${{ matrix.platform }}
+        run: yarn electron:build:${{ matrix.platform }} --publish=onTag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -204,37 +204,18 @@ jobs:
           echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release Linux
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          release_name: BookLib ${{ steps.version.outputs.version }}
+          name: BookLib ${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.changelog }}
           draft: true
           prerelease: false
-
-      - name: Upload Linux AppImage
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/linux-builds/BookLib-${{ steps.package_version.outputs.version }}.AppImage
-          asset_name: BookLib-${{ steps.package_version.outputs.version }}-linux-x86_64.AppImage
-          asset_content_type: application/octet-stream
-
-      - name: Upload Linux DEB
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/linux-builds/booklib_${{ steps.package_version.outputs.version }}_amd64.deb
-          asset_name: BookLib-${{ steps.package_version.outputs.version }}-linux-amd64.deb
-          asset_content_type: application/vnd.debian.binary-package
+          files: |
+            ./artifacts/linux-builds/*.AppImage
+            ./artifacts/linux-builds/*.deb
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Upload Windows Installer
       #   uses: actions/upload-release-asset@v1
@@ -255,65 +236,3 @@ jobs:
       #     asset_path: ./artifacts/macos-builds/BookLib-${{ steps.package_version.outputs.version }}.dmg
       #     asset_name: BookLib-${{ steps.package_version.outputs.version }}-macos-universal.dmg
       #     asset_content_type: application/octet-stream
-
-  publish:
-    needs: [package, release]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get version
-        id: get_version
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          # Ensure version starts with 'v'
-          if [[ ! "$VERSION" =~ ^v ]]; then
-            VERSION="v$VERSION"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: nuxt-build
-
-      - name: Publish to GitHub Releases
-        run: yarn electron:publish
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update release to published
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data: releases } = await github.rest.repos.listReleases({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-
-            const release = releases.find(r => r.tag_name === '${{ steps.get_version.outputs.version }}');
-
-            if (release && release.draft) {
-              await github.rest.repos.updateRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: release.id,
-                draft: false,
-              });
-              
-              console.log(`Release ${{ steps.get_version.outputs.version }} has been published!`);
-            }
