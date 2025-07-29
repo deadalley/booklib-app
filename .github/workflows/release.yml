@@ -65,17 +65,18 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
             platform: linux
             arch: x64
-          - os: windows-latest
-            platform: win
-            arch: x64
-          - os: macos-latest
-            platform: mac
-            arch: universal
+          # - os: windows-latest
+          #   platform: win
+          #   arch: x64
+          # - os: macos-latest
+          #   platform: mac
+          #   arch: universal
 
     runs-on: ${{ matrix.os }}
 
