@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./public/icon.svg" alt="BookLib Logo" width="200"/>
   <h1>BookLib</h1>
-  <p>A comprehensive personal book library management application</p>
+  <p>Manage your personal library and reach your reading goals.</p>
   
   [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/deadalley/booklib-app)
   [![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00C58E.svg)](https://nuxt.com)
