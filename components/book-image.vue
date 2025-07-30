@@ -91,35 +91,25 @@ async function onFileChange(e: Event) {
   await handleFileInput(e)
   loading.value = true
 
-  try {
-    const file = (e.target as HTMLInputElement)?.files?.[0]
-    if (!file) return
+  const file = (e.target as HTMLInputElement)?.files?.[0]
+  if (!file) return
 
-    const newCoverSrc = await updateBookCover(
-      props.book.id ?? props.tempCoverSrc!,
-      file,
-    )
+  const newCoverSrc = await updateBookCover(
+    props.book.id ?? props.tempCoverSrc!,
+    file,
+  )
 
-    if (newCoverSrc) {
-      coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
-    }
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
+  if (newCoverSrc) {
+    coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
   }
+  loading.value = false
 }
 
 async function onRemoveClick() {
   loading.value = true
 
-  try {
-    await deleteBookCover(props.book.id ?? props.tempCoverSrc!)
-    coverSrc.value = null
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
+  await deleteBookCover(props.book.id ?? props.tempCoverSrc!)
+  coverSrc.value = null
+  loading.value = false
 }
 </script>

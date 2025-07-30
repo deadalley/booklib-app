@@ -195,21 +195,16 @@ function onPageChange(page: number) {
 }
 
 async function onActionSelect(action: string) {
-  try {
-    loading.value = true
-    if (action === 'delete') {
-      await deleteBooks(
-        viewBooks.value.filter(({ selected }) => selected).map(({ id }) => id),
-      )
-    }
-  } catch (error) {
-    console.error(error)
-  } finally {
-    await refresh()
-    editing.value = false
-    onResetFilter()
-    loading.value = false
+  loading.value = true
+  if (action === 'delete') {
+    await deleteBooks(
+      viewBooks.value.filter(({ selected }) => selected).map(({ id }) => id),
+    )
   }
+  await refresh()
+  editing.value = false
+  onResetFilter()
+  loading.value = false
 }
 
 function onBookSelect({

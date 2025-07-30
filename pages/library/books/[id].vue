@@ -550,22 +550,18 @@ function onCancel() {
 }
 
 async function onSubmit(bookValues: Book) {
-  try {
-    const updatedBook = await createBook({
-      ...bookValues,
-      collections: allCollections.value
-        .filter(({ selected }) => !!selected)
-        .map(({ id }) => id),
-      tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
-      genres: book.value?.genres ?? [],
-      rating: book.value?.rating,
-      progressStatus: book.value?.progressStatus,
-    } as Book)
+  const updatedBook = await createBook({
+    ...bookValues,
+    collections: allCollections.value
+      .filter(({ selected }) => !!selected)
+      .map(({ id }) => id),
+    tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
+    genres: book.value?.genres ?? [],
+    rating: book.value?.rating,
+    progressStatus: book.value?.progressStatus,
+  } as Book)
 
-    return updatedBook
-  } catch (error) {
-    console.error(error)
-  }
+  return updatedBook
 }
 
 async function onSaveChanges() {
@@ -665,13 +661,9 @@ function dateFormatter(date: Date | undefined): string | undefined {
 }
 
 async function fetchBooksFromGoogle() {
-  try {
-    if (book.value) {
-      const books = await searchGoogleBooks(book.value.title || '')
-      externalBooks.value = books as Book[]
-    }
-  } catch (error) {
-    console.error(error)
+  if (book.value) {
+    const books = await searchGoogleBooks(book.value.title || '')
+    externalBooks.value = books as Book[]
   }
 }
 

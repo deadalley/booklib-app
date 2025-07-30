@@ -220,21 +220,17 @@ async function onCancel() {
 }
 
 async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
-  try {
-    const booksInCollection = allBooks.value
-      .filter(({ selected }) => !!selected)
-      .map(({ id, order }) => ({ id, order }))
+  const booksInCollection = allBooks.value
+    .filter(({ selected }) => !!selected)
+    .map(({ id, order }) => ({ id, order }))
 
-    const updatedCollection = await createCollection({
-      ...collection,
-      books: booksInCollection,
-    } as Collection)
+  const updatedCollection = await createCollection({
+    ...collection,
+    books: booksInCollection,
+  } as Collection)
 
-    if (updatedCollection) {
-      navigateTo('/library/collections')
-    }
-  } catch (error) {
-    console.error(error)
+  if (updatedCollection) {
+    navigateTo('/library/collections')
   }
 }
 

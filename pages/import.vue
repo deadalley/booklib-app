@@ -191,33 +191,29 @@ async function onFileChange(e: Event) {
 }
 
 async function onSubmit() {
-  try {
-    if (importedBooks.value?.length) {
-      const { importLibrary } = useBookLibrary()
-      // Convert books array to Database format
-      const databaseData = {
-        authors: [],
-        books: selectedBooksForUpload.value.map((book) => ({
-          ...book,
-          created_at: book.createdAt,
-          author_id: book.author,
-          progress_status: book.progressStatus,
-          cover_src: book.coverSrc,
-          original_title: book.originalTitle,
-          original_language: book.originalLanguage,
-          started_at: book.startedAt,
-          finished_at: book.finishedAt,
-        })),
-        collections: [],
-        'collection-book': [],
-        goals: [],
-      }
-      await importLibrary(databaseData)
-
-      navigateTo('/library')
+  if (importedBooks.value?.length) {
+    const { importLibrary } = useBookLibrary()
+    // Convert books array to Database format
+    const databaseData = {
+      authors: [],
+      books: selectedBooksForUpload.value.map((book) => ({
+        ...book,
+        created_at: book.createdAt,
+        author_id: book.author,
+        progress_status: book.progressStatus,
+        cover_src: book.coverSrc,
+        original_title: book.originalTitle,
+        original_language: book.originalLanguage,
+        started_at: book.startedAt,
+        finished_at: book.finishedAt,
+      })),
+      collections: [],
+      'collection-book': [],
+      goals: [],
     }
-  } catch (error) {
-    console.error(error)
+    await importLibrary(databaseData)
+
+    navigateTo('/library')
   }
 }
 

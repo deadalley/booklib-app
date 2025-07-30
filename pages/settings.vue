@@ -76,20 +76,12 @@ const { resetLibrary: resetLib, checkLibraryIntegrity } = useBookLibrary()
 const libraryIntegrityResult = ref<LibraryIntegrityResult | undefined>()
 
 async function resetLibrary() {
-  try {
-    await resetLib()
-    navigateTo('/library')
-  } catch (error) {
-    console.error(error)
-  }
+  await resetLib()
+  navigateTo('/library')
 }
 
 async function checkLibrary() {
-  try {
-    libraryIntegrityResult.value = await checkLibraryIntegrity()
-  } catch (error) {
-    console.error(error)
-  }
+  libraryIntegrityResult.value = await checkLibraryIntegrity()
 }
 
 useHead({

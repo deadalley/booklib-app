@@ -203,19 +203,15 @@ async function onSubmit() {
   const newEntry = getEntryValue()
 
   if (goal.value && newEntry) {
-    try {
-      await createGoal({
-        ...goal.value,
-        entries: isNew.value
-          ? goal.value.entries.concat(newEntry)
-          : goal.value.entries,
-      } as Goal)
+    await createGoal({
+      ...goal.value,
+      entries: isNew.value
+        ? goal.value.entries.concat(newEntry)
+        : goal.value.entries,
+    } as Goal)
 
-      props.reloadGoals()
-      clearState()
-    } catch (error) {
-      console.error(error)
-    }
+    props.reloadGoals()
+    clearState()
   }
 }
 

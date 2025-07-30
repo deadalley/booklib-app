@@ -1,7 +1,7 @@
 <template>
   <div
     v-bind="$attrs"
-    class="flex flex-col gap-2 rounded-xl bg-main/10 px-6 py-4 font-Sarala text-main"
+    class="flex flex-col gap-2 rounded-xl bg-main/10 px-6 py-4 font-Sarala text-black"
   >
     <div class="flex items-center gap-1">
       <slot

@@ -177,18 +177,13 @@ async function onClick() {
 
 async function onUpdateBook(bookValues: Book) {
   loading.value = true
-  try {
-    const updatedBook = await createBook(bookValues)
+  const updatedBook = await createBook(bookValues)
 
-    await props.reloadBooks()
-    success.value = true
+  await props.reloadBooks()
+  success.value = true
 
-    return updatedBook
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
+  return updatedBook
+  loading.value = false
 }
 
 async function onRateBook(ratingValue: number) {
