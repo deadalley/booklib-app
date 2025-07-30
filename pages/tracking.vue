@@ -90,6 +90,10 @@ const authorsById = computed(() =>
 
 const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
+watch(books, (newBooks) => {
+  viewBooks.value = getBooksWithAuthorNames(newBooks)
+})
+
 const selectedGoal = ref<Goal | undefined>()
 
 const sortedGoals = computed(() => sortGoals(goals.value ?? []))
