@@ -100,29 +100,17 @@
         <div class="col-span-12 flex flex-col lg:col-span-5">
           <bl-book-stats-tile :books="books ?? []" />
         </div>
-        <div class="col-span-12 flex flex-col lg:col-span-4">
+        <div
+          v-if="books.length || authors.length"
+          class="col-span-12 flex flex-col lg:col-span-4"
+        >
           <bl-book-suggestions-tile
-            :books="books ?? []"
-            :authors="authors ?? []"
+            :books="books"
+            :authors="authors"
             :reload-books="refresh"
           />
         </div>
-        <div class="col-span-12 flex flex-col gap-4 lg:col-span-3">
-          <bl-author-highlight-tile
-            v-if="authorsByBookCount?.length"
-            :authors="authorsByRatings"
-          />
-
-          <bl-author-highlight-tile
-            v-if="authorsByBookCount?.length"
-            :authors="authorsByBookCount"
-          />
-
-          <bl-author-highlight-tile
-            v-if="authorsByWithStatuses?.length"
-            :authors="authorsByWithStatuses"
-          />
-        </div>
+        <div class="col-span-12 flex flex-col gap-4 lg:col-span-3"></div>
       </div>
     </div>
   </NuxtLayout>
@@ -159,32 +147,6 @@ const loadData = async () => {
 const refresh = loadData
 
 onMounted(loadData)
-
-const authorsByRatings = computed(() =>
-  sortAuthorsByBookRatings(books.value ?? [], authors.value ?? [], 4).map(
-    (author) => ({
-      ...author,
-      label: author.average ? 'Average rating' : undefined,
-    }),
-  ),
-)
-
-const authorsByBookCount = computed(() =>
-  sortAuthorsByBookCount(books.value ?? [], authors.value ?? []).map(
-    (author) => ({
-      ...author,
-      label: 'Total books',
-    }),
-  ),
-)
-
-const authorsByWithStatuses = computed(() =>
-  sortAuthorByStatusesCount(books.value ?? [], authors.value ?? []).map(
-    (author) => ({
-      ...author,
-    }),
-  ),
-)
 
 useHead({
   title: 'BookLib | Home',
