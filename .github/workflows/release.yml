@@ -25,28 +25,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Get pnpm cache directory path
+        id: pnpm-cache-dir-path
+        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache yarn dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
-        id: yarn-cache
+        id: pnpm-cache
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
             node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build app for Electron
-        run: yarn build:electron
+        run: pnpm build:electron
 
       - name: Verify build output
         run: |
@@ -56,7 +56,7 @@ jobs:
           ls -la .output/public/ || echo ".output/public directory not found"
 
       - name: Package Electron app for Linux
-        run: yarn electron:build:linux --publish=never
+        run: pnpm electron:build:linux --publish=never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -90,28 +90,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Get pnpm cache directory path
+        id: pnpm-cache-dir-path
+        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache yarn dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
-        id: yarn-cache
+        id: pnpm-cache
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
             node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build app for Electron
-        run: yarn build:electron
+        run: pnpm build:electron
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -133,22 +133,22 @@ jobs:
             --env ELECTRON_CACHE="/root/.cache/electron" \
             --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
             --env GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-            --env YARN_CACHE_FOLDER="/root/.cache/yarn" \
+            --env pnpm_CACHE_FOLDER="/root/.cache/pnpm" \
             --env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="true" \
             --env ELECTRON_SKIP_BINARY_DOWNLOAD="true" \
             -v ${{ github.workspace }}:/project \
             -v ${{ github.workspace }}-node-modules:/project/node_modules \
-            -v ~/.cache/yarn:/root/.cache/yarn \
+            -v ~/.cache/pnpm:/root/.cache/pnpm \
             electronuserland/builder:wine \
             /bin/bash -c "cd /project && \
-              echo 'Upgrading Yarn to latest version...' && \
-              npm install -g yarn@latest && \
+              echo 'Upgrading pnpm to latest version...' && \
+              npm install -g pnpm@latest && \
               echo 'Installing dependencies...' && \
-              yarn install --frozen-lockfile --network-timeout 300000 && \
+              pnpm install --frozen-lockfile --network-timeout 300000 && \
               echo 'Building Electron app...' && \
-              yarn build:electron && \
+              pnpm build:electron && \
               echo 'Building Windows executable...' && \
-              yarn electron:build:win --publish=never --config.nativeRebuilder=legacy"
+              pnpm electron:build:win --publish=never --config.nativeRebuilder=legacy"
 
       - name: Verify Windows build artifacts
         run: |
@@ -197,25 +197,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Get pnpm cache directory path
+        id: pnpm-cache-dir-path
+        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache yarn dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
-        id: yarn-cache
+        id: pnpm-cache
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
             node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Update package.json version
         run: |

@@ -91,6 +91,10 @@ export default defineNuxtConfig({
     mount: 'usr',
   },
 
+  tailwindcss: {
+    exposeConfig: true,
+  },
+
   typescript: {
     strict: true,
   },

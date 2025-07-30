@@ -655,7 +655,6 @@ export class BookLibDataManagementService {
 let dataManagementService: BookLibDataManagementService | null = null
 
 export function useBookLibService(): BookLibDataManagementService {
-  console.log({ dataManagementService })
   if (!dataManagementService) {
     dataManagementService = new BookLibDataManagementService()
   }

@@ -80,13 +80,13 @@
 2. **Install dependencies**
 
    ```bash
-   yarn install
+   pnpm install
    ```
 
 3. **Start development server**
    ```bash
    # Web version
-   yarn dev
+   pnpm dev
    ```
 
 The web application will be available at `http://localhost:3000`
@@ -98,52 +98,52 @@ The web application will be available at `http://localhost:3000`
 #### Development
 
 ```bash
-yarn dev              # Start web development server
+pnpm dev              # Start web development server
 ```
 
 #### Building
 
 ```bash
-yarn build:electron  # Build for Electron (desktop app)
-yarn build:web       # Build for web deployment
-yarn preview         # Preview production build
+pnpm build:electron  # Build for Electron (desktop app)
+pnpm build:web       # Build for web deployment
+pnpm preview         # Preview production build
 ```
 
 #### Testing
 
 ```bash
-yarn test            # Run unit tests
-yarn test:e2e        # Run end-to-end tests
-yarn test:e2e:ui     # Run e2e tests with UI
-yarn coverage        # Generate test coverage report
+pnpm test            # Run unit tests
+pnpm test:e2e        # Run end-to-end tests
+pnpm test:e2e:ui     # Run e2e tests with UI
+pnpm coverage        # Generate test coverage report
 ```
 
 #### Linting
 
 ```bash
-yarn lint            # Run all linters
-yarn lint:fix        # Fix linting issues
-yarn lint:js         # ESLint JavaScript/TypeScript
-yarn lint:ts         # TypeScript type checking
-yarn lint:prettier   # Prettier formatting check
+pnpm lint            # Run all linters
+pnpm lint:fix        # Fix linting issues
+pnpm lint:js         # ESLint JavaScript/TypeScript
+pnpm lint:ts         # TypeScript type checking
+pnpm lint:prettier   # Prettier formatting check
 ```
 
 #### Histoire
 
 ```bash
-yarn story:dev       # Start Storybook development server
-yarn story:build     # Build Storybook
-yarn story:preview   # Preview built Storybook
+pnpm story:dev       # Start Storybook development server
+pnpm story:build     # Build Storybook
+pnpm story:preview   # Preview built Storybook
 ```
 
 #### Electron Distribution
 
 ```bash
-yarn electron:build        # Build for current platform
-yarn electron:build:win    # Build for Windows
-yarn electron:build:mac    # Build for macOS
-yarn electron:build:linux  # Build for Linux
-yarn electron:publish      # Build and publish
+pnpm electron:build        # Build for current platform
+pnpm electron:build:win    # Build for Windows
+pnpm electron:build:mac    # Build for macOS
+pnpm electron:build:linux  # Build for Linux
+pnpm electron:publish      # Build and publish
 ```
 
 ## Architecture
@@ -205,9 +205,9 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 Run tests:
 
 ```bash
-yarn test           # Unit tests
-yarn test:e2e       # E2E tests
-yarn lint:ts        # Type checking
+pnpm test           # Unit tests
+pnpm test:e2e       # E2E tests
+pnpm lint:ts        # Type checking
 ```
 
 ## Tools

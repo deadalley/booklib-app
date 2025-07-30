@@ -16,36 +16,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Yarn dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
 
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: Get pnpm cache directory path
+        id: pnpm-cache-dir-path
+        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache yarn dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
-        id: yarn-cache
+        id: pnpm-cache
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
             node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        if: steps.pnpm-cache.outputs.cache-hit != 'true'
+        run: pnpm install --frozen-lockfile
 
       - name: Cache Playwright Chromium
         uses: actions/cache@v4
@@ -58,9 +58,9 @@ jobs:
 
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: yarn playwright install chromium --with-deps
+        run: pnpm playwright install chromium --with-deps
 
       - name: Run Playwright tests
-        run: yarn test:e2e
+        run: pnpm test:e2e
         env:
           CI: true

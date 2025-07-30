@@ -1,4 +1,3 @@
-import resolveConfig from 'tailwindcss/resolveConfig.js'
-import tailwindConfig from '@/tailwind.config.js'
+import tailwindConfig from '#tailwind-config'
 
-export const tailwind = resolveConfig(tailwindConfig)
+export const tailwind = tailwindConfig
