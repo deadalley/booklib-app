@@ -81,7 +81,7 @@
           </template>
         </bl-section-tile>
       </div>
-      <div class="flex flex-col gap-8">
+      <div v-if="latestBooks?.length" class="flex flex-col gap-8">
         <bl-tile>
           <template #title>Last books added to library</template>
           <div
