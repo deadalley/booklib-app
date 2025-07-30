@@ -97,7 +97,7 @@
         </bl-tile>
       </div>
       <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 flex flex-col lg:col-span-5">
+        <div class="col-span-12 flex flex-col lg:col-span-4">
           <bl-book-stats-tile :books="books ?? []" />
         </div>
         <div
@@ -110,7 +110,9 @@
             :reload-books="refresh"
           />
         </div>
-        <div class="col-span-12 flex flex-col gap-4 lg:col-span-3"></div>
+        <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
+          <bl-goal-suggestion-tile />
+        </div>
       </div>
     </div>
   </NuxtLayout>
