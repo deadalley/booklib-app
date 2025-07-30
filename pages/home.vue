@@ -48,7 +48,11 @@
             {{ books?.length }}
             {{ (books?.length ?? 0) > 1 ? 'books' : 'book' }}
           </template>
-          <NuxtLink v-if="!books?.length" to="/library/books/new">
+          <NuxtLink
+            v-if="!books?.length"
+            class="hidden sm:block"
+            to="/library/books/new"
+          >
             <bl-button>Create a book</bl-button>
           </NuxtLink>
         </bl-section-tile>
@@ -58,7 +62,11 @@
             {{ collections?.length }}
             {{ (collections?.length ?? 0) > 1 ? 'collections' : 'collection' }}
           </template>
-          <NuxtLink v-if="!collections?.length" to="/library/collections/new">
+          <NuxtLink
+            v-if="!collections?.length"
+            class="hidden sm:block"
+            to="/library/collections/new"
+          >
             <bl-button>Create a collection</bl-button>
           </NuxtLink>
         </bl-section-tile>
