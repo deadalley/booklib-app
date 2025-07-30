@@ -156,17 +156,8 @@ const buttons = computed(() => [
 
 const { isSidebarCollapsed, toggleSidebar } = useGlobalState()
 const collapsed = ref(isSidebarCollapsed)
-// const collapsed = ref(true)
-
-// onMounted(() => {
-//   if (!isMobile()) {
-//     console.log('Setting sidebar to expanded on desktop')
-//     collapsed.value = false
-//   }
-// })
 
 function onCollapse() {
   toggleSidebar()
-  // collapsed.value = !collapsed.value
 }
 </script>
