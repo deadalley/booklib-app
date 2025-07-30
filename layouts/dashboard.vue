@@ -50,7 +50,7 @@
       <div
         class="relative flex w-full flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
       >
-        <bl-warning-badge v-if="isWebEnvironment" class="mb-4 hidden md:flex">
+        <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
           <template #icon="iconProps">
             <IconAlertTriangle v-bind="iconProps" />
           </template>
