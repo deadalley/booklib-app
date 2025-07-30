@@ -49,7 +49,7 @@
             </template>
             <template #title>
               Are you sure you want to delete
-              <strong>{{ collection.name }}</strong>
+              <strong class="contents">{{ collection.name }}</strong>
               ?
             </template>
             <bl-checkbox v-model="deleteBooks" align="left">

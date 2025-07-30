@@ -41,7 +41,7 @@
           <template #title>
             <div>
               Are you sure you want to delete
-              <strong>{{ goal.title }}</strong>
+              <strong class="contents">{{ goal.title }}</strong>
               ?
             </div>
           </template>

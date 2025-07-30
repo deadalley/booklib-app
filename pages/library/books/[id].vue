@@ -49,7 +49,7 @@
                   </template>
                   <template #title>
                     Are you sure you want to delete
-                    <strong>{{ book.title }}</strong>
+                    <strong class="contents">{{ book.title }}</strong>
                     ?
                   </template>
                   This action cannot be undone.
@@ -91,7 +91,7 @@
                   </template>
                   <template #title>
                     Are you sure you want to delete
-                    <strong>{{ book.title }}</strong>
+                    <strong class="contents">{{ book.title }}</strong>
                     ?
                   </template>
                   This action cannot be undone.

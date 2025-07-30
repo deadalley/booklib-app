@@ -58,7 +58,7 @@
               </template>
               <template #title>
                 Are you sure you want to delete
-                <strong>{{ collection.name }}</strong>
+                <strong class="contents">{{ collection.name }}</strong>
                 ?
               </template>
               Your books will <strong>not</strong> be deleted. This action
