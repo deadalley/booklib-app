@@ -9,11 +9,5 @@
 </template>
 
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core'
-
-const props = defineProps<{ checked?: boolean }>()
-
-const emit = defineEmits(['update:checked'])
-
-const _checked = useVModel(props, 'checked', emit)
+const checked = defineModel<boolean>('checked', { default: false })
 </script>

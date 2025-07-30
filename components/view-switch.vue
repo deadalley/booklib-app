@@ -1,9 +1,9 @@
 <template>
-  <bl-switch v-model="_view">
+  <bl-switch v-model="view">
     <bl-switch-option
       v-if="views.includes('cards')"
       value="cards"
-      :selected-value="_view"
+      :selected-value="view"
     >
       <template #icon="iconProps">
         <IconLayoutGrid v-bind="iconProps" />
@@ -13,7 +13,7 @@
     <bl-switch-option
       v-if="views.includes('expanded-cards')"
       value="expanded-cards"
-      :selected-value="_view"
+      :selected-value="view"
     >
       <template #icon="iconProps">
         <IconMist v-bind="iconProps" />
@@ -22,7 +22,7 @@
     <bl-switch-option
       v-if="views.includes('table')"
       value="table"
-      :selected-value="_view"
+      :selected-value="view"
     >
       <template #icon="iconProps">
         <IconList v-bind="iconProps" />
@@ -33,19 +33,15 @@
 </template>
 
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core'
 import { IconLayoutGrid, IconMist, IconList } from '@tabler/icons-vue'
 import type { View } from '~/types/ui'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     views?: View[]
-    view: View
   }>(),
   { views: () => ['cards', 'table'] },
 )
 
-const emit = defineEmits(['update:view'])
-
-const _view = useVModel(props, 'view', emit)
+const view = defineModel<View>('view')
 </script>
