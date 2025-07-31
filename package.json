@@ -7,6 +7,7 @@
   "author": "Jessica Aissa <deadalley31@gmail.com>",
   "scripts": {
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
+    "dev:electron": "cross-env ELECTRON_ENABLED=true nuxt dev --dotenv .env.local",
     "build:electron": "cross-env ELECTRON_ENABLED=true nuxt generate",
     "build:web": "cross-env ELECTRON_ENABLED=false nuxt generate",
     "preview": "nuxt preview",
