@@ -34,7 +34,7 @@ jobs:
 
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm dependencies
         uses: actions/cache@v4
@@ -104,7 +104,7 @@ jobs:
 
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm dependencies
         uses: actions/cache@v4
@@ -216,7 +216,7 @@ jobs:
 
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm dependencies
         uses: actions/cache@v4
