@@ -27,6 +27,11 @@ jobs:
           node-version: lts/*
           cache: 'pnpm'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
         run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
@@ -91,6 +96,11 @@ jobs:
         with:
           node-version: lts/*
           cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
@@ -198,6 +208,11 @@ jobs:
         with:
           node-version: lts/*
           cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path

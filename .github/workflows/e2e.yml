@@ -28,6 +28,11 @@ jobs:
         with:
           node-version: lts/*
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
       - name: Get pnpm cache directory path
         id: pnpm-cache-dir-path
         run: echo "dir=$(pnpm cache dir)" >> $GITHUB_OUTPUT
