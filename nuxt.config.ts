@@ -23,10 +23,20 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/eslint',
     '@nuxt/test-utils/module',
+    // Only include Sentry module when not running in Electron
+    ...(process.env.ELECTRON_ENABLED !== 'true' ? ['@sentry/nuxt/module'] : []),
     'nuxt-echarts',
     ...(process.env.ELECTRON_ENABLED === 'true' ? ['nuxt-electron'] : []),
     'nuxt-file-storage',
   ],
+
+  runtimeConfig: {
+    public: {
+      sentry: {
+        dsn: process.env.SENTRY_DSN, // Use a public environment variable for the DSN
+      },
+    },
+  },
 
   components: {
     dirs: [
@@ -98,6 +108,17 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+
+  sentry: {
+    sourceMapsUploadOptions: {
+      org: 'deadalley',
+      project: 'javascript-nuxt',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    },
+    autoInjectServerSentry: 'top-level-import',
+  },
+
+  sourcemap: { client: 'hidden' },
 
   routeRules: {
     '/library': { redirect: '/library/books' },
