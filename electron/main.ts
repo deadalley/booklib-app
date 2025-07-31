@@ -1,7 +1,34 @@
+import * as Sentry from '@sentry/electron/main'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'url'
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN || '',
+  environment: process.env.NODE_ENV || 'development',
+  beforeSend(event) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Sentry main process event:', event)
+    }
+    return event
+  },
+})
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception in main process:', error)
+  Sentry.captureException(error)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(
+    'Unhandled Rejection in main process at:',
+    promise,
+    'reason:',
+    reason,
+  )
+  Sentry.captureException(reason)
+})
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -31,7 +58,7 @@ function createWindow() {
       preload: path.join(MAIN_DIST, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false, // Allow loading local files
+      webSecurity: process.env.NODE_ENV === 'production', // Enable webSecurity in production
     },
     show: false, // Don't show until ready to avoid flash
   })
@@ -96,6 +123,8 @@ function initIpc() {
     try {
       return await fs.readFile(filePath, 'utf-8')
     } catch (error) {
+      console.error('File read error:', error)
+      Sentry.captureException(error)
       throw new Error(`Failed to read file: ${error}`)
     }
   })
@@ -104,6 +133,8 @@ function initIpc() {
     try {
       await fs.writeFile(filePath, data, 'utf-8')
     } catch (error) {
+      console.error('File write error:', error)
+      Sentry.captureException(error)
       throw new Error(`Failed to write file: ${error}`)
     }
   })
@@ -121,6 +152,8 @@ function initIpc() {
     try {
       await fs.mkdir(dirPath, { recursive: true })
     } catch (error) {
+      console.error('Directory creation error:', error)
+      Sentry.captureException(error)
       throw new Error(`Failed to create directory: ${error}`)
     }
   })
