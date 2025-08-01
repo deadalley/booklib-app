@@ -11,7 +11,7 @@
         <AccordionTrigger
           class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-accent px-8 py-2 text-start hover:bg-accent-light"
         >
-          <div class="flex flex-1 items-center gap-3 md:flex-col lg:flex-row">
+          <div class="flex flex-1 items-center gap-3">
             <NuxtLink
               class="flex items-center gap-3"
               :to="`/library/${collectionType}/${collection.id}`"

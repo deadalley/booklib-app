@@ -18,6 +18,7 @@
       <template #icon="iconProps">
         <IconMist v-bind="iconProps" />
       </template>
+      <template #tooltip>Expanded cars view</template>
     </bl-switch-option>
     <bl-switch-option
       v-if="views.includes('table')"

@@ -8,14 +8,11 @@
     "
   >
     <template #navbar>
-      <div class="flex w-full items-start gap-3 xl:flex-row">
-        <bl-search-bar @input="onSearch" />
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
-      <NuxtLink class="flex md:inline-flex" to="/library/collections/new">
+      <bl-search-bar @input="onSearch" />
+      <NuxtLink
+        class="flex md:inline-flex lg:order-6"
+        to="/library/collections/new"
+      >
         <bl-button expand>
           <template #prependIcon="prependIcon">
             <IconPlus v-bind="prependIcon" />
@@ -23,6 +20,12 @@
           Collection
         </bl-button>
       </NuxtLink>
+      <div class="flex justify-end gap-3">
+        <bl-view-switch
+          v-model:view="view"
+          :views="['cards', 'expanded-cards']"
+        />
+      </div>
     </template>
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
       <template #label> There are no collections in your library </template>
@@ -81,17 +84,9 @@ import type { Author } from '~/types/author'
 
 const { getCollections, getBooks, getAuthors } = useBookLibrary()
 
-const collections = ref<Collection[]>([])
-const books = ref<Book[]>([])
-const authors = ref<Author[]>([])
-
-const loadData = async () => {
-  collections.value = await getCollections()
-  books.value = await getBooks({ withBookCovers: true })
-  authors.value = await getAuthors()
-}
-
-onMounted(loadData)
+const collections = ref<Collection[]>(await getCollections())
+const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
+const authors = ref<Author[]>(await getAuthors())
 
 const booksByCollectionId = computed(() =>
   getBooksByCollection(

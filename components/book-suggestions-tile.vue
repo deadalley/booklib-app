@@ -181,9 +181,9 @@ async function onUpdateBook(bookValues: Book) {
 
   await props.reloadBooks()
   success.value = true
+  loading.value = false
 
   return updatedBook
-  loading.value = false
 }
 
 async function onRateBook(ratingValue: number) {

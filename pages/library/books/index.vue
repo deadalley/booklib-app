@@ -55,19 +55,16 @@
         </bl-dropdown>
       </div>
     </template>
-    <div
-      v-if="books?.length === 0"
-      class="flex flex-col items-center justify-center gap-8 rounded-xl bg-accent-light px-4 py-16"
-    >
-      <IconBooks class="text-accent-dark" size="58" stroke="1" />
-      <div class="flex flex-col items-center justify-center gap-4">
-        There are no books in your library
+    <bl-empty v-if="books?.length === 0" icon="IconBooks">
+      <template #label> There are no books in your library </template>
+      <template #action>
         <NuxtLink to="/library/books/new">
           <bl-button>Create a book</bl-button>
         </NuxtLink>
-      </div>
-    </div>
+      </template>
+    </bl-empty>
     <bl-books-views
+      v-if="books.length"
       v-model:current-page="currentPage"
       v-model:books="filteredBooksByPage"
       :editing="editing"
@@ -116,30 +113,15 @@
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import {
-  IconBooks,
-  IconPlus,
-  IconFilter,
-  IconTable,
-  IconStack2,
-} from '@tabler/icons-vue'
+import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 
 const { getBooks, getAuthors, deleteBooks } = useBookLibrary()
 
-const books = ref<Book[]>([])
-const authors = ref<Author[]>([])
-
-const loadData = async () => {
-  books.value = await getBooks({ withBookCovers: true })
-  authors.value = await getAuthors()
-}
-
-const refresh = loadData
-
-onMounted(loadData)
+const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
+const authors = ref<Author[]>(await getAuthors())
 
 const authorsById = computed(() =>
   authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
@@ -192,6 +174,11 @@ const {
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+async function refresh() {
+  books.value = await getBooks({ withBookCovers: true })
+  authors.value = await getAuthors()
 }
 
 async function onActionSelect(action: string) {

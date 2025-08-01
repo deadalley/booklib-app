@@ -7,7 +7,7 @@
 }
 
 .switch-option-inner {
-  @apply flex items-center rounded-[inherit] p-2 lg:w-full;
+  @apply flex cursor-pointer items-center rounded-[inherit] p-2 lg:w-full;
 }
 
 .switch-option.selected {

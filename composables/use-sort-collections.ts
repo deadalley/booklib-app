@@ -12,6 +12,13 @@ export const useSortCollections = (collections: Collection[]) => {
     router.push({ query: { view: v } })
   })
 
+  watch(
+    () => route.query.view,
+    (v) => {
+      view.value = (v as View) ?? 'cards'
+    },
+  )
+
   const currentPage = ref<number>(1)
 
   const sortedCollections = computed(() => {
