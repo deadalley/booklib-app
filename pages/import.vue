@@ -182,18 +182,17 @@ async function onFileChange(e: Event) {
     id: String(index + 1),
   }))
 
-  importedBooks.value = booksWithIds
-
   selectedBooks.value = booksWithIds.reduce(
     (acc, { id }) => ({ ...acc, [id]: true }),
     {},
   )
+
+  importedBooks.value = booksWithIds
 }
 
 async function onSubmit() {
   if (importedBooks.value?.length) {
     const { importLibrary } = useBookLibrary()
-    // Convert books array to Database format
     const databaseData = {
       authors: [],
       books: selectedBooksForUpload.value.map((book) => ({
@@ -222,7 +221,7 @@ function onCancel() {
   selectedBooks.value = {}
 }
 
-function onSelectBook(value: typeof selectedBooks.value) {
+function onSelectBook(value: Record<string, boolean>) {
   selectedBooks.value = value
 }
 
