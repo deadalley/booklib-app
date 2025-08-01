@@ -68,7 +68,7 @@
             >
               {{
                 canCreateNew
-                  ? `Add ${searchTerm}`
+                  ? `Add ${searchTerm ?? 'new'}`
                   : (notFoundLabel ?? 'No matches')
               }}
             </div>
@@ -154,7 +154,7 @@ function onBlur() {
 function filterFunction(list: string[], searchTerm: string) {
   return list.filter((option) => {
     return labelByValue.value[option]
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(searchTerm.toLowerCase())
   })
 }
