@@ -119,9 +119,9 @@ import { getAssetPath } from '~/utils/assets'
 const route = useRoute()
 
 const { isLibraryEmpty } = useBookLibrary()
-const isEmpty = ref<boolean>(false)
+const isEmpty = ref<boolean>(await isLibraryEmpty())
 
-onMounted(async () => {
+watch(route, async () => {
   isEmpty.value = await isLibraryEmpty()
 })
 
