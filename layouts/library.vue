@@ -4,7 +4,7 @@
     v-bind="$attrs"
   >
     <div class="flex flex-col items-baseline justify-between lg:flex-row">
-      <div class="flex w-full items-center gap-3 lg:flex-col xl:flex-row">
+      <div class="flex w-full items-center gap-3">
         <h3>{{ title }}</h3>
         <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
         <div class="flex flex-1 justify-end sm:hidden">
