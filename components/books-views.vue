@@ -46,6 +46,7 @@
         (args) =>
           $emit('book-select', { bookId: args.id, selected: args.selected })
       "
+      @click:row="(args: Book) => navigateTo(`/library/books/${args.id}`)"
     />
   </div>
 
