@@ -58,8 +58,15 @@
                   <strong class="contents">{{ collection.name }}</strong>
                   ?
                 </template>
-                Your books will <strong>not</strong> be deleted. This action
-                cannot be undone.
+                <bl-checkbox v-model="deleteBooks" align="left">
+                  <template v-if="!deleteBooks">
+                    Your books will <strong>not</strong> be deleted.
+                  </template>
+                  <template v-if="deleteBooks">
+                    Your books <strong>will</strong> be deleted.
+                  </template>
+                  This action cannot be undone.
+                </bl-checkbox>
                 <template #cancel-label> Cancel </template>
                 <template #action-label> Delete </template>
               </bl-modal>
@@ -139,7 +146,7 @@ const {
   getCollection,
   getBooks,
   getAuthors,
-  deleteCollection: deleteCollectionService,
+  deleteCollection: _deleteCollectionService,
   createCollection,
   updateCollection,
 } = useBookLibrary()
@@ -153,6 +160,7 @@ const editing = ref(isNew.value)
 const collection = ref<Collection>()
 const loading = ref(false)
 const allBooks = ref<ViewBook[]>([])
+const deleteBooks = ref(false)
 
 const formattedDate = computed(() =>
   toFullDateCompact(collection.value?.createdAt),
@@ -182,7 +190,7 @@ async function fetchCollection() {
 }
 
 async function deleteCollection() {
-  await deleteCollectionService(route.params.id as string)
+  await _deleteCollectionService(route.params.id as string, deleteBooks.value)
   navigateTo('/library/collections')
 }
 
