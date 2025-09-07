@@ -418,8 +418,9 @@ const {
   getCollections,
   getAuthors,
   getBook,
-  deleteBook: deleteBookService,
+  deleteBook: _deleteBook,
   createBook,
+  updateBook,
   searchGoogleBooks,
 } = useBookLibrary()
 
@@ -528,7 +529,7 @@ async function fetchBook() {
 }
 
 async function deleteBook() {
-  await deleteBookService(route.params.id as string)
+  await _deleteBook(route.params.id as string)
   navigateTo('/library/books')
 }
 
@@ -550,7 +551,7 @@ function onCancel() {
 }
 
 async function onSubmit(bookValues: Book) {
-  const updatedBook = await createBook({
+  const updatedBook = {
     ...bookValues,
     collections: allCollections.value
       .filter(({ selected }) => !!selected)
@@ -559,7 +560,13 @@ async function onSubmit(bookValues: Book) {
     genres: book.value?.genres ?? [],
     rating: book.value?.rating,
     progressStatus: book.value?.progressStatus,
-  } as Book)
+  } as Book
+
+  if (isNew.value) {
+    await createBook(updatedBook)
+  } else {
+    await updateBook(route.params.id as string, updatedBook)
+  }
 
   return updatedBook
 }
