@@ -1,7 +1,7 @@
 import type { Author } from '~/types/author'
 import type { View } from '~/types/ui'
 
-export const useSortAuthors = (authors: Author[]) => {
+export const useSortAuthors = (authors: Ref<Author[] | null>) => {
   const router = useRouter()
   const route = useRoute()
 
@@ -16,7 +16,7 @@ export const useSortAuthors = (authors: Author[]) => {
 
   const sortedAuthors = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(
-      authors ?? [],
+      authors.value ?? [],
       textSearch.value,
       ['name'],
     )

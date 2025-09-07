@@ -54,9 +54,10 @@
           :key="collection.id"
           collection-type="collections"
           :collection="collection"
-          :books="booksByCollectionId[collection.id]"
+          :books="booksByCollectionId[collection.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
-          can-delete
+          :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
+          @delete="deleteCollection"
         />
       </div>
     </div>
@@ -82,7 +83,12 @@ import { IconPlus } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
-const { getCollections, getBooks, getAuthors } = useBookLibrary()
+const {
+  getCollections,
+  getBooks,
+  getAuthors,
+  deleteCollection: _deleteCollection,
+} = useBookLibrary()
 
 const collections = ref<Collection[]>(await getCollections())
 const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
@@ -102,9 +108,23 @@ const {
   sortedCollections,
   filteredCollectionsByPage,
   onSearch,
-} = useSortCollections(collections.value ?? [])
+} = useSortCollections(collections)
+
+watch(sortedCollections, () => {
+  console.log(sortedCollections.value)
+})
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+async function refresh() {
+  books.value = await getBooks({ withBookCovers: true })
+  collections.value = await getCollections()
+}
+
+async function deleteCollection(id: string | number, deleteBooks: boolean) {
+  await _deleteCollection(id as string, deleteBooks)
+  await refresh()
 }
 </script>

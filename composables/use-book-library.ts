@@ -42,6 +42,13 @@ export function useBookLibrary() {
     return await service.createBook(book)
   }
 
+  const updateBook = async (
+    id: string,
+    book: Partial<Book>,
+  ): Promise<Book | null> => {
+    return await service.updateBook(id, book)
+  }
+
   const deleteBook = async (id: string): Promise<string | null> => {
     return await service.deleteBook(id)
   }
@@ -99,6 +106,13 @@ export function useBookLibrary() {
     return await service.createCollection(collection)
   }
 
+  const updateCollection = async (
+    id: string,
+    collection: Partial<Collection>,
+  ): Promise<Collection | null> => {
+    return await service.updateCollection(id, collection)
+  }
+
   const deleteCollection = async (
     id: string,
     deleteBooks = false,
@@ -150,6 +164,7 @@ export function useBookLibrary() {
     getBook,
     getBooks,
     createBook,
+    updateBook,
     deleteBook,
     deleteBooks,
     getBookCount,
@@ -164,6 +179,7 @@ export function useBookLibrary() {
     getCollections,
     getCollectionCount,
     createCollection,
+    updateCollection,
     deleteCollection,
     // Goals
     getGoals,

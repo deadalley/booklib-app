@@ -41,6 +41,7 @@
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
           can-delete
+          @delete="deleteAuthor"
         />
       </div>
     </div>
@@ -61,7 +62,7 @@ import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
-const { getBooks, getAuthors } = useBookLibrary()
+const { getBooks, getAuthors, deleteAuthor: _deleteAuthor } = useBookLibrary()
 
 const books = ref<Book[]>([])
 const authors = ref<Author[]>([])
@@ -78,9 +79,19 @@ const booksByAuthorId = computed(() =>
 )
 
 const { view, currentPage, sortedAuthors, filteredAuthorsByPage, onSearch } =
-  useSortAuthors(authors.value ?? [])
+  useSortAuthors(authors)
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+async function refresh() {
+  books.value = await getBooks({ withBookCovers: true })
+  authors.value = await getAuthors()
+}
+
+async function deleteAuthor(id: string | number, deleteBooks: boolean) {
+  await _deleteAuthor(id as string, deleteBooks)
+  await refresh()
 }
 </script>

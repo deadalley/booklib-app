@@ -35,16 +35,15 @@
           </div>
           <bl-modal
             v-if="canDelete"
-            ref="deleteModalRef"
             size="sm"
-            @confirm="deleteCollection"
+            @confirm="$emit('delete', collection.id, deleteBooks)"
           >
             <template #trigger>
               <IconTrash
                 class="mr-4 cursor-pointer text-accent-dark hover:text-main"
                 :size="ICON_SIZE_SMALL"
                 stroke="1.5"
-                @click="openDeleteModal"
+                @click="deleteModalOpen = true"
               />
             </template>
             <template #title>
@@ -115,7 +114,7 @@ import {
 } from 'radix-vue'
 import type { Book } from '~/types/book'
 
-const props = defineProps<{
+defineProps<{
   collectionType: 'authors' | 'collections'
   collection: T
   books: Book[]
@@ -123,26 +122,10 @@ const props = defineProps<{
   icon?: keyof typeof icons
 }>()
 
-defineEmits(['delete'])
+defineEmits<{ (e: 'delete', id: T['id'], deleteBooks: boolean): void }>()
 
-const deleteModalRef = ref()
+const deleteModalOpen = ref(false)
 const deleteBooks = ref(false)
-
-const { deleteCollection: _deleteCollection, deleteAuthor } = useBookLibrary()
-
-function openDeleteModal() {
-  deleteModalRef.value.setIsOpen(true)
-}
-
-async function deleteCollection() {
-  if (props.collectionType === 'collections') {
-    await _deleteCollection(props.collection.id as string, deleteBooks.value)
-  } else {
-    await deleteAuthor(props.collection.id as string, deleteBooks.value)
-  }
-
-  navigateTo(`/library/${props.collectionType}`)
-}
 </script>
 
 <style scoped>

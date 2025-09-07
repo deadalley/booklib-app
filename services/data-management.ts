@@ -138,7 +138,6 @@ export class BookLibDataManagementService {
     if (params.deleteBooks) {
       this.client.data.books = this.client.data.books.filter((book) => {
         if (book.author_id === id) {
-          // Handle book cover deletion in client-side context
           this.deleteBookCover(book.id)
         }
         return book.author_id !== id
@@ -245,6 +244,50 @@ export class BookLibDataManagementService {
     await this.client.write()
 
     return this.getBook(bookDb.id)
+  }
+
+  async updateBook(
+    id: BookDB['id'],
+    book: Partial<Book>,
+  ): Promise<Book | null> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    this.client.read()
+
+    const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
+    if (bookIndex === -1) return null
+
+    const existingBook = this.client.data.books[bookIndex]
+
+    const updatedBookDb: BookDB = {
+      ...existingBook,
+      ...bookToDbBook(book as Book),
+      id,
+      author_id:
+        book.author !== undefined ? book.author : existingBook.author_id,
+      created_at: existingBook.created_at,
+    }
+
+    this.client.data.books[bookIndex] = updatedBookDb
+
+    if (book.collections !== undefined) {
+      this.client.data['collection-book'] = this.client.data[
+        'collection-book'
+      ].filter(({ book_id }) => book_id !== id)
+
+      book.collections.forEach((collectionId, index) => {
+        this.client!.data['collection-book'].push({
+          book_id: id,
+          collection_id: collectionId,
+          order: index,
+        })
+      })
+    }
+
+    await this.client.write()
+
+    return this.getBook(id)
   }
 
   async deleteBook(id: BookDB['id']): Promise<BookDB['id'] | null> {
@@ -461,6 +504,55 @@ export class BookLibDataManagementService {
     await this.client.write()
 
     return this.getCollection(collectionDb.id)
+  }
+
+  async updateCollection(
+    id: CollectionDB['id'],
+    collection: Partial<Collection>,
+  ): Promise<Collection | null> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    this.client.read()
+
+    const collectionIndex = this.client.data.collections.findIndex(
+      (c) => c.id === id,
+    )
+    if (collectionIndex === -1) return null
+
+    const existingCollection = this.client.data.collections[collectionIndex]
+
+    // Update collection data
+    const updatedCollectionDb: CollectionDB = {
+      ...existingCollection,
+      name:
+        collection.name !== undefined
+          ? collection.name
+          : existingCollection.name,
+    }
+
+    this.client.data.collections[collectionIndex] = updatedCollectionDb
+
+    // Update book relationships if provided
+    if (collection.books !== undefined) {
+      // Remove existing collection-book relationships
+      this.client.data['collection-book'] = this.client.data[
+        'collection-book'
+      ].filter(({ collection_id }) => collection_id !== id)
+
+      // Add new book relationships
+      collection.books.forEach((book, index) => {
+        this.client!.data['collection-book'].push({
+          book_id: book.id,
+          collection_id: id,
+          order: book.order ?? index,
+        })
+      })
+    }
+
+    await this.client.write()
+
+    return this.getCollection(id)
   }
 
   async deleteCollection(

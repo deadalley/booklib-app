@@ -151,6 +151,7 @@ const {
   getAuthors,
   deleteCollection: deleteCollectionService,
   createCollection,
+  updateCollection,
 } = useBookLibrary()
 
 const route = useRoute()
@@ -224,14 +225,19 @@ async function onSubmit(collection: Pick<Collection, 'id' | 'name'>) {
     .filter(({ selected }) => !!selected)
     .map(({ id, order }) => ({ id, order }))
 
-  const updatedCollection = await createCollection({
-    ...collection,
-    books: booksInCollection,
-  } as Collection)
-
-  if (updatedCollection) {
-    navigateTo('/library/collections')
+  if (isNew.value) {
+    await createCollection({
+      ...collection,
+      books: booksInCollection,
+    } as Collection)
+  } else {
+    await updateCollection(collection.id!, {
+      ...collection,
+      books: booksInCollection,
+    } as Collection)
   }
+
+  navigateTo('/library/collections')
 }
 
 function onSelectBook({

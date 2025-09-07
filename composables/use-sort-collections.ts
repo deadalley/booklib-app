@@ -1,7 +1,7 @@
 import type { Collection } from '~/types/collection'
 import type { View } from '~/types/ui'
 
-export const useSortCollections = (collections: Collection[]) => {
+export const useSortCollections = (collections: Ref<Collection[] | null>) => {
   const router = useRouter()
   const route = useRoute()
 
@@ -23,7 +23,7 @@ export const useSortCollections = (collections: Collection[]) => {
 
   const sortedCollections = computed(() => {
     const filterByTextSearch = filterElementsBySearchParam(
-      collections ?? [],
+      collections.value ?? [],
       textSearch.value,
       ['name'],
     )
