@@ -110,10 +110,6 @@ const {
   onSearch,
 } = useSortCollections(collections)
 
-watch(sortedCollections, () => {
-  console.log(sortedCollections.value)
-})
-
 function onPageChange(page: number) {
   currentPage.value = page
 }

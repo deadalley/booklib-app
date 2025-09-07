@@ -20,7 +20,6 @@ export const useGlobalState = createGlobalState(() => {
 
   onMounted(() => {
     if (isMobile()) {
-      console.log('Setting sidebar to collapse on mobile')
       state.value = {
         ...state.value,
         sidebarCollapsed: true,
