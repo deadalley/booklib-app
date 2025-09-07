@@ -1,6 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <AccordionRoot
+    v-model="selectedValue"
     :default-value="defaultOpen ? 'tile' : undefined"
     class="flex flex-col gap-3 rounded-xl border border-accent bg-white px-8 py-6"
     type="single"
@@ -26,7 +27,16 @@
               <slot name="title" />
             </h5>
           </AccordionTrigger>
-          <slot name="actions" />
+          <!-- Actions only visible on larger screens -->
+          <div
+            class="sm:!flex sm:w-[unset]"
+            :class="{
+              'flex w-full': selectedValue === 'tile',
+              hidden: selectedValue !== 'tile',
+            }"
+          >
+            <slot name="actions" />
+          </div>
         </div>
         <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
@@ -60,6 +70,8 @@ withDefaults(
   }>(),
   { defaultOpen: true },
 )
+
+const selectedValue = ref<string>()
 </script>
 
 <style scoped>
