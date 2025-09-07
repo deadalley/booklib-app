@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import { map, indexBy, prop } from 'ramda'
-import type { SelectProps } from './raw-select.vue'
+import type { SelectOption } from './raw-select.vue'
 import {
   ComboboxAnchor,
   ComboboxContent,
@@ -111,15 +111,19 @@ import {
 } from 'radix-vue'
 import { IconX } from '@tabler/icons-vue'
 
-export type AutocompleteProps = SelectProps & {
+export type AutocompleteProps = {
+  dataTestid?: string
+  options: SelectOption[]
+  placeholder?: string
+  withWrapper?: boolean
+  align?: 'start' | 'center' | 'end'
+  side?: 'top' | 'right' | 'bottom' | 'left'
+  multiple?: boolean
   clearable?: boolean
   editing?: boolean
   hidden?: boolean
   canCreateNew?: boolean
   notFoundLabel?: string
-  align?: 'start' | 'center' | 'end'
-  side?: 'top' | 'right' | 'bottom' | 'left'
-  multiple?: boolean
 }
 
 const props = withDefaults(defineProps<AutocompleteProps>(), {
@@ -136,10 +140,18 @@ const selectValue = defineModel<string | string[]>()
 const searchTerm = defineModel<string>('searchTerm')
 const focused = defineModel<boolean>('focused')
 const open = ref<boolean>(false)
-const extendedOptions = ref(props.options!)
+const extendedOptions = ref([...props.options])
+
+watch(
+  () => props.options,
+  (options) => {
+    extendedOptions.value = [...options]
+  },
+  { deep: true, immediate: true },
+)
 
 const labelByValue = computed<Record<string, string>>(() =>
-  map(prop('label'), indexBy(prop('value'), props.options!)),
+  map(prop('label'), indexBy(prop('value'), extendedOptions.value)),
 )
 
 function onFocus() {
@@ -175,6 +187,8 @@ function onAddNew() {
       selectValue.value = searchTerm.value
     }
   }
+
+  open.value = false
 }
 
 function onClear() {
