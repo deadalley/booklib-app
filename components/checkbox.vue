@@ -7,11 +7,7 @@
       'flex-row-reverse': align === 'left',
     }"
   >
-    <span
-      v-if="$slots['default']"
-      class="size-full"
-      @click="checked = !checked"
-    >
+    <span v-if="$slots['default']" class="size-full">
       <slot />
     </span>
     <input
