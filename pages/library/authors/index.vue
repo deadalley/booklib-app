@@ -3,13 +3,13 @@
     name="library"
     title="Authors"
     :total="
-      sortedAuthors?.length &&
-      `${sortedAuthors.length} ${sortedAuthors.length > 1 ? 'authors' : 'author'}`
+      sortedAuthors?.length !== undefined &&
+      `${sortedAuthors.length} ${sortedAuthors.length === 1 ? 'author' : 'authors'}`
     "
   >
     <template #navbar>
-      <div class="flex w-full items-start gap-3 xl:flex-row">
-        <bl-search-bar @input="onSearch" />
+      <bl-search-bar @input="onSearch" />
+      <div class="flex justify-end gap-3">
         <bl-view-switch
           v-model:view="view"
           :views="['cards', 'expanded-cards']"

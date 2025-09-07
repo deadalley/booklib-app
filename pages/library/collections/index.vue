@@ -3,8 +3,8 @@
     name="library"
     title="Collections"
     :total="
-      sortedCollections?.length &&
-      `${sortedCollections.length} ${sortedCollections.length > 1 ? 'collections' : 'collection'}`
+      sortedCollections?.length !== undefined &&
+      `${sortedCollections.length} ${sortedCollections.length === 1 ? 'collection' : 'collections'}`
     "
   >
     <template #navbar>

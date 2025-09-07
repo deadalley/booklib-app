@@ -3,8 +3,8 @@
     name="library"
     title="Books"
     :total="
-      sortedBooks.length &&
-      `${sortedBooks.length} ${sortedBooks.length > 1 ? 'books' : 'book'}`
+      sortedBooks.length !== undefined &&
+      `${sortedBooks.length} ${sortedBooks.length === 1 ? 'book' : 'books'}`
     "
     :sidebar-content="sidebarContent"
     :loading="loading"
