@@ -35,6 +35,12 @@
         </NuxtLink>
       </template>
     </bl-empty>
+    <bl-empty
+      v-if="collections?.length >= 0 && sortedCollections?.length === 0"
+      icon="IconArchive"
+    >
+      <template #label> No collections found </template>
+    </bl-empty>
     <div
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
