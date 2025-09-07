@@ -218,16 +218,31 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
+    this.client.read()
+
+    let author = null
+    if (book.author) {
+      author = this.client.data.authors.find((a) => a.id === book.author)
+
+      if (!author) {
+        // If author doesn't exist, create a new one
+        author = {
+          id: uuidv4(),
+          name: book.author,
+          created_at: now(),
+        }
+        this.client.data.authors.push(author)
+      }
+    }
+
     const bookDb: BookDB = {
       ...bookToDbBook(book),
       id: book.id ?? uuidv4(),
-      author_id: book.author || null,
+      author_id: author?.id || null,
       created_at: book.createdAt || now(),
     }
 
     const collections = book.collections
-
-    this.client.read()
 
     // Add book
     this.client.data.books.push(bookDb)
@@ -255,6 +270,21 @@ export class BookLibDataManagementService {
 
     this.client.read()
 
+    let author = null
+    if (book.author) {
+      author = this.client.data.authors.find((a) => a.id === book.author)
+
+      if (!author) {
+        // If author doesn't exist, create a new one
+        author = {
+          id: uuidv4(),
+          name: book.author,
+          created_at: now(),
+        }
+        this.client.data.authors.push(author)
+      }
+    }
+
     const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
     if (bookIndex === -1) return null
 
@@ -264,8 +294,7 @@ export class BookLibDataManagementService {
       ...existingBook,
       ...bookToDbBook(book as Book),
       id,
-      author_id:
-        book.author !== undefined ? book.author : existingBook.author_id,
+      author_id: author?.id || null,
       created_at: existingBook.created_at,
     }
 
