@@ -206,7 +206,10 @@ async function onSubmit() {
         started_at: book.startedAt,
         finished_at: book.finishedAt,
       })),
-      collections: [],
+      collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
+        ...c,
+        created_at: now(),
+      })),
       'collection-book': [],
       goals: [],
     }
