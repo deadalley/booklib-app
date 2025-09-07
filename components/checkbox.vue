@@ -14,7 +14,7 @@
       v-bind="$attrs"
       v-model="checked"
       type="checkbox"
-      class="relative aspect-square size-4 cursor-pointer appearance-none rounded-md border border-accent-dark transition-all checked:border-main checked:bg-main"
+      class="relative aspect-square size-5 cursor-pointer appearance-none rounded-md border border-accent-dark transition-all checked:border-main checked:bg-main"
     />
   </label>
 </template>
