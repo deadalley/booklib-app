@@ -11,59 +11,18 @@
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         <h6>Back</h6>
       </button>
-      <div class="flex flex-col">
-        <div
-          class="flex flex-col items-start justify-between gap-3 md:flex-row"
-        >
-          <div class="flex flex-col">
-            <div class="flex w-full flex-1 items-center gap-5 sm:w-[unset]">
-              <h2 class="flex items-end leading-none">
-                {{ isNew ? 'New Book' : book.title }}
-              </h2>
-              <bl-rating
-                :editing="editing"
-                :rating="book.rating ?? 0"
-                :on-commit="onSelectRating"
-              />
-              <div class="flex gap-2">
-                <bl-button
-                  v-if="!editing"
-                  variant="secondary"
-                  @click="onEdit(true)"
-                >
-                  <template #prependIcon>
-                    <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-                  </template>
-                </bl-button>
-                <bl-modal
-                  v-if="!isNew && !editing"
-                  size="sm"
-                  @confirm="deleteBook"
-                >
-                  <template #trigger>
-                    <bl-button variant="secondary">
-                      <template #prependIcon>
-                        <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
-                      </template>
-                    </bl-button>
-                  </template>
-                  <template #title>
-                    Are you sure you want to delete
-                    <strong class="contents">{{ book.title }}</strong>
-                    ?
-                  </template>
-                  This action cannot be undone.
-                  <template #cancel-label> Cancel </template>
-                  <template #action-label> Delete </template>
-                </bl-modal>
-              </div>
-            </div>
-            <h5 v-if="authorName">{{ authorName }}</h5>
-          </div>
-          <div
-            class="flex w-full flex-col-reverse items-start gap-3 sm:w-[unset] sm:flex-row"
-          >
-            <div class="flex w-full">
+      <div class="flex flex-col items-start justify-between gap-3 md:flex-row">
+        <div class="flex flex-col">
+          <div class="flex w-full flex-1 items-center gap-5 sm:w-[unset]">
+            <h2 class="flex items-end leading-none">
+              {{ isNew ? 'New Book' : book.title }}
+            </h2>
+            <bl-rating
+              :editing="editing"
+              :rating="book.rating ?? 0"
+              :on-commit="onSelectRating"
+            />
+            <div class="flex gap-2">
               <div v-if="editing" class="flex w-full justify-start gap-2">
                 <bl-button expand variant="secondary" @click="onCancel">
                   {{ isNew ? 'Cancel' : 'Discard changes' }}
@@ -73,37 +32,46 @@
                 </bl-button>
               </div>
 
-              <div class="hidden gap-2 sm:flex">
-                <bl-button
-                  v-if="!editing"
-                  variant="secondary"
-                  @click="onEdit(true)"
-                >
-                  Edit
-                </bl-button>
-                <bl-modal
-                  v-if="!isNew && !editing"
-                  size="sm"
-                  @confirm="deleteBook"
-                >
-                  <template #trigger>
-                    <bl-button>Delete</bl-button>
-                  </template>
-                  <template #title>
-                    Are you sure you want to delete
-                    <strong class="contents">{{ book.title }}</strong>
-                    ?
-                  </template>
-                  This action cannot be undone.
-                  <template #cancel-label> Cancel </template>
-                  <template #action-label> Delete </template>
-                </bl-modal>
-              </div>
+              <bl-button
+                v-if="!editing"
+                variant="secondary"
+                @click="onEdit(true)"
+              >
+                <template #prependIcon>
+                  <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+                </template>
+              </bl-button>
+              <bl-modal
+                v-if="!isNew && !editing"
+                size="sm"
+                @confirm="deleteBook"
+              >
+                <template #trigger>
+                  <bl-button variant="secondary">
+                    <template #prependIcon>
+                      <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+                    </template>
+                  </bl-button>
+                </template>
+                <template #title>
+                  Are you sure you want to delete
+                  <strong class="contents">{{ book.title }}</strong>
+                  ?
+                </template>
+                This action cannot be undone.
+                <template #cancel-label> Cancel </template>
+                <template #action-label> Delete </template>
+              </bl-modal>
             </div>
-            <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
-              <p>Added on</p>
-              <h6 class="w-max">{{ formattedDate }}</h6>
-            </div>
+          </div>
+          <h5 v-if="authorName">{{ authorName }}</h5>
+        </div>
+        <div
+          class="flex w-full flex-col-reverse items-start gap-3 sm:w-[unset] sm:flex-row"
+        >
+          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
+            <p>Added on</p>
+            <h6 class="w-max">{{ formattedDate }}</h6>
           </div>
         </div>
       </div>
@@ -387,16 +355,6 @@
                 />
               </div>
             </section>
-            <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button variant="secondary" @click="onCancel">
-                {{ isNew ? 'Cancel' : 'Discard changes' }}
-              </bl-button>
-              <FormKit type="submit">
-                <bl-button type="submit">{{
-                  isNew ? 'Create book' : 'Save changes'
-                }}</bl-button>
-              </FormKit>
-            </div>
           </FormKit>
         </div>
       </ClientOnly>

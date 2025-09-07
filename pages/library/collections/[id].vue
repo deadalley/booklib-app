@@ -11,63 +11,65 @@
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         <h6>Back</h6>
       </button>
-      <div
-        class="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center"
-      >
-        <div class="flex items-center gap-5">
-          <h2 class="flex items-end leading-none">
-            {{ isNew ? 'New Collection' : collection.name }}
-          </h2>
+      <div class="flex flex-col items-start justify-between gap-3 md:flex-row">
+        <div class="flex flex-col">
+          <div class="flex w-full flex-1 items-center gap-5 sm:w-[unset]">
+            <h2 class="flex items-end leading-none">
+              {{ isNew ? 'New Collection' : collection.name }}
+            </h2>
+            <div class="flex gap-2">
+              <div v-if="editing" class="flex w-full justify-start gap-2">
+                <bl-button variant="secondary" @click="onCancel">
+                  {{ isNew ? 'Cancel' : 'Discard changes' }}
+                </bl-button>
+                <bl-button @click="onSubmit(collection)">{{
+                  isNew ? 'Create collection' : 'Save changes'
+                }}</bl-button>
+              </div>
+
+              <bl-button
+                v-if="!editing"
+                variant="secondary"
+                @click="onEdit(true)"
+              >
+                <template #prependIcon>
+                  <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+                </template>
+              </bl-button>
+
+              <bl-modal
+                v-if="
+                  !isNew &&
+                  !editing &&
+                  !DEFAULT_COLLECTIONS.includes(String(collection?.id))
+                "
+                size="sm"
+                @confirm="deleteCollection"
+              >
+                <template #trigger>
+                  <bl-button variant="secondary">
+                    <template #prependIcon>
+                      <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+                    </template>
+                  </bl-button>
+                </template>
+                <template #title>
+                  Are you sure you want to delete
+                  <strong class="contents">{{ collection.name }}</strong>
+                  ?
+                </template>
+                Your books will <strong>not</strong> be deleted. This action
+                cannot be undone.
+                <template #cancel-label> Cancel </template>
+                <template #action-label> Delete </template>
+              </bl-modal>
+            </div>
+          </div>
         </div>
         <div
-          class="flex w-full flex-col items-start gap-3 md:w-[unset] md:flex-row md:items-end"
+          class="flex w-full flex-col-reverse items-end gap-3 sm:w-[unset] sm:flex-row"
         >
-          <div
-            class="order-3 flex w-full flex-col items-start gap-2 md:order-none md:flex-row md:items-end"
-          >
-            <bl-button
-              v-if="!isNew && !editing"
-              variant="secondary"
-              class="w-full"
-              @click="onEdit(true)"
-            >
-              Edit
-            </bl-button>
-
-            <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button variant="secondary" @click="onCancel">
-                {{ isNew ? 'Cancel' : 'Discard changes' }}
-              </bl-button>
-              <bl-button @click="onSubmit(collection)">{{
-                isNew ? 'Create collection' : 'Save changes'
-              }}</bl-button>
-            </div>
-
-            <bl-modal
-              v-if="
-                !isNew &&
-                !editing &&
-                !DEFAULT_COLLECTIONS.includes(String(collection?.id))
-              "
-              ref="deleteModalRef"
-              size="sm"
-              @confirm="deleteCollection"
-            >
-              <template #trigger>
-                <bl-button @click="openDeleteModal">Delete</bl-button>
-              </template>
-              <template #title>
-                Are you sure you want to delete
-                <strong class="contents">{{ collection.name }}</strong>
-                ?
-              </template>
-              Your books will <strong>not</strong> be deleted. This action
-              cannot be undone.
-              <template #cancel-label> Cancel </template>
-              <template #action-label> Delete </template>
-            </bl-modal>
-            <bl-view-switch v-model:view="view" />
-          </div>
+          <bl-view-switch v-model:view="view" />
           <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
             <p>Added on</p>
             <h6 class="w-max">{{ formattedDate }}</h6>
@@ -75,7 +77,6 @@
         </div>
       </div>
     </header>
-
     <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
       <ClientOnly>
         <div
@@ -115,22 +116,11 @@
             />
 
             <section
-              v-if="!selectedBooks.length"
+              v-if="!selectedBooks.length && !editing"
               class="flex flex-col items-center gap-3 py-24"
             >
               <p>There are no books in this collection.</p>
             </section>
-
-            <div v-if="editing" class="flex justify-end gap-2">
-              <bl-button variant="secondary" @click="onCancel">
-                {{ isNew ? 'Cancel' : 'Discard changes' }}
-              </bl-button>
-              <FormKit type="submit">
-                <bl-button type="submit">{{
-                  isNew ? 'Create collection' : 'Save changes'
-                }}</bl-button>
-              </FormKit>
-            </div>
           </FormKit>
         </div>
       </ClientOnly>
@@ -139,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconArrowLeft } from '@tabler/icons-vue'
+import { IconArrowLeft, IconEdit, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
@@ -160,7 +150,6 @@ const isNew = computed(() => route.params.id === 'new')
 
 const managingBooks = ref(isNew.value)
 const editing = ref(isNew.value)
-const deleteModalRef = ref()
 const collection = ref<Collection>()
 const loading = ref(false)
 const allBooks = ref<ViewBook[]>([])
@@ -175,10 +164,6 @@ const { view, selectedBooks, notSelectedBooks, selectedTableColumns } =
 watch(isNew, () => {
   managingBooks.value = isNew.value
 })
-
-function openDeleteModal() {
-  deleteModalRef.value.setIsOpen(true)
-}
 
 async function fetchCollection() {
   loading.value = true
