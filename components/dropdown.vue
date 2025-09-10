@@ -1,6 +1,11 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <div class="relative">
+  <div
+    class="popper relative w-full"
+    :class="{
+      [side]: true,
+    }"
+  >
     <DropdownMenuRoot>
       <DropdownMenuTrigger class="dropdown-trigger">
         <bl-button v-bind="$props" expand variant="tertiary">
@@ -20,6 +25,7 @@
         <DropdownMenuContent
           :align="align"
           :avoid-collisions="false"
+          position="popper"
           class="base-container top-2 z-50 mt-1 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
         >
           <DropdownMenuItem
@@ -64,8 +70,9 @@ withDefaults(
     items: DropdownItem[]
     withChevron?: boolean
     align?: 'start' | 'center' | 'end'
+    side?: 'top' | 'right' | 'bottom' | 'left'
   }>(),
-  { withChevron: true, align: 'start' },
+  { withChevron: true, align: 'start', side: 'bottom' },
 )
 
 defineEmits<{
@@ -80,5 +87,10 @@ defineEmits<{
 
 .dropdown-trigger[data-state='open'] .dropdown-chevron {
   transform: rotate(180deg);
+}
+
+.popper [data-radix-popper-content-wrapper] {
+  position: absolute !important;
+  width: 100%;
 }
 </style>

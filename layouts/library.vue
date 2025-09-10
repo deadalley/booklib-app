@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex size-full flex-col gap-4 overflow-y-hidden overflow-x-visible sm:gap-8"
+    class="relative flex size-full flex-col gap-4 overflow-x-visible sm:gap-8"
     v-bind="$attrs"
   >
     <div class="flex flex-col items-baseline justify-between lg:flex-row">
@@ -18,7 +18,7 @@
         </div>
       </div>
       <div
-        class="w-full overflow-hidden transition-all duration-300 ease-in-out"
+        class="z-10 w-full transition-all duration-300 ease-in-out"
         :class="{
           'max-h-96 opacity-100': actionsOpen,
           'max-h-0 opacity-0': !actionsOpen,
