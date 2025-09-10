@@ -415,7 +415,7 @@ const formattedDate = computed(() => toFullDateCompact(book.value?.createdAt))
 
 const currentStep = ref<number | undefined>(
   book.value
-    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'not-read'].step
+    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'not-owned'].step
     : undefined,
 )
 
@@ -441,12 +441,9 @@ const progressSteps = computed(() => [
   book.value?.progressStatus === 'owned'
     ? PROGRESS_STATUS_MAP.owned
     : PROGRESS_STATUS_MAP['not-owned'],
-
-  book.value?.progressStatus === 'not-read'
-    ? PROGRESS_STATUS_MAP['not-read']
-    : book.value?.progressStatus === 'paused'
-      ? PROGRESS_STATUS_MAP.paused
-      : PROGRESS_STATUS_MAP.reading,
+  book.value?.progressStatus === 'paused'
+    ? PROGRESS_STATUS_MAP.paused
+    : PROGRESS_STATUS_MAP.reading,
   book.value?.progressStatus === 'not-finished'
     ? PROGRESS_STATUS_MAP['not-finished']
     : PROGRESS_STATUS_MAP.read,
@@ -476,7 +473,7 @@ async function fetchBook() {
   }))
 
   currentStep.value =
-    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-read'].step
+    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-owned'].step
 
   selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
     !!book.value &&

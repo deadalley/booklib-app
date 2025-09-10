@@ -133,7 +133,6 @@ export function getBooksByStatus(
     {
       owned: 0,
       'not-owned': 0,
-      'not-read': 0,
       reading: 0,
       paused: 0,
       read: 0,

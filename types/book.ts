@@ -4,7 +4,6 @@ import type { Collection } from './collection'
 export type BookProgressStatus =
   | 'owned'
   | 'not-owned'
-  | 'not-read'
   | 'reading'
   | 'paused'
   | 'read'

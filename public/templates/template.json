@@ -13,7 +13,7 @@
       "summary": "",
       "year": 0,
       "genres": ["", "", ""],
-      "progressStatus": "not-read",
+      "progressStatus": "not-owned",
       "format": "other",
       "startedAt": "2020-01-01T00:00:00Z",
       "finishedAt": "2020-01-01T00:00:00Z"
@@ -31,7 +31,7 @@
       "summary": "",
       "year": 0,
       "genres": ["", "", ""],
-      "progressStatus": "not-read",
+      "progressStatus": "not-owned",
       "format": "other",
       "startedAt": "2020-01-01T00:00:00Z",
       "finishedAt": "2020-01-01T00:00:00Z"
@@ -49,7 +49,7 @@
       "summary": "",
       "year": 0,
       "genres": ["", "", ""],
-      "progressStatus": "not-read",
+      "progressStatus": "not-owned",
       "format": "other",
       "startedAt": "2020-01-01T00:00:00Z",
       "finishedAt": "2020-01-01T00:00:00Z"

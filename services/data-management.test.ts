@@ -247,7 +247,7 @@ describe('StorageService', () => {
         summary: null,
         year: null,
         genres: null,
-        progressStatus: 'not-read',
+        progressStatus: 'not-owned',
         format: null,
         startedAt: null,
         finishedAt: null,

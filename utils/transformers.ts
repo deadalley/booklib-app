@@ -65,7 +65,7 @@ export function bookToDbBook(
     title: book.title || '',
     year: nullify(book.year),
     genres: book.genres || null,
-    progress_status: book.progressStatus || 'not-read',
+    progress_status: book.progressStatus || 'not-owned',
     format: book.format || null,
     started_at: nullify(book.startedAt),
     finished_at: nullify(book.finishedAt),

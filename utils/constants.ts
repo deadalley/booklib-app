@@ -44,7 +44,6 @@ export const ICON_SIZE_LARGE = 26
 export const PROGRESS_STATUS = [
   'owned',
   'not-owned',
-  'not-read',
   'reading',
   'paused',
   'read',
@@ -71,12 +70,6 @@ export const PROGRESS_STATUS_MAP: Record<
     step: 1,
     description: 'Owned',
     icon: 'IconArchive',
-  },
-  'not-read': {
-    id: 'not-read',
-    step: 2,
-    description: 'Not read',
-    icon: 'IconBook2',
   },
   reading: {
     id: 'reading',
