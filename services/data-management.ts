@@ -765,11 +765,13 @@ export class BookLibDataManagementService {
       ],
       collections: [
         ...this.client.data.collections,
-        ...data.collections.map((collection) => ({
-          ...collection,
-          id: uuidv4(),
-          created_at: now(),
-        })),
+        ...data.collections
+          .filter((collection) => !DEFAULT_COLLECTIONS.includes(collection.id))
+          .map((collection) => ({
+            ...collection,
+            id: uuidv4(),
+            created_at: now(),
+          })),
       ],
       'collection-book': [
         ...this.client.data['collection-book'],
