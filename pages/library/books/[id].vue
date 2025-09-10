@@ -112,40 +112,49 @@
             @change="onProgressChange"
           />
           <bl-modal v-model="stepperModalOpen" :with-close-button="false">
-            <div class="flex flex-col gap-3">
-              <div class="flex justify-center gap-3">
-                <div
-                  v-for="status in Object.values(PROGRESS_STATUS_MAP).filter(
-                    ({ step }) => step === currentStep,
-                  )"
-                  :key="status.id"
-                  class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                  @click="onSelectProgress(status.id)"
-                >
-                  <component
-                    :is="icons[status.icon]"
-                    :size="32"
-                    class="text-main"
-                  />
-                  {{ status.description }}
+            <div class="flex flex-col gap-5">
+              <div class="flex flex-col gap-3">
+                <div class="flex justify-center gap-3">
+                  <div
+                    v-for="status in Object.values(PROGRESS_STATUS_MAP).filter(
+                      ({ step }) => step === currentStep,
+                    )"
+                    :key="status.id"
+                    class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                    @click="onSelectProgress(status.id)"
+                  >
+                    <component
+                      :is="icons[status.icon]"
+                      :size="32"
+                      class="text-main"
+                    />
+                    {{ status.description }}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="ml-5 mt-5 flex flex-col gap-2">
-              <bl-checkbox
-                v-if="currentStep === 2"
-                v-model="startReadingBookToday"
-                align="left"
+              <div class="flex flex-col">
+                <bl-checkbox
+                  v-if="currentStep === 2"
+                  v-model="startReadingBookToday"
+                  align="left"
+                >
+                  Update start reading date to today
+                </bl-checkbox>
+                <bl-checkbox
+                  v-if="currentStep === 3"
+                  v-model="finishReadingBookToday"
+                  align="left"
+                >
+                  Update finish reading date to today
+                </bl-checkbox>
+              </div>
+              <bl-button
+                variant="secondary"
+                expand
+                @click="stepperModalOpen = false"
               >
-                Update start reading date to today
-              </bl-checkbox>
-              <bl-checkbox
-                v-if="currentStep === 3"
-                v-model="finishReadingBookToday"
-                align="left"
-              >
-                Update finish reading date to today
-              </bl-checkbox>
+                Cancel
+              </bl-button>
             </div>
           </bl-modal>
         </div>

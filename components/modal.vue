@@ -20,7 +20,7 @@
         }"
       >
         <DialogTitle
-          v-if="$slots['title']"
+          v-if="$slots['title'] || withCloseButton || icon"
           as="div"
           class="items-top mb-4 flex w-full items-start"
         >
