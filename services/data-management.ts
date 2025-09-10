@@ -744,7 +744,46 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.data = data
+    await this.client.read()
+
+    this.client.data = {
+      authors: [
+        ...this.client.data.authors,
+        ...data.authors.map((author) => ({
+          ...author,
+          id: uuidv4(),
+          created_at: now(),
+        })),
+      ],
+      books: [
+        ...this.client.data.books,
+        ...data.books.map((book) => ({
+          ...book,
+          id: uuidv4(),
+          created_at: now(),
+        })),
+      ],
+      collections: [
+        ...this.client.data.collections,
+        ...data.collections.map((collection) => ({
+          ...collection,
+          id: uuidv4(),
+          created_at: now(),
+        })),
+      ],
+      'collection-book': [
+        ...this.client.data['collection-book'],
+        ...data['collection-book'],
+      ],
+      goals: [
+        ...this.client.data.goals,
+        ...data.goals.map((goal) => ({
+          ...goal,
+          id: uuidv4(),
+          created_at: now(),
+        })),
+      ],
+    }
     await this.client.write()
   }
 
