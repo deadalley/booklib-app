@@ -101,6 +101,7 @@
         </div>
       </div>
       <bl-books-table
+        v-if="importedBooks?.length"
         :books="importedBooks"
         :selected-table-columns="selectedTableColumns"
         with-check

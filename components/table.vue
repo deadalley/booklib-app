@@ -154,7 +154,7 @@ const table = useVueTable({
           header: (info: HeaderContext<T, string | undefined>) => {
             return h(BlCheckbox, {
               id: 'all-checked',
-              checked: info.table.getIsAllRowsSelected(),
+              modelValue: info.table.getIsAllRowsSelected(),
               onChange: info.table.getToggleAllRowsSelectedHandler(),
             })
           },
@@ -165,14 +165,8 @@ const table = useVueTable({
 
             return h(BlCheckbox, {
               id: `${info.row.original.id}-checked`,
-              checked: info.row.getIsSelected(),
-              onChange: (event: Event) => {
-                emit('select:row', {
-                  id: info.row.original.id,
-                  selected: (event.target as HTMLInputElement).checked,
-                })
-                return info.row.getToggleSelectedHandler()(event)
-              },
+              modelValue: info.row.getIsSelected(),
+              onChange: info.row.getToggleSelectedHandler(),
             })
           },
           enableSorting: false,
