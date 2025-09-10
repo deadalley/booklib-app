@@ -131,6 +131,22 @@
                 </div>
               </div>
             </div>
+            <div class="ml-5 mt-5 flex flex-col gap-2">
+              <bl-checkbox
+                v-if="currentStep === 2"
+                v-model="startReadingBookToday"
+                align="left"
+              >
+                Update start reading date to today
+              </bl-checkbox>
+              <bl-checkbox
+                v-if="currentStep === 3"
+                v-model="finishReadingBookToday"
+                align="left"
+              >
+                Update finish reading date to today
+              </bl-checkbox>
+            </div>
           </bl-modal>
         </div>
       </div>
@@ -394,6 +410,8 @@ const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
+const startReadingBookToday = ref(false)
+const finishReadingBookToday = ref(false)
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
@@ -585,15 +603,23 @@ function onDefaultCollectionChange(collectionId: string) {
   }
 }
 
-function onSelectProgress(progressStatus: BookProgressStatus) {
+async function onSelectProgress(progressStatus: BookProgressStatus) {
   if (book.value) {
     book.value.progressStatus = progressStatus
 
+    if (progressStatus === 'reading' && startReadingBookToday.value) {
+      book.value.startedAt = now()
+    } else if (progressStatus === 'read' && finishReadingBookToday.value) {
+      book.value.finishedAt = now()
+    }
+
     if (!isNew.value) {
-      onSubmit(book.value)
+      await onSubmit(book.value)
     }
   }
   stepperModalOpen.value = false
+  startReadingBookToday.value = false
+  finishReadingBookToday.value = false
 }
 
 function onProgressChange(progressStatusStep: number) {
