@@ -2,16 +2,19 @@ import type { icons } from '@tabler/icons-vue'
 import type { BookFormat, BookProgressStatus } from '~/types/book'
 import type { GoalInterval, GoalStatus, GoalType } from '~/types/goal'
 
-export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const FAVORITE_COLLECTION_ID = 'favorite'
+export const WISHLIST_COLLECTION_ID = 'wishlist'
+export const TBR_COLLECTION_ID = 'tbr'
 export const DEFAULT_COLLECTIONS = [
   FAVORITE_COLLECTION_ID,
   WISHLIST_COLLECTION_ID,
+  TBR_COLLECTION_ID,
 ]
 
 export const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeart',
   [WISHLIST_COLLECTION_ID]: 'IconGift',
+  [TBR_COLLECTION_ID]: 'IconStack2',
 }
 
 export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
@@ -20,6 +23,7 @@ export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
 > = {
   [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
   [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
+  [TBR_COLLECTION_ID]: 'IconStack2Filled',
 }
 
 export const DEFAULT_COLLECTIONS_INIT = [
@@ -30,6 +34,10 @@ export const DEFAULT_COLLECTIONS_INIT = [
   {
     id: FAVORITE_COLLECTION_ID,
     name: 'Favorites',
+  },
+  {
+    id: TBR_COLLECTION_ID,
+    name: 'To Be Read',
   },
 ]
 
