@@ -63,12 +63,6 @@
         </NuxtLink>
       </template>
     </bl-empty>
-    <bl-empty
-      v-if="books?.length >= 0 && sortedBooks?.length === 0"
-      icon="IconBooks"
-    >
-      <template #label> No books found </template>
-    </bl-empty>
     <bl-books-views
       v-if="books.length"
       v-model:current-page="currentPage"
@@ -80,6 +74,12 @@
       @update:page="onPageChange"
       @book-select="onBookSelect"
     />
+    <bl-empty
+      v-if="books?.length >= 0 && sortedBooks?.length === 0"
+      icon="IconBooks"
+    >
+      <template #label> No books found </template>
+    </bl-empty>
   </NuxtLayout>
   <bl-sidebar
     :title="sidebarContent"
