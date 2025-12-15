@@ -62,8 +62,7 @@ export default defineNuxtConfig({
         image: {
           dir: 'public',
           format: ['webp', 'jpg', 'png', 'svg'],
-          provider: 'static',
-          staticFilename: './{name}.{format}',
+          provider: 'ipxStatic',
         },
         electron: {
           build: [
@@ -124,5 +123,5 @@ export default defineNuxtConfig({
     '/library': { redirect: '/library/books' },
   },
 
-  compatibilityDate: '2024-08-14',
+  compatibilityDate: '2024-12-15',
 })
