@@ -29,7 +29,12 @@
               upload it to BookLib.
             </p>
           </div>
-          <bl-button class="ml-4" :disabled="!importType" @click="downloadFile">
+          <bl-button
+            class="ml-4"
+            :disabled="!importType"
+            :loading="loading"
+            @click="downloadFile"
+          >
             <template #prependIcon="prependIcon">
               <IconDownload v-bind="prependIcon" />
             </template>
@@ -50,6 +55,7 @@
           <bl-button
             class="ml-4"
             :disabled="!importType"
+            :loading="loading"
             @click="onUploadClick"
           >
             <template #prependIcon="prependIcon">
@@ -64,6 +70,15 @@
             @change="onFileChange"
           />
         </div>
+        <bl-warning-badge v-if="error">
+          <template #icon="iconProps">
+            <IconAlertTriangle v-bind="iconProps" />
+          </template>
+          <template #content>
+            <b>Error importing file: </b>
+            {{ error }}
+          </template>
+        </bl-warning-badge>
       </div>
     </div>
     <div
@@ -113,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconDownload, IconUpload } from '@tabler/icons-vue'
+import { IconAlertTriangle, IconDownload, IconUpload } from '@tabler/icons-vue'
 import { indexBy, prop, uniq } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import type { SelectOption } from '~/components/raw-select.vue'
@@ -145,6 +160,9 @@ const fileInput = ref()
 const importType = ref<ImportType>()
 const importedBooks = ref<Book[] | undefined>()
 const selectedBooks = ref<Record<Book['id'], boolean>>({})
+const fileName = ref<string>('')
+const loading = ref(false)
+const error = ref<string | null>(null)
 
 const selectedBooksForUpload = computed(() =>
   (importedBooks?.value ?? []).filter(({ id }) => selectedBooks.value[id]),
@@ -178,19 +196,31 @@ async function parseFile(file: File) {
 async function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement)?.files?.[0] as File
 
-  const books = await parseFile(file)
+  fileName.value = file.name
 
-  const booksWithIds = books.map((book, index) => ({
-    ...book,
-    id: String(index + 1),
-  }))
+  loading.value = true
+  try {
+    const books = await parseFile(file)
 
-  selectedBooks.value = booksWithIds.reduce(
-    (acc, { id }) => ({ ...acc, [id]: true }),
-    {},
-  )
+    const booksWithIds = books.map((book, index) => ({
+      ...book,
+      id: String(index + 1),
+    }))
 
-  importedBooks.value = booksWithIds
+    selectedBooks.value = booksWithIds.reduce(
+      (acc, { id }) => ({ ...acc, [id]: true }),
+      {},
+    )
+
+    importedBooks.value = booksWithIds
+  } catch (e) {
+    error.value =
+      typeof e === 'string' ? e : 'An error occurred while parsing the file.'
+    importedBooks.value = []
+    loading.value = false
+  } finally {
+    loading.value = false
+  }
 }
 
 const { importLibrary } = useBookLibrary()

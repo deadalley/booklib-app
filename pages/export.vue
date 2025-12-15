@@ -36,7 +36,8 @@
           <h6>3. Export your library</h6>
           <bl-button
             class="ml-4"
-            :disabled="!exportType || !exportCollection || loading"
+            :disabled="!exportType || !exportCollection"
+            :loading="loading"
             @click="downloadFile"
           >
             <template #prependIcon="prependIcon">
@@ -47,7 +48,6 @@
                 ? `Export ${exportCollection === 'all' ? 'library' : exportCollection} as ${exportType}`
                 : 'Choose file format'
             }}
-            <bl-loading v-if="loading" class="!size-4" />
           </bl-button>
         </div>
       </div>

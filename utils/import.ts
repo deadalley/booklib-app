@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
-import type { Book } from '~/types/book'
 import languageOptions from '~/public/languages-2.json'
+import type { Book } from '~/types/book'
 
 export async function parseCsvFile(file: File): Promise<Book[]> {
   return new Promise((resolve, reject) => {
@@ -27,7 +27,7 @@ export async function parseCsvFile(file: File): Promise<Book[]> {
       },
       complete: ({ data, errors }) => {
         if (errors.length) {
-          reject(errors[0].message)
+          reject(errors[0]?.message)
         } else {
           resolve(data)
         }
@@ -44,7 +44,11 @@ export function parseJsonFile(file: File): Promise<Book[]> {
   return new Promise((resolve, reject) => {
     fileReader.onload = (e) => {
       if (e.target?.result) {
-        resolve(JSON.parse(e.target.result as string).books)
+        try {
+          resolve(JSON.parse(e.target.result as string).books)
+        } catch {
+          reject('Invalid JSON file')
+        }
       } else {
         reject('Could not parse data')
       }

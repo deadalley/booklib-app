@@ -10,8 +10,8 @@
         variant === 'secondary',
       'border border-accent bg-white p-2 text-black hover:bg-accent-light active:bg-accent':
         variant === 'tertiary',
-      '!bg-accent-light !text-accent-dark': !!disabled,
-      'cursor-pointer': !disabled,
+      '!bg-accent-light !text-accent-dark': !!disabled || !!loading,
+      'cursor-pointer': !disabled && !loading,
       'w-full flex-1': !!expand,
       'px-2':
         !$slots['default'] && ($slots['prependIcon'] || $slots['appendIcon']),
@@ -25,6 +25,7 @@
     <slot name="prependIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
     <slot />
     <slot name="appendIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
+    <bl-loading v-if="loading" class="!size-4" />
   </button>
 </template>
 
@@ -33,6 +34,7 @@ withDefaults(
   defineProps<{
     expand?: boolean
     disabled?: boolean
+    loading?: boolean
     variant?: 'primary' | 'secondary' | 'tertiary'
   }>(),
   { variant: 'primary' },
