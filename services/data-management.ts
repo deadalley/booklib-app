@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid'
 import type {
   Database,
   DeleteAuthorParams,
@@ -6,25 +7,24 @@ import type {
   GetOrderedBooksQuerySearchParams,
   LibraryIntegrityResult,
 } from '~/types/api'
-import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
-import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
+import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Goal } from '~/types/goal'
-import type { DatabaseClient } from './database-client'
-import { createDatabaseClient } from './database-client'
-import { v4 as uuidv4 } from 'uuid'
 import {
-  logger,
-  DEFAULT_COLLECTIONS_INIT,
-  now,
-  dbBookToBook,
   bookToDbBook,
   dbAuthorToAuthor,
+  dbBookToBook,
   dbCollectionToCollection,
   dbGoalToGoal,
+  DEFAULT_COLLECTIONS_INIT,
   goalToDbGoal,
+  logger,
+  now,
 } from '../utils'
+import type { DatabaseClient } from './database-client'
+import { createDatabaseClient } from './database-client'
 
 export class BookLibDataManagementService {
   private client: DatabaseClient | null = null
@@ -85,7 +85,7 @@ export class BookLibDataManagementService {
 
       this.isInitialized = true
     } catch (error) {
-      logger.error('Failed to initialize database:', error)
+      logger.error('Failed to initialize database:', undefined, error)
       throw error
     }
   }
@@ -270,6 +270,15 @@ export class BookLibDataManagementService {
 
     this.client.read()
 
+    const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
+    if (bookIndex === -1) return null
+
+    const existingBook = this.client.data.books[bookIndex]
+
+    if (!existingBook) {
+      throw new Error('Book not found')
+    }
+
     let author = null
     if (book.author) {
       author = this.client.data.authors.find((a) => a.id === book.author)
@@ -284,11 +293,6 @@ export class BookLibDataManagementService {
         this.client.data.authors.push(author)
       }
     }
-
-    const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
-    if (bookIndex === -1) return null
-
-    const existingBook = this.client.data.books[bookIndex]
 
     const updatedBookDb: BookDB = {
       ...existingBook,
@@ -551,6 +555,10 @@ export class BookLibDataManagementService {
 
     const existingCollection = this.client.data.collections[collectionIndex]
 
+    if (!existingCollection) {
+      throw new Error('Collection not found')
+    }
+
     // Update collection data
     const updatedCollectionDb: CollectionDB = {
       ...existingCollection,
@@ -747,14 +755,7 @@ export class BookLibDataManagementService {
     await this.client.read()
 
     this.client.data = {
-      authors: [
-        ...this.client.data.authors,
-        ...data.authors.map((author) => ({
-          ...author,
-          id: uuidv4(),
-          created_at: now(),
-        })),
-      ],
+      authors: [...this.client.data.authors, ...data.authors],
       books: [
         ...this.client.data.books,
         ...data.books.map((book) => ({
@@ -807,7 +808,7 @@ export class BookLibDataManagementService {
       )
       return await response.json()
     } catch (error) {
-      logger.error('Failed to search Google Books:', error)
+      logger.error('Failed to search Google Books:', undefined, error)
       throw error
     }
   }

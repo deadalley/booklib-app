@@ -114,8 +114,10 @@
 
 <script setup lang="ts">
 import { IconDownload, IconUpload } from '@tabler/icons-vue'
-import { useBookLibrary } from '~/composables/use-book-library'
+import { indexBy, prop, uniq } from 'ramda'
+import { v4 as uuidv4 } from 'uuid'
 import type { SelectOption } from '~/components/raw-select.vue'
+import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import { parseCsvFile } from '~/utils/import'
 
@@ -191,15 +193,30 @@ async function onFileChange(e: Event) {
   importedBooks.value = booksWithIds
 }
 
+const { importLibrary } = useBookLibrary()
+
 async function onSubmit() {
   if (importedBooks.value?.length) {
-    const { importLibrary } = useBookLibrary()
+    const uniqueAuthors = uniq(
+      selectedBooksForUpload.value.map((book) => book.author),
+    )
+
+    const authors = Array.from(uniqueAuthors).map((name) => ({
+      name: name!,
+      id: uuidv4(),
+      created_at: now(),
+    }))
+
+    const authorNameToId = indexBy(prop('name'), authors)
+
     const databaseData = {
-      authors: [],
+      authors,
       books: selectedBooksForUpload.value.map((book) => ({
         ...book,
         created_at: book.createdAt,
-        author_id: book.author,
+        author_id: book.author
+          ? (authorNameToId[book.author as string]?.id ?? null)
+          : null,
         progress_status: book.progressStatus,
         cover_src: book.coverSrc,
         original_title: book.originalTitle,
