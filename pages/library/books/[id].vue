@@ -86,7 +86,7 @@
             v-for="item in DEFAULT_COLLECTIONS"
             :key="item"
             :value="item"
-            :selected="selectedDefaultCollections[item]"
+            :selected="!!selectedDefaultCollections[item]"
             @select="onDefaultCollectionChange"
           >
             <template #icon="iconProps">
@@ -95,7 +95,7 @@
                   icons[
                     (selectedDefaultCollections[item]
                       ? DEFAULT_COLLECTION_ICONS_FILLED
-                      : DEFAULT_COLLECTION_ICONS)[item]
+                      : DEFAULT_COLLECTION_ICONS)[item]!!
                   ]
                 "
                 class="text-main"
@@ -389,13 +389,13 @@
 
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
+import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
+import languageOptions from '~/public/languages-2.json'
+import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import languageOptions from '~/public/languages-2.json'
-import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
 import { toDefaultDate } from '../../../utils/date'
-import type { Author } from '~/types/author'
 
 const {
   getCollections,
@@ -448,6 +448,7 @@ const currentStep = ref<number | undefined>(
 
 const selectedDefaultCollections = ref<Record<string, boolean>>({
   [WISHLIST_COLLECTION_ID]: false,
+  [TBR_COLLECTION_ID]: false,
   [FAVORITE_COLLECTION_ID]: false,
 })
 
@@ -508,6 +509,8 @@ async function fetchBook() {
   selectedDefaultCollections.value[WISHLIST_COLLECTION_ID] =
     !!book.value &&
     isBookInDefaultCollection(book.value, WISHLIST_COLLECTION_ID)
+  selectedDefaultCollections.value[TBR_COLLECTION_ID] =
+    !!book.value && isBookInDefaultCollection(book.value, TBR_COLLECTION_ID)
 }
 
 async function deleteBook() {
@@ -595,11 +598,11 @@ function onSelectCollection({
   allCollections.value = allCollections.value.map((collection) =>
     String(collection.id) === String(collectionId)
       ? { ...collection, selected }
-      : collection,
+      : { ...collection },
   )
 }
 
-function onDefaultCollectionChange(collectionId: string) {
+async function onDefaultCollectionChange(collectionId: string) {
   selectedDefaultCollections.value[collectionId] =
     !selectedDefaultCollections.value[collectionId]
   onSelectCollection({
@@ -608,7 +611,11 @@ function onDefaultCollectionChange(collectionId: string) {
   })
 
   if (book.value) {
-    onSubmit(book.value)
+    book.value.collections = allCollections.value
+      .filter(({ selected }) => !!selected)
+      .map(({ id }) => id)
+
+    await onSubmit(book.value)
   }
 }
 
