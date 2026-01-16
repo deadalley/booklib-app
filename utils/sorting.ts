@@ -3,6 +3,12 @@ import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal, GoalStatus } from '~/types/goal'
+import { DEFAULT_COLLECTIONS } from '~/utils/constants'
+import {
+  getBooksByAuthor,
+  getAverageRating,
+  getBooksByStatus,
+} from '~/utils/mappers'
 
 export function sortBooksByOrder(booksToBeSorted: ViewBook[]) {
   return booksToBeSorted.concat().sort((book1, book2) => {
@@ -114,11 +120,18 @@ export function sortAuthorsByBookCount(
   const authorsById = indexBy(prop('id'), authors)
   const booksByAuthor = getBooksByAuthor(books, authors)
   const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => ({
-      author: authorsById[authorId],
-      count: booksByAuthor[authorId].length,
-    }))
-    .filter(({ count }) => count > 0)
+    .map((authorId) => {
+      const author = authorsById[authorId]
+      const authorBooks = booksByAuthor[authorId]
+      return {
+        author,
+        count: authorBooks?.length ?? 0,
+      }
+    })
+    .filter(
+      (item): item is { author: Author; count: number } =>
+        item.author !== undefined && item.count > 0,
+    )
 
   return authorCounts.sort((a, b) => {
     if (a.count === b.count) {
@@ -136,14 +149,20 @@ export function sortAuthorsByBookRatings(
   const authorsById = indexBy(prop('id'), authors)
   const booksByAuthor = getBooksByAuthor(books, authors)
   const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => ({
-      author: authorsById[authorId],
-      count: booksByAuthor[authorId].length,
-      average: getAverageRating(booksByAuthor[authorId]),
-    }))
+    .map((authorId) => {
+      const author = authorsById[authorId]
+      const authorBooks = booksByAuthor[authorId]
+      return {
+        author,
+        count: authorBooks?.length ?? 0,
+        average: authorBooks ? getAverageRating(authorBooks) : undefined,
+      }
+    })
     .filter(
       (a): a is { author: Author; count: number; average: number } =>
-        a.average !== undefined && a.average >= minAverage,
+        a.author !== undefined &&
+        a.average !== undefined &&
+        a.average >= minAverage,
     )
 
   return authorCounts.sort((a, b) => {
@@ -169,12 +188,27 @@ export function sortAuthorByStatusesCount(
   const authorsById = indexBy(prop('id'), authors)
   const booksByAuthor = getBooksByAuthor(books, authors)
   const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => ({
-      author: authorsById[authorId],
-      count: booksByAuthor[authorId].length,
-      countByStatus: getBooksByStatus(booksByAuthor[authorId]),
+    .map((authorId) => {
+      const author = authorsById[authorId]
+      const authorBooks = booksByAuthor[authorId]
+      if (!author || !authorBooks) {
+        return null
+      }
+      return {
+        author,
+        count: authorBooks.length,
+        countByStatus: getBooksByStatus(authorBooks),
+      }
+    })
+    .filter(
+      (item): item is NonNullable<typeof item> =>
+        item !== null && item.count > 0,
+    )
+    .map((item) => ({
+      author: item.author,
+      count: item.count,
+      countByStatus: item.countByStatus,
     }))
-    .filter(({ count }) => count > 0)
 
   return authorCounts
 }
