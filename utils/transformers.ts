@@ -100,29 +100,35 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
   if (dbGoal.type === 'books') {
     return {
       type: 'books',
-      entries: dbGoal.entries.map((entry) => ({
-        id: entry.id,
-        book: entry.book_id!,
-        createdAt: entry.created_at,
-      })),
+      entries: dbGoal.entries
+        .filter((entry) => entry.book_id != null)
+        .map((entry) => ({
+          id: entry.id,
+          book: entry.book_id!,
+          createdAt: entry.created_at,
+        })),
     }
   } else if (dbGoal.type === 'pages') {
     return {
       type: 'pages',
-      entries: dbGoal.entries.map((entry) => ({
-        id: entry.id,
-        pages: entry.pages!,
-        createdAt: entry.created_at,
-      })),
+      entries: dbGoal.entries
+        .filter((entry) => entry.pages != null)
+        .map((entry) => ({
+          id: entry.id,
+          pages: entry.pages!,
+          createdAt: entry.created_at,
+        })),
     }
   } else if (dbGoal.type === 'hours') {
     return {
       type: 'hours',
-      entries: dbGoal.entries.map((entry) => ({
-        id: entry.id,
-        hours: entry.hours!,
-        createdAt: entry.created_at,
-      })),
+      entries: dbGoal.entries
+        .filter((entry) => entry.hours != null)
+        .map((entry) => ({
+          id: entry.id,
+          hours: entry.hours!,
+          createdAt: entry.created_at,
+        })),
     }
   }
   throw new Error(`Unknown goal type: ${dbGoal.type}`)
@@ -199,7 +205,7 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
   return {
     id: '0',
     title: googleBook.volumeInfo.title,
-    coverSrc: googleBook.volumeInfo.imageLinks.thumbnail,
+    coverSrc: googleBook.volumeInfo.imageLinks?.thumbnail || null,
     createdAt: '',
     isbn: null,
     language: googleBook.volumeInfo.language,
@@ -209,7 +215,11 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
     publisher: googleBook.volumeInfo.publisher,
     rating: 0,
     summary: googleBook.volumeInfo.description,
-    year: new Date(googleBook.volumeInfo.publishedDate).getFullYear(),
+    year: (() => {
+      if (!googleBook.volumeInfo.publishedDate) return null
+      const date = new Date(googleBook.volumeInfo.publishedDate)
+      return isNaN(date.getTime()) ? null : date.getFullYear()
+    })(),
     genres: googleBook.volumeInfo.categories || [],
     collections: [],
     progressStatus: null,

@@ -5,13 +5,13 @@ export type GoogleBook = {
     subtitle: string
     authors: string[]
     publisher: string
-    publishedDate: string
+    publishedDate?: string
     description: string
     pageCount: number
     printType: string
     categories: string[]
     maturityRating: string
-    imageLinks: {
+    imageLinks?: {
       smallThumbnail: string
       thumbnail: string
     }

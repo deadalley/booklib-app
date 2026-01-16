@@ -27,7 +27,11 @@ export class ElectronAdapter<T> implements Adapter<T> {
       if (error instanceof SyntaxError) {
         throw new Error(`Invalid JSON in ${this.filePath}`)
       }
-      // If file doesn't exist, return null to indicate no data
+      // Re-throw ElectronAPI errors (they shouldn't be swallowed)
+      if (error instanceof Error && error.message === 'ElectronAPI not available') {
+        throw error
+      }
+      // If file doesn't exist or other non-critical errors, return null to indicate no data
       return null
     }
   }
@@ -40,7 +44,12 @@ export class ElectronAdapter<T> implements Adapter<T> {
       }
 
       // Ensure directory exists
-      const dirPath = this.filePath.substring(0, this.filePath.lastIndexOf('/'))
+      // Handle both Unix (/) and Windows (\) path separators for cross-platform compatibility
+      const lastSlash = Math.max(
+        this.filePath.lastIndexOf('/'),
+        this.filePath.lastIndexOf('\\'),
+      )
+      const dirPath = lastSlash > 0 ? this.filePath.substring(0, lastSlash) : ''
       if (dirPath) {
         await window.electronAPI.ensureDir(dirPath)
       }
@@ -49,7 +58,9 @@ export class ElectronAdapter<T> implements Adapter<T> {
       const jsonData = JSON.stringify(data, null, 2)
       await window.electronAPI.writeFile(this.filePath, jsonData)
     } catch (error) {
-      throw new Error(`Failed to write to ${this.filePath}: ${error}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to write to ${this.filePath}: ${errorMessage}`)
     }
   }
 }

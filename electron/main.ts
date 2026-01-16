@@ -125,7 +125,9 @@ function initIpc() {
     } catch (error) {
       console.error('File read error:', error)
       Sentry.captureException(error)
-      throw new Error(`Failed to read file: ${error}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to read file: ${errorMessage}`)
     }
   })
 
@@ -135,7 +137,9 @@ function initIpc() {
     } catch (error) {
       console.error('File write error:', error)
       Sentry.captureException(error)
-      throw new Error(`Failed to write file: ${error}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to write file: ${errorMessage}`)
     }
   })
 
@@ -154,7 +158,9 @@ function initIpc() {
     } catch (error) {
       console.error('Directory creation error:', error)
       Sentry.captureException(error)
-      throw new Error(`Failed to create directory: ${error}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to create directory: ${errorMessage}`)
     }
   })
 }

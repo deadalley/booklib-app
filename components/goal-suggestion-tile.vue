@@ -12,7 +12,7 @@
         :goal="goal"
         :books="viewBooks"
         :sorted-entries="sortedEntries"
-        :reload-goals="async () => {}"
+        :reload-goals="loadData"
       />
     </template>
     <template v-else>
@@ -35,6 +35,7 @@ import { indexBy } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Goal } from '~/types/goal'
+import { sortGoals } from '~/utils/sorting'
 
 const { getAuthors, getBooks, getGoals } = useBookLibrary()
 
@@ -52,8 +53,7 @@ onMounted(loadData)
 
 const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
-const goal = computed<Goal | undefined>(() => undefined)
-// const goal = computed(() => sortGoals(goals.value ?? [])[0])
+const goal = computed(() => sortGoals(goals.value ?? [])[0])
 
 const authorsById = computed(() =>
   authors.value ? indexBy(({ id }) => String(id), authors.value) : {},

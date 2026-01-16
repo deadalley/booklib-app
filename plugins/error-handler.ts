@@ -5,31 +5,40 @@ export default defineNuxtPlugin((nuxtApp) => {
     typeof window !== 'undefined' && 'electronAPI' in window
 
   // Initialize Sentry for Electron renderer process
+  let sentryInitialized = false
   if (isElectronEnvironment) {
-    Sentry.init({
-      dsn: useRuntimeConfig().public.sentry.dsn,
-      debug: true,
-      sendDefaultPii: true,
-    })
+    const dsn = useRuntimeConfig().public.sentry.dsn
+    if (dsn) {
+      Sentry.init({
+        dsn,
+        debug: import.meta.env.DEV,
+        sendDefaultPii: true,
+      })
+      sentryInitialized = true
+    }
 
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection:', event.reason)
-      Sentry.captureException(event.reason)
+      if (sentryInitialized) {
+        Sentry.captureException(event.reason)
+      }
     })
 
     // Handle uncaught exceptions
     window.addEventListener('error', (event) => {
       console.error('Uncaught error:', event.error)
-      Sentry.captureException(event.error)
+      if (sentryInitialized) {
+        Sentry.captureException(event.error)
+      }
     })
   }
 
   nuxtApp.vueApp.config.errorHandler = (error) => {
     console.error(error)
 
-    // Log to Sentry when running in Electron
-    if (isElectronEnvironment) {
+    // Log to Sentry when running in Electron and Sentry is initialized
+    if (isElectronEnvironment && sentryInitialized) {
       Sentry.captureException(error)
     }
   }
@@ -37,8 +46,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('vue:error', (error) => {
     console.error(error)
 
-    // Log to Sentry when running in Electron
-    if (isElectronEnvironment) {
+    // Log to Sentry when running in Electron and Sentry is initialized
+    if (isElectronEnvironment && sentryInitialized) {
       Sentry.captureException(error)
     }
   })
@@ -47,7 +56,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:error', (error) => {
     console.error('Nuxt app error:', error)
 
-    if (isElectronEnvironment) {
+    if (isElectronEnvironment && sentryInitialized) {
       Sentry.captureException(error)
     }
   })

@@ -27,6 +27,7 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import { NuxtImg } from '#components'
+import { getAssetPath } from '~/utils/assets'
 
 defineProps({
   error: Object as () => NuxtError,
