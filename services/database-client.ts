@@ -21,7 +21,9 @@ class ElectronDatabaseClient implements DatabaseClient {
   }
 
   get data(): Database {
-    return this.lowClient.data!
+    // After read() is called, data is guaranteed to exist (either from file or defaultData)
+    // If data is null, return defaultData as fallback
+    return this.lowClient.data ?? this.defaultData
   }
 
   set data(value: Database) {

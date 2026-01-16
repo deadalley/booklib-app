@@ -41,9 +41,13 @@ export function sortBooksBy<B extends Book>(
           })
     }
 
-    return direction === 'desc'
-      ? (book2[bookProperty] as number) - (book1[bookProperty] as number)
-      : (book1[bookProperty] as number) - (book2[bookProperty] as number)
+    const val1 = book1[bookProperty]
+    const val2 = book2[bookProperty]
+    if (typeof val1 === 'number' && typeof val2 === 'number') {
+      return direction === 'desc' ? val2 - val1 : val1 - val2
+    }
+
+    return 0
   })
 
   return count ? sortedBooks.slice(0, count) : sortedBooks

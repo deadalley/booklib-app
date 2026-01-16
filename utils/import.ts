@@ -1,6 +1,10 @@
 import Papa from 'papaparse'
 import languageOptions from '~/public/languages-2.json'
 import type { Book } from '~/types/book'
+import {
+  isFileReaderStringResult,
+  isBookImportResult,
+} from '~/utils/type-guards'
 
 export async function parseCsvFile(file: File): Promise<Book[]> {
   return new Promise((resolve, reject) => {
@@ -45,9 +49,14 @@ export function parseJsonFile(file: File): Promise<Book[]> {
     fileReader.onload = (e) => {
       if (e.target?.result) {
         try {
-          const parsed = JSON.parse(e.target.result as string)
-          if (parsed && typeof parsed === 'object' && Array.isArray(parsed.books)) {
-            resolve(parsed.books)
+          // Use type guard instead of type assertion
+          if (!isFileReaderStringResult(e.target.result)) {
+            reject('FileReader result is not a string')
+            return
+          }
+          const parsed = JSON.parse(e.target.result)
+          if (isBookImportResult(parsed)) {
+            resolve(parsed.books as Book[])
           } else {
             reject('Invalid JSON structure: expected object with "books" array')
           }

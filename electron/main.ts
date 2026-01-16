@@ -92,7 +92,8 @@ function createWindow() {
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
     win.webContents.openDevTools()
   } else {
-    const htmlPath = path.join(process.env.VITE_PUBLIC!, '200.html')
+    const vitePublic = process.env.VITE_PUBLIC || RENDERER_DIST
+    const htmlPath = path.join(vitePublic, '200.html')
     console.log('Loading file from:', htmlPath)
     win
       .loadFile(htmlPath)
