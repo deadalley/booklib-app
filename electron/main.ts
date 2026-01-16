@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'url'
+import { handleFileError } from '../utils/error-handling'
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || '',
@@ -125,9 +126,7 @@ function initIpc() {
     } catch (error) {
       console.error('File read error:', error)
       Sentry.captureException(error)
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to read file: ${errorMessage}`)
+      throw handleFileError('read', filePath, error)
     }
   })
 
@@ -137,9 +136,7 @@ function initIpc() {
     } catch (error) {
       console.error('File write error:', error)
       Sentry.captureException(error)
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to write file: ${errorMessage}`)
+      throw handleFileError('write', filePath, error)
     }
   })
 
@@ -158,9 +155,7 @@ function initIpc() {
     } catch (error) {
       console.error('Directory creation error:', error)
       Sentry.captureException(error)
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to create directory: ${errorMessage}`)
+      throw handleFileError('ensure', dirPath, error)
     }
   })
 }

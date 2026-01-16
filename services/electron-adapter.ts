@@ -1,4 +1,5 @@
 import type { Adapter } from 'lowdb'
+import { handleFileError } from '~/utils/error-handling'
 
 export class ElectronAdapter<T> implements Adapter<T> {
   private filePath: string
@@ -58,9 +59,7 @@ export class ElectronAdapter<T> implements Adapter<T> {
       const jsonData = JSON.stringify(data, null, 2)
       await window.electronAPI.writeFile(this.filePath, jsonData)
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to write to ${this.filePath}: ${errorMessage}`)
+      throw handleFileError('write', this.filePath, error)
     }
   }
 }
