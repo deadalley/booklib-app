@@ -28,7 +28,7 @@
                 icons[
                   (selectedCollections?.includes(item)
                     ? DEFAULT_COLLECTION_ICONS_FILLED
-                    : DEFAULT_COLLECTION_ICONS)[item]
+                    : DEFAULT_COLLECTION_ICONS)[item]!
                 ]
               "
               v-bind="iconProps"

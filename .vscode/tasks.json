@@ -1,17 +1,17 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "shell",
-            "command": "pnpm",
-            "args": ["dev"],
-            "problemMatcher": [],
-            "label": "pnpm: dev",
-            "detail": "Start Nuxt development server",
-            "isBackground": true,
-            "runOptions": {
-                "instanceLimit": 1
-            }
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["dev"],
+      "problemMatcher": [],
+      "label": "pnpm: dev",
+      "detail": "Start Nuxt development server",
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    }
+  ]
 }

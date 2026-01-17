@@ -144,7 +144,7 @@ describe('StorageService', () => {
     it('should get all authors', async () => {
       const authors = await service.getAuthors()
       expect(authors).toHaveLength(2)
-      expect(authors[0].name).toBe('John Doe')
+      expect(authors[0]?.name).toBe('John Doe')
     })
 
     it('should delete an author and optionally delete books', async () => {
@@ -167,7 +167,7 @@ describe('StorageService', () => {
 
       expect(service['client']!.data.authors).toHaveLength(1)
       expect(service['client']!.data.books).toHaveLength(1)
-      expect(service['client']!.data.books[0].author_id).toBe('2')
+      expect(service['client']!.data.books[0]?.author_id).toBe('2')
     })
 
     it('should delete an author and set books author_id to null', async () => {
@@ -184,7 +184,7 @@ describe('StorageService', () => {
 
       expect(service['client']!.data.authors).toHaveLength(1)
       expect(service['client']!.data.books).toHaveLength(1)
-      expect(service['client']!.data.books[0].author_id).toBeNull()
+      expect(service['client']!.data.books[0]?.author_id).toBeNull()
     })
   })
 
@@ -226,7 +226,7 @@ describe('StorageService', () => {
     it('should get books with filters', async () => {
       const books = await service.getBooks({ bookProgress: 'read' })
       expect(books).toHaveLength(1)
-      expect(books[0].title).toBe('Test Book')
+      expect(books[0]?.title).toBe('Test Book')
     })
 
     it('should create a new book', async () => {
@@ -348,7 +348,7 @@ describe('StorageService', () => {
     it('should get all goals', async () => {
       const goals = await service.getGoals()
       expect(goals).toHaveLength(1)
-      expect(goals[0].title).toBe('Read 10 books')
+      expect(goals[0]?.title).toBe('Read 10 books')
     })
 
     it('should create a new goal', async () => {
@@ -431,7 +431,7 @@ describe('StorageService', () => {
 
       await service.importLibrary(importData)
       expect(service['client']!.data.authors).toHaveLength(1)
-      expect(service['client']!.data.authors[0].name).toBe('Imported Author')
+      expect(service['client']!.data.authors[0]?.name).toBe('Imported Author')
     })
   })
 

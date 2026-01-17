@@ -29,7 +29,10 @@ export class ElectronAdapter<T> implements Adapter<T> {
         throw new Error(`Invalid JSON in ${this.filePath}`)
       }
       // Re-throw ElectronAPI errors (they shouldn't be swallowed)
-      if (error instanceof Error && error.message === 'ElectronAPI not available') {
+      if (
+        error instanceof Error &&
+        error.message === 'ElectronAPI not available'
+      ) {
         throw error
       }
       // If file doesn't exist or other non-critical errors, return null to indicate no data

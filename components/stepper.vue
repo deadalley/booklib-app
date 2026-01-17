@@ -37,7 +37,7 @@
       </StepperTrigger>
 
       <StepperSeparator
-        v-if="item.step !== steps[steps.length - 1].step"
+        v-if="item.step !== steps[steps.length - 1]?.step"
         class="absolute -right-1/2 left-1/2 top-1/2 block h-[5px] shrink-0 -translate-y-1/2 rounded-full bg-accent group-data-[disabled]:bg-accent group-data-[state=completed]:bg-main"
       />
 

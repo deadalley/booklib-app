@@ -8,7 +8,7 @@
           :size="ICON_SIZE_SMALL"
           @click="onClickBack"
         />
-        <h6 class="text-center">{{ authors[index].author.name }}</h6>
+        <h6 class="text-center">{{ authors[index]?.author.name }}</h6>
         <IconChevronRight
           class="-mx-2 cursor-pointer text-main hover:text-main/60"
           :size="ICON_SIZE_SMALL"
@@ -23,13 +23,13 @@
         class="flex flex-col items-center rounded-2xl border border-accent bg-white px-6 py-2 text-main"
       >
         <div class="flex items-center">
-          <template v-if="authors[0].average !== undefined">
+          <template v-if="authors[0]?.average !== undefined">
             <h4>
               {{ authors[index]?.average }}
             </h4>
             <IconStar stroke="2" :size="ICON_SIZE_MEDIUM" />
           </template>
-          <template v-if="authors[0].average === undefined">
+          <template v-if="authors[0]?.average === undefined">
             <h4>
               {{ authors[index]?.count }}
             </h4>
@@ -43,7 +43,7 @@
       <div v-if="authors[index]?.countByStatus" class="flex gap-2">
         <div
           v-for="[status, count] in Object.entries(
-            authors[index].countByStatus ?? {},
+            authors[index]?.countByStatus ?? {},
           )
             .filter(([, count]) => count > 0)
             .slice(0, 2)"

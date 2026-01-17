@@ -1,5 +1,5 @@
 <template>
-  <bl-tile :key="index" class="flex-1">
+  <bl-tile v-if="selectedOption" :key="index" class="flex-1">
     <template #title>{{ selectedOption.label }}</template>
     <div class="flex h-full flex-1 items-center justify-center">
       <bl-books-pie-chart
