@@ -44,7 +44,7 @@ export function filterElementsBySearchParam<
 
     const lowerCaseSearchParam = searchParam?.toLowerCase()
     return Object.entries(element).some(([key, value]) => {
-      if (value && (!keys || keys.includes(key as K))) {
+      if (value && (!keys || (keys as string[]).includes(key))) {
         return `${value}`.toLowerCase().includes(lowerCaseSearchParam)
       }
       return false
@@ -57,13 +57,11 @@ export function filterElementsBySelectedArray<
   K extends keyof T,
 >(key: K, elements: T[], selectedArray: T[K][]): T[] {
   return elements.filter((element) => {
-    if (Array.isArray(element[key])) {
-      return !!intersection(
-        element[key] as Array<T>,
-        selectedArray[0] as Array<T>,
-      ).length
+    const value = element[key]
+    if (Array.isArray(value) && Array.isArray(selectedArray[0])) {
+      return !!intersection(value, selectedArray[0] as typeof value).length
     }
-    return element[key] && selectedArray.includes(element[key])
+    return value && selectedArray.includes(value)
   })
 }
 
@@ -72,13 +70,16 @@ export function filterElementsByRange<T extends object, K extends keyof T>(
   elements: T[],
   range: [number, number],
 ): T[] {
-  return elements.filter(
-    (element) =>
-      element[key] === undefined ||
-      element[key] === null ||
-      ((element[key] as number) >= range[0] &&
-        (element[key] as number) <= range[1]),
-  )
+  return elements.filter((element) => {
+    const value = element[key]
+    if (value === undefined || value === null) {
+      return true
+    }
+    if (typeof value === 'number') {
+      return value >= range[0] && value <= range[1]
+    }
+    return false
+  })
 }
 
 export function mergeAndFilter<T extends object, K extends keyof T>(

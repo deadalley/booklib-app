@@ -14,12 +14,15 @@
           <IconCircleCheck size="48px" class="text-main" />
           <p>Success!</p>
         </template>
-        <template v-if="rating">
+        <template v-if="rating && selectedOption?.book">
           <bl-rating editing :rating="0" :on-commit="onRateBook" />
           <p>Rate {{ selectedOption.book.title }}</p>
         </template>
       </div>
-      <div v-if="!loading && !success && !rating" class="flex flex-col gap-3">
+      <div
+        v-if="!loading && !success && !rating && selectedOption?.book"
+        class="flex flex-col gap-3"
+      >
         <NuxtLink
           :to="`/library/books/${selectedOption.book.id}`"
           class="w-full"
@@ -145,33 +148,35 @@ function getBooksWithAuthorNames(_books: Book[] | null): ViewBook[] {
 }
 
 async function onClick() {
-  stop()
-  switch (selectedOption.value.id) {
-    case 'startNewBook':
-      await onUpdateBook({
-        ...selectedOption.value.book,
-        progressStatus: 'reading',
-      })
-      break
-    case 'finishCurrentBook':
-      await onUpdateBook({
-        ...selectedOption.value.book,
-        progressStatus: 'read',
-      })
-      break
-    case 'rateFinishedBook':
-      rating.value = true
-      break
-    case 'resumePausedBook':
-      await onUpdateBook({
-        ...selectedOption.value.book,
-        progressStatus: 'reading',
-      })
-      break
-    default:
-      return
+  if (selectedOption.value) {
+    stop()
+    switch (selectedOption.value.id) {
+      case 'startNewBook':
+        await onUpdateBook({
+          ...selectedOption.value.book,
+          progressStatus: 'reading',
+        } as Book)
+        break
+      case 'finishCurrentBook':
+        await onUpdateBook({
+          ...selectedOption.value.book,
+          progressStatus: 'read',
+        } as Book)
+        break
+      case 'rateFinishedBook':
+        rating.value = true
+        break
+      case 'resumePausedBook':
+        await onUpdateBook({
+          ...selectedOption.value.book,
+          progressStatus: 'reading',
+        } as Book)
+        break
+      default:
+        return
+    }
+    start()
   }
-  start()
 }
 
 async function onUpdateBook(bookValues: Book) {
@@ -186,13 +191,15 @@ async function onUpdateBook(bookValues: Book) {
 }
 
 async function onRateBook(ratingValue: number) {
-  stop()
-  await onUpdateBook({
-    ...selectedOption.value.book,
-    rating: ratingValue > 0 ? ratingValue : null,
-  })
-  rating.value = false
-  start()
+  if (selectedOption.value?.book) {
+    stop()
+    await onUpdateBook({
+      ...selectedOption.value.book,
+      rating: ratingValue > 0 ? ratingValue : null,
+    })
+    rating.value = false
+    start()
+  }
 }
 </script>
 

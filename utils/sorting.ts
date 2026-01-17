@@ -73,9 +73,13 @@ export function sortBooksByAuthor(books: ViewBook[]) {
       return 1
     }
 
-    return b1.authorName!.localeCompare(b2.authorName!, undefined, {
-      numeric: true,
-    })
+    if (b1.authorName && b2.authorName) {
+      return b1.authorName.localeCompare(b2.authorName, undefined, {
+        numeric: true,
+      })
+    }
+
+    return 0
   })
 }
 

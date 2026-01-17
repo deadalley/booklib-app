@@ -72,18 +72,12 @@ export function hasPropertyOfType<K extends string, T>(
 export function isBookImportResult(
   value: unknown,
 ): value is { books: unknown[] } {
-  return (
-    isObject(value) &&
-    hasProperty(value, 'books') &&
-    isArray(value.books)
-  )
+  return isObject(value) && hasProperty(value, 'books') && isArray(value.books)
 }
 
 /**
  * Type guard to check if FileReader result is a string
  */
-export function isFileReaderStringResult(
-  value: unknown,
-): value is string {
+export function isFileReaderStringResult(value: unknown): value is string {
   return isString(value)
 }

@@ -101,10 +101,13 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'books',
       entries: dbGoal.entries
-        .filter((entry) => entry.book_id != null)
+        .filter(
+          (entry): entry is typeof entry & { book_id: string } =>
+            entry.book_id != null,
+        )
         .map((entry) => ({
           id: entry.id,
-          book: entry.book_id!,
+          book: entry.book_id,
           createdAt: entry.created_at,
         })),
     }
@@ -112,10 +115,13 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'pages',
       entries: dbGoal.entries
-        .filter((entry) => entry.pages != null)
+        .filter(
+          (entry): entry is typeof entry & { pages: number } =>
+            entry.pages != null,
+        )
         .map((entry) => ({
           id: entry.id,
-          pages: entry.pages!,
+          pages: entry.pages,
           createdAt: entry.created_at,
         })),
     }
@@ -123,10 +129,13 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
     return {
       type: 'hours',
       entries: dbGoal.entries
-        .filter((entry) => entry.hours != null)
+        .filter(
+          (entry): entry is typeof entry & { hours: number } =>
+            entry.hours != null,
+        )
         .map((entry) => ({
           id: entry.id,
-          hours: entry.hours!,
+          hours: entry.hours,
           createdAt: entry.created_at,
         })),
     }
@@ -135,6 +144,7 @@ function getGoalTypeAndEntries(dbGoal: GoalDB): Pick<Goal, 'type' | 'entries'> {
 }
 
 export function dbGoalToGoal(dbGoal: GoalDB): Goal {
+  const typeAndEntries = getGoalTypeAndEntries(dbGoal)
   return {
     id: dbGoal.id,
     title: dbGoal.title,
@@ -147,7 +157,7 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     author: dbGoal.author_id,
     genres: dbGoal.genres,
     completedAt: dbGoal.completed_at,
-    ...getGoalTypeAndEntries(dbGoal),
+    ...typeAndEntries,
   } as Goal
 }
 

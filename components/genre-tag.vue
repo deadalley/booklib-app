@@ -129,8 +129,9 @@ function onNew() {
 }
 
 function onClick() {
-  // @ts-expect-error onclick should be clickable
-  attrs.onClick?.()
+  if (typeof attrs.onClick === 'function') {
+    attrs.onClick()
+  }
 
   if (props.editable) {
     editing.value = true

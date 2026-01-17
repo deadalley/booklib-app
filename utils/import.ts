@@ -15,17 +15,23 @@ export async function parseCsvFile(file: File): Promise<Book[]> {
         return snakeCaseToCamelCase(header)
       },
       transform: (value: string, field: string) => {
+        if (typeof value !== 'string') {
+          return value
+        }
+
         if (field === 'progressStatus') {
           return snakeCaseToKebabCase(value)
         }
         if (['pages', 'year', 'rating'].includes(field)) {
-          return value ? +value : null
+          const numValue = Number(value)
+          return value && !isNaN(numValue) ? numValue : null
         }
         if (['language', 'originalLanguage'].includes(field)) {
           const languageMap = Object.entries(languageOptions).reduce<
             Record<string, string>
           >((acc, [key, value]) => ({ ...acc, [value]: key }), {})
-          return languageMap[capitalize(value)] || value
+          const capitalized = capitalize(value)
+          return languageMap[capitalized] || value
         }
         return value
       },
@@ -56,7 +62,15 @@ export function parseJsonFile(file: File): Promise<Book[]> {
           }
           const parsed = JSON.parse(e.target.result)
           if (isBookImportResult(parsed)) {
-            resolve(parsed.books as Book[])
+            // Type guard ensures books is an array, but we validate items are Books
+            const books = parsed.books.filter(
+              (item): item is Book =>
+                typeof item === 'object' &&
+                item !== null &&
+                'id' in item &&
+                'title' in item,
+            )
+            resolve(books)
           } else {
             reject('Invalid JSON structure: expected object with "books" array')
           }

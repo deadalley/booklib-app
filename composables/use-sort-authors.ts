@@ -45,7 +45,10 @@ export const useSortAuthors = (authors: Ref<Author[] | null>) => {
   })
 
   function onSearch($event: Event) {
-    textSearch.value = ($event.target as HTMLInputElement)?.value
+    const target = $event.target
+    if (target && target instanceof HTMLInputElement) {
+      textSearch.value = target.value
+    }
   }
 
   return {

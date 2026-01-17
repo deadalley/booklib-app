@@ -168,7 +168,7 @@ const option = computed<EChartsOption>(() => ({
               formatter: (params: any) => {
                 if (props.tooltipFormatter) {
                   return props.tooltipFormatter({
-                    x: xAxisData[item.values.length - 1],
+                    x: xAxisData[item.values.length - 1] ?? '',
                     y: (params.value as number) ?? undefined,
                   })
                 }
@@ -204,7 +204,7 @@ const option = computed<EChartsOption>(() => ({
               formatter: (params: any) => {
                 if (props.tooltipFormatter) {
                   return props.tooltipFormatter({
-                    x: xAxisData[params.dataIndex],
+                    x: xAxisData[params.dataIndex] ?? '',
                     y: (params.value as number) ?? undefined,
                   })
                 }
@@ -219,7 +219,7 @@ const option = computed<EChartsOption>(() => ({
       formatter: (params) => {
         if (props.tooltipFormatter) {
           return props.tooltipFormatter({
-            x: xAxisData[params.dataIndex],
+            x: xAxisData[params.dataIndex] ?? '',
             y: (params.value as number) ?? undefined,
           })
         }

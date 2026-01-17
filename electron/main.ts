@@ -4,30 +4,28 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'url'
 import { handleFileError } from '../utils/error-handling'
+import { logger } from '../utils/logger'
+
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || '',
   environment: process.env.NODE_ENV || 'development',
   beforeSend(event) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Sentry main process event:', event)
+    if (isDevelopment) {
+      logger.debug({ event }, 'Sentry main process event')
     }
     return event
   },
 })
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception in main process:', error)
+  logger.error({ error }, 'Uncaught Exception in main process')
   Sentry.captureException(error)
 })
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error(
-    'Unhandled Rejection in main process at:',
-    promise,
-    'reason:',
-    reason,
-  )
+  logger.error({ reason, promise }, 'Unhandled Rejection in main process')
   Sentry.captureException(reason)
 })
 
@@ -65,43 +63,49 @@ function createWindow() {
   })
 
   // Add debugging for loading events
-  win.webContents.on(
-    'did-fail-load',
-    (event, errorCode, errorDescription, validatedURL) => {
-      console.error(
-        'Failed to load:',
-        errorCode,
-        errorDescription,
-        validatedURL,
-      )
-    },
-  )
+  if (isDevelopment) {
+    win.webContents.on(
+      'did-fail-load',
+      (event, errorCode, errorDescription, validatedURL) => {
+        logger.error(
+          { errorCode, errorDescription, validatedURL },
+          'Failed to load page',
+        )
+      },
+    )
 
-  win.webContents.on('did-finish-load', () => {
-    console.log('Page finished loading')
-  })
+    win.webContents.on('did-finish-load', () => {
+      logger.debug('Page finished loading')
+    })
 
-  win.webContents.on(
-    'console-message',
-    (event, level, message, _line, _sourceId) => {
-      console.log(`Console [${level}]:`, message)
-    },
-  )
+    win.webContents.on(
+      'console-message',
+      (event, level, message, _line, _sourceId) => {
+        logger.debug({ level, message }, 'Console message from renderer')
+      },
+    )
+  }
 
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
-    win.webContents.openDevTools()
+    if (isDevelopment) {
+      win.webContents.openDevTools()
+    }
   } else {
     const vitePublic = process.env.VITE_PUBLIC || RENDERER_DIST
     const htmlPath = path.join(vitePublic, '200.html')
-    console.log('Loading file from:', htmlPath)
+    if (isDevelopment) {
+      logger.debug({ htmlPath }, 'Loading file from path')
+    }
     win
       .loadFile(htmlPath)
       .then(() => {
-        console.log('File loaded successfully')
+        if (isDevelopment) {
+          logger.debug('File loaded successfully')
+        }
       })
       .catch((error) => {
-        console.error('Failed to load file:', error)
+        logger.error({ error, htmlPath }, 'Failed to load file')
       })
   }
 
@@ -125,7 +129,7 @@ function initIpc() {
     try {
       return await fs.readFile(filePath, 'utf-8')
     } catch (error) {
-      console.error('File read error:', error)
+      logger.error({ error, filePath }, 'File read error')
       Sentry.captureException(error)
       throw handleFileError('read', filePath, error)
     }
@@ -135,7 +139,7 @@ function initIpc() {
     try {
       await fs.writeFile(filePath, data, 'utf-8')
     } catch (error) {
-      console.error('File write error:', error)
+      logger.error({ error, filePath }, 'File write error')
       Sentry.captureException(error)
       throw handleFileError('write', filePath, error)
     }
@@ -154,7 +158,7 @@ function initIpc() {
     try {
       await fs.mkdir(dirPath, { recursive: true })
     } catch (error) {
-      console.error('Directory creation error:', error)
+      logger.error({ error, dirPath }, 'Directory creation error')
       Sentry.captureException(error)
       throw handleFileError('ensure', dirPath, error)
     }
