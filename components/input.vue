@@ -5,7 +5,7 @@
     <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
       {{ displayValue }}
     </p>
-    <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
+    <IconCircleOff v-if="!inputModel" :size="14" class="text-ink-muted" />
   </div>
   <FormKit
     v-model="inputModel"
@@ -15,7 +15,7 @@
       outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'form-wrapper flex-1',
       label: 'form-label ml-4',
-      inner: `form-inner ${focused ? '!border-main' : 'border-accent'}`,
+      inner: `form-inner ${focused ? '!border-primary' : 'border-stroke'}`,
       input: 'form-input',
     }"
     @focus="onFocus"

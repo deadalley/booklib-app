@@ -2,9 +2,9 @@
   <div
     class="relative mt-1 inline-flex items-center gap-2 rounded-xl px-3 py-1 text-sm font-medium"
     :class="{
-      'border border-accent bg-accent-light text-accent-darker':
+      'border border-stroke bg-surface-subtle text-ink-secondary':
         variant === 'secondary',
-      'border border-main bg-main text-white': variant === 'primary',
+      'border border-primary bg-primary text-ink-inverse': variant === 'primary',
     }"
   >
     <slot />

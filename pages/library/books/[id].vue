@@ -5,7 +5,7 @@
   >
     <header class="flex flex-col gap-6">
       <button
-        class="hidden items-center gap-2 hover:text-main sm:flex"
+        class="hidden items-center gap-2 hover:text-primary sm:flex"
         @click="$router.back()"
       >
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
@@ -98,7 +98,7 @@
                       : DEFAULT_COLLECTION_ICONS)[item]!!
                   ]
                 "
-                class="text-main"
+                class="text-primary"
                 v-bind="iconProps"
               />
             </template>
@@ -120,13 +120,13 @@
                       ({ step }) => step === currentStep,
                     )"
                     :key="status.id"
-                    class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
+                    class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-stroke p-2 hover:bg-surface-subtle"
                     @click="onSelectProgress(status.id)"
                   >
                     <component
                       :is="icons[status.icon]"
                       :size="32"
-                      class="text-main"
+                      class="text-primary"
                     />
                     {{ status.description }}
                   </div>

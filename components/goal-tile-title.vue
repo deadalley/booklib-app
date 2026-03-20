@@ -13,7 +13,7 @@
       >
         <IconConfetti
           v-if="goal.status === 'finished'"
-          class="text-main"
+          class="text-primary"
           :size="16"
         />
         {{ GOAL_STATUS_MAP[goal.status].description }}

@@ -9,7 +9,7 @@
     <AccordionItem value="items">
       <AccordionHeader as="div" class="flex w-full">
         <AccordionTrigger
-          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-accent px-8 py-2 text-start hover:bg-accent-light"
+          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-stroke px-8 py-2 text-start hover:bg-surface-subtle"
         >
           <div class="flex flex-1 items-center gap-3">
             <NuxtLink
@@ -21,9 +21,9 @@
                 :is="icons[icon]"
                 v-if="icon"
                 stroke="1.5"
-                class="text-main"
+                class="text-primary"
               />
-              <h5 class="hover:text-main">
+              <h5 class="hover:text-primary">
                 {{ collection.name }}
               </h5>
             </NuxtLink>
@@ -40,7 +40,7 @@
           >
             <template #trigger>
               <IconTrash
-                class="mr-4 cursor-pointer text-accent-dark hover:text-main"
+                class="mr-4 cursor-pointer text-ink-muted hover:text-primary"
                 :size="ICON_SIZE_SMALL"
                 stroke="1.5"
                 @click="deleteModalOpen = true"

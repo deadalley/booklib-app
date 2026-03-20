@@ -64,13 +64,13 @@ const lineChartItems = computed<LineChartItem[]>(() => {
   return [
     {
       label: 'actual',
-      color: tailwind.theme.colors.main,
+      color: tailwind.colors.primary.DEFAULT,
       values: actualDates,
       markPoint: 'max',
     },
     {
       label: 'projected',
-      color: tailwind.theme.colors.accent,
+      color: tailwind.colors.stroke.DEFAULT,
       values: projectedDates,
       markPoint: 'max',
     },

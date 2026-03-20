@@ -15,7 +15,7 @@
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'form-inner': withWrapper,
-          '!border-main': focused,
+          '!border-primary': focused,
         }"
         @focus="onFocus"
         @blur="onBlur"
@@ -45,7 +45,7 @@
               <SelectItem
                 v-for="(option, index) in options"
                 :key="index"
-                class="relative flex w-full cursor-pointer select-none items-center gap-1 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+                class="relative flex w-full cursor-pointer select-none items-center gap-1 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
                 :value="option.value"
               >
                 <component
@@ -63,7 +63,7 @@
             <template v-for="(group, index) in groups" :key="group.label">
               <SelectLabel
                 v-if="group.label"
-                class="mt-2 w-full uppercase text-accent-dark"
+                class="mt-2 w-full uppercase text-ink-muted"
               >
                 {{ group.label }}
               </SelectLabel>
@@ -71,7 +71,7 @@
                 <SelectItem
                   v-for="option in group.options"
                   :key="option.value"
-                  class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+                  class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
                   :value="option.value"
                 >
                   <SelectItemText>
@@ -87,7 +87,7 @@
               </SelectGroup>
               <SelectSeparator
                 v-if="index < (groups?.length ?? 0) - 1"
-                class="mt-0 h-px w-full bg-accent"
+                class="mt-0 h-px w-full bg-surface"
               />
             </template>
           </SelectViewport>

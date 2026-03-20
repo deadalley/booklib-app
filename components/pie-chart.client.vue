@@ -34,7 +34,7 @@ const props = defineProps<{
 
 const option = computed<EChartsOption>(() => ({
   color: props.items.map((_, index) =>
-    Color(tailwind.theme.colors.main)
+    Color(tailwind.colors.primary.DEFAULT)
       .lighten(index * 0.1)
       .hex(),
   ),
@@ -53,29 +53,29 @@ const option = computed<EChartsOption>(() => ({
         formatter: `{label|{b} ${props.unit ?? ''}} {value|{c}}`,
         rich: {
           label: {
-            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
             fontSize: 18,
-            color: tailwind.theme.colors['accent-darker'],
+            color: tailwind.colors.ink.secondary,
             verticalAlign: 'middle',
             padding: [0, 6, 0, 0],
           },
           value: {
-            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
             fontSize: 16,
-            color: tailwind.theme.colors.white,
-            backgroundColor: tailwind.theme.colors.main,
+            color: tailwind.colors.ink.inverse,
+            backgroundColor: tailwind.colors.primary.DEFAULT,
             verticalAlign: 'middle',
             padding: [4, 6],
             borderRadius: 4,
           },
         },
-        color: tailwind.theme.colors.black,
+        color: tailwind.colors.ink.primary,
       },
       labelLine: {
         lineStyle: {
-          color: tailwind.theme.colors.black,
+          color: tailwind.colors.ink.primary,
         },
         smooth: 0.1,
       },

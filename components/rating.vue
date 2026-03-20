@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center text-black"
+    class="flex items-center text-ink-primary"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
     @click="_onCommit"

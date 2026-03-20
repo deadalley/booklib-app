@@ -23,7 +23,7 @@
           </bl-button>
         </NuxtLink>
         <div
-          class="flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full [&_hr]:text-accent"
+          class="flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full [&_hr]:text-ink-muted"
         >
           <hr />
           <h6>OR</h6>

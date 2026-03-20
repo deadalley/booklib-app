@@ -2,16 +2,16 @@
   <button
     class="inline-flex size-8 items-center justify-center gap-2 rounded-3xl text-base font-medium"
     :class="{
-      'bg-main text-white': variant === 'primary',
-      'hover:bg-main/90 active:bg-main-dark':
+      'bg-primary text-ink-inverse': variant === 'primary',
+      'hover:bg-primary/90 active:bg-primary-800':
         variant === 'primary' && !disabled,
-      'bg-accent-light text-black': variant === 'secondary',
-      'hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
+      'bg-surface-subtle text-ink-primary': variant === 'secondary',
+      'hover:bg-surface-elevated hover:ring-1 hover:ring-inset hover:ring-stroke-strong active:bg-surface-subtle':
         variant === 'secondary' && !disabled,
-      'border border-accent p-2 text-black': variant === 'tertiary',
-      'hover:bg-accent-light active:bg-accent':
+      'border border-stroke p-2 text-ink-primary': variant === 'tertiary',
+      'hover:bg-surface-subtle active:bg-surface':
         variant === 'tertiary' && !disabled,
-      '!bg-accent-light !text-accent-dark': !!disabled && !keepStyle,
+      '!bg-surface-subtle !text-ink-muted': !!disabled && !keepStyle,
       'cursor-pointer': !disabled,
     }"
     :disabled="disabled"

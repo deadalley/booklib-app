@@ -6,12 +6,12 @@
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="z-50 rounded-lg bg-white px-3 py-2 drop-shadow-md"
+          class="bg-surface-elevated z-50 rounded-lg px-3 py-2 drop-shadow-md"
           :side-offset="5"
           :side="side"
         >
           <slot name="tooltip-content" />
-          <TooltipArrow class="fill-white" :width="8" />
+          <TooltipArrow class="fill-surface-elevated" :width="8" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>

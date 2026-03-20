@@ -2,26 +2,26 @@
   <div class="relative flex flex-col" v-bind="$attrs">
     <div
       v-if="draggable"
-      class="relative flex w-full cursor-grab items-center gap-3 rounded-t-xl border-x border-t border-main bg-main px-4 py-1"
+      class="relative flex w-full cursor-grab items-center gap-3 rounded-t-xl border-x border-t border-primary bg-primary px-4 py-1"
     >
       <span
         v-if="book.order !== undefined"
-        class="w-full text-center text-lg text-white"
+        class="w-full text-center text-lg text-ink-inverse"
         >{{ book.order + 1 }}</span
       >
       <IconDirectionArrows
-        class="absolute right-4 top-1/2 -translate-y-1/2 text-white"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-ink-inverse"
         :size="ICON_SIZE_SMALL"
         stroke="1.5"
       />
       <div
-        class="absolute -inset-x-px -bottom-4 -z-10 h-4 border-x border-main bg-main"
+        class="absolute -inset-x-px -bottom-4 -z-10 h-4 border-x border-primary bg-primary"
       />
     </div>
     <div class="relative flex flex-col items-start gap-3">
       <div
         v-if="floatingIcon"
-        class="absolute right-0 top-0 z-10 flex size-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-main text-white"
+        class="absolute right-0 top-0 z-10 flex size-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-primary text-ink-inverse"
       >
         <component :is="icons[floatingIcon]" :size="ICON_SIZE_SMALL - 4" />
       </div>
@@ -48,7 +48,7 @@
             {{ book.title }}
           </h6>
         </NuxtLink>
-        <p v-if="book.authorName" class="truncate text-accent-darker">
+        <p v-if="book.authorName" class="truncate text-ink-secondary">
           {{ book.authorName }}
         </p>
       </div>

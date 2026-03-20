@@ -23,7 +23,7 @@
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'form-inner': withWrapper,
-          '!border-main': focused,
+          '!border-primary': focused,
         }"
       >
         <ComboboxInput
@@ -63,7 +63,7 @@
         <ComboboxViewport class="w-full">
           <ComboboxEmpty as-child>
             <div
-              class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-accent-light"
+              class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-surface-subtle"
               @click="onAddNew"
             >
               {{
@@ -81,7 +81,7 @@
             <ComboboxItem
               v-for="(option, index) in extendedOptions"
               :key="index"
-              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
               :value="option.value"
             >
               <ComboboxLabel>

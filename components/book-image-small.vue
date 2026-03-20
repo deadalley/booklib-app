@@ -1,10 +1,10 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative w-full cursor-pointer rounded-xl border border-accent"
+    class="relative w-full cursor-pointer rounded-xl border border-stroke"
     :class="{
       'transition-all duration-300 ease-in-out': selectable,
-      'border-main': selectable && !!selected,
+      'border-primary': selectable && !!selected,
     }"
     @click="$emit('click')"
     @mouseenter="setHovered(true)"
@@ -25,7 +25,7 @@
     </bl-icon-button>
     <div
       v-if="selectable"
-      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-black transition-opacity duration-300"
+      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-surface-inverse transition-opacity duration-300"
       :class="{
         'opacity-0': !selected || !hovered,
         'opacity-60': hovered,

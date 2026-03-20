@@ -53,7 +53,7 @@
         v-for="row in table.getRowModel().rows"
         :key="row.id"
         :class="{
-          'cursor-pointer hover:bg-accent-light/40': !!rowClickable,
+          'cursor-pointer hover:bg-surface-subtle/40': !!rowClickable,
         }"
         @click="rowClickable ? $emit('click:row', row.original) : undefined"
       >

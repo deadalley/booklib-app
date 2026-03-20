@@ -66,7 +66,7 @@ const interval = computed(() => {
 })
 
 const option = computed<EChartsOption>(() => ({
-  color: tailwind.theme.colors.main,
+  color: tailwind.colors.primary.DEFAULT,
   grid: {
     left: tooManyItems.value ? 100 : 30,
     right: 0,
@@ -79,46 +79,46 @@ const option = computed<EChartsOption>(() => ({
     },
     transitionDuration: 0,
     textStyle: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-      color: tailwind.theme.colors['accent-darker'],
+      fontFamily: tailwind.fontFamily.display[0],
+      color: tailwind.colors.ink.secondary,
       align: 'center',
     },
     shadowColor: 'transparent',
-    borderColor: tailwind.theme.colors['accent'],
+    borderColor: tailwind.colors.stroke.DEFAULT,
     borderRadius: 6,
     padding: [4, 6],
-    backgroundColor: tailwind.theme.colors['accent-light'],
+    backgroundColor: tailwind.colors.surface.subtle,
   },
   xAxis: {
     data: props.items.map(({ label }) => label),
     axisLabel: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+      fontFamily: tailwind.fontFamily.display[0],
       fontSize: 16,
       padding: [6, 0],
-      color: tailwind.theme.colors['accent-darker'],
+      color: tailwind.colors.ink.secondary,
       interval: interval.value,
       rotate: tooManyItems.value ? 30 : 0,
     },
     axisLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent'],
+        color: tailwind.colors.stroke.DEFAULT,
       },
     },
   },
   yAxis: {
     type: 'value',
     axisLabel: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-      color: tailwind.theme.colors['accent-darker'],
+      fontFamily: tailwind.fontFamily.display[0],
+      color: tailwind.colors.ink.secondary,
     },
     axisLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent-darker'],
+        color: tailwind.colors.ink.secondary,
       },
     },
     splitLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent'],
+        color: tailwind.colors.stroke.DEFAULT,
       },
     },
   },
@@ -128,7 +128,7 @@ const option = computed<EChartsOption>(() => ({
       type: 'bar',
       tooltip: {
         formatter: `<b>{b}</b><br />{c} ${props.unit ?? ''}`,
-        color: tailwind.theme.colors.black,
+        color: tailwind.colors.ink.primary,
       },
       itemStyle: {
         borderRadius: 6,

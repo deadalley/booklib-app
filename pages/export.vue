@@ -2,9 +2,9 @@
   <NuxtLayout name="dashboard" title="Import">
     <div class="flex flex-col items-center">
       <div
-        class="flex w-full flex-col gap-12 rounded-3xl border border-accent p-16 md:w-3/5"
+        class="flex w-full flex-col gap-12 rounded-3xl border border-stroke p-16 md:w-3/5"
       >
-        <div class="self-center text-main">
+        <div class="self-center text-primary">
           <IconDownload size="80" stroke="1.5" />
           <h4>Export</h4>
         </div>

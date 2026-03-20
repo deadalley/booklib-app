@@ -4,13 +4,13 @@
     type="button"
     class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-xl py-2 text-base font-medium lg:inline-flex lg:grow-0"
     :class="{
-      'bg-main text-white hover:bg-main/90 active:bg-main-dark':
+      'bg-primary text-ink-inverse hover:bg-primary/90 active:bg-primary-800':
         variant === 'primary',
-      'bg-accent-light text-black hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
+      'bg-surface-subtle text-ink-primary hover:bg-surface-elevated hover:ring-1 hover:ring-inset hover:ring-stroke-strong active:bg-surface-subtle':
         variant === 'secondary',
-      'border border-accent bg-white p-2 text-black hover:bg-accent-light active:bg-accent':
+      'border border-stroke bg-surface-elevated p-2 text-ink-primary hover:bg-surface-subtle active:bg-surface':
         variant === 'tertiary',
-      '!bg-accent-light !text-accent-dark': !!disabled || !!loading,
+      '!bg-surface-subtle !text-ink-muted': !!disabled || !!loading,
       'cursor-pointer': !disabled && !loading,
       'w-full flex-1': !!expand,
       'px-2':

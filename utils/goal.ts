@@ -6,16 +6,16 @@ export function getGoalProgressColor(
   type: 'bg' | 'text',
 ): string | undefined {
   if (status === 'not-tracking' || status === 'expired') {
-    return `${type}-accent-dark`
+    return `${type}-ink-muted`
   }
 
   if (status === 'tracking') {
-    return `${type}-main`
+    return `${type}-primary`
   }
 
-  // bg-main-light text-main-light
+  // bg-primary-200 text-primary-200
   if (status === 'finished') {
-    return `${type}-main-light`
+    return `${type}-primary-200`
   }
 
   return undefined

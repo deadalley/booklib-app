@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="order-last flex w-full flex-col gap-6 overflow-hidden border-r border-t border-accent bg-background py-2 transition-all duration-500 sm:order-none sm:h-full sm:w-[unset] sm:border-t-0 sm:pb-8 sm:pt-16"
+    class="order-last flex w-full flex-col gap-6 overflow-hidden border-r border-t border-stroke bg-surface-canvas py-2 transition-all duration-500 sm:order-none sm:h-full sm:w-[unset] sm:border-t-0 sm:pb-8 sm:pt-16"
     :class="{
       'px-6': !collapsed,
       'items-center px-2': collapsed,
@@ -36,7 +36,7 @@
         </NuxtLink>
       </h3>
       <IconChevronLeftPipe
-        class="cursor-pointer text-accent-darker transition-all duration-100 hover:text-main"
+        class="cursor-pointer text-ink-secondary transition-all duration-100 hover:text-primary"
         :class="{
           'rotate-180': collapsed,
         }"

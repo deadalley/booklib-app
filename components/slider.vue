@@ -14,14 +14,14 @@
         class="relative mt-16 flex h-5 w-full touch-none select-none items-center"
       >
         <SliderTrack
-          class="relative h-[5px] grow cursor-pointer rounded-full bg-accent"
+          class="relative h-[5px] grow cursor-pointer rounded-full bg-surface"
         >
-          <SliderRange class="absolute h-full rounded-full bg-main" />
+          <SliderRange class="absolute h-full rounded-full bg-primary" />
         </SliderTrack>
         <SliderThumb v-for="(value, index) in values" :key="index">
-          <span class="block size-5 cursor-pointer rounded-[10px] bg-main" />
+          <span class="block size-5 cursor-pointer rounded-[10px] bg-primary" />
           <div
-            class="absolute bottom-8 left-0 flex -translate-x-1/4 items-center justify-center rounded-md bg-accent px-3 py-1 font-ReemKufi text-black"
+            class="absolute bottom-8 left-0 flex -translate-x-1/4 items-center justify-center rounded-md bg-surface px-3 py-1 font-display text-ink-primary"
           >
             {{ value }}
           </div>

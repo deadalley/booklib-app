@@ -88,24 +88,24 @@ const option = computed<EChartsOption>(() => ({
     },
     transitionDuration: 0,
     textStyle: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
-      color: tailwind.theme.colors['accent-darker'],
+      fontFamily: tailwind.fontFamily.display[0],
+      color: tailwind.colors.ink.secondary,
       align: 'center',
     },
     shadowColor: 'transparent',
-    borderColor: tailwind.theme.colors['accent'],
+    borderColor: tailwind.colors.stroke.DEFAULT,
     borderRadius: 6,
     padding: [4, 6],
-    backgroundColor: tailwind.theme.colors['accent-light'],
+    backgroundColor: tailwind.colors.surface.subtle,
   },
   xAxis: {
     data: xAxisData,
     type: 'category',
     boundaryGap: false,
     axisLabel: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+      fontFamily: tailwind.fontFamily.display[0],
       fontSize: 14,
-      color: tailwind.theme.colors['accent-darker'],
+      color: tailwind.colors.ink.secondary,
       formatter: props.xAxisLabelFormatter,
       showMinLabel: true,
       showMaxLabel: true,
@@ -113,7 +113,7 @@ const option = computed<EChartsOption>(() => ({
     },
     axisLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent'],
+        color: tailwind.colors.stroke.DEFAULT,
       },
     },
     axisTick: {
@@ -125,18 +125,18 @@ const option = computed<EChartsOption>(() => ({
   },
   yAxis: {
     axisLabel: {
-      fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+      fontFamily: tailwind.fontFamily.display[0],
       fontSize: 14,
-      color: tailwind.theme.colors['accent-darker'],
+      color: tailwind.colors.ink.secondary,
     },
     axisLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent'],
+        color: tailwind.colors.stroke.DEFAULT,
       },
     },
     splitLine: {
       lineStyle: {
-        color: tailwind.theme.colors['accent'],
+        color: tailwind.colors.stroke.DEFAULT,
       },
     },
   },
@@ -144,7 +144,7 @@ const option = computed<EChartsOption>(() => ({
     data: item.values.map(({ y }) => y),
     type: 'line',
     name: item.label,
-    color: item.color ?? tailwind.theme.colors.main,
+    color: item.color ?? tailwind.colors.primary.DEFAULT,
     smooth: true,
     ...(item.markPoint
       ? {
@@ -153,12 +153,12 @@ const option = computed<EChartsOption>(() => ({
             symbol: 'roundRect',
             symbolSize: 20,
             label: {
-              fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+              fontFamily: tailwind.fontFamily.display[0],
               fontSize: 14,
               color:
-                item.color === tailwind.theme.colors.main
-                  ? tailwind.theme.colors['white']
-                  : tailwind.theme.colors['accent-darker'],
+                item.color === tailwind.colors.primary.DEFAULT
+                  ? tailwind.colors.ink.inverse
+                  : tailwind.colors.ink.secondary,
             },
             itemStyle: {
               color: item.color,
@@ -185,19 +185,19 @@ const option = computed<EChartsOption>(() => ({
             symbol: ['none', 'none'],
             silent: true,
             lineStyle: {
-              color: tailwind.theme.colors['accent-dark'],
+              color: tailwind.colors.stroke.strong,
             },
             symbolSize: 20,
             label: {
-              fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+              fontFamily: tailwind.fontFamily.display[0],
               fontSize: 14,
-              color: tailwind.theme.colors['accent-darker'],
-              backgroundColor: tailwind.theme.colors['accent'],
+              color: tailwind.colors.ink.secondary,
+              backgroundColor: tailwind.colors.surface.subtle,
               padding: [4, 6],
               borderRadius: 6,
             },
             itemStyle: {
-              color: tailwind.theme.colors['main'],
+              color: tailwind.colors.primary.DEFAULT,
             },
             tooltip: {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -215,7 +215,7 @@ const option = computed<EChartsOption>(() => ({
         }
       : {}),
     tooltip: {
-      color: tailwind.theme.colors.black,
+      color: tailwind.colors.ink.primary,
       formatter: (params) => {
         if (props.tooltipFormatter) {
           return props.tooltipFormatter({

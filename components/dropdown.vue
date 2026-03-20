@@ -32,7 +32,7 @@
             v-for="item in items"
             :key="item.value"
             :value="item.value"
-            class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+            class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
             @click="$emit('click', item.value)"
           >
             <component

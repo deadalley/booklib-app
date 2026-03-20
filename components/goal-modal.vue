@@ -32,7 +32,7 @@
           <section class="book-section">
             <h6 class="flex flex-1 items-center gap-2">
               <IconLicense
-                class="text-main"
+                class="text-primary"
                 :size="ICON_SIZE_SMALL"
                 stroke="1.5"
               />
@@ -113,7 +113,7 @@
           <section class="book-section">
             <h6 class="flex flex-1 items-center gap-2">
               <IconTimeDuration30
-                class="text-main"
+                class="text-primary"
                 :size="ICON_SIZE_SMALL"
                 stroke="1.5"
               />

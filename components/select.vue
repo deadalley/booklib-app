@@ -2,7 +2,7 @@
   <div v-if="!editing && !hidden" class="form-wrapper flex-1">
     <label class="form-label">{{ $attrs.label }}</label>
     <h5 v-if="inputModel">{{ displayValue }}</h5>
-    <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
+    <IconCircleOff v-if="!inputModel" :size="14" class="text-ink-muted" />
   </div>
   <!-- @ts-expect-error options is used by the underlying select component -->
   <!-- @vue-skip -->
@@ -13,7 +13,7 @@
     :classes="{
       outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
       label: 'form-label ml-4',
-      inner: `form-inner !gap-0 relative ${focused ? '!border-main' : 'border-accent'}`,
+      inner: `form-inner !gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
       wrapper: 'form-wrapper',
       input: 'form-input',
     }"

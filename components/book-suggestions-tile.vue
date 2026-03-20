@@ -11,7 +11,7 @@
           <p>Loading...</p>
         </template>
         <template v-if="success">
-          <IconCircleCheck size="48px" class="text-main" />
+          <IconCircleCheck size="48px" class="text-primary" />
           <p>Success!</p>
         </template>
         <template v-if="rating && selectedOption?.book">

@@ -4,7 +4,7 @@
       <template #error="{ error, clearError }">
         <bl-warning-badge>
           <template #icon="iconProps">
-            <IconAlertTriangle v-bind="iconProps" class="text-main" />
+            <IconAlertTriangle v-bind="iconProps" class="text-primary" />
           </template>
           <template #title> Something went wrong. </template>
           <template #content>

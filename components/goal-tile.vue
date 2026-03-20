@@ -129,7 +129,7 @@
               @click="onCreateNew"
             >
               <template #prependIcon="iconProps">
-                <IconPlus v-bind="iconProps" class="!text-main" />
+                <IconPlus v-bind="iconProps" class="!text-primary" />
               </template>
               Add new entry
             </bl-button>

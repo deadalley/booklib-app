@@ -26,7 +26,7 @@
         class="col-span-12 items-center justify-center gap-4 py-8"
       >
         <div class="flex flex-col items-center gap-2">
-          <IconChartAreaLine class="text-main" size="70" stroke="1.5" />
+          <IconChartAreaLine class="text-primary" size="70" stroke="1.5" />
           You don't have any goals yet.
           <bl-goal-modal
             v-if="authors && books"

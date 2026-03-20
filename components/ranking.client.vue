@@ -66,7 +66,7 @@ const _items = computed(() =>
 )
 
 const option = computed<EChartsOption>(() => ({
-  color: tailwind.theme.colors['accent-dark'],
+  color: tailwind.colors.stroke.strong,
   grid: {
     left: 0,
     right: '70%',
@@ -87,10 +87,10 @@ const option = computed<EChartsOption>(() => ({
           ? {
               value,
               itemStyle: {
-                color: tailwind.theme.colors.main,
+                color: tailwind.colors.primary.DEFAULT,
               },
               label: {
-                color: tailwind.theme.colors.main,
+                color: tailwind.colors.primary.DEFAULT,
               },
             }
           : value,
@@ -106,7 +106,7 @@ const option = computed<EChartsOption>(() => ({
         offset: [10, -10],
         rich: {
           label: {
-            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
             fontSize: 18,
             padding:
@@ -114,11 +114,11 @@ const option = computed<EChartsOption>(() => ({
             align: 'left',
           },
           value: {
-            fontFamily: tailwind.theme.fontFamily.ReemKufi[0],
+            fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 400,
             fontSize: 14,
-            color: tailwind.theme.colors['accent-darker'],
-            backgroundColor: tailwind.theme.colors['accent'],
+            color: tailwind.colors.ink.secondary,
+            backgroundColor: tailwind.colors.surface.subtle,
             padding: [4, 6],
             borderRadius: 6,
             align: 'left',
@@ -139,8 +139,8 @@ const option = computed<EChartsOption>(() => ({
           itemStyle: {
             color:
               index === _items.value.length - 1
-                ? tailwind.theme.colors.main
-                : tailwind.theme.colors['accent-dark'],
+                ? tailwind.colors.primary.DEFAULT
+                : tailwind.colors.stroke.strong,
           },
         })),
       },

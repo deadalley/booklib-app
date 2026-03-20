@@ -12,7 +12,7 @@
 }
 
 .bl-table thead th {
-  @apply bg-accent-light text-left font-semibold;
+  @apply bg-surface-subtle text-left font-semibold;
   position: sticky;
 }
 
@@ -29,5 +29,5 @@
 }
 
 .bl-table td {
-  @apply border-b border-accent-light text-base;
+  @apply border-b border-stroke-subtle text-base;
 }

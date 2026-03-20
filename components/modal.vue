@@ -6,10 +6,10 @@
     </DialogTrigger>
     <DialogPortal>
       <DialogOverlay
-        class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-black/80"
+        class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-surface-inverse/80"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-white p-7 focus:outline-none"
+        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-surface-elevated p-7 focus:outline-none"
         :class="{
           'w-[90vw]': size !== undefined,
           'max-w-screen-sm': size === 'sm',
@@ -28,7 +28,7 @@
             <component
               :is="icons[icon]"
               v-if="icon"
-              class="text-main"
+              class="text-primary"
               :size="30"
               stroke="1.5"
             />

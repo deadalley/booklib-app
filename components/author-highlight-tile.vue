@@ -4,13 +4,13 @@
     <div class="flex w-full flex-col items-center gap-6">
       <div class="flex w-full items-center justify-between gap-2">
         <IconChevronLeft
-          class="-mx-2 cursor-pointer text-main hover:text-main/60"
+          class="-mx-2 cursor-pointer text-primary hover:text-primary/60"
           :size="ICON_SIZE_SMALL"
           @click="onClickBack"
         />
         <h6 class="text-center">{{ authors[index]?.author.name }}</h6>
         <IconChevronRight
-          class="-mx-2 cursor-pointer text-main hover:text-main/60"
+          class="-mx-2 cursor-pointer text-primary hover:text-primary/60"
           :size="ICON_SIZE_SMALL"
           @click="onClickForward"
         />
@@ -20,7 +20,7 @@
           authors[index]?.average !== undefined ||
           authors[index]?.countByStatus === undefined
         "
-        class="flex flex-col items-center rounded-2xl border border-accent bg-white px-6 py-2 text-main"
+        class="flex flex-col items-center rounded-2xl border border-stroke bg-surface-elevated px-6 py-2 text-primary"
       >
         <div class="flex items-center">
           <template v-if="authors[0]?.average !== undefined">
@@ -36,7 +36,7 @@
             <IconBooks stroke="1.5" :size="ICON_SIZE_MEDIUM + 2" />
           </template>
         </div>
-        <p v-if="authors[index]?.label" class="text-accent-darker">
+        <p v-if="authors[index]?.label" class="text-ink-secondary">
           {{ authors[index]?.label }}
         </p>
       </div>
@@ -48,7 +48,7 @@
             .filter(([, count]) => count > 0)
             .slice(0, 2)"
           :key="status"
-          class="flex flex-col items-center rounded-2xl border border-accent bg-white px-6 py-2 text-main"
+          class="flex flex-col items-center rounded-2xl border border-stroke bg-surface-elevated px-6 py-2 text-primary"
         >
           <div class="flex items-center">
             <h4>
@@ -62,7 +62,7 @@
               stroke="2"
             />
           </div>
-          <p class="text-accent-darker">
+          <p class="text-ink-secondary">
             {{ PROGRESS_STATUS_MAP[status as BookProgressStatus].description }}
           </p>
         </div>

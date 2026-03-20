@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Sarala:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap');
 
@@ -15,34 +17,34 @@
   }
 
   body {
-    @apply bg-background font-Sarala text-black;
+    @apply bg-surface-canvas font-body text-ink-primary;
   }
 
   h1 {
-    @apply font-ReemKufi text-[2.986rem] font-bold;
+    @apply font-display text-[2.986rem] font-bold;
   }
 
   h2 {
-    @apply font-ReemKufi text-[2.488rem] font-semibold;
+    @apply font-display text-[2.488rem] font-semibold;
   }
 
   h3 {
-    @apply font-ReemKufi text-[2.074rem] font-semibold;
+    @apply font-display text-[2.074rem] font-semibold;
   }
 
   h4 {
-    @apply font-ReemKufi text-[1.728rem] font-semibold;
+    @apply font-display text-[1.728rem] font-semibold;
   }
 
   h5 {
-    @apply font-ReemKufi text-[1.44rem] font-medium;
+    @apply font-display text-[1.44rem] font-medium;
   }
 
   h6 {
-    @apply font-ReemKufi text-[1.2rem] font-medium;
+    @apply font-display text-[1.2rem] font-medium;
   }
 
   p {
-    @apply font-normal text-black;
+    @apply text-ink-primary font-normal;
   }
 }

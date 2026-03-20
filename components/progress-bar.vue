@@ -1,7 +1,7 @@
 <template>
   <ProgressRoot
     v-model="progressValue"
-    class="relative w-full overflow-hidden rounded-full bg-accent"
+    class="relative w-full overflow-hidden rounded-full bg-surface"
     :class="{
       'h-2': size === 'sm',
       'h-3': size === 'md',
@@ -29,7 +29,7 @@ withDefaults(
     size?: 'sm' | 'md' | 'lg'
     color?: string
   }>(),
-  { size: 'md', color: 'bg-main' },
+  { size: 'md', color: 'bg-primary' },
 )
 
 const hovered = ref(false)

@@ -3,16 +3,16 @@
     v-bind="$attrs"
     class="flex flex-col items-center justify-center gap-8 rounded-xl px-4 py-16"
     :class="{
-      'bg-white': variant === 'primary',
-      'bg-accent-light': variant === 'secondary',
+      'bg-surface-elevated': variant === 'primary',
+      'bg-surface-subtle': variant === 'secondary',
     }"
   >
     <component
       :is="icons[icon]"
-      class="text-accent-dark"
+      class="text-ink-muted"
       :class="{
-        'text-accent-darker': variant === 'primary',
-        'text-accent-dark': variant === 'secondary',
+        'text-ink-secondary': variant === 'primary',
+        'text-ink-muted': variant === 'secondary',
       }"
       size="58"
       stroke="1"

@@ -11,7 +11,7 @@
         <li
           v-for="item of navItems"
           :key="item.label"
-          class="text-xl hover:text-main"
+          class="hover:text-primary text-xl"
         >
           <NuxtLink :to="item.to" @click="sidebarOpen = false">{{
             item.label
@@ -22,7 +22,7 @@
     <main
       class="relative flex h-0 w-full flex-1 flex-col sm:h-screen sm:flex-[unset]"
     >
-      <nav class="flex items-center gap-8 border-b border-b-accent px-8 py-4">
+      <nav class="border-b-stroke flex items-center gap-8 border-b px-8 py-4">
         <NuxtLink class="flex-1" to="/library/books">
           <h5>{{ title }}</h5>
         </NuxtLink>
@@ -31,7 +31,7 @@
           <li
             v-for="item of navItems"
             :key="item.label"
-            class="text-lg hover:text-main"
+            class="hover:text-primary text-lg"
           >
             <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
           </li>
@@ -43,7 +43,7 @@
           v-if="!!navItems?.length"
           :size="ICON_SIZE_MEDIUM"
           stroke="1.5"
-          class="cursor-pointer hover:text-main sm:hidden"
+          class="hover:text-primary cursor-pointer sm:hidden"
           @click="sidebarOpen = !sidebarOpen"
         />
       </nav>
@@ -60,7 +60,7 @@
             elsewhere. To use BookLib fully, please download the app at
             <NuxtLink
               to="https://github.com/deadalley/booklib-app/releases/latest"
-              class="contents font-semibold underline hover:text-main"
+              class="hover:text-primary contents font-semibold underline"
               target="_blank"
             >
               @deadalley/booklib-app

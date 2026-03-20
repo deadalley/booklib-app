@@ -22,7 +22,7 @@
     @apply pb-2;
   }
   .book-section:not(:first-child) {
-    @apply border-t border-t-accent pt-12;
+    @apply border-t-stroke border-t pt-12;
   }
 
   .form-row {
@@ -30,15 +30,15 @@
   }
 
   .form-label {
-    @apply font-ReemKufi text-base text-accent-darker;
+    @apply font-display text-ink-secondary text-base;
   }
 
   .form-inner {
-    @apply flex h-min w-full items-center gap-3 rounded-xl border border-accent bg-white px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in placeholder:text-accent;
+    @apply border-stroke bg-surface-elevated placeholder:text-ink-muted flex h-min w-full items-center gap-3 rounded-xl border px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in;
   }
 
   select.form-input {
-    @apply w-full cursor-pointer bg-white;
+    @apply bg-surface-elevated w-full cursor-pointer;
   }
 
   input.form-input,
@@ -48,7 +48,7 @@
 
   input:focus.form-input,
   textarea:focus.form-input {
-    @apply border-accent-dark;
+    @apply border-stroke-strong;
   }
 
   .form-wrapper {

@@ -11,7 +11,7 @@
           <IconChevronDown
             :size="ICON_SIZE_MEDIUM"
             stroke="1.5"
-            class="cursor-pointer text-accent-darker transition-all duration-300 hover:text-main"
+            class="cursor-pointer text-ink-secondary transition-all duration-300 hover:text-primary"
             :class="{ 'rotate-180': actionsOpen }"
             @click="actionsOpen = !actionsOpen"
           />

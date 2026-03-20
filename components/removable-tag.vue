@@ -4,10 +4,11 @@
     ref="target"
     class="relative flex w-fit items-center gap-2 rounded-xl"
     :class="{
-      'cursor-pointer hover:bg-main/90': !!attrs.onClick,
-      'bg-main-dark': !!selected,
-      'bg-white text-main ring-1 ring-inset ring-main': editing,
-      'bg-main text-white': !editing,
+      'hover:bg-primary/90 cursor-pointer': !!attrs.onClick,
+      'bg-primary-800': !!selected,
+      'bg-surface-elevated text-primary ring-primary ring-1 ring-inset':
+        editing,
+      'bg-primary text-ink-inverse': !editing,
       'px-4 py-1 text-base': !compact,
       'px-3 py-1 text-sm font-medium': compact,
     }"
@@ -22,12 +23,15 @@
       v-if="editable && !editing"
       ref="genre-input"
       v-model="content"
-      class="max-w-24 text-black"
+      class="text-ink-primary max-w-24"
       :class="{
         'w-0 opacity-0': !editing,
       }"
     />
-    <bl-loading v-if="loading" class="!h-4 !w-4 !fill-white !text-main" />
+    <bl-loading
+      v-if="loading"
+      class="!fill-ink-inverse !text-primary !h-4 !w-4"
+    />
     <IconCircleX
       v-if="!loading && removable"
       :size="16"
@@ -44,7 +48,7 @@
   </div>
   <div
     v-if="newGenre && !editing"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl bg-main px-4 py-2 text-base text-white hover:bg-main/90"
+    class="bg-primary text-ink-inverse hover:bg-primary/90 relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-2 text-base"
     @click="onNew"
   >
     <IconPlus :size="16" stroke="2" />

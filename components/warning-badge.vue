@@ -1,7 +1,7 @@
 <template>
   <div
     v-bind="$attrs"
-    class="flex flex-col gap-2 rounded-xl bg-main/10 px-6 py-4 font-Sarala text-black"
+    class="flex flex-col gap-2 rounded-xl bg-primary/10 px-6 py-4 font-body text-ink-primary"
   >
     <div class="flex items-center gap-1">
       <slot
@@ -13,10 +13,10 @@
       />
       <h5><slot name="title" /></h5>
     </div>
-    <div class="flex gap-1 text-black">
+    <div class="flex gap-1 text-ink-primary">
       <slot
         v-if="!$slots.title"
-        class="mt-[2px] min-w-8 text-main"
+        class="mt-[2px] min-w-8 text-primary"
         name="icon"
         :size="ICON_SIZE_SMALL"
         stroke="2"

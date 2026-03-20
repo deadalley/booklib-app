@@ -8,10 +8,10 @@
       :to="disabled ? undefined : to"
       class="flex items-center rounded-xl py-3 text-lg"
       :class="{
-        'cursor-pointer transition-all hover:bg-accent/30 active:bg-accent-dark/20':
+        'hover:bg-surface/30 active:bg-surface-dark/20 cursor-pointer transition-all':
           !disabled,
-        'cursor-default text-accent': disabled,
-        'bg-main text-white hover:bg-main/80': active,
+        'text-ink-muted cursor-default': disabled,
+        'bg-primary text-ink-inverse hover:bg-primary/80': active,
         'gap-3 px-5': !iconOnly,
         'px-3': !!iconOnly,
       }"

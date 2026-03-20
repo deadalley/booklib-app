@@ -1,3 +1,3 @@
-import tailwindConfig from '#tailwind-config'
+import { activeTheme } from './theme'
 
-export const tailwind = tailwindConfig
+export const tailwind = activeTheme

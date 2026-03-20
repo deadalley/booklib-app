@@ -38,7 +38,7 @@
           </bl-button>
           <div
             v-if="libraryIntegrityResult"
-            class="mt-2 flex flex-col gap-4 rounded-xl bg-accent-light p-4"
+            class="mt-2 flex flex-col gap-4 rounded-xl bg-surface-subtle p-4"
           >
             <div
               v-if="
