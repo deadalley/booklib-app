@@ -45,7 +45,6 @@
     - [Building](#building)
     - [Testing](#testing)
     - [Linting](#linting)
-    - [Histoire](#histoire)
     - [Electron Distribution](#electron-distribution)
 - [Architecture](#architecture)
   - [Tech Stack](#tech-stack)
@@ -128,14 +127,6 @@ pnpm lint:ts         # TypeScript type checking
 pnpm lint:prettier   # Prettier formatting check
 ```
 
-#### Histoire
-
-```bash
-pnpm story:dev       # Start Storybook development server
-pnpm story:build     # Build Storybook
-pnpm story:preview   # Preview built Storybook
-```
-
 #### Electron Distribution
 
 ```bash
@@ -200,7 +191,6 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 
 - **Unit tests** with Vitest
 - **End-to-end tests** with Playwright
-- **Visual testing** with Histoire
 
 Run tests:
 
