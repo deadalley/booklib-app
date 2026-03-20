@@ -12,7 +12,7 @@
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
-      label: 'ml-4',
+      label: 'form-label',
       inner: `!gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
     }"
     :type="rawAutocomplete"

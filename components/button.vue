@@ -2,15 +2,11 @@
   <button
     v-bind="$attrs"
     type="button"
-    class="flex h-min w-fit items-center justify-center gap-2 whitespace-nowrap rounded-xl py-2 text-base font-medium lg:inline-flex lg:grow-0"
+    class="button"
     :class="{
-      'bg-primary text-ink-inverse hover:bg-primary/90 active:bg-primary-800':
-        variant === 'primary',
-      'bg-surface-subtle text-ink-primary hover:bg-surface-elevated hover:ring-1 hover:ring-inset hover:ring-stroke-strong active:bg-surface-subtle':
-        variant === 'secondary',
-      'border border-stroke bg-surface-elevated p-2 text-ink-primary hover:bg-surface-subtle active:bg-surface':
-        variant === 'tertiary',
-      '!bg-surface-subtle !text-ink-muted': !!disabled || !!loading,
+      'button-primary': variant === 'primary',
+      'button-secondary': variant === 'secondary',
+      'button-disabled': !!disabled || !!loading,
       'cursor-pointer': !disabled && !loading,
       'w-full flex-1': !!expand,
       'px-2':
@@ -35,7 +31,7 @@ withDefaults(
     expand?: boolean
     disabled?: boolean
     loading?: boolean
-    variant?: 'primary' | 'secondary' | 'tertiary'
+    variant?: 'primary' | 'secondary'
   }>(),
   { variant: 'primary' },
 )

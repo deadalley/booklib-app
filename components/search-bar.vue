@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inline-flex h-min w-full items-center gap-3 rounded-xl border bg-surface-elevated px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in placeholder:text-ink-muted lg:w-[355px]"
+    class="form-inner inline-flex lg:w-[355px]"
     :class="{
       'border-primary text-ink-primary': focused,
       'border-stroke text-ink-muted': !focused,

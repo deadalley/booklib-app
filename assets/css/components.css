@@ -1,49 +1,135 @@
 @layer components {
+  /* Buttons */
+  .button {
+    @apply rounded-scholarly flex h-min w-fit items-center justify-center gap-2 border py-2 text-base font-semibold whitespace-nowrap lg:inline-flex lg:grow-0;
+  }
+  .button-primary {
+    @apply border-primary bg-primary text-ink-inverse hover:bg-primary-700 active:bg-primary-800 hover:border-transparent active:border-transparent;
+  }
+  .button-secondary {
+    @apply border-stroke-subtle bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
+  }
+  .button-disabled {
+    @apply bg-surface-subtle! text-ink-muted! border-surface-subtle;
+  }
+
+  /* Switches */
   .switch {
-    @apply inline-flex h-min items-center rounded-3xl;
+    @apply inline-flex h-min items-center;
   }
-
   .switch-option {
-    @apply border-stroke bg-surface-elevated text-ink-primary hover:bg-surface-subtle active:bg-surface flex w-full cursor-pointer items-center justify-center border transition-all ring-inset first:rounded-l-xl last:rounded-r-xl;
+    @apply border-stroke-subtle bg-surface-elevated text-ink-secondary hover:bg-stroke/40 active:bg-stroke-subtle;
+    @apply first:rounded-l-scholarly last:rounded-r-scholarly flex w-full cursor-pointer items-center justify-center border transition-all ring-inset;
   }
-
   .switch-option-inner {
     @apply flex cursor-pointer items-center rounded-[inherit] p-2 lg:w-full;
   }
-
   .switch-option.selected {
-    @apply border-stroke-strong bg-surface-subtle hover:bg-surface-subtle w-full;
+    @apply border-stroke bg-surface hover:bg-stroke/40;
+    @apply w-full;
   }
 
-  .base-container {
-    @apply border-stroke bg-surface-elevated flex flex-col items-start gap-1 rounded-xl border p-[0.35rem] text-base transition-all duration-100 ease-in;
+  /* Pills */
+  .pill {
+    @apply rounded-scholarly active:bg-surface border-stroke bg-surface-subtle hover:bg-surface-subtle/20 border;
+    @apply relative inline-flex cursor-pointer items-center gap-2 px-4 py-1 font-medium transition-all;
+  }
+  .pill-selected {
+    @apply border-stroke-strong bg-surface-container hover:bg-surface/80;
   }
 
+  /* Dropdown */
+  .dropdown-trigger {
+    @apply relative;
+  }
+  .dropdown-trigger[data-state='open'] .dropdown-chevron {
+    transform: rotate(180deg);
+  }
+  .dropdown-content {
+    @apply base-container top-2 z-50 mt-1 max-h-96 w-full overflow-x-hidden overflow-y-auto;
+  }
+  .dropdown-item {
+    @apply rounded-scholarly text-ink-primary relative flex w-full cursor-pointer items-center gap-2 text-base select-none;
+    @apply data-disabled:text-ink-muted data-highlighted:bg-surface-subtle;
+    @apply data-disabled:pointer-events-none data-highlighted:outline-none;
+    @apply data-[state=checked]:bg-primary data-[state=checked]:text-ink-inverse;
+  }
+
+  /* Tooltip */
+  .tooltip-content {
+    @apply rounded-scholarly bg-surface-elevated text-ink-primary px-3 py-2 text-sm shadow-sm;
+  }
+
+  /* Pagination */
+  .pagination-list {
+    @apply flex items-center gap-3;
+  }
+  .pagination-arrow {
+    @apply text-ink-secondary enabled:hover:text-primary flex size-9 items-center justify-center rounded-full not-disabled:cursor-pointer disabled:opacity-50;
+  }
+  .pagination-arrow-prev {
+    @apply mr-4;
+  }
+  .pagination-arrow-next {
+    @apply ml-4;
+  }
+  .pagination-page-item {
+    @apply rounded-scholarly size-10 cursor-pointer border text-lg transition-all;
+    @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle;
+    @apply data-selected:border-primary data-selected:bg-primary data-selected:text-ink-inverse;
+  }
+  .pagination-ellipsis {
+    @apply text-ink-secondary enabled:hover:text-primary flex size-9 items-center justify-center;
+  }
+
+  /* Total tag */
+  .total-tag {
+    @apply rounded-scholarly relative inline-flex items-center gap-2 truncate px-3 py-1 text-sm font-semibold;
+  }
+  .total-tag-primary {
+    @apply border-primary bg-primary text-ink-inverse border;
+  }
+  .total-tag-secondary {
+    @apply border-stroke bg-surface-subtle text-ink-secondary border;
+  }
+
+  /* Nav Sidebar */
+  .nav-sidebar-button {
+    @apply rounded-scholarly hover:bg-stroke/40 active:bg-stroke;
+    @apply flex cursor-pointer items-center gap-3 px-5 py-3 text-lg transition-all;
+  }
+  .nav-sidebar-button-disabled {
+    @apply text-ink-muted cursor-default;
+  }
+  .nav-sidebar-button-active {
+    @apply bg-primary text-ink-inverse hover:bg-primary/80;
+  }
+  .nav-sidebar-button-icon-only {
+    @apply gap-0 px-3;
+  }
+
+  /* Sidebars */
   .sidebar-slide-right-enter-active,
   .sidebar-slide-right-leave-active {
     transition: all 0.3s ease-in-out;
   }
-
   .sidebar-slide-right-enter-to,
   .sidebar-slide-rightr-leave-from {
-    @apply -translate-x-0;
+    @apply translate-x-0;
   }
 
   .sidebar-slide-right-enter-from,
   .sidebar-slide-right-leave-to {
     @apply translate-x-full;
   }
-
   .sidebar-slide-left-enter-active,
   .sidebar-slide-left-leave-active {
     transition: all 0.3s ease-in-out;
   }
-
   .sidebar-slide-left-enter-to,
   .sidebar-slide-leftr-leave-from {
-    @apply -translate-x-0;
+    @apply translate-x-0;
   }
-
   .sidebar-slide-left-enter-from,
   .sidebar-slide-left-leave-to {
     @apply -translate-x-full;

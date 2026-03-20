@@ -1,0 +1,25 @@
+@utility base-container {
+  @apply border-stroke-subtle bg-surface-elevated rounded-scholarly border;
+  @apply flex flex-col items-start gap-1 p-2 text-base transition-all duration-100 ease-in;
+}
+
+@layer components {
+  .book-section h3,
+  .book-section h4 {
+    @apply pb-4;
+  }
+  .book-section h5,
+  .book-section h6 {
+    @apply pb-2;
+  }
+  .book-section {
+    @apply pb-2;
+  }
+  .book-section:not(:first-child) {
+    @apply border-t-stroke border-t pt-12;
+  }
+
+  .paper {
+    @apply bg-surface-elevated rounded-xl shadow-md;
+  }
+}

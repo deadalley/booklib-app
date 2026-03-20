@@ -8,9 +8,7 @@
   >
     <AccordionItem value="items">
       <AccordionHeader as="div" class="flex w-full">
-        <AccordionTrigger
-          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-stroke px-8 py-2 text-start hover:bg-surface-subtle"
-        >
+        <AccordionTrigger class="accordion-trigger">
           <div class="flex flex-1 items-center gap-3">
             <NuxtLink
               class="flex items-center gap-3"
@@ -40,7 +38,7 @@
           >
             <template #trigger>
               <IconTrash
-                class="mr-4 cursor-pointer text-ink-muted hover:text-primary"
+                class="text-ink-muted hover:text-primary mr-4 cursor-pointer"
                 :size="ICON_SIZE_SMALL"
                 stroke="1.5"
                 @click="deleteModalOpen = true"
@@ -129,20 +127,22 @@ const deleteBooks = ref(false)
 </script>
 
 <style scoped>
+@reference '../assets/css/main.css';
+
 .accordion-content {
   overflow: hidden;
 }
-
 .accordion-content[data-state='open'] {
   animation: slideDown 300ms ease-out;
 }
-
 .accordion-content[data-state='closed'] {
   animation: slideUp 300ms ease-out;
 }
-
 .accordion-chevron {
   transition: transform 300ms;
+}
+.accordion-trigger {
+  @apply border-stroke bg-surface-subtle hover:bg-stroke/40 rounded-scholarly flex w-full cursor-pointer items-center justify-between border px-4 py-2 text-start;
 }
 .accordion-trigger[data-state='open'] > .accordion-chevron {
   transform: rotate(180deg);

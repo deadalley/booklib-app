@@ -23,7 +23,7 @@
         <bl-view-switch v-model:view="view" />
         <bl-tooltip>
           <template #tooltip-content>Filter</template>
-          <bl-button variant="tertiary" @click="onFilterOpen">
+          <bl-button variant="secondary" @click="onFilterOpen">
             <template #appendIcon="iconProps">
               <IconFilter v-bind="iconProps" />
             </template>
@@ -31,7 +31,7 @@
         </bl-tooltip>
         <bl-tooltip v-if="view === 'table'">
           <template #tooltip-content>Table</template>
-          <bl-button variant="tertiary" @click="onTableSettingsOpen">
+          <bl-button variant="secondary" @click="onTableSettingsOpen">
             <template #appendIcon="iconProps">
               <IconTable v-bind="iconProps" />
             </template>
@@ -39,7 +39,7 @@
         </bl-tooltip>
         <bl-tooltip>
           <template #tooltip-content>Bulk actions</template>
-          <bl-button variant="tertiary" @click="editing = true">
+          <bl-button variant="secondary" @click="editing = true">
             <template #appendIcon="iconProps">
               <IconStack2 v-bind="iconProps" />
             </template>

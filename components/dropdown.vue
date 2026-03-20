@@ -1,14 +1,14 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="popper relative w-full"
+    class="dropdown popper relative w-full"
     :class="{
       [side]: true,
     }"
   >
     <DropdownMenuRoot>
       <DropdownMenuTrigger class="dropdown-trigger">
-        <bl-button v-bind="$props" expand variant="tertiary">
+        <bl-button v-bind="$props" expand variant="secondary">
           <slot />
           <template v-if="withChevron" #appendIcon="iconProps">
             <IconChevronDown
@@ -26,13 +26,13 @@
           :align="align"
           :avoid-collisions="false"
           position="popper"
-          class="base-container top-2 z-50 mt-1 max-h-96 flex-col overflow-y-auto overflow-x-hidden"
+          class="dropdown-content"
         >
           <DropdownMenuItem
             v-for="item in items"
             :key="item.value"
             :value="item.value"
-            class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
+            class="dropdown-item"
             @click="$emit('click', item.value)"
           >
             <component
@@ -79,18 +79,3 @@ defineEmits<{
   (e: 'click', val: string): void
 }>()
 </script>
-
-<style scoped>
-.dropdown-trigger {
-  position: relative;
-}
-
-.dropdown-trigger[data-state='open'] .dropdown-chevron {
-  transform: rotate(180deg);
-}
-
-.popper [data-radix-popper-content-wrapper] {
-  position: absolute !important;
-  width: 100%;
-}
-</style>

@@ -5,11 +5,7 @@
         <slot />
       </TooltipTrigger>
       <TooltipPortal>
-        <TooltipContent
-          class="bg-surface-elevated z-50 rounded-lg px-3 py-2 drop-shadow-md"
-          :side-offset="5"
-          :side="side"
-        >
+        <TooltipContent class="tooltip-content" :side-offset="5" :side="side">
           <slot name="tooltip-content" />
           <TooltipArrow class="fill-surface-elevated" :width="8" />
         </TooltipContent>

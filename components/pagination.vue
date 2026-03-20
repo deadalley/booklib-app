@@ -8,22 +8,18 @@
     :items-per-page="itemsPerPage"
     @update:page="(args) => $emit('update:page', args)"
   >
-    <PaginationList v-slot="{ items }" class="flex items-center gap-3">
-      <PaginationFirst
-        class="flex size-9 items-center justify-center rounded-full text-ink-secondary enabled:hover:text-primary disabled:opacity-50"
-      >
+    <PaginationList v-slot="{ items }" class="pagination-list">
+      <PaginationFirst class="pagination-arrow">
         <IconChevronsLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationFirst>
-      <PaginationPrev
-        class="mr-4 flex size-9 items-center justify-center rounded-full text-ink-secondary enabled:hover:text-primary disabled:opacity-50"
-      >
+      <PaginationPrev class="pagination-arrow pagination-arrow-prev">
         <IconChevronLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationPrev>
       <template v-for="(page, index) in items">
         <PaginationListItem
           v-if="page.type === 'page'"
           :key="index"
-          class="size-10 rounded-full border border-stroke bg-surface-elevated text-lg text-ink-secondary transition-all first:rounded-l-xl last:rounded-r-xl hover:bg-surface-subtle data-[selected]:border-primary data-[selected]:bg-primary data-[selected]:text-ink-inverse"
+          class="pagination-page-item"
           :value="page.value"
         >
           {{ page.value }}
@@ -32,19 +28,15 @@
           v-else
           :key="page.type"
           :index="index"
-          class="flex size-9 items-center justify-center text-ink-secondary enabled:hover:text-primary"
+          class="pagination-ellipsis"
         >
           &#8230;
         </PaginationEllipsis>
       </template>
-      <PaginationNext
-        class="ml-4 flex size-9 items-center justify-center rounded-full text-ink-secondary enabled:hover:text-primary disabled:opacity-50"
-      >
+      <PaginationNext class="pagination-arrow pagination-arrow-next">
         <IconChevronRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationNext>
-      <PaginationLast
-        class="flex size-9 items-center justify-center rounded-full text-ink-secondary enabled:hover:text-primary disabled:opacity-50"
-      >
+      <PaginationLast class="pagination-arrow">
         <IconChevronsRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationLast>
     </PaginationList>

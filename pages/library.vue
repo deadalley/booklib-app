@@ -20,7 +20,7 @@
 
     <template #action-btn>
       <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-        <bl-button expand>
+        <bl-button>
           <template #prependIcon="prependIcon">
             <IconPlus v-bind="prependIcon" />
           </template>

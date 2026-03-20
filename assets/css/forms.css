@@ -4,55 +4,30 @@
   .form-section {
     @apply relative flex flex-col gap-3;
   }
-
-  .book-section h3,
-  .book-section h4 {
-    @apply pb-4;
+  .form-wrapper {
+    @apply flex flex-1 flex-col gap-1;
   }
-
-  .book-section h5,
-  .book-section h6 {
-    @apply pb-2;
-  }
-
-  .book-section {
-    @apply pb-2;
-  }
-  .book-section:not(:first-child) {
-    @apply border-t-stroke border-t pt-12;
-  }
-
   .form-row {
     @apply flex flex-col gap-4 sm:flex-row;
   }
-
   .form-label {
+    @apply ml-4;
     @apply font-display text-ink-secondary text-base;
   }
-
   .form-inner {
-    @apply border-stroke bg-surface-elevated placeholder:text-ink-muted flex h-min w-full items-center gap-3 rounded-xl border px-4 py-[0.35rem] text-base transition-all duration-100 ease-in outline-none;
+    @apply border-stroke-subtle bg-surface-elevated placeholder:text-ink-muted;
+    @apply rounded-scholarly flex h-min w-full items-center gap-3 border px-4 py-2 text-base transition-all duration-100 ease-in outline-none;
   }
 
   select.form-input {
     @apply bg-surface-elevated w-full cursor-pointer;
   }
-
   input.form-input,
   textarea.form-input {
     @apply w-full;
   }
-
   input:focus.form-input,
   textarea:focus.form-input {
     @apply border-stroke-strong;
-  }
-
-  .form-wrapper {
-    @apply flex flex-1 flex-col gap-1;
-  }
-
-  .form-outer {
-    @apply flex;
   }
 }

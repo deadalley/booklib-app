@@ -12,9 +12,9 @@
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
-      wrapper: 'form-wrapper flex-1',
-      label: 'form-label ml-4',
+      outer: `flex flex-1 ${editing ? '' : '!hidden'}`,
+      wrapper: 'form-wrapper',
+      label: 'form-label',
       inner: `form-inner ${focused ? '!border-primary' : 'border-stroke'}`,
       input: 'form-input',
     }"

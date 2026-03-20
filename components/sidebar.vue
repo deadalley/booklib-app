@@ -7,7 +7,7 @@
       <div class="flex justify-between">
         <h4 v-if="!!title">{{ title }}</h4>
 
-        <bl-icon-button variant="tertiary" @click="$emit('close')">
+        <bl-icon-button variant="secondary" @click="$emit('close')">
           <template #default="iconProps">
             <IconX v-bind="iconProps" />
           </template>

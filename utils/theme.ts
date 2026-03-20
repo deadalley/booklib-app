@@ -16,6 +16,7 @@ export type ThemeTokens = {
     surface: {
       DEFAULT: string
       canvas: string
+      container: string
       subtle: string
       elevated: string
       dark: string
@@ -46,6 +47,7 @@ export type ThemeTokens = {
     atelier: string
     elevated: string
     inner: string
+    subtle: string
   }
 }
 
@@ -67,6 +69,7 @@ export const legacyTheme: ThemeTokens = {
     surface: {
       DEFAULT: '#F6F6F6',
       canvas: '#FFFFFF',
+      container: '#FFFFFF',
       subtle: '#F6F6F6',
       elevated: '#FFFFFF',
       dark: '#202020',
@@ -108,6 +111,7 @@ export const legacyTheme: ThemeTokens = {
     elevated:
       '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03)',
     inner: 'inset 0 2px 8px 0 rgb(0 0 0 / 0.3)',
+    subtle: '0px 0px 5px 2px rgba(0,0,0,0.82)',
   },
 }
 
@@ -129,6 +133,7 @@ export const newTheme: ThemeTokens = {
     surface: {
       DEFAULT: '#f5f3f3',
       canvas: '#fbf9f8',
+      container: '#e4ddd9',
       subtle: '#f5f3f3',
       elevated: '#ffffff',
       dark: '#1b1c1c',
@@ -162,7 +167,7 @@ export const newTheme: ThemeTokens = {
     ],
   },
   borderRadius: {
-    scholarly: '8px',
+    scholarly: '0.5rem',
   },
   boxShadow: {
     atelier:
@@ -170,6 +175,7 @@ export const newTheme: ThemeTokens = {
     elevated:
       '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     inner: 'inset 0 2px 8px 0 rgb(0 0 0 / 0.12)',
+    subtle: '0px 0px 1px 1px rgba(0,0,0,0.06)',
   },
 }
 

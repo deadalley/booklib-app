@@ -3,7 +3,7 @@
   <AccordionRoot
     v-model="selectedValue"
     :default-value="defaultOpen ? 'tile' : undefined"
-    class="flex flex-col gap-3 rounded-xl border border-stroke bg-surface-elevated px-8 py-6"
+    class="bg-surface-elevated paper rounded-xl px-8 py-6"
     type="single"
     :collapsible="true"
     :disabled="!$slots['collapsible']"
@@ -40,7 +40,7 @@
         </div>
         <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
-            class="accordion-chevron mt-2 cursor-pointer text-ink-secondary transition-transform duration-300 ease-in hover:text-primary sm:mt-0"
+            class="accordion-chevron text-ink-secondary hover:text-primary mt-2 cursor-pointer transition-transform duration-300 ease-in sm:mt-0"
             :size="ICON_SIZE_SMALL"
           />
         </AccordionTrigger>

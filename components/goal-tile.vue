@@ -125,7 +125,7 @@
             <bl-button
               v-if="sortedEntries.length && !addingNew"
               class="w-full"
-              variant="tertiary"
+              variant="secondary"
               @click="onCreateNew"
             >
               <template #prependIcon="iconProps">

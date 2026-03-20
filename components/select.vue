@@ -11,10 +11,10 @@
     v-bind="$attrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
-      label: 'form-label ml-4',
-      inner: `form-inner !gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
+      outer: `flex flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'form-wrapper',
+      label: 'form-label',
+      inner: `form-inner !gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
       input: 'form-input',
     }"
     :type="rawSelect"
