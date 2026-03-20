@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -10,15 +12,13 @@ export default defineNuxtConfig({
     },
   },
 
-  css: [
-    '@/assets/css/main.css',
-    '@/assets/css/components.css',
-    '@/assets/css/forms.css',
-    '@/assets/css/table.css',
-  ],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
+  css: ['@/assets/css/main.css'],
 
   modules: [
-    '@nuxtjs/tailwindcss',
     '@formkit/nuxt',
     '@nuxt/image',
     '@nuxt/eslint',
@@ -98,10 +98,6 @@ export default defineNuxtConfig({
 
   fileStorage: {
     mount: 'usr',
-  },
-
-  tailwindcss: {
-    exposeConfig: true,
   },
 
   typescript: {

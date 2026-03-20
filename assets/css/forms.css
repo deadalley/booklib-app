@@ -1,7 +1,4 @@
-:root,
-:before,
-:after,
-* {
+@layer components {
   .form-form,
   .form-form section,
   .form-section {
@@ -34,7 +31,7 @@
   }
 
   .form-inner {
-    @apply border-stroke bg-surface-elevated placeholder:text-ink-muted flex h-min w-full items-center gap-3 rounded-xl border px-4 py-[0.35rem] text-base outline-none transition-all duration-100 ease-in;
+    @apply border-stroke bg-surface-elevated placeholder:text-ink-muted flex h-min w-full items-center gap-3 rounded-xl border px-4 py-[0.35rem] text-base transition-all duration-100 ease-in outline-none;
   }
 
   select.form-input {
