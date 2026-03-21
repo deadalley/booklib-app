@@ -23,7 +23,7 @@
       </ul>
     </bl-sidebar>
     <main
-      class="relative flex h-0 w-full flex-1 flex-col sm:h-screen sm:flex-[unset]"
+      class="relative flex h-0 w-full min-w-0 flex-1 flex-col sm:h-screen sm:flex-[unset]"
     >
       <!-- Header -->
       <nav
@@ -79,7 +79,7 @@
         </div>
       </nav>
       <div
-        class="relative flex w-full flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
+        class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
       >
         <!-- Demo alert -->
         <!-- <bl-warning-badge v-if="isWebEnvironment" class="mb-4">

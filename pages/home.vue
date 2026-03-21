@@ -23,7 +23,7 @@
           </bl-button>
         </NuxtLink>
         <div
-          class="flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full [&_hr]:text-ink-muted"
+          class="[&_hr]:text-ink-muted flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full"
         >
           <hr />
           <h6>OR</h6>
@@ -81,18 +81,18 @@
           </template>
         </bl-section-tile>
       </div>
-      <div v-if="latestBooks?.length" class="flex flex-col gap-8">
+      <div v-if="latestBooks?.length" class="flex min-w-0 flex-col gap-8">
         <bl-tile>
           <template #title>Last books added to library</template>
-          <div
-            class="relative flex size-max w-full gap-x-6 overflow-x-auto p-3 transition duration-100 ease-out"
-          >
-            <bl-book-card
-              v-for="book in latestBooks"
-              :key="book.title"
-              :book="book"
-              class="!w-32 shrink-0"
-            />
+          <div class="relative min-w-0 overflow-x-auto overflow-y-hidden pb-1">
+            <div class="flex w-max items-stretch gap-6">
+              <bl-book-tile
+                v-for="book in latestBooks"
+                :key="book.id"
+                :book="book"
+                class="w-36 shrink-0"
+              />
+            </div>
           </div>
         </bl-tile>
       </div>
@@ -121,7 +121,7 @@
 <script setup lang="ts">
 import { IconPlus, IconUpload } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
-import type { Book } from '~/types/book'
+import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import { useBookLibrary } from '~/composables/use-book-library'
 import { getAssetPath } from '~/utils/assets'
@@ -133,17 +133,19 @@ const isEmpty = ref<boolean>(false)
 const authors = ref<Author[]>([])
 const books = ref<Book[]>([])
 const collections = ref<Collection[]>([])
-const latestBooks = ref<Pick<Book, 'id' | 'title' | 'coverSrc'>[]>([])
+const latestBooks = ref<ViewBook[]>([])
 
 const loadData = async () => {
   isEmpty.value = await isLibraryEmpty()
   authors.value = await getAuthors()
   books.value = await getBooks()
   collections.value = await getCollections()
-  latestBooks.value = (await getLatestBooks()) as Pick<
-    Book,
-    'id' | 'title' | 'coverSrc'
-  >[]
+  const allLatestBooks = await getLatestBooks()
+  const authorsById = new Map(authors.value.map((a) => [a.id, a.name]))
+  latestBooks.value = allLatestBooks.map((book) => ({
+    ...book,
+    authorName: book.author ? authorsById.get(book.author) : undefined,
+  }))
 }
 
 const refresh = loadData
