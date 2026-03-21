@@ -4,10 +4,8 @@
       v-if="!importedBooks?.length"
       class="flex flex-col items-center gap-12"
     >
-      <div
-        class="flex w-full flex-col gap-12 rounded-3xl border border-stroke p-16 md:w-3/5"
-      >
-        <div class="self-center text-primary">
+      <div class="paper flex w-full flex-col gap-12 p-16 md:w-3/5">
+        <div class="text-primary self-center">
           <IconDownload size="80" stroke="1.5" />
           <h4>Import</h4>
         </div>
@@ -88,7 +86,9 @@
       <div class="flex justify-between">
         <div>
           <h5 v-if="selectedBooksForUpload.length">
-            <span class="text-primary">{{ selectedBooksForUpload.length }}</span>
+            <span class="text-primary">{{
+              selectedBooksForUpload.length
+            }}</span>
             books selected for import
           </h5>
           <h5 v-if="!selectedBooksForUpload.length">
