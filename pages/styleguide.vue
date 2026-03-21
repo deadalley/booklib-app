@@ -384,11 +384,13 @@
                     :key="heading.tag"
                     class="border-stroke flex flex-wrap items-baseline gap-4 border-b pb-3 last:border-b-0"
                   >
-                    <component
-                      :is="heading.tag"
-                      class="flex-1"
-                    >{{ heading.sample }}</component>
-                    <span class="text-ink-muted font-mono text-xs whitespace-nowrap">{{ heading.tag }} &mdash; {{ heading.size }}</span>
+                    <component :is="heading.tag" class="flex-1">{{
+                      heading.sample
+                    }}</component>
+                    <span
+                      class="text-ink-muted font-mono text-xs whitespace-nowrap"
+                      >{{ heading.tag }} &mdash; {{ heading.size }}</span
+                    >
                   </div>
                 </div>
               </div>
@@ -461,7 +463,8 @@
                     <span
                       class="font-mono text-xs whitespace-nowrap"
                       :style="{ color: ink.hex }"
-                    >{{ ink.label }} — {{ ink.hex }}</span>
+                      >{{ ink.label }} — {{ ink.hex }}</span
+                    >
                   </div>
                 </div>
               </div>
@@ -580,21 +583,65 @@ function toggleMultiselectValue(value: string) {
 const colors = activeTheme.colors
 
 const typographyHeadings = [
-  { tag: 'h1', sample: 'Heading 1 — The Left Hand of Darkness', size: 'text-5xl / 3rem' },
-  { tag: 'h2', sample: 'Heading 2 — Ursula K. Le Guin', size: 'text-4xl / 2.25rem' },
-  { tag: 'h3', sample: 'Heading 3 — Hainish Cycle, 1969', size: 'text-3xl / 1.875rem' },
-  { tag: 'h4', sample: 'Heading 4 — Science Fiction', size: 'text-2xl / 1.5rem' },
+  {
+    tag: 'h1',
+    sample: 'Heading 1 — The Left Hand of Darkness',
+    size: 'text-5xl / 3rem',
+  },
+  {
+    tag: 'h2',
+    sample: 'Heading 2 — Ursula K. Le Guin',
+    size: 'text-4xl / 2.25rem',
+  },
+  {
+    tag: 'h3',
+    sample: 'Heading 3 — Hainish Cycle, 1969',
+    size: 'text-3xl / 1.875rem',
+  },
+  {
+    tag: 'h4',
+    sample: 'Heading 4 — Science Fiction',
+    size: 'text-2xl / 1.5rem',
+  },
   { tag: 'h5', sample: 'Heading 5 — 286 pages', size: 'text-xl / 1.25rem' },
-  { tag: 'h6', sample: 'Heading 6 — Finished reading', size: 'text-lg / 1.125rem' },
+  {
+    tag: 'h6',
+    sample: 'Heading 6 — Finished reading',
+    size: 'text-lg / 1.125rem',
+  },
 ]
 
 const typographyBody = [
-  { label: 'text-base (body)', class: 'text-base', sample: 'Body text — used for most UI copy and descriptions.' },
-  { label: 'text-sm (small)', class: 'text-sm', sample: 'Small text — labels, captions, and secondary details.' },
-  { label: 'text-xs (extra small)', class: 'text-xs', sample: 'Extra small — badges, metadata, monospace values.' },
-  { label: 'text-lg (large)', class: 'text-lg', sample: 'Large body — section intros and prominent descriptions.' },
-  { label: 'font-semibold', class: 'text-base font-semibold', sample: 'Semibold — button labels, list headers, emphasis.' },
-  { label: 'font-mono text-sm', class: 'font-mono text-sm', sample: 'Monospace — hex values, IDs, code snippets.' },
+  {
+    label: 'text-base (body)',
+    class: 'text-base',
+    sample: 'Body text — used for most UI copy and descriptions.',
+  },
+  {
+    label: 'text-sm (small)',
+    class: 'text-sm',
+    sample: 'Small text — labels, captions, and secondary details.',
+  },
+  {
+    label: 'text-xs (extra small)',
+    class: 'text-xs',
+    sample: 'Extra small — badges, metadata, monospace values.',
+  },
+  {
+    label: 'text-lg (large)',
+    class: 'text-lg',
+    sample: 'Large body — section intros and prominent descriptions.',
+  },
+  {
+    label: 'font-semibold',
+    class: 'text-base font-semibold',
+    sample: 'Semibold — button labels, list headers, emphasis.',
+  },
+  {
+    label: 'font-mono text-sm',
+    class: 'font-mono text-sm',
+    sample: 'Monospace — hex values, IDs, code snippets.',
+  },
 ]
 
 const typographyFamilies = [
@@ -620,9 +667,17 @@ const typographyFamilies = [
 
 const typographyInk = [
   { label: 'ink-primary', class: 'text-ink-primary', hex: colors.ink.primary },
-  { label: 'ink-secondary', class: 'text-ink-secondary', hex: colors.ink.secondary },
+  {
+    label: 'ink-secondary',
+    class: 'text-ink-secondary',
+    hex: colors.ink.secondary,
+  },
   { label: 'ink-muted', class: 'text-ink-muted', hex: colors.ink.muted },
-  { label: 'ink-inverse (on dark)', class: 'text-ink-inverse bg-surface-dark rounded px-2 py-0.5', hex: colors.ink.inverse },
+  {
+    label: 'ink-inverse (on dark)',
+    class: 'text-ink-inverse bg-surface-dark rounded px-2 py-0.5',
+    hex: colors.ink.inverse,
+  },
 ]
 const swatchGroups = [
   {

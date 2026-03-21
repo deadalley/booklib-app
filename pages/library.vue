@@ -1,5 +1,6 @@
 <template>
   <NuxtLayout name="dashboard" title="Library" :nav-items="navItems">
+    <!-- Error boundary -->
     <NuxtErrorBoundary>
       <template #error="{ error, clearError }">
         <bl-warning-badge>
@@ -17,22 +18,11 @@
       </template>
       <NuxtPage />
     </NuxtErrorBoundary>
-
-    <template #action-btn>
-      <NuxtLink class="flex md:inline-flex" to="/library/books/new">
-        <bl-button>
-          <template #prependIcon="prependIcon">
-            <IconPlus v-bind="prependIcon" />
-          </template>
-          Book
-        </bl-button>
-      </NuxtLink>
-    </template>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { IconAlertTriangle, IconPlus } from '@tabler/icons-vue'
+import { IconAlertTriangle } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 
 const route = useRoute()

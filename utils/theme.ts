@@ -154,7 +154,7 @@ export const newTheme: ThemeTokens = {
   },
   fontFamily: {
     body: ['Manrope', 'Inter', 'ui-sans-serif', 'system-ui'],
-    display: ['Fraunces', 'Iowan Old Style', 'ui-serif', 'Georgia', 'serif'],
+    display: ['Fraunces', 'Manrope', 'Inter', 'ui-sans-serif', 'system-ui'],
     mono: [
       'ui-monospace',
       'SFMono-Regular',

@@ -1,27 +1,37 @@
 <template>
   <nav class="nav-sidebar" :data-state="collapsed ? 'collapsed' : 'expanded'">
-    <img
-      :src="getAssetPath('/logo.svg')"
-      alt="BookLib"
-      class="nav-sidebar-logo"
-    />
-    <div class="nav-sidebar-header">
-      <h3 class="nav-sidebar-brand">
-        <NuxtLink class="flex gap-2" to="/">
-          <img :src="getAssetPath('/logo.svg')" alt="BookLib" class="w-6" />
-          BOOKLIB
-        </NuxtLink>
-      </h3>
+    <button
+      type="button"
+      class="nav-sidebar-collapse-toggle"
+      :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      @click="onCollapse"
+    >
       <IconChevronLeftPipe
-        class="nav-sidebar-collapse-toggle"
-        :class="{
-          'rotate-180': collapsed,
-        }"
+        class="nav-sidebar-collapse-icon"
         :size="ICON_SIZE_LARGE"
         stroke="1.5"
-        @click="onCollapse"
       />
+    </button>
+    <div class="nav-sidebar-header">
+      <img
+        v-if="collapsed"
+        :src="getAssetPath('/logo.svg')"
+        alt="BookLib"
+        class="nav-sidebar-logo"
+      />
+      <h2 class="nav-sidebar-brand">
+        <NuxtLink class="nav-sidebar-brand-link" to="/">
+          <img
+            :src="getAssetPath('/logo.svg')"
+            alt="BookLib"
+            class="nav-sidebar-brand-mark"
+          />
+          BOOKLIB
+        </NuxtLink>
+      </h2>
     </div>
+
     <div class="nav-sidebar-content">
       <div class="nav-sidebar-links">
         <bl-nav-sidebar-button
