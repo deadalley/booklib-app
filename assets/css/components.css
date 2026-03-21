@@ -68,7 +68,7 @@
     @apply bg-primary text-ink-inverse absolute right-3 bottom-3 inline-flex items-center justify-center rounded-full p-1;
   }
   .book-tile-content {
-    @apply flex flex-1 flex-col justify-between gap-1 p-4;
+    @apply flex flex-1 flex-col justify-between gap-2 p-4;
   }
   .book-tile-header {
     @apply flex flex-col gap-1;
@@ -84,7 +84,7 @@
     @apply text-ink-secondary truncate text-sm;
   }
   .book-tile-meta {
-    @apply border-stroke mt-3 flex items-center justify-between border-t pt-3;
+    @apply border-stroke flex items-center justify-between border-t pt-2;
   }
   .book-tile-rating {
     @apply text-ink-primary inline-flex items-center gap-1 text-sm font-semibold;
