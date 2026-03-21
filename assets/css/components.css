@@ -274,3 +274,44 @@
     @apply -translate-x-full;
   }
 }
+
+/* Data Management page */
+.data-management-card {
+  @apply flex flex-col gap-6 p-8;
+}
+.data-management-card-header {
+  @apply border-stroke flex flex-col gap-1 border-b pb-4;
+}
+.platform-btn {
+  @apply border-stroke bg-surface-elevated rounded-scholarly flex cursor-pointer items-center gap-2 border px-4 py-3 text-sm font-medium transition-all duration-150;
+  @apply hover:border-primary hover:text-primary;
+}
+.platform-btn-active {
+  @apply border-primary text-primary bg-primary/5;
+}
+.file-drop-zone {
+  @apply border-stroke rounded-scholarly flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed p-8 text-center transition-colors duration-150;
+  @apply hover:border-primary hover:bg-primary/5;
+}
+.file-drop-zone-over {
+  @apply border-primary bg-primary/5;
+}
+.export-format-option {
+  @apply border-stroke bg-surface-elevated rounded-scholarly flex cursor-pointer items-center gap-3 border p-4 transition-all duration-150;
+  @apply hover:border-primary;
+}
+.export-format-option-active {
+  @apply border-primary bg-primary/5;
+}
+.export-format-option-disabled {
+  @apply pointer-events-none cursor-not-allowed opacity-50;
+}
+.export-format-radio {
+  @apply border-stroke-strong flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 bg-transparent transition-colors;
+}
+.export-format-radio-checked {
+  @apply border-primary;
+}
+.export-format-radio-dot {
+  @apply bg-primary h-2 w-2 rounded-full;
+}

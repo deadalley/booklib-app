@@ -78,8 +78,7 @@ import {
   IconHome,
   IconClockHour3,
   IconChartLine,
-  IconBookUpload,
-  IconBookDownload,
+  IconDatabaseImport,
   IconSettings,
   IconChevronLeftPipe,
 } from '@tabler/icons-vue'
@@ -114,12 +113,11 @@ const buttons = computed(() => [
     to: '/tracking',
     disabled: !!isEmpty.value,
   },
-  { label: 'Import', icon: IconBookUpload, to: '/import', disabled: false },
   {
-    label: 'Export',
-    icon: IconBookDownload,
-    to: '/export',
-    disabled: !!isEmpty.value,
+    label: 'Data',
+    icon: IconDatabaseImport,
+    to: '/data-management',
+    disabled: false,
   },
 ])
 
