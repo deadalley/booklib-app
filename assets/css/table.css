@@ -1,35 +1,49 @@
 @layer components {
+  .bl-table-wrapper {
+    @apply rounded-scholarly border-stroke-subtle bg-surface-elevated w-full overflow-x-auto border shadow-sm;
+  }
+
   .bl-table {
-    @apply relative w-full overflow-x-auto;
+    @apply relative w-full min-w-190 border-separate border-spacing-0;
     table-layout: fixed;
   }
 
   .bl-table th {
-    @apply px-8 py-4 text-base;
+    @apply px-5 py-3 text-sm;
   }
 
   .bl-table td {
-    @apply px-8 py-3 text-base;
+    @apply px-5 py-3.5 text-sm;
   }
 
   .bl-table thead th {
-    @apply bg-surface-subtle text-left font-semibold;
+    @apply bg-surface-subtle text-ink-secondary border-stroke-subtle border-b text-left text-xs font-semibold tracking-wide uppercase;
     position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   .bl-table thead th > span {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-2;
   }
 
-  .bl-table th:first-child {
-    @apply rounded-l-lg;
+  .bl-table thead th:first-child {
+    @apply rounded-tl-scholarly;
   }
 
-  .bl-table th:last-child {
-    @apply rounded-r-lg;
+  .bl-table thead th:last-child {
+    @apply rounded-tr-scholarly;
   }
 
   .bl-table td {
-    @apply border-stroke-subtle border-b text-base;
+    @apply border-stroke-subtle border-b align-middle;
+  }
+
+  .bl-table tbody tr {
+    @apply transition-colors;
+  }
+
+  .bl-table tbody tr:last-child td {
+    @apply border-b-0;
   }
 }

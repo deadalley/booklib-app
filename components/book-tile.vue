@@ -43,12 +43,14 @@
       </NuxtLink>
 
       <div class="book-tile-content">
-        <NuxtLink :to="selectable ? undefined : href" @click="onSelect">
-          <h6 class="book-tile-title">{{ book.title }}</h6>
-        </NuxtLink>
-        <p class="book-tile-author">
-          {{ book.authorName ?? 'Unknown author' }}
-        </p>
+        <div class="book-tile-header">
+          <NuxtLink :to="selectable ? undefined : href" @click="onSelect">
+            <h6 class="book-tile-title">{{ book.title }}</h6>
+          </NuxtLink>
+          <p class="book-tile-author">
+            {{ book.authorName ?? 'Unknown author' }}
+          </p>
+        </div>
 
         <div class="book-tile-meta">
           <p class="book-tile-rating">

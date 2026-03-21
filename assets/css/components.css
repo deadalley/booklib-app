@@ -70,6 +70,9 @@
   .book-tile-content {
     @apply flex flex-1 flex-col justify-between gap-1 p-4;
   }
+  .book-tile-header {
+    @apply flex flex-col gap-1;
+  }
   .book-tile-title {
     @apply overflow-hidden pb-0! leading-tight;
     line-clamp: 2;
