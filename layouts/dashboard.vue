@@ -26,47 +26,55 @@
       class="relative flex h-0 w-full flex-1 flex-col sm:h-screen sm:flex-[unset]"
     >
       <!-- Header -->
-      <nav class="border-b-stroke flex items-center gap-8 border-b px-8 py-4">
-        <!-- Page title -->
-        <NuxtLink
-          v-if="!navigationItems?.length"
-          to="/library/books"
-          class="flex flex-1 justify-center"
-        >
-          <h6>{{ title }}</h6>
-        </NuxtLink>
+      <nav
+        class="border-b-stroke relative flex items-center border-b px-8 py-4"
+      >
+        <div class="ml-auto flex items-center gap-4">
+          <!-- Action button -->
+          <slot name="action-btn" />
 
-        <!-- Navigation items -->
-        <ul
-          v-if="!!navigationItems?.length"
-          class="hidden flex-1 items-center justify-center gap-5 sm:flex"
+          <IconMenu2
+            v-if="!!navigationItems?.length"
+            :size="ICON_SIZE_MEDIUM"
+            stroke="1.5"
+            class="hover:text-primary cursor-pointer sm:hidden"
+            @click="sidebarOpen = !sidebarOpen"
+          />
+        </div>
+
+        <div
+          class="pointer-events-none absolute inset-0 flex items-center justify-center px-8"
         >
-          <li
-            v-for="item of navigationItems"
-            :key="item.label"
-            class="hover:text-primary"
-            :class="{
-              'text-primary': item.active,
-            }"
+          <!-- Page title -->
+          <NuxtLink
+            v-if="!navigationItems?.length"
+            to="/library/books"
+            class="pointer-events-auto"
           >
-            <NuxtLink :to="item.to">
-              <h6>
-                {{ item.label }}
-              </h6>
-            </NuxtLink>
-          </li>
-        </ul>
+            <h6>{{ title }}</h6>
+          </NuxtLink>
 
-        <!-- Action button -->
-        <slot name="action-btn" />
-
-        <IconMenu2
-          v-if="!!navigationItems?.length"
-          :size="ICON_SIZE_MEDIUM"
-          stroke="1.5"
-          class="hover:text-primary cursor-pointer sm:hidden"
-          @click="sidebarOpen = !sidebarOpen"
-        />
+          <!-- Navigation items -->
+          <ul
+            v-if="!!navigationItems?.length"
+            class="pointer-events-auto hidden items-center justify-center gap-5 sm:flex"
+          >
+            <li
+              v-for="item of navigationItems"
+              :key="item.label"
+              class="hover:text-primary"
+              :class="{
+                'text-primary': item.active,
+              }"
+            >
+              <NuxtLink :to="item.to">
+                <h6>
+                  {{ item.label }}
+                </h6>
+              </NuxtLink>
+            </li>
+          </ul>
+        </div>
       </nav>
       <div
         class="relative flex w-full flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"

@@ -8,7 +8,7 @@
       @drag="(args) => $emit('book-drag', args)"
       @select="(args) => $emit('book-select', args)"
     />
-    <hr v-if="editing" class="my-8 text-primary" />
+    <hr v-if="editing" class="text-primary my-8" />
     <div v-if="editing" class="flex items-center justify-between">
       <h4>All books</h4>
       <bl-search-bar

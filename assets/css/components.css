@@ -89,7 +89,10 @@
   }
 
   .autocomplete-empty-item {
-    @apply rounded-scholarly relative flex w-full cursor-pointer items-center gap-1 px-2 py-2 text-base select-none;
+    @apply rounded-scholarly text-ink-muted relative flex w-full items-center gap-1 px-2 py-2 text-base select-none;
+  }
+  .autocomplete-empty-item:not(.disabled) {
+    @apply text-ink-primary cursor-pointer;
     @apply hover:bg-surface-subtle;
   }
 

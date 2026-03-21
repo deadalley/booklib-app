@@ -8,7 +8,7 @@
     "
   >
     <template #navbar>
-      <bl-search-bar @input="onSearch" />
+      <!-- <bl-search-bar @input="onSearch" /> -->
       <div class="flex justify-end gap-3">
         <bl-view-switch
           v-model:view="view"
@@ -27,7 +27,7 @@
     </bl-empty>
     <div
       v-if="view === 'cards'"
-      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-visible overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
       <bl-collection-card
         v-for="author in filteredAuthorsByPage"

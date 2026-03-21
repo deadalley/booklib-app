@@ -8,7 +8,7 @@
     "
   >
     <template #navbar>
-      <bl-search-bar @input="onSearch" />
+      <!-- <bl-search-bar @input="onSearch" /> -->
       <NuxtLink
         class="flex md:inline-flex lg:order-6"
         to="/library/collections/new"
@@ -43,7 +43,7 @@
     </bl-empty>
     <div
       v-if="view === 'cards'"
-      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-visible overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
       <bl-collection-card
         v-for="collection in filteredCollectionsByPage"

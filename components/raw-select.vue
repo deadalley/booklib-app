@@ -113,6 +113,10 @@ export type SelectOption = {
   label: string
   value: string
   icon?: keyof typeof icons
+  subtitle?: string
+  imageSrc?: string | null
+  href?: string
+  group?: 'books' | 'collections' | 'authors'
 }
 export type SelectProps = {
   dataTestid?: string

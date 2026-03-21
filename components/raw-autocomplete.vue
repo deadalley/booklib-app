@@ -24,9 +24,10 @@
           'border-primary!': focused,
         }"
       >
+        <slot name="prepend" />
         <ComboboxInput
           v-bind="$attrs"
-          class="w-full"
+          class="min-w-0 flex-1"
           :class="{ hidden: !(editing && !hidden) }"
           :placeholder="placeholder"
           @focus="onFocus"
@@ -34,7 +35,7 @@
         />
         <IconX
           v-if="clearable && selectValue"
-          class="cursor-pointer"
+          class="shrink-0 cursor-pointer"
           :size="14"
           @click="onClear"
         />
@@ -60,7 +61,11 @@
       >
         <ComboboxViewport class="w-full">
           <ComboboxEmpty as-child>
-            <div class="autocomplete-empty-item" @click="onAddNew">
+            <div
+              class="autocomplete-empty-item"
+              :class="{ disabled: !canCreateNew }"
+              @click="onAddNew"
+            >
               {{
                 canCreateNew
                   ? `Add ${searchTerm ?? 'new'}`
@@ -69,8 +74,30 @@
             </div>
           </ComboboxEmpty>
 
+          <template v-if="groups?.length">
+            <template v-for="(group, groupIndex) in groups" :key="groupIndex">
+              <ComboboxLabel v-if="group.label" class="select-group-label">
+                {{ group.label }}
+              </ComboboxLabel>
+              <ComboboxGroup class="flex w-full flex-col gap-1">
+                <ComboboxItem
+                  v-for="(option, index) in group.options"
+                  :key="`${group.label}-${index}`"
+                  class="menu-item"
+                  :value="option.value"
+                >
+                  <slot name="item" :option="option">
+                    <ComboboxLabel>
+                      {{ option.label }}
+                    </ComboboxLabel>
+                  </slot>
+                </ComboboxItem>
+              </ComboboxGroup>
+            </template>
+          </template>
+
           <ComboboxGroup
-            v-if="extendedOptions"
+            v-else-if="extendedOptions"
             class="flex w-full flex-col gap-1"
           >
             <ComboboxItem
@@ -79,9 +106,11 @@
               class="menu-item"
               :value="option.value"
             >
-              <ComboboxLabel>
-                {{ option.label }}
-              </ComboboxLabel>
+              <slot name="item" :option="option">
+                <ComboboxLabel>
+                  {{ option.label }}
+                </ComboboxLabel>
+              </slot>
             </ComboboxItem>
           </ComboboxGroup>
         </ComboboxViewport>
@@ -109,6 +138,7 @@ import { IconX } from '@tabler/icons-vue'
 export type AutocompleteProps = {
   dataTestid?: string
   options: SelectOption[]
+  groups?: { label?: string; options: SelectOption[] }[]
   placeholder?: string
   withWrapper?: boolean
   align?: 'start' | 'center' | 'end'
@@ -137,8 +167,16 @@ const focused = defineModel<boolean>('focused')
 const open = ref<boolean>(false)
 const extendedOptions = ref([...props.options])
 
+const mergedOptions = computed<SelectOption[]>(() => {
+  if (props.groups?.length) {
+    return props.groups.flatMap((group) => group.options)
+  }
+
+  return props.options
+})
+
 watch(
-  () => props.options,
+  mergedOptions,
   (options) => {
     extendedOptions.value = [...options]
   },

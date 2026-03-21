@@ -10,7 +10,7 @@
     :loading="loading"
   >
     <template #navbar>
-      <bl-search-bar @input="onSearch" />
+      <!-- <bl-search-bar @input="onSearch" /> -->
       <NuxtLink class="flex md:inline-flex lg:order-6" to="/library/books/new">
         <bl-button expand>
           <template #prependIcon="prependIcon">
