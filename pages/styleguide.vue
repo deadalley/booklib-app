@@ -369,6 +369,108 @@
 
         <div class="col-span-12">
           <bl-tile>
+            <template #title>Typography</template>
+            <div class="flex flex-col gap-10">
+              <!-- Headings -->
+              <div>
+                <p
+                  class="text-ink-secondary mb-4 text-sm font-semibold tracking-widest uppercase"
+                >
+                  Headings
+                </p>
+                <div class="flex flex-col gap-3">
+                  <div
+                    v-for="heading in typographyHeadings"
+                    :key="heading.tag"
+                    class="border-stroke flex flex-wrap items-baseline gap-4 border-b pb-3 last:border-b-0"
+                  >
+                    <component
+                      :is="heading.tag"
+                      class="flex-1"
+                    >{{ heading.sample }}</component>
+                    <span class="text-ink-muted font-mono text-xs whitespace-nowrap">{{ heading.tag }} &mdash; {{ heading.size }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Body text -->
+              <div>
+                <p
+                  class="text-ink-secondary mb-4 text-sm font-semibold tracking-widest uppercase"
+                >
+                  Body &amp; UI text
+                </p>
+                <div
+                  class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+                >
+                  <div
+                    v-for="variant in typographyBody"
+                    :key="variant.label"
+                    class="rounded-scholarly border-stroke border p-4"
+                  >
+                    <p :class="variant.class">{{ variant.sample }}</p>
+                    <p class="text-ink-muted mt-2 font-mono text-xs">
+                      {{ variant.label }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Font families -->
+              <div>
+                <p
+                  class="text-ink-secondary mb-4 text-sm font-semibold tracking-widest uppercase"
+                >
+                  Font Families
+                </p>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div
+                    v-for="family in typographyFamilies"
+                    :key="family.label"
+                    class="rounded-scholarly border-stroke border p-4"
+                  >
+                    <p :class="[family.class, 'text-2xl leading-snug']">
+                      {{ family.sample }}
+                    </p>
+                    <p class="text-ink-muted mt-2 font-mono text-xs">
+                      {{ family.label }}
+                    </p>
+                    <p class="text-ink-muted font-mono text-xs">
+                      {{ family.stack }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ink scale -->
+              <div>
+                <p
+                  class="text-ink-secondary mb-4 text-sm font-semibold tracking-widest uppercase"
+                >
+                  Ink colour scale
+                </p>
+                <div class="flex flex-col gap-3">
+                  <div
+                    v-for="ink in typographyInk"
+                    :key="ink.label"
+                    class="border-stroke flex items-baseline gap-4 border-b pb-3 last:border-b-0"
+                  >
+                    <p :class="[ink.class, 'flex-1 text-lg']">
+                      The quick brown fox jumps over the lazy dog
+                    </p>
+                    <span
+                      class="font-mono text-xs whitespace-nowrap"
+                      :style="{ color: ink.hex }"
+                    >{{ ink.label }} — {{ ink.hex }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12">
+          <bl-tile>
             <template #title>Color Tokens</template>
             <div class="flex flex-col gap-6">
               <div v-for="group in swatchGroups" :key="group.label">
@@ -476,6 +578,52 @@ function toggleMultiselectValue(value: string) {
 }
 
 const colors = activeTheme.colors
+
+const typographyHeadings = [
+  { tag: 'h1', sample: 'Heading 1 — The Left Hand of Darkness', size: 'text-5xl / 3rem' },
+  { tag: 'h2', sample: 'Heading 2 — Ursula K. Le Guin', size: 'text-4xl / 2.25rem' },
+  { tag: 'h3', sample: 'Heading 3 — Hainish Cycle, 1969', size: 'text-3xl / 1.875rem' },
+  { tag: 'h4', sample: 'Heading 4 — Science Fiction', size: 'text-2xl / 1.5rem' },
+  { tag: 'h5', sample: 'Heading 5 — 286 pages', size: 'text-xl / 1.25rem' },
+  { tag: 'h6', sample: 'Heading 6 — Finished reading', size: 'text-lg / 1.125rem' },
+]
+
+const typographyBody = [
+  { label: 'text-base (body)', class: 'text-base', sample: 'Body text — used for most UI copy and descriptions.' },
+  { label: 'text-sm (small)', class: 'text-sm', sample: 'Small text — labels, captions, and secondary details.' },
+  { label: 'text-xs (extra small)', class: 'text-xs', sample: 'Extra small — badges, metadata, monospace values.' },
+  { label: 'text-lg (large)', class: 'text-lg', sample: 'Large body — section intros and prominent descriptions.' },
+  { label: 'font-semibold', class: 'text-base font-semibold', sample: 'Semibold — button labels, list headers, emphasis.' },
+  { label: 'font-mono text-sm', class: 'font-mono text-sm', sample: 'Monospace — hex values, IDs, code snippets.' },
+]
+
+const typographyFamilies = [
+  {
+    label: 'font-display',
+    class: 'font-display',
+    sample: 'The Left Hand of Darkness',
+    stack: activeTheme.fontFamily.display.join(', '),
+  },
+  {
+    label: 'font-body (sans)',
+    class: 'font-body',
+    sample: 'Ursula K. Le Guin • 1969',
+    stack: activeTheme.fontFamily.body.join(', '),
+  },
+  {
+    label: 'font-mono',
+    class: 'font-mono',
+    sample: 'ISBN 978-0-441-47812-5',
+    stack: activeTheme.fontFamily.mono.join(', '),
+  },
+]
+
+const typographyInk = [
+  { label: 'ink-primary', class: 'text-ink-primary', hex: colors.ink.primary },
+  { label: 'ink-secondary', class: 'text-ink-secondary', hex: colors.ink.secondary },
+  { label: 'ink-muted', class: 'text-ink-muted', hex: colors.ink.muted },
+  { label: 'ink-inverse (on dark)', class: 'text-ink-inverse bg-surface-dark rounded px-2 py-0.5', hex: colors.ink.inverse },
+]
 const swatchGroups = [
   {
     label: 'Surface',
