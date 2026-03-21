@@ -100,6 +100,16 @@
     @apply text-ink-muted mt-2 w-full uppercase;
   }
 
+  /* Search modal */
+  .search-result-row {
+    @apply rounded-scholarly flex w-full cursor-pointer px-2 py-2 select-none;
+    @apply hover:bg-surface-subtle;
+  }
+  .search-group-list {
+    @apply flex flex-col gap-1 overflow-y-auto;
+    max-height: 60vh;
+  }
+
   /* Tooltip */
   .tooltip-content {
     @apply rounded-scholarly bg-surface-elevated text-ink-primary px-3 py-2 text-sm shadow-sm;

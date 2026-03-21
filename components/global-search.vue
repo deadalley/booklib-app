@@ -1,12 +1,33 @@
 <template>
+  <!-- Desktop: inline search bar -->
   <bl-search-bar-autocomplete
+    class="hidden sm:flex"
     :class="{ invisible: isLibraryEmpty }"
     :groups="searchGroups"
     placeholder="Search books, collections, authors..."
   />
+
+  <!-- Mobile: icon button that opens a modal -->
+  <button
+    v-if="!isLibraryEmpty"
+    type="button"
+    class="hover:text-primary flex cursor-pointer sm:hidden"
+    aria-label="Search"
+    @click="mobileOpen = true"
+  >
+    <IconSearch :size="ICON_SIZE_MEDIUM" stroke="1.5" />
+  </button>
+
+  <bl-search-modal
+    v-if="mobileOpen"
+    :open="mobileOpen"
+    :groups="searchGroups"
+    @close="mobileOpen = false"
+  />
 </template>
 
 <script setup lang="ts">
+import { IconSearch } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
@@ -17,6 +38,8 @@ import type {
 } from '~/components/search-bar-autocomplete.vue'
 
 const route = useRoute()
+
+const mobileOpen = ref(false)
 
 const {
   isLibraryEmpty: checkLibraryEmpty,

@@ -16,36 +16,13 @@
     </template>
 
     <template #item="{ option }">
-      <div class="flex w-full items-center gap-3">
-        <NuxtImg
-          v-if="option.imageSrc"
-          :src="option.imageSrc"
-          :alt="option.label"
-          class="border-stroke size-8 shrink-0 rounded-md border object-cover"
-        />
-        <div
-          v-else
-          class="border-stroke bg-surface-subtle text-ink-secondary flex size-8 shrink-0 items-center justify-center rounded-md border"
-        >
-          <component :is="getOptionIcon(option)" :size="16" stroke="1.75" />
-        </div>
-
-        <div class="flex min-w-0 flex-1 flex-col">
-          <span class="truncate">{{ option.label }}</span>
-          <span
-            v-if="option.subtitle"
-            class="text-ink-secondary truncate text-xs"
-          >
-            {{ option.subtitle }}
-          </span>
-        </div>
-      </div>
+      <bl-search-result-item :option="option" />
     </template>
   </bl-raw-autocomplete>
 </template>
 
 <script setup lang="ts">
-import { IconArchive, IconBooks, IconSearch, IconUser } from '@tabler/icons-vue'
+import { IconSearch } from '@tabler/icons-vue'
 import type { SelectOption } from './raw-select.vue'
 
 export type SearchAutocompleteOption = SelectOption & {
@@ -72,6 +49,8 @@ const props = withDefaults(
   },
 )
 
+const emit = defineEmits<{ navigate: [] }>()
+
 const route = useRoute()
 const selectedValue = ref<string | undefined>(undefined)
 const searchTerm = ref<string>('')
@@ -80,37 +59,9 @@ const allOptions = computed(() =>
   props.groups.flatMap((group) => group.options),
 )
 
-const normalizedSearchTerm = computed(() =>
-  searchTerm.value.trim().toLowerCase(),
-)
-
-const visibleGroups = computed<SearchAutocompleteGroup[]>(() => {
-  if (!normalizedSearchTerm.value) {
-    return []
-  }
-
-  return props.groups
-    .map((group) => ({
-      ...group,
-      options: group.options.filter((option) => {
-        return [option.label, option.subtitle]
-          .filter(Boolean)
-          .some((field) =>
-            field!.toLowerCase().includes(normalizedSearchTerm.value),
-          )
-      }),
-    }))
-    .filter((group) => group.options.length > 0)
-})
-
-const visibleFlatOptions = computed(() =>
-  visibleGroups.value.flatMap((group) => group.options),
-)
-
-const notFoundLabel = computed(() =>
-  normalizedSearchTerm.value
-    ? 'No matches'
-    : 'Search books, collections, authors...',
+const { visibleGroups, visibleFlatOptions, notFoundLabel } = useSearchFilter(
+  computed(() => props.groups),
+  searchTerm,
 )
 
 watch(selectedValue, async (value) => {
@@ -133,6 +84,7 @@ watch(selectedValue, async (value) => {
   await nextTick()
   selectedValue.value = undefined
   searchTerm.value = ''
+  emit('navigate')
 })
 
 watch(searchTerm, (term) => {
@@ -141,15 +93,4 @@ watch(searchTerm, (term) => {
     selectedValue.value = undefined
   }
 })
-
-function getOptionIcon(option: SearchAutocompleteOption) {
-  switch (option.group) {
-    case 'collections':
-      return IconArchive
-    case 'authors':
-      return IconUser
-    default:
-      return IconBooks
-  }
-}
 </script>
