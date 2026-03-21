@@ -20,7 +20,7 @@
         </bl-button>
       </NuxtLink>
       <div class="flex justify-end gap-3">
-        <bl-view-switch v-model:view="view" />
+        <bl-view-switch v-model:view="view" show-labels />
         <bl-tooltip>
           <template #tooltip-content>Filter</template>
           <bl-button variant="secondary" @click="onFilterOpen">

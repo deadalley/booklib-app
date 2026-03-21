@@ -14,6 +14,9 @@
       </template>
       <span class="switch-option-inner">
         <slot name="icon" :size="19" stroke="1.5" />
+        <span v-if="$slots.label" class="switch-option-label">
+          <slot name="label" />
+        </span>
       </span>
     </bl-tooltip>
   </RadioGroupItem>
