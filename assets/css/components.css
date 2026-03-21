@@ -93,6 +93,14 @@
     @apply border-stroke bg-surface-subtle text-ink-secondary border;
   }
 
+  /* Checkbox */
+  .checkbox-label {
+    @apply text-ink-primary flex cursor-pointer items-center gap-3;
+  }
+  .checkbox-input {
+    @apply border-stroke-strong checked:border-primary checked:bg-primary relative aspect-square size-5 cursor-pointer appearance-none rounded-md border transition-all;
+  }
+
   /* Nav Sidebar */
   .nav-sidebar {
     @apply border-stroke bg-surface-canvas order-last flex w-full flex-col gap-6 overflow-hidden border-t border-r py-2 transition-all duration-500 sm:order-0 sm:h-full sm:w-[unset] sm:border-t-0 sm:pt-16 sm:pb-8;
