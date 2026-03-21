@@ -27,10 +27,12 @@
     >
       <!-- Header -->
       <nav
-        class="border-b-stroke relative flex items-center border-b px-8 py-4"
+        class="border-b-stroke relative flex items-center border-b px-8 py-3"
       >
         <div class="ml-auto flex items-center gap-4">
-          <!-- Action button -->
+          <!-- Global search bar -->
+          <bl-global-search />
+
           <slot name="action-btn" />
 
           <IconMenu2
@@ -110,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
+import { IconMenu2 } from '@tabler/icons-vue'
 
 const route = useRoute()
 
