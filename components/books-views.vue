@@ -50,17 +50,13 @@
     />
   </div>
 
-  <div
+  <bl-pagination
     v-if="totalBookCount && totalBookCount > BOOKS_PAGE_SIZE"
-    class="flex justify-center py-2"
-  >
-    <bl-pagination
-      v-model="currentPage"
-      :total-item-count="totalBookCount"
-      :items-per-page="BOOKS_PAGE_SIZE"
-      @update:page="(args) => $emit('update:page', args)"
-    />
-  </div>
+    v-model="currentPage"
+    :total-item-count="totalBookCount"
+    :items-per-page="BOOKS_PAGE_SIZE"
+    @update:page="(args) => $emit('update:page', args)"
+  />
 </template>
 
 <script setup lang="ts">

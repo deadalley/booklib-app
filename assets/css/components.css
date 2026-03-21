@@ -180,25 +180,28 @@
   }
 
   /* Pagination */
+  .pagination-root {
+    @apply bg-surface-elevated rounded-b-scholarly border-stroke-subtle flex w-full items-center justify-between gap-3 border-r border-b border-l p-2;
+  }
+  .pagination-summary {
+    @apply text-ink-secondary text-sm font-medium;
+  }
   .pagination-list {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-1;
   }
   .pagination-arrow {
-    @apply text-ink-secondary enabled:hover:text-primary flex size-9 items-center justify-center rounded-full not-disabled:cursor-pointer disabled:opacity-50;
-  }
-  .pagination-arrow-prev {
-    @apply mr-4;
-  }
-  .pagination-arrow-next {
-    @apply ml-4;
+    @apply text-ink-secondary/70 enabled:hover:text-primary disabled:text-ink-muted/60;
+    @apply flex size-8 items-center justify-center rounded-md transition-colors;
+    @apply enabled:hover:bg-surface-subtle not-disabled:cursor-pointer;
   }
   .pagination-page-item {
-    @apply rounded-scholarly size-10 cursor-pointer border text-lg transition-all;
-    @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle;
+    @apply text-ink-secondary rounded-md border border-transparent bg-transparent;
+    @apply flex size-8 cursor-pointer items-center justify-center text-sm font-medium transition-colors;
+    @apply hover:bg-surface-subtle;
     @apply data-selected:border-primary data-selected:bg-primary data-selected:text-ink-inverse;
   }
   .pagination-ellipsis {
-    @apply text-ink-secondary enabled:hover:text-primary flex size-9 items-center justify-center;
+    @apply text-ink-secondary/80 flex size-8 items-center justify-center text-sm;
   }
 
   /* Total tag */
@@ -293,7 +296,7 @@
     @apply flex h-11 items-center gap-3 px-4 py-2 text-base font-semibold;
     @apply transition-colors duration-200;
     @apply hover:border-stroke-subtle hover:bg-surface-elevated hover:text-ink-primary;
-    @apply focus-visible:ring-primary/25 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2;
+    @apply focus-visible:ring-primary/25 focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:outline-none;
   }
   .nav-sidebar-button-disabled {
     @apply text-ink-muted pointer-events-none cursor-default opacity-70;

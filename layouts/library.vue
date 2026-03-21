@@ -1,10 +1,11 @@
 <template>
   <div
-    class="relative flex size-full flex-col gap-4 overflow-x-visible sm:gap-8"
+    class="relative flex size-full flex-col overflow-x-visible"
     v-bind="$attrs"
   >
     <div class="flex flex-col items-baseline justify-between lg:flex-row">
-      <div class="flex w-full items-center gap-3">
+      <!-- Header -->
+      <div class="mb-4 flex w-full items-center gap-3">
         <h3>{{ title }}</h3>
         <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
         <div class="flex flex-1 justify-end sm:hidden">
@@ -25,7 +26,7 @@
         }"
       >
         <div
-          class="mt-5 flex w-full flex-1 flex-col justify-end gap-3 px-1 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          class="mt-5 flex w-full flex-1 flex-col justify-end gap-3 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
           :class="[
             { 'md:mr-[355px]': !!sidebarContent },
             actionsOpen ? 'translate-y-0' : '-translate-y-full',

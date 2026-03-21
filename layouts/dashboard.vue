@@ -79,7 +79,7 @@
         </div>
       </nav>
       <div
-        class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
+        class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto p-6 pt-10 sm:p-16"
       >
         <!-- Demo alert -->
         <!-- <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
