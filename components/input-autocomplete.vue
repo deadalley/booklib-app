@@ -12,8 +12,10 @@
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
       outer: `flex-1 ${editing ? '' : '!hidden'}`,
+      wrapper: 'form-wrapper',
       label: 'form-label',
-      inner: `!gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
+      inner: `form-inner !gap-0 relative ${focused ? 'border-primary' : 'border-stroke'}`,
+      input: 'form-input',
     }"
     :type="rawAutocomplete"
     :options="options"

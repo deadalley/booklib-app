@@ -15,7 +15,7 @@
       outer: `flex flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'form-wrapper',
       label: 'form-label',
-      inner: `form-inner ${focused ? '!border-primary' : 'border-stroke'}`,
+      inner: `form-inner ${focused ? 'border-primary' : 'border-stroke'}`,
       input: 'form-input',
     }"
     @focus="onFocus"

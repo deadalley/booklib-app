@@ -15,17 +15,104 @@
         <div class="col-span-12 xl:col-span-7">
           <bl-tile>
             <template #title>Buttons</template>
-            <div class="flex flex-wrap gap-4">
-              <bl-button>Primary</bl-button>
-              <bl-button variant="secondary">Secondary</bl-button>
-              <bl-button disabled>Disabled</bl-button>
-              <bl-button loading>Loading</bl-button>
-              <bl-button>
-                <template #prependIcon="iconProps">
-                  <IconPlus v-bind="iconProps" />
-                </template>
-                Add book
-              </bl-button>
+            <div class="flex flex-col gap-6">
+              <div class="flex flex-wrap gap-4">
+                <bl-button>Primary</bl-button>
+                <bl-button variant="secondary">Secondary</bl-button>
+                <bl-button disabled>Disabled</bl-button>
+                <bl-button loading>Loading</bl-button>
+                <bl-button>
+                  <template #prependIcon="iconProps">
+                    <IconPlus v-bind="iconProps" />
+                  </template>
+                  Add book
+                </bl-button>
+              </div>
+
+              <div
+                class="border-t-stroke flex flex-wrap items-center gap-4 border-t pt-4"
+              >
+                <div class="flex flex-col gap-2">
+                  <p class="text-ink-secondary text-sm">Multiselect</p>
+                  <bl-multiselect>
+                    <bl-multiselect-option
+                      value="books"
+                      :selected="multiselectValues.includes('books')"
+                      @select="toggleMultiselectValue"
+                    >
+                      <template #icon="iconProps">
+                        <IconBooks v-bind="iconProps" />
+                      </template>
+                      <template #tooltip>Books</template>
+                    </bl-multiselect-option>
+                    <bl-multiselect-option
+                      value="home"
+                      :selected="multiselectValues.includes('home')"
+                      @select="toggleMultiselectValue"
+                    >
+                      <template #icon="iconProps">
+                        <IconHome v-bind="iconProps" />
+                      </template>
+                      <template #tooltip>Home</template>
+                    </bl-multiselect-option>
+                    <bl-multiselect-option
+                      value="palette"
+                      :selected="multiselectValues.includes('palette')"
+                      @select="toggleMultiselectValue"
+                    >
+                      <template #icon="iconProps">
+                        <IconPalette v-bind="iconProps" />
+                      </template>
+                      <template #tooltip>Palette</template>
+                    </bl-multiselect-option>
+                  </bl-multiselect>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <p class="text-ink-secondary text-sm">Switch</p>
+                  <bl-switch v-model="previewView">
+                    <bl-switch-option
+                      value="grid"
+                      :selected-value="previewView"
+                    >
+                      <template #icon="iconProps">
+                        <IconLayoutGrid v-bind="iconProps" />
+                      </template>
+                      <template #tooltip>Grid</template>
+                    </bl-switch-option>
+                    <bl-switch-option
+                      value="list"
+                      :selected-value="previewView"
+                    >
+                      <template #icon="iconProps">
+                        <IconList v-bind="iconProps" />
+                      </template>
+                      <template #tooltip>List</template>
+                    </bl-switch-option>
+                  </bl-switch>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <p class="text-ink-secondary text-sm">Icon button</p>
+                  <div class="flex items-center gap-3">
+                    <bl-icon-button>
+                      <template #default="iconProps">
+                        <IconPlus v-bind="iconProps" />
+                      </template>
+                    </bl-icon-button>
+                    <bl-icon-button variant="secondary">
+                      <template #default="iconProps">
+                        <IconPalette v-bind="iconProps" />
+                      </template>
+                    </bl-icon-button>
+                    <bl-icon-button disabled>
+                      <template #default="iconProps">
+                        <IconPlus v-bind="iconProps" />
+                      </template>
+                    </bl-icon-button>
+                  </div>
+                </div>
+              </div>
             </div>
           </bl-tile>
         </div>
@@ -45,51 +132,160 @@
         <div class="col-span-12">
           <bl-tile>
             <template #title>Inputs</template>
-            <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
-              <bl-input v-model="title" label="Input" />
-              <bl-input
-                v-model="year"
-                label="Number input"
-                type="number"
-                :min="1000"
-                :max="9999"
-              />
-              <bl-select
-                v-model="status"
-                label="Select"
-                :options="statusOptions"
-              />
-              <bl-input-autocomplete
-                v-model:input="genre"
-                label="Input autocomplete"
-                :options="genreOptions"
-                placeholder="Pick a genre…"
-              />
-              <bl-dropdown :items="sortItems" with-chevron @click="onSortClick">
-                Dropdown: {{ sortLabel }}
-              </bl-dropdown>
-              <bl-search-bar v-model="search" placeholder="Search bar" />
-              <div class="lg:col-span-2 xl:col-span-3">
+            <div class="flex flex-col gap-8">
+              <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
+                <bl-input v-model="title" label="Input" />
                 <bl-input
-                  v-model="notes"
-                  label="Textarea"
-                  type="textarea"
-                  rows="4"
+                  v-model="year"
+                  label="Number input"
+                  type="number"
+                  :min="1000"
+                  :max="9999"
+                />
+                <bl-search-bar v-model="search" placeholder="Search bar" />
+                <div class="lg:col-span-2 xl:col-span-3">
+                  <bl-input
+                    v-model="notes"
+                    label="Textarea"
+                    type="textarea"
+                    rows="4"
+                  />
+                </div>
+                <div class="flex-start flex flex-col gap-3">
+                  <bl-checkbox v-model="owned"
+                    >Checkbox align right</bl-checkbox
+                  >
+                  <bl-checkbox v-model="wishlist" align="left">
+                    Checkbox align left
+                  </bl-checkbox>
+                </div>
+                <bl-slider
+                  v-model:values="pageRange"
+                  label="Slider"
+                  :min="0"
+                  :max="1000"
+                  :step="50"
                 />
               </div>
-              <div class="flex-start flex flex-col gap-3">
-                <bl-checkbox v-model="owned">Checkbox align right</bl-checkbox>
-                <bl-checkbox v-model="wishlist" align="left">
-                  Checkbox align left
-                </bl-checkbox>
+
+              <div class="border-t-stroke flex flex-col gap-4 border-t pt-6">
+                <div
+                  class="flex flex-col justify-between gap-4 md:flex-row md:items-end"
+                >
+                  <h6>Select Menus</h6>
+                  <div class="flex items-center gap-3">
+                    <bl-switch v-model="menuSide">
+                      <bl-switch-option
+                        value="bottom"
+                        :selected-value="menuSide"
+                      >
+                        <template #icon="iconProps">
+                          <IconChevronDown v-bind="iconProps" />
+                        </template>
+                        <template #tooltip>Bottom</template>
+                      </bl-switch-option>
+                      <bl-switch-option value="top" :selected-value="menuSide">
+                        <template #icon="iconProps">
+                          <IconChevronUp v-bind="iconProps" />
+                        </template>
+                        <template #tooltip>Top</template>
+                      </bl-switch-option>
+                    </bl-switch>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                  <div
+                    class="rounded-scholarly border-stroke bg-surface border p-4"
+                  >
+                    <p
+                      class="text-ink-secondary mb-3 text-xs tracking-widest uppercase"
+                    >
+                      Select
+                    </p>
+                    <div class="flex flex-col gap-4">
+                      <div class="flex flex-col gap-2">
+                        <p class="text-ink-secondary text-xs">Raw</p>
+                        <bl-raw-select
+                          v-model="statusRaw"
+                          :options="statusOptions"
+                          placeholder="Pick a status..."
+                          :side="menuSide"
+                        />
+                      </div>
+                      <bl-select
+                        v-model="status"
+                        label="Editing"
+                        :options="statusOptions"
+                        placeholder="Pick a status..."
+                        :side="menuSide"
+                      />
+                      <bl-select
+                        v-model="statusReadOnly"
+                        label="Not editing"
+                        :options="statusOptions"
+                        :editing="false"
+                        :side="menuSide"
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-scholarly border-stroke bg-surface border p-4"
+                  >
+                    <p
+                      class="text-ink-secondary mb-3 text-xs tracking-widest uppercase"
+                    >
+                      Input autocomplete
+                    </p>
+                    <div class="flex flex-col gap-4">
+                      <div class="flex flex-col gap-2">
+                        <p class="text-ink-secondary text-xs">Raw</p>
+                        <bl-raw-autocomplete
+                          v-model="genreRaw"
+                          :options="genreOptions"
+                          placeholder="Pick a genre…"
+                          :side="menuSide"
+                        />
+                      </div>
+                      <bl-input-autocomplete
+                        v-model:input="genre"
+                        label="Editing"
+                        :options="genreOptions"
+                        placeholder="Pick a genre…"
+                        :side="menuSide"
+                      />
+                      <bl-input-autocomplete
+                        v-model:input="genreReadOnly"
+                        label="Not editing"
+                        :options="genreOptions"
+                        :editing="false"
+                        :side="menuSide"
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-scholarly border-stroke bg-surface border p-4"
+                  >
+                    <p
+                      class="text-ink-secondary mb-3 text-xs tracking-widest uppercase"
+                    >
+                      Dropdown
+                    </p>
+                    <div class="flex flex-col gap-4">
+                      <bl-dropdown
+                        :items="sortItems"
+                        with-chevron
+                        :side="menuSide"
+                        @click="onSortClick"
+                      >
+                        Editing: {{ sortLabel }}
+                      </bl-dropdown>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <bl-slider
-                v-model:values="pageRange"
-                label="Slider"
-                :min="0"
-                :max="1000"
-                :step="50"
-              />
             </div>
           </bl-tile>
         </div>
@@ -212,14 +408,17 @@
 import {
   IconAlertTriangle,
   IconBooks,
+  IconChevronDown,
+  IconChevronUp,
   IconHome,
+  IconLayoutGrid,
+  IconList,
   IconPalette,
   IconPlus,
 } from '@tabler/icons-vue'
 import { activeTheme } from '~/utils/theme'
 
 const title = ref('The Left Hand of Darkness')
-const author = ref('Ursula K. Le Guin')
 const year = ref('1969')
 const notes = ref(
   'Elegant typography and component states should be easy to inspect.',
@@ -227,6 +426,13 @@ const notes = ref(
 const search = ref('')
 const status = ref<string | undefined>(undefined)
 const genre = ref<string | undefined>(undefined)
+const statusReadOnly = ref<string | undefined>('reading')
+const genreReadOnly = ref<string | undefined>('fantasy')
+const statusRaw = ref<string | undefined>('finished')
+const genreRaw = ref<string | undefined>('sci-fi')
+const menuSide = ref<'top' | 'bottom'>('bottom')
+const previewView = ref<'grid' | 'list'>('grid')
+const multiselectValues = ref<string[]>(['books'])
 const pageRange = ref<[number, number]>([100, 500])
 const sortBy = ref('title')
 const owned = ref(true)
@@ -261,6 +467,12 @@ const sortLabel = computed(
 
 function onSortClick(value: string) {
   sortBy.value = value
+}
+
+function toggleMultiselectValue(value: string) {
+  multiselectValues.value = multiselectValues.value.includes(value)
+    ? multiselectValues.value.filter((item) => item !== value)
+    : [...multiselectValues.value, value]
 }
 
 const colors = activeTheme.colors

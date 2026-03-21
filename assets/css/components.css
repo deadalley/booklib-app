@@ -39,20 +39,62 @@
   }
 
   /* Dropdown */
-  .dropdown-trigger {
+  .menu-trigger {
     @apply relative;
   }
-  .dropdown-trigger[data-state='open'] .dropdown-chevron {
+  .menu-popper-root {
+    @apply relative w-full;
+  }
+  .menu-popper-root [data-radix-popper-content-wrapper] {
+    position: absolute !important;
+    width: 100%;
+  }
+  .menu-popper-root:not(.with-wrapper) [data-radix-popper-content-wrapper] {
+    width: calc(100% + 30px);
+  }
+  .menu-popper-root:not(.with-wrapper).select
+    [data-radix-popper-content-wrapper] {
+    margin-left: -15px;
+  }
+  .menu-popper-root.bottom:not(.with-wrapper)
+    [data-radix-popper-content-wrapper] {
+    margin-top: 8px !important;
+  }
+  .menu-popper-root.top:not(.with-wrapper) [data-radix-popper-content-wrapper] {
+    padding-bottom: 12px !important;
+  }
+  .menu-popper-root.top.with-wrapper [data-radix-popper-content-wrapper] {
+    padding-bottom: 4px !important;
+  }
+  .menu-trigger[data-state='open'] .menu-chevron {
     transform: rotate(180deg);
   }
-  .dropdown-content {
-    @apply base-container top-2 z-50 mt-1 max-h-96 w-full overflow-x-hidden overflow-y-auto;
+  .menu-chevron {
+    @apply transition-transform duration-300 ease-in;
   }
-  .dropdown-item {
-    @apply rounded-scholarly text-ink-primary relative flex w-full cursor-pointer items-center gap-2 text-base select-none;
-    @apply data-disabled:text-ink-muted data-highlighted:bg-surface-subtle;
-    @apply data-disabled:pointer-events-none data-highlighted:outline-none;
+  .menu-content {
+    @apply border-stroke-subtle bg-surface-elevated rounded-scholarly border;
+    @apply flex flex-col items-start gap-1 p-2 text-base;
+    @apply bottom-2 z-50 mt-1 max-h-96 w-full overflow-x-hidden overflow-y-auto;
+    @apply transition-all duration-100 ease-in;
+  }
+  .menu-item {
+    @apply rounded-scholarly relative flex w-full cursor-pointer items-center gap-1 px-2 py-2 text-base select-none;
+    @apply data-[highlighted]:bg-surface-subtle data-[highlighted]:outline-none;
     @apply data-[state=checked]:bg-primary data-[state=checked]:text-ink-inverse;
+    @apply data-[disabled]:text-ink-muted data-[disabled]:pointer-events-none;
+  }
+  .menu-popper-root.dropdown {
+    width: fit-content;
+  }
+
+  .autocomplete-empty-item {
+    @apply rounded-scholarly relative flex w-full cursor-pointer items-center gap-1 px-2 py-2 text-base select-none;
+    @apply hover:bg-surface-subtle;
+  }
+
+  .select-group-label {
+    @apply text-ink-muted mt-2 w-full uppercase;
   }
 
   /* Tooltip */

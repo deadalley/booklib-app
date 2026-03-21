@@ -14,7 +14,7 @@
       outer: `flex flex-1 ${editing ? '' : '!hidden'}`,
       wrapper: 'form-wrapper',
       label: 'form-label',
-      inner: `form-inner !gap-0 relative ${focused ? '!border-primary' : 'border-stroke'}`,
+      inner: `form-inner !gap-0 relative ${focused ? 'border-primary' : 'border-stroke'}`,
       input: 'form-input',
     }"
     :type="rawSelect"
@@ -47,7 +47,7 @@ const rawSelect = createInput(SelectForInput, {
   ],
 })
 
-const inputModel = ref()
+const inputModel = defineModel<string | undefined>('input')
 const focused = ref(false)
 
 const props = withDefaults(
@@ -65,6 +65,7 @@ const props = withDefaults(
 )
 
 const displayValue = computed(() => {
+  console.log('inputModel', inputModel.value)
   return props.options.find(({ value }) => value === inputModel.value)?.label
 })
 

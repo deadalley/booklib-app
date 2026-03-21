@@ -6,12 +6,13 @@
     :class="context.attrs?.class"
     :options="context.options"
     :placeholder="context.placeholder"
-    :can-create-new="context.canCreateNew"
-    :not-found-label="context.notFoundLabel"
-    :clearable="context.clearable"
+    :with-wrapper="false"
     :align="context.align"
     :side="context.side"
+    :clearable="context.clearable"
     :multiple="context.multiple"
+    :can-create-new="context.canCreateNew"
+    :not-found-label="context.notFoundLabel"
   />
 </template>
 

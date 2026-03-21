@@ -1,10 +1,9 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="relative w-full"
+    class="menu-popper-root"
     :class="{
-      'popper-with-wrapper': withWrapper,
-      popper: !withWrapper,
+      'with-wrapper': withWrapper,
       [side]: true,
     }"
   >
@@ -21,9 +20,8 @@
     >
       <ComboboxAnchor
         :class="{
-          'flex size-full items-center gap-3': !withWrapper,
           'form-inner': withWrapper,
-          '!border-primary': focused,
+          'border-primary!': focused,
         }"
       >
         <ComboboxInput
@@ -58,14 +56,11 @@
         :side="side"
         :avoid-collisions="false"
         position="popper"
-        class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
+        class="menu-content"
       >
         <ComboboxViewport class="w-full">
           <ComboboxEmpty as-child>
-            <div
-              class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-surface-subtle"
-              @click="onAddNew"
-            >
+            <div class="autocomplete-empty-item" @click="onAddNew">
               {{
                 canCreateNew
                   ? `Add ${searchTerm ?? 'new'}`
@@ -81,7 +76,7 @@
             <ComboboxItem
               v-for="(option, index) in extendedOptions"
               :key="index"
-              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse data-[highlighted]:outline-none"
+              class="menu-item"
               :value="option.value"
             >
               <ComboboxLabel>
@@ -214,33 +209,3 @@ function getDisplayValue(value: string) {
   return labelByValue.value[value] ?? value
 }
 </script>
-
-<style scoped>
-[data-radix-popper-content-wrapper] {
-  position: absolute !important;
-}
-
-.popper-with-wrapper [data-radix-popper-content-wrapper] {
-  width: 100%;
-}
-
-.popper [data-radix-popper-content-wrapper] {
-  width: calc(100% + 30px);
-}
-
-.popper.bottom [data-radix-popper-content-wrapper] {
-  margin-top: 8px !important;
-}
-
-.popper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 12px !important;
-}
-
-.popper-with-wrapper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 8px !important;
-}
-
-.select-trigger[data-state='open'] .select-chevron {
-  transform: rotate(180deg);
-}
-</style>

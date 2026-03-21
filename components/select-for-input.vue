@@ -40,4 +40,8 @@ watch(selectValue, (value) => {
 watch(focused, (value) => {
   props.context.attrs?.['on-focus']?.(value)
 })
+
+watch(props.context, (v) => {
+  selectValue.value = v.node?._value
+})
 </script>

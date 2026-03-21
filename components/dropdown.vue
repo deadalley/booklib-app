@@ -1,21 +1,26 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="dropdown popper relative w-full"
+    class="menu-popper-root with-wrapper dropdown"
     :class="{
       [side]: true,
     }"
   >
     <DropdownMenuRoot>
-      <DropdownMenuTrigger class="dropdown-trigger">
-        <bl-button v-bind="$props" expand variant="secondary">
+      <DropdownMenuTrigger class="menu-trigger">
+        <bl-button
+          v-bind="$props"
+          class="border-stroke!"
+          expand
+          variant="secondary"
+        >
           <slot />
           <template v-if="withChevron" #appendIcon="iconProps">
             <IconChevronDown
               v-bind="iconProps"
               :size="15"
               stroke="2"
-              class="dropdown-chevron transition-transform duration-300 ease-in"
+              class="menu-chevron"
             />
           </template>
         </bl-button>
@@ -26,13 +31,13 @@
           :align="align"
           :avoid-collisions="false"
           position="popper"
-          class="dropdown-content"
+          class="menu-content"
         >
           <DropdownMenuItem
             v-for="item in items"
             :key="item.value"
             :value="item.value"
-            class="dropdown-item"
+            class="menu-item"
             @click="$emit('click', item.value)"
           >
             <component

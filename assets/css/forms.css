@@ -15,7 +15,7 @@
     @apply font-display text-ink-secondary text-base;
   }
   .form-inner {
-    @apply border-stroke-subtle bg-surface-elevated placeholder:text-ink-muted;
+    @apply border-stroke bg-surface-elevated placeholder:text-ink-muted;
     @apply rounded-scholarly flex h-min w-full items-center gap-3 border px-4 py-2 text-base transition-all duration-100 ease-in outline-none;
   }
 

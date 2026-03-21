@@ -2,20 +2,19 @@
 <template>
   <div
     :data-testid="dataTestid"
-    class="relative w-full"
+    class="menu-popper-root select"
     :class="{
-      'popper-with-wrapper': withWrapper,
-      popper: !withWrapper,
+      'with-wrapper': withWrapper,
       [side]: true,
     }"
   >
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
-        class="select-trigger relative"
+        class="menu-trigger relative"
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
           'form-inner': withWrapper,
-          '!border-primary': focused,
+          'border-primary!': focused,
         }"
         @focus="onFocus"
         @blur="onBlur"
@@ -27,7 +26,7 @@
         <input class="w-0 opacity-0" />
         <component
           :is="side === 'top' ? IconChevronUp : IconChevronDown"
-          class="select-chevron transition-transform duration-300 ease-in"
+          class="menu-chevron"
           :size="ICON_SIZE_SMALL"
         />
       </SelectTrigger>
@@ -38,14 +37,14 @@
           :side="side"
           :avoid-collisions="false"
           position="popper"
-          class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
+          class="menu-content"
         >
           <SelectViewport class="w-full">
             <SelectGroup v-if="options" class="flex w-full flex-col gap-1">
               <SelectItem
                 v-for="(option, index) in options"
                 :key="index"
-                class="data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse relative flex w-full cursor-pointer select-none items-center gap-1 rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:outline-none"
+                class="menu-item"
                 :value="option.value"
               >
                 <component
@@ -61,17 +60,14 @@
             </SelectGroup>
 
             <template v-for="(group, index) in groups" :key="group.label">
-              <SelectLabel
-                v-if="group.label"
-                class="text-ink-muted mt-2 w-full uppercase"
-              >
+              <SelectLabel v-if="group.label" class="select-group-label">
                 {{ group.label }}
               </SelectLabel>
               <SelectGroup class="flex w-full flex-col gap-1">
                 <SelectItem
                   v-for="option in group.options"
                   :key="option.value"
-                  class="data-[highlighted]:bg-surface-subtle data-[state=checked]:bg-primary data-[disabled]:text-ink-muted data-[state=checked]:text-ink-inverse relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:outline-none"
+                  class="menu-item"
                   :value="option.value"
                 >
                   <SelectItemText>
@@ -148,34 +144,3 @@ function onBlur() {
   focused.value = false
 }
 </script>
-
-<style scoped>
-[data-radix-popper-content-wrapper] {
-  position: absolute !important;
-}
-
-.popper-with-wrapper [data-radix-popper-content-wrapper] {
-  width: 100%;
-}
-
-.popper [data-radix-popper-content-wrapper] {
-  width: calc(100% + 30px);
-  margin-left: -15px !important;
-}
-
-.popper.bottom [data-radix-popper-content-wrapper] {
-  margin-top: 8px !important;
-}
-
-.popper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 12px !important;
-}
-
-.popper-with-wrapper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 8px !important;
-}
-
-.select-trigger[data-state='open'] .select-chevron {
-  transform: rotate(180deg);
-}
-</style>
