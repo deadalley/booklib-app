@@ -1,42 +1,19 @@
 <template>
-  <nav
-    class="order-last flex w-full flex-col gap-6 overflow-hidden border-r border-t border-stroke bg-surface-canvas py-2 transition-all duration-500 sm:order-none sm:h-full sm:w-[unset] sm:border-t-0 sm:pb-8 sm:pt-16"
-    :class="{
-      'px-6': !collapsed,
-      'items-center px-2': collapsed,
-    }"
-    :style="{ 'min-width': collapsed ? '0px' : '255px' }"
-  >
+  <nav class="nav-sidebar" :data-state="collapsed ? 'collapsed' : 'expanded'">
     <img
       :src="getAssetPath('/logo.svg')"
       alt="BookLib"
-      class="hidden w-6 transition-all duration-500 sm:block"
-      :class="{
-        'max-w-0 opacity-0': !collapsed,
-        'max-w-[200px] opacity-100': collapsed,
-      }"
+      class="nav-sidebar-logo"
     />
-    <div
-      class="hidden items-center sm:flex"
-      :class="{
-        'justify-center': collapsed,
-        'justify-between': !collapsed,
-      }"
-    >
-      <h3
-        class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
-        :class="{
-          'pointer-events-none max-w-0 opacity-0': collapsed,
-          'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
-        }"
-      >
+    <div class="nav-sidebar-header">
+      <h3 class="nav-sidebar-brand">
         <NuxtLink class="flex gap-2" to="/">
           <img :src="getAssetPath('/logo.svg')" alt="BookLib" class="w-6" />
           BOOKLIB
         </NuxtLink>
       </h3>
       <IconChevronLeftPipe
-        class="cursor-pointer text-ink-secondary transition-all duration-100 hover:text-primary"
+        class="nav-sidebar-collapse-toggle"
         :class="{
           'rotate-180': collapsed,
         }"
@@ -45,12 +22,8 @@
         @click="onCollapse"
       />
     </div>
-    <div
-      class="flex flex-1 justify-center gap-3 sm:flex-col sm:justify-between"
-    >
-      <div
-        class="flex justify-center gap-3 sm:flex-1 sm:flex-col sm:justify-start"
-      >
+    <div class="nav-sidebar-content">
+      <div class="nav-sidebar-links">
         <bl-nav-sidebar-button
           v-for="button in buttons"
           :key="button.label"
@@ -64,19 +37,13 @@
           </template>
           <template v-if="collapsed" #tooltip>{{ button.label }}</template>
           <template #default>
-            <span
-              class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
-              :class="{
-                'pointer-events-none max-w-0 opacity-0': collapsed,
-                'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
-              }"
-            >
+            <span class="nav-sidebar-label">
               {{ button.label }}
             </span>
           </template>
         </bl-nav-sidebar-button>
       </div>
-      <div class="flex gap-3 sm:flex-col">
+      <div class="nav-sidebar-footer">
         <bl-nav-sidebar-button
           to="/settings"
           :active="route.path.includes('settings')"
@@ -87,15 +54,7 @@
           </template>
           <template v-if="collapsed" #tooltip>Settings</template>
           <template #default>
-            <span
-              class="inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500"
-              :class="{
-                'pointer-events-none max-w-0 opacity-0': collapsed,
-                'pointer-events-auto max-w-[200px] opacity-100': !collapsed,
-              }"
-            >
-              Settings
-            </span>
+            <span class="nav-sidebar-label"> Settings </span>
           </template>
         </bl-nav-sidebar-button>
       </div>

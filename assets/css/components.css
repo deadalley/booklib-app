@@ -94,15 +94,62 @@
   }
 
   /* Nav Sidebar */
+  .nav-sidebar {
+    @apply border-stroke bg-surface-canvas order-last flex w-full flex-col gap-6 overflow-hidden border-t border-r py-2 transition-all duration-500 sm:order-0 sm:h-full sm:w-[unset] sm:border-t-0 sm:pt-16 sm:pb-8;
+  }
+  .nav-sidebar[data-state='expanded'] {
+    @apply px-6;
+    min-width: 255px;
+  }
+  .nav-sidebar[data-state='collapsed'] {
+    @apply items-center px-2;
+    min-width: 0;
+  }
+  .nav-sidebar-logo {
+    @apply hidden w-6 max-w-0 opacity-0 transition-all duration-500 sm:block;
+  }
+  .nav-sidebar[data-state='collapsed'] .nav-sidebar-logo {
+    @apply max-w-50 opacity-100;
+  }
+  .nav-sidebar-header {
+    @apply hidden items-center justify-between sm:flex;
+  }
+  .nav-sidebar[data-state='collapsed'] .nav-sidebar-header {
+    @apply justify-center;
+  }
+  .nav-sidebar-brand {
+    @apply pointer-events-auto max-w-50 opacity-100;
+    @apply inline-block overflow-hidden align-middle whitespace-nowrap transition-all duration-500;
+  }
+  .nav-sidebar-collapse-toggle {
+    @apply text-ink-secondary hover:text-primary cursor-pointer transition-all duration-100;
+  }
+  .nav-sidebar-content {
+    @apply flex flex-1 justify-center gap-3 sm:flex-col sm:justify-between;
+  }
+  .nav-sidebar-links {
+    @apply flex justify-center gap-3 sm:flex-1 sm:flex-col sm:justify-start;
+  }
+  .nav-sidebar-footer {
+    @apply flex gap-3 sm:flex-col;
+  }
+  .nav-sidebar-label {
+    @apply pointer-events-auto max-w-50 opacity-100;
+    @apply inline-block overflow-hidden align-middle whitespace-nowrap transition-all duration-500;
+  }
+  .nav-sidebar[data-state='collapsed'] .nav-sidebar-brand,
+  .nav-sidebar[data-state='collapsed'] .nav-sidebar-label {
+    @apply pointer-events-none max-w-0 opacity-0;
+  }
   .nav-sidebar-button {
-    @apply rounded-scholarly hover:bg-stroke/40 active:bg-stroke;
+    @apply rounded-scholarly hover:bg-stroke/40;
     @apply flex cursor-pointer items-center gap-3 px-5 py-3 text-lg transition-all;
   }
   .nav-sidebar-button-disabled {
     @apply text-ink-muted cursor-default;
   }
   .nav-sidebar-button-active {
-    @apply bg-primary text-ink-inverse hover:bg-primary/80;
+    @apply bg-primary text-ink-inverse hover:bg-primary/80 font-semibold;
   }
   .nav-sidebar-button-icon-only {
     @apply gap-0 px-3;
