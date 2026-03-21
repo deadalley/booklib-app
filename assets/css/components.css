@@ -191,7 +191,7 @@
   }
   .nav-sidebar-collapse-toggle {
     @apply hover:text-primary;
-    @apply size-9 translate-x-0 cursor-pointer self-start transition-all duration-300 ease-out will-change-transform;
+    @apply hidden size-9 translate-x-0 cursor-pointer self-start transition-all duration-300 ease-out will-change-transform sm:block;
   }
   .nav-sidebar[data-state='expanded'] .nav-sidebar-collapse-toggle:hover,
   .nav-sidebar[data-state='expanded']
