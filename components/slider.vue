@@ -1,34 +1,22 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <div class="form-wrapper flex-1">
-    <label v-if="!!label" for="default-range" class="form-label">{{
-      label
-    }}</label>
-
-    <div class="px-5">
-      <SliderRoot
-        v-model="values"
-        :max="max"
-        :min="min"
-        :step="step"
-        class="relative mt-16 flex h-5 w-full touch-none select-none items-center"
-      >
-        <SliderTrack
-          class="relative h-[5px] grow cursor-pointer rounded-full bg-surface"
-        >
-          <SliderRange class="absolute h-full rounded-full bg-primary" />
-        </SliderTrack>
-        <SliderThumb v-for="(value, index) in values" :key="index">
-          <span class="block size-5 cursor-pointer rounded-[10px] bg-primary" />
-          <div
-            class="absolute bottom-8 left-0 flex -translate-x-1/4 items-center justify-center rounded-md bg-surface px-3 py-1 font-display text-ink-primary"
-          >
-            {{ value }}
-          </div>
-        </SliderThumb>
-      </SliderRoot>
-    </div>
-  </div>
+  <SliderRoot
+    v-model="values"
+    :max="max"
+    :min="min"
+    :step="step"
+    class="slider-root"
+  >
+    <SliderTrack class="slider-track">
+      <SliderRange class="slider-range" />
+    </SliderTrack>
+    <SliderThumb v-for="(value, index) in values" :key="index">
+      <span class="slider-thumb" />
+      <span v-if="withThumbLabel" class="slider-thumb-label">
+        {{ value }}
+      </span>
+    </SliderThumb>
+  </SliderRoot>
 </template>
 
 <script setup lang="ts">
@@ -36,12 +24,12 @@ import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'radix-vue'
 
 withDefaults(
   defineProps<{
-    label?: string
     min?: number
     max?: number
     step?: number
+    withThumbLabel?: boolean
   }>(),
-  { step: 1, min: 0, max: 100 },
+  { step: 1, min: 0, max: 100, withThumbLabel: false },
 )
 
 const values = defineModel<[number, number]>('values')

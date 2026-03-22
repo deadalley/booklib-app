@@ -40,9 +40,9 @@
     />
 
     <div class="filter-section">
-      <div class="range-header">
-        <h6>Year Range</h6>
-        <span>{{ yearLabel }}</span>
+      <div class="filter-section-header">
+        <label class="filter-section-label">Year</label>
+        <span class="filter-section-reset">{{ yearLabel }}</span>
       </div>
       <bl-slider
         v-if="selectedYearRange"
@@ -54,9 +54,9 @@
     </div>
 
     <div class="filter-section">
-      <div class="range-header">
-        <h6>Page Count</h6>
-        <span>{{ pageLabel }}</span>
+      <div class="filter-section-header">
+        <label class="filter-section-label">Pages</label>
+        <span class="filter-section-reset">{{ pageLabel }}</span>
       </div>
       <bl-slider
         v-if="selectedPageRange"
@@ -187,7 +187,7 @@ const pageLabel = computed(() => {
     return ''
   }
 
-  return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}+`
+  return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}`
 })
 
 function onSelectPublisher(publisher: string, selected: boolean) {
