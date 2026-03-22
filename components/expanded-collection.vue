@@ -19,6 +19,7 @@
             :size="18"
           />
           <NuxtLink
+            v-if="collectionType === 'collections'"
             :to="`/library/${collectionType}/${collection.id}`"
             class="text-ink-primary group-hover:text-primary font-semibold"
             @click="(event: Event) => event.stopPropagation()"
@@ -27,6 +28,12 @@
               {{ collection.name }}
             </h6>
           </NuxtLink>
+          <h6
+            v-else
+            class="text-ink-primary group-hover:text-primary font-semibold"
+          >
+            {{ collection.name }}
+          </h6>
           <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
           <div
             class="ml-auto flex items-center gap-4"

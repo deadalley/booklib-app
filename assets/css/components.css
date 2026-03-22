@@ -181,7 +181,7 @@
 
   /* Pagination */
   .pagination-root {
-    @apply bg-surface-elevated rounded-scholarly border-stroke-subtle flex w-full items-center justify-between gap-3 border p-2;
+    @apply bg-surface-elevated rounded-scholarly border-stroke-subtle mt-2 flex w-full items-center justify-between gap-3 border p-2;
   }
   .pagination-summary {
     @apply text-ink-secondary text-sm font-medium;
