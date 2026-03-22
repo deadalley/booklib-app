@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{ align?: 'right' | 'left' }>(), { align: 'right' })
+withDefaults(defineProps<{ align?: 'right' | 'left' }>(), { align: 'left' })
 
 const checked = defineModel<boolean>()
 

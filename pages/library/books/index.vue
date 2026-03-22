@@ -25,19 +25,26 @@
       <bl-dropdown
         v-if="view === 'cards'"
         :items="sortDropdownItems"
-        @click="onSortSelect"
+        @click="onSortByChange"
       >
         {{ sortLabel || 'Sort' }}
       </bl-dropdown>
-      <bl-tooltip v-if="view === 'table'">
-        <template #tooltip-content>Table</template>
-        <bl-button variant="secondary" @click="onTableSettingsOpen">
-          <template #prependIcon="iconProps">
-            <IconTable v-bind="iconProps" />
-          </template>
-          Table
-        </bl-button>
-      </bl-tooltip>
+      <bl-dropdown v-if="view === 'table'" :items="tableColumnsOptions">
+        <template #prependIcon="iconProps">
+          <IconTable v-bind="iconProps" />
+        </template>
+        Columns
+        <template #item="{ item }">
+          <div @click.stop="toggleColumnChecked(item.value as string)">
+            <bl-checkbox
+              :id="`col-${item.value}`"
+              v-model="columnCheckboxStates[item.value as string]"
+            >
+              {{ item.label }}
+            </bl-checkbox>
+          </div>
+        </template>
+      </bl-dropdown>
       <bl-tooltip>
         <template #tooltip-content>Filter</template>
         <bl-button variant="secondary" @click="onFilterOpen">
@@ -96,10 +103,6 @@
     :open="!!sidebarContent"
     @close="onCloseSidebar"
   >
-    <bl-book-table-columns-selector
-      v-if="sidebarContent === 'Table'"
-      v-model:selected-table-columns="selectedTableColumns"
-    />
     <bl-book-filter
       v-if="sidebarContent === 'Filter'"
       v-model:selected-collections="selectedCollections"
@@ -195,7 +198,6 @@ const {
   originalLanguages,
   genres,
   onFilterOpen,
-  onTableSettingsOpen,
   onCloseSidebar,
   onResetFilter,
   onSortByChange,
@@ -207,8 +209,34 @@ const sortLabel = computed(
     sortDropdownItems.find(({ value }) => value === sortBy.value)?.label ?? '',
 )
 
-function onSortSelect(value: string) {
-  onSortByChange(value as BookSortValue)
+const tableColumnsOptions = computed(() =>
+  Object.entries(selectedTableColumns.value).map(([value, rest]) => ({
+    value,
+    ...rest,
+  })),
+)
+
+const columnCheckboxStates = ref<Record<string, boolean>>({})
+
+watch(
+  tableColumnsOptions,
+  (columns) => {
+    columns.forEach((col) => {
+      columnCheckboxStates.value[col.value] = !!col.checked
+    })
+  },
+  { immediate: true, deep: true },
+)
+
+function toggleColumnChecked(columnValue: string) {
+  const entry =
+    selectedTableColumns.value[
+      columnValue as keyof typeof selectedTableColumns.value
+    ]
+  if (entry) {
+    entry.checked = !entry.checked
+    columnCheckboxStates.value[columnValue] = entry.checked
+  }
 }
 
 function onPageChange(page: number) {
@@ -233,6 +261,11 @@ async function onActionSelect(action: string) {
   loading.value = false
 }
 
+function updateBookSelection(bookId: Book['id'], selected: boolean) {
+  const book = viewBooks.value.find((b) => b.id === bookId)
+  if (book) book.selected = selected
+}
+
 function onBookSelect({
   bookId,
   selected,
@@ -240,18 +273,14 @@ function onBookSelect({
   bookId: Book['id']
   selected: boolean
 }) {
-  viewBooks.value = viewBooks.value.map((book) => ({
-    ...book,
-    selected: book.id === bookId ? selected : book.selected,
-  }))
+  updateBookSelection(bookId, selected)
 }
 
 function onCancel() {
   editing.value = false
-  viewBooks.value = viewBooks.value.map((book) => ({
-    ...book,
-    selected: false,
-  }))
+  viewBooks.value.forEach((b) => {
+    b.selected = false
+  })
 }
 
 // TODO: return author name with book from server

@@ -9,6 +9,9 @@
     <DropdownMenuRoot>
       <DropdownMenuTrigger class="menu-trigger">
         <bl-button v-bind="$props" expand variant="secondary">
+          <template #prependIcon="iconProps">
+            <slot name="prependIcon" v-bind="iconProps" />
+          </template>
           <slot />
           <template v-if="withChevron" #appendIcon="iconProps">
             <IconChevronDown
@@ -21,28 +24,32 @@
         </bl-button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuPortal disabled>
+      <DropdownMenuPortal>
         <DropdownMenuContent
           :align="align"
           :avoid-collisions="false"
           position="popper"
           class="menu-content"
         >
-          <DropdownMenuItem
-            v-for="item in items"
-            :key="item.value"
-            :value="item.value"
-            class="menu-item"
-            @click="$emit('click', item.value)"
-          >
-            <component
-              :is="icons[item.icon]"
-              v-if="item.icon"
-              :size="16"
-              stroke="1.5"
-            />
-            {{ item.label }}
-          </DropdownMenuItem>
+          <slot name="content">
+            <DropdownMenuItem
+              v-for="item in items"
+              :key="item.value"
+              :value="item.value"
+              class="menu-item"
+              @click="$emit('click', item.value)"
+            >
+              <slot name="item" :item="item">
+                <component
+                  :is="icons[item.icon]"
+                  v-if="item.icon"
+                  :size="16"
+                  stroke="1.5"
+                />
+                {{ item.label }}
+              </slot>
+            </DropdownMenuItem>
+          </slot>
         </DropdownMenuContent>
       </DropdownMenuPortal>
     </DropdownMenuRoot>
