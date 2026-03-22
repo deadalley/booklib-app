@@ -46,7 +46,7 @@
       v-if="view === 'cards'"
       class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-visible overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
-      <bl-collection-card
+      <bl-collection-tile
         v-for="collection in filteredCollectionsByPage"
         :key="collection.id"
         collection-type="collections"

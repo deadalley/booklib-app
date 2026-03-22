@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative w-full cursor-pointer rounded-xl border border-stroke"
+    class="rounded-scholarly border-stroke relative w-full cursor-pointer border"
     :class="{
       'transition-all duration-300 ease-in-out': selectable,
       'border-primary': selectable && !!selected,
@@ -12,7 +12,7 @@
   >
     <bl-icon-button
       v-if="selectable && hovered"
-      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
+      class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       :class="{
         'opacity-0': !selected,
         'opacity-100': selected || hovered,
@@ -25,7 +25,7 @@
     </bl-icon-button>
     <div
       v-if="selectable"
-      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-surface-inverse transition-opacity duration-300"
+      class="rounded-scholarly bg-surface-inverse absolute inset-0 z-10 size-full cursor-pointer transition-opacity duration-300"
       :class="{
         'opacity-0': !selected || !hovered,
         'opacity-60': hovered,

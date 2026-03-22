@@ -93,6 +93,46 @@
     @apply text-ink-muted max-w-[55%] truncate text-xs;
   }
 
+  /* Collection tile */
+  .collection-tile {
+    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full flex-col overflow-hidden border shadow-sm transition-shadow duration-200;
+    @apply hover:border-primary hover:shadow-primary/50;
+  }
+  .collection-tile-selected {
+    @apply border-primary ring-primary ring-1;
+  }
+  .collection-tile-cover-wrap {
+    @apply block;
+  }
+  .collection-tile-cover-grid {
+    @apply border-stroke-subtle grid h-48 w-full grid-cols-2 grid-rows-2 overflow-hidden border-b;
+  }
+  .collection-tile-cover-cell {
+    @apply size-full;
+  }
+  .collection-tile-cover {
+    @apply size-full object-cover object-center;
+  }
+  .collection-tile-empty-cover {
+    @apply rounded-none! p-2! text-xs!;
+  }
+  .collection-tile-empty-state {
+    @apply size-full rounded-none! p-5!;
+  }
+  .collection-tile-content {
+    @apply flex items-start p-4;
+  }
+  .collection-tile-title-row {
+    @apply text-ink-primary hover:text-primary flex items-start gap-1;
+  }
+  .collection-tile-title {
+    @apply overflow-hidden pb-0! leading-tight;
+    line-clamp: 2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
   /* Pills */
   .pill {
     @apply rounded-scholarly active:bg-surface border-stroke bg-surface-subtle hover:bg-surface-subtle/20 border;

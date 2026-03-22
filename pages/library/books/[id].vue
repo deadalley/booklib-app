@@ -351,7 +351,7 @@
                 v-if="!!collectionsDisplayed.length"
                 class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
               >
-                <bl-collection-card
+                <bl-collection-tile
                   v-for="collection in collectionsDisplayed"
                   :key="collection.id"
                   :collection="collection"
