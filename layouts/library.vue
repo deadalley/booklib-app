@@ -41,7 +41,10 @@
           ]"
         >
           <div
-            class="paper-sm flex w-fit justify-end gap-2 overflow-visible p-2"
+            class="flex w-fit justify-end gap-2 overflow-visible"
+            :class="{
+              'paper-sm p-2': !isMobile(),
+            }"
           >
             <slot name="navbar" />
           </div>
