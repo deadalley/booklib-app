@@ -14,11 +14,11 @@
         <li
           v-for="item of navigationItems"
           :key="item.label"
-          class="hover:text-primary text-xl"
+          class="hover:text-primary font-display text-2xl"
         >
-          <NuxtLink :to="item.to" @click="sidebarOpen = false">{{
-            item.label
-          }}</NuxtLink>
+          <NuxtLink :to="item.to" @click="sidebarOpen = false">
+            {{ item.label }}
+          </NuxtLink>
         </li>
       </ul>
     </bl-sidebar>
