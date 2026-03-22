@@ -45,7 +45,7 @@
           :collection="author"
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
-          can-delete
+          :can-delete="false"
           @delete="deleteAuthor"
         />
       </div>
