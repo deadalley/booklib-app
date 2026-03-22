@@ -8,12 +8,7 @@
   >
     <DropdownMenuRoot>
       <DropdownMenuTrigger class="menu-trigger">
-        <bl-button
-          v-bind="$props"
-          class="border-stroke!"
-          expand
-          variant="secondary"
-        >
+        <bl-button v-bind="$props" expand variant="secondary">
           <slot />
           <template v-if="withChevron" #appendIcon="iconProps">
             <IconChevronDown

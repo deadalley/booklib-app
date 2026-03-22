@@ -3,30 +3,37 @@
     class="relative flex size-full flex-col overflow-x-visible"
     v-bind="$attrs"
   >
-    <div class="flex flex-col items-baseline justify-between lg:flex-row">
-      <!-- Header -->
-      <div class="mb-4 flex w-full items-center gap-3">
-        <h3>{{ title }}</h3>
-        <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
-        <div class="flex flex-1 justify-end sm:hidden">
-          <IconChevronDown
-            :size="ICON_SIZE_MEDIUM"
-            stroke="1.5"
-            class="text-ink-secondary hover:text-primary cursor-pointer transition-all duration-300"
-            :class="{ 'rotate-180': actionsOpen }"
-            @click="actionsOpen = !actionsOpen"
-          />
+    <div class="mb-8 flex flex-col gap-4">
+      <div class="flex items-baseline justify-between">
+        <!-- Header -->
+        <div class="flex w-full items-center gap-3">
+          <!-- Title -->
+          <h3>{{ title }}</h3>
+          <!-- Total -->
+          <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
+          <!-- Sidebar trigger button -->
+          <div class="flex flex-1 justify-end sm:hidden">
+            <IconChevronDown
+              :size="ICON_SIZE_MEDIUM"
+              stroke="1.5"
+              class="text-ink-secondary hover:text-primary cursor-pointer transition-all duration-300"
+              :class="{ 'rotate-180': actionsOpen }"
+              @click="actionsOpen = !actionsOpen"
+            />
+          </div>
         </div>
+        <slot v-if="!isMobile()" name="headerActions" />
       </div>
+      <!-- Actions -->
       <div
-        class="z-10 w-full transition-all duration-300 ease-in-out"
+        class="z-10 flex w-full flex-col gap-3 overflow-x-auto transition-all duration-300 ease-in-out"
         :class="{
           'max-h-96 opacity-100': actionsOpen,
           'max-h-0 opacity-0': !actionsOpen,
         }"
       >
         <div
-          class="mt-5 flex w-full flex-1 flex-col justify-end gap-3 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          class="flex w-fit w-full flex-1 flex-col justify-start gap-3 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
           :class="[
             { 'md:mr-[355px]': !!sidebarContent },
             actionsOpen ? 'translate-y-0' : '-translate-y-full',
@@ -34,8 +41,10 @@
         >
           <slot name="navbar" />
         </div>
+        <slot v-if="isMobile()" name="headerActions" />
       </div>
     </div>
+    <!-- Content -->
     <slot />
   </div>
   <bl-loading-overlay v-if="loading" />

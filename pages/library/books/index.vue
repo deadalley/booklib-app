@@ -9,50 +9,61 @@
     :sidebar-content="sidebarContent"
     :loading="loading"
   >
-    <template #navbar>
-      <!-- <bl-search-bar @input="onSearch" /> -->
-      <NuxtLink class="flex md:inline-flex lg:order-6" to="/library/books/new">
-        <bl-button expand>
-          <template #prependIcon="prependIcon">
-            <IconPlus v-bind="prependIcon" />
+    <template #headerActions>
+      <NuxtLink to="/library/books/new">
+        <bl-button variant="primary" :expand="isMobile()">
+          <template #appendIcon="iconProps">
+            <IconPlus v-bind="iconProps" />
+            Add book
           </template>
-          Book
         </bl-button>
       </NuxtLink>
-      <div class="flex justify-end gap-3">
+    </template>
+    <template #navbar>
+      <div class="flex justify-end gap-2">
         <bl-view-switch v-model:view="view" show-labels />
+        <bl-dropdown
+          v-if="view === 'cards'"
+          :items="sortDropdownItems"
+          @click="onSortSelect"
+        >
+          {{ sortLabel || 'Sort' }}
+        </bl-dropdown>
+        <bl-tooltip v-if="view === 'table'">
+          <template #tooltip-content>Table</template>
+          <bl-button variant="secondary" @click="onTableSettingsOpen">
+            <template #prependIcon="iconProps">
+              <IconTable v-bind="iconProps" />
+            </template>
+            Table
+          </bl-button>
+        </bl-tooltip>
         <bl-tooltip>
           <template #tooltip-content>Filter</template>
           <bl-button variant="secondary" @click="onFilterOpen">
             <template #appendIcon="iconProps">
               <IconFilter v-bind="iconProps" />
             </template>
-          </bl-button>
-        </bl-tooltip>
-        <bl-tooltip v-if="view === 'table'">
-          <template #tooltip-content>Table</template>
-          <bl-button variant="secondary" @click="onTableSettingsOpen">
-            <template #appendIcon="iconProps">
-              <IconTable v-bind="iconProps" />
-            </template>
+            Filter
           </bl-button>
         </bl-tooltip>
         <bl-tooltip>
           <template #tooltip-content>Bulk actions</template>
           <bl-button variant="secondary" @click="editing = true">
-            <template #appendIcon="iconProps">
+            <template #prependIcon="iconProps">
               <IconStack2 v-bind="iconProps" />
             </template>
+            Manage
           </bl-button>
         </bl-tooltip>
-      </div>
-      <div v-if="editing" class="flex justify-end gap-3">
-        <bl-button expand variant="secondary" @click="onCancel">
-          Cancel
-        </bl-button>
-        <bl-dropdown :items="dropdownItems" @click="onActionSelect">
-          Select action
-        </bl-dropdown>
+        <div v-if="editing" class="flex justify-end gap-3">
+          <bl-button expand variant="secondary" @click="onCancel">
+            Cancel
+          </bl-button>
+          <bl-dropdown :items="dropdownItems" @click="onActionSelect">
+            Select action
+          </bl-dropdown>
+        </div>
       </div>
     </template>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
@@ -122,6 +133,7 @@
 import type { Book, ViewBook } from '~/types/book'
 import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
+import type { BookSortValue } from '~/composables/use-sort-books'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 import type { Collection } from '~/types/collection'
@@ -140,6 +152,14 @@ const dropdownItems: DropdownItem[] = [
   { label: 'Delete', value: 'delete', icon: 'IconTrash' },
 ]
 
+const sortDropdownItems: DropdownItem[] = [
+  { label: 'Title (A-Z)', value: 'title-asc' },
+  { label: 'Title (Z-A)', value: 'title-desc' },
+  { label: 'Author (A-Z)', value: 'author-asc' },
+  { label: 'Year (Newest)', value: 'year-desc' },
+  { label: 'Rating (Highest)', value: 'rating-desc' },
+]
+
 const viewBooks = ref<ViewBook[]>(getBooksWithAuthorNames(books.value))
 
 const editing = ref(false)
@@ -152,6 +172,7 @@ watch(books, (newBooks) => {
 const {
   view,
   currentPage,
+  sortBy,
   sortedBooks,
   filteredBooksByPage,
   sidebarContent,
@@ -174,12 +195,21 @@ const {
   languages,
   originalLanguages,
   genres,
-  onSearch,
   onFilterOpen,
   onTableSettingsOpen,
   onCloseSidebar,
   onResetFilter,
+  onSortByChange,
 } = useSortBooks(viewBooks)
+
+const sortLabel = computed(
+  () =>
+    sortDropdownItems.find(({ value }) => value === sortBy.value)?.label ?? '',
+)
+
+function onSortSelect(value: string) {
+  onSortByChange(value as BookSortValue)
+}
 
 function onPageChange(page: number) {
   currentPage.value = page

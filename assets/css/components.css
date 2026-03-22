@@ -7,7 +7,7 @@
     @apply border-primary bg-primary text-ink-inverse hover:bg-primary-700 active:bg-primary-800 hover:border-transparent active:border-transparent;
   }
   .button-secondary {
-    @apply border-stroke-subtle bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
+    @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
   }
   .button-disabled {
     @apply bg-surface-subtle! text-ink-muted! border-surface-subtle;
@@ -18,14 +18,14 @@
     @apply inline-flex h-min items-center;
   }
   .switch-option {
-    @apply border-stroke-subtle bg-surface-elevated text-ink-secondary hover:bg-stroke/40 active:bg-stroke-subtle;
+    @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-stroke/40 active:bg-stroke-subtle;
     @apply first:rounded-l-scholarly last:rounded-r-scholarly flex w-full cursor-pointer items-center justify-center border transition-all ring-inset;
   }
   .switch-option-inner {
     @apply flex cursor-pointer items-center gap-2 rounded-[inherit] px-3 py-2 lg:w-full;
   }
   .switch-option-label {
-    @apply text-sm font-medium whitespace-nowrap;
+    @apply text-base font-semibold whitespace-nowrap;
   }
   .switch-option.selected {
     @apply border-stroke bg-surface hover:bg-stroke/40;

@@ -1,6 +1,38 @@
 import type { BookFormat, BookProgressStatus, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
+export type BookSortValue =
+  | 'custom'
+  | 'title-asc'
+  | 'title-desc'
+  | 'author-asc'
+  | 'year-desc'
+  | 'rating-desc'
+
+const BOOK_SORT_VALUES: BookSortValue[] = [
+  'custom',
+  'title-asc',
+  'title-desc',
+  'author-asc',
+  'year-desc',
+  'rating-desc',
+]
+
+function compareNullableNumberDesc(
+  val1: number | null | undefined,
+  val2: number | null | undefined,
+) {
+  if (val1 === null || val1 === undefined) {
+    return val2 === null || val2 === undefined ? 0 : 1
+  }
+
+  if (val2 === null || val2 === undefined) {
+    return -1
+  }
+
+  return val2 - val1
+}
+
 export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const router = useRouter()
   const route = useRoute()
@@ -21,6 +53,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   )
 
   const currentPage = ref<number>(1)
+  const sortBy = ref<BookSortValue>('custom')
 
   const defaultTableColumns = {
     coverSrc: { label: 'Cover', checked: false },
@@ -199,13 +232,64 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
         )
       : filterByAuthor
 
-    const sorted = sortBooksByOrder(filterByCollections).map((book) => ({
+    const booksWithCollections = filterByCollections.map((book) => ({
       ...book,
       isFavorite: isBookInDefaultCollection(book, FAVORITE_COLLECTION_ID),
       isWishlist: isBookInDefaultCollection(book, WISHLIST_COLLECTION_ID),
     }))
 
-    return sorted
+    if (sortBy.value === 'custom') {
+      return sortBooksByOrder(booksWithCollections)
+    }
+
+    if (sortBy.value === 'title-asc') {
+      return booksWithCollections.concat().sort((book1, book2) =>
+        book1.title.localeCompare(book2.title, undefined, {
+          numeric: true,
+        }),
+      )
+    }
+
+    if (sortBy.value === 'title-desc') {
+      return booksWithCollections.concat().sort((book1, book2) =>
+        book2.title.localeCompare(book1.title, undefined, {
+          numeric: true,
+        }),
+      )
+    }
+
+    if (sortBy.value === 'author-asc') {
+      return sortBooksByAuthor(booksWithCollections)
+    }
+
+    if (sortBy.value === 'year-desc') {
+      return booksWithCollections.concat().sort((book1, book2) => {
+        const yearCompare = compareNullableNumberDesc(book1.year, book2.year)
+
+        if (!yearCompare) {
+          return book1.title.localeCompare(book2.title, undefined, {
+            numeric: true,
+          })
+        }
+
+        return yearCompare
+      })
+    }
+
+    return booksWithCollections.concat().sort((book1, book2) => {
+      const ratingCompare = compareNullableNumberDesc(
+        book1.rating,
+        book2.rating,
+      )
+
+      if (!ratingCompare) {
+        return book1.title.localeCompare(book2.title, undefined, {
+          numeric: true,
+        })
+      }
+
+      return ratingCompare
+    })
   })
 
   const filteredBooksByPage = computed(() => {
@@ -253,9 +337,19 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     onCloseSidebar()
   }
 
+  function onSortByChange(value: string) {
+    if (!BOOK_SORT_VALUES.includes(value as BookSortValue)) {
+      return
+    }
+
+    sortBy.value = value as BookSortValue
+    currentPage.value = 1
+  }
+
   return {
     view,
     currentPage,
+    sortBy,
     sortedBooks,
     filteredBooksByPage,
     filterCount,
@@ -287,5 +381,6 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     onTableSettingsOpen,
     onCloseSidebar,
     onResetFilter,
+    onSortByChange,
   }
 }
