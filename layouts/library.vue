@@ -3,7 +3,7 @@
     class="relative flex size-full flex-col overflow-x-visible"
     v-bind="$attrs"
   >
-    <div class="mb-8 flex flex-col">
+    <div class="mb-6 flex flex-col">
       <div class="flex items-baseline justify-between">
         <!-- Header -->
         <div class="flex w-full items-center gap-3">
@@ -34,13 +34,13 @@
         }"
       >
         <div
-          class="flex w-full flex-1 flex-col justify-start gap-3 overflow-x-auto transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          class="flex w-full flex-1 flex-col justify-end gap-3 overflow-x-auto p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
           :class="[
             { 'md:mr-[355px]': !!sidebarContent },
             actionsOpen ? 'translate-y-0' : '-translate-y-full',
           ]"
         >
-          <div class="flex w-fit flex-1 justify-end gap-2">
+          <div class="paper-sm flex w-fit justify-end gap-2 p-2">
             <slot name="navbar" />
           </div>
         </div>

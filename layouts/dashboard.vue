@@ -50,8 +50,8 @@
           <!-- Page title -->
           <NuxtLink
             v-if="!navigationItems?.length"
-            to="/library/books"
-            class="pointer-events-auto"
+            :to="route.path"
+            class="hover:text-primary pointer-events-auto"
           >
             <h6>{{ title }}</h6>
           </NuxtLink>

@@ -17,4 +17,7 @@
   .paper {
     @apply bg-surface-elevated rounded-xl shadow-md;
   }
+  .paper-sm {
+    @apply bg-surface-elevated rounded-scholarly shadow-sm;
+  }
 }

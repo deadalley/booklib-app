@@ -312,7 +312,7 @@
     @apply text-ink-secondary rounded-scholarly border border-transparent bg-transparent;
     @apply flex h-11 items-center gap-3 px-4 py-2 text-base font-semibold;
     @apply transition-colors duration-200;
-    @apply hover:border-stroke-subtle hover:bg-surface-elevated hover:text-ink-primary;
+    @apply hover:border-stroke hover:bg-surface-subtle hover:text-ink-primary;
     @apply focus-visible:ring-primary/25 focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:outline-none;
   }
   .nav-sidebar-button-disabled {
