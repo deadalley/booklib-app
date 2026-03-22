@@ -110,6 +110,7 @@
       :min-max-year-range="[minYear, maxYear]"
       :min-max-page-range="[minPages, maxPages]"
       :books="books ?? []"
+      :collections="collections ?? []"
       :authors="authors ?? []"
       @reset="onResetFilter"
       @apply="onCloseSidebar"
@@ -123,10 +124,12 @@ import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
+import type { Collection } from '~/types/collection'
 
-const { getBooks, getAuthors, deleteBooks } = useBookLibrary()
+const { getBooks, getAuthors, getCollections, deleteBooks } = useBookLibrary()
 
 const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
+const collections = ref<Collection[]>(await getCollections())
 const authors = ref<Author[]>(await getAuthors())
 
 const authorsById = computed(() =>

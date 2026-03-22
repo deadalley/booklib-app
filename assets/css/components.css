@@ -379,67 +379,15 @@
     @apply hover:text-primary-400 cursor-pointer;
   }
 
-  .chip-group {
-    @apply flex flex-wrap gap-2;
-  }
-  .chip {
-    @apply border-stroke bg-surface-subtle text-ink-secondary rounded-sm border px-3 py-1 text-xs font-semibold;
-  }
-  .chip.selected {
-    @apply border-primary bg-primary text-ink-inverse;
-  }
-
   .format-grid {
     @apply grid grid-cols-2 gap-2;
   }
   .format-option {
-    @apply border-stroke bg-surface-subtle text-ink-secondary flex items-center justify-center gap-2 rounded-sm border px-2 py-2 text-xs font-semibold uppercase;
+    @apply border-stroke bg-surface-subtle text-ink-secondary flex items-center justify-center gap-2 rounded-sm border px-2 py-2 text-sm font-semibold uppercase;
+    @apply hover:border-stroke-strong hover:bg-surface-canvas cursor-pointer;
   }
   .format-option.selected {
     @apply border-primary bg-primary/10 text-primary;
-  }
-  .filter-apply {
-    @apply mt-2;
-  }
-
-  :deep(h6) {
-    @apply text-ink-secondary mb-0 text-xs font-semibold tracking-[0.14em] uppercase;
-  }
-
-  :deep(.form-inner) {
-    @apply border-stroke-subtle bg-surface rounded-sm border px-3 py-2 text-sm;
-  }
-
-  :deep(.form-inner input) {
-    @apply placeholder:text-ink-muted;
-  }
-
-  :deep(.menu-content) {
-    @apply rounded-sm border;
-  }
-
-  :deep(.form-wrapper) {
-    @apply gap-0;
-  }
-
-  :deep(.form-wrapper .absolute.bottom-8) {
-    display: none;
-  }
-
-  :deep(.form-wrapper .px-5) {
-    @apply px-1;
-  }
-
-  :deep(.form-wrapper .bg-surface) {
-    @apply bg-stroke-subtle;
-  }
-
-  :deep(.form-wrapper .bg-primary) {
-    @apply bg-primary;
-  }
-
-  :deep(.form-wrapper .size-5) {
-    @apply border-primary bg-surface size-4 border-2;
   }
 }
 

@@ -15,6 +15,24 @@
       />
     </div>
 
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Status</label>
+      </div>
+      <bl-raw-select
+        v-model="selectedStatus"
+        with-wrapper
+        placeholder="Any Status"
+        :options="statusOptions"
+      />
+    </div>
+
+    <bl-book-filter-section
+      v-model="selectedCollections"
+      title="Collections"
+      :elements="collections.map(({ id, name }) => name)"
+    />
+
     <bl-book-filter-section
       v-model="selectedPublishers"
       title="Publisher"
@@ -68,33 +86,9 @@
     </div>
 
     <div class="filter-section">
-      <h6>Status</h6>
-      <bl-raw-select
-        v-model="selectedStatus"
-        with-wrapper
-        placeholder="Any Status"
-        :options="statusOptions"
-      />
-    </div>
-
-    <div class="filter-section">
-      <h6>Collections</h6>
-      <div class="chip-group">
-        <button
-          v-for="item in DEFAULT_COLLECTIONS"
-          :key="item"
-          type="button"
-          class="chip"
-          :class="{ selected: !!selectedCollections?.includes(item) }"
-          @click="onSelectCollection(item)"
-        >
-          {{ collectionLabels[item] ?? item }}
-        </button>
+      <div class="filter-section-header">
+        <label class="filter-section-label">Format</label>
       </div>
-    </div>
-
-    <div class="filter-section">
-      <h6>Format</h6>
       <div class="format-grid">
         <button
           v-for="item in Object.values(BOOK_FORMAT_MAP)"
@@ -110,9 +104,7 @@
       </div>
     </div>
 
-    <bl-button expand class="filter-apply" @click="$emit('apply')">
-      Apply Filters
-    </bl-button>
+    <bl-button expand @click="$emit('apply')"> Apply Filters </bl-button>
   </div>
 </template>
 
@@ -120,10 +112,12 @@
 import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book, BookFormat, BookProgressStatus } from '~/types/book'
+import type { Collection } from '~/types/collection'
 
 defineProps<{
   authors: Author[]
   books: Book[]
+  collections: Collection[]
 
   publishers: string[]
   languages: string[]
@@ -151,12 +145,6 @@ const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
 
 defineEmits(['reset', 'apply'])
-
-const collectionLabels: Record<string, string> = {
-  favorite: 'Favorites',
-  wishlist: 'Wishlist',
-  tbr: 'To Be Read',
-}
 
 const statusOptions = computed(() =>
   Object.values(PROGRESS_STATUS_MAP).map((status) => ({
@@ -189,21 +177,6 @@ const pageLabel = computed(() => {
 
   return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}`
 })
-
-function onSelectPublisher(publisher: string, selected: boolean) {
-  if (selectedPublishers.value) {
-    const index = selectedPublishers.value.findIndex((v) => v === publisher)
-    if (index === -1) {
-      selectedPublishers.value.push(publisher)
-    } else {
-      selectedPublishers.value.splice(index, 1)
-    }
-  }
-}
-
-function resetSelectedPublishers() {
-  selectedPublishers.value = []
-}
 
 function onSelectStatus(value: BookProgressStatus) {
   if (selectedStatuses.value) {
