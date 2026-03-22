@@ -33,7 +33,7 @@
             @click="(event: Event) => event.stopPropagation()"
           >
             <NuxtLink
-              v-if="isOpen"
+              v-if="isOpen && showSeeAll"
               :to="`/library/${collectionType}/${collection.id}`"
               class="text-primary text-xs font-bold tracking-widest uppercase"
             >
@@ -133,10 +133,17 @@ const props = defineProps<{
 
 defineEmits<{ (e: 'delete', id: T['id'], deleteBooks: boolean): void }>()
 
-const openValue = ref<string | undefined>(
-  props.books.length ? 'items' : undefined,
-)
-const isOpen = computed(() => openValue.value === 'items')
+const open = defineModel<boolean>('open', { default: true })
+
+const openValue = computed({
+  get: () => (open.value ? 'items' : undefined),
+  set: (val) => {
+    open.value = val === 'items'
+  },
+})
+
+const isOpen = computed(() => open.value)
+const showSeeAll = computed(() => props.collectionType === 'collections')
 
 const deleteBooks = ref(false)
 

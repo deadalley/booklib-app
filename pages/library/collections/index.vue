@@ -19,6 +19,9 @@
     </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
+      <bl-button v-if="view === 'expanded-cards'" @click="toggleAll">
+        {{ allExpanded ? 'Collapse All' : 'Expand All' }}
+      </bl-button>
       <bl-view-switch
         v-model:view="view"
         :views="['cards', 'expanded-cards']"
@@ -61,6 +64,7 @@
           :books="booksByCollectionId[collection.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
           :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
+          v-model:open="allExpanded"
           @delete="deleteCollection"
         />
       </div>
@@ -116,6 +120,12 @@ const {
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+const allExpanded = ref(true)
+
+function toggleAll() {
+  allExpanded.value = !allExpanded.value
 }
 
 async function refresh() {

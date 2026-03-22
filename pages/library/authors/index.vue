@@ -9,6 +9,19 @@
   >
     <template #navbar>
       <bl-search-bar @input="onSearch" />
+      <bl-button
+        v-if="view === 'expanded-cards'"
+        variant="secondary"
+        @click="toggleAll"
+      >
+        <template #prependIcon="iconProps">
+          <component
+            :is="allExpanded ? IconMinimize : IconMaximize"
+            v-bind="iconProps"
+          />
+        </template>
+        {{ allExpanded ? 'Collapse' : 'Expand' }}
+      </bl-button>
       <bl-view-switch
         v-model:view="view"
         :views="['cards', 'expanded-cards']"
@@ -46,6 +59,7 @@
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
           :can-delete="false"
+          v-model:open="allExpanded"
           @delete="deleteAuthor"
         />
       </div>
@@ -66,6 +80,7 @@
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
+import { IconMaximize, IconMinimize } from '@tabler/icons-vue'
 
 const { getBooks, getAuthors, deleteAuthor: _deleteAuthor } = useBookLibrary()
 
@@ -88,6 +103,12 @@ const { view, currentPage, sortedAuthors, filteredAuthorsByPage, onSearch } =
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+const allExpanded = ref(true)
+
+function toggleAll() {
+  allExpanded.value = !allExpanded.value
 }
 
 async function refresh() {

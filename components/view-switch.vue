@@ -20,7 +20,7 @@
         <IconMist v-bind="iconProps" />
       </template>
       <template v-if="showLabels" #label>Rows</template>
-      <template #tooltip>Expanded cars view</template>
+      <template #tooltip>Expanded cards view</template>
     </bl-switch-option>
     <bl-switch-option
       v-if="views.includes('table')"
