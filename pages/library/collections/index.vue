@@ -7,25 +7,23 @@
       `${sortedCollections.length} ${sortedCollections.length === 1 ? 'collection' : 'collections'}`
     "
   >
-    <template #navbar>
-      <!-- <bl-search-bar @input="onSearch" /> -->
-      <NuxtLink
-        class="flex md:inline-flex lg:order-6"
-        to="/library/collections/new"
-      >
-        <bl-button expand>
-          <template #prependIcon="prependIcon">
-            <IconPlus v-bind="prependIcon" />
+    <template #headerActions>
+      <NuxtLink to="/library/collections/new">
+        <bl-button variant="primary" :expand="isMobile()">
+          <template #appendIcon="iconProps">
+            <IconPlus v-bind="iconProps" />
+            Add collection
           </template>
-          Collection
         </bl-button>
       </NuxtLink>
-      <div class="flex justify-end gap-3">
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
+    </template>
+    <template #navbar>
+      <bl-search-bar @input="onSearch" />
+      <bl-view-switch
+        v-model:view="view"
+        :views="['cards', 'expanded-cards']"
+        show-labels
+      />
     </template>
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
       <template #label> There are no collections in your library </template>

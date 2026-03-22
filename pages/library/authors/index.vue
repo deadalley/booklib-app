@@ -8,13 +8,12 @@
     "
   >
     <template #navbar>
-      <!-- <bl-search-bar @input="onSearch" /> -->
-      <div class="flex justify-end gap-3">
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
+      <bl-search-bar @input="onSearch" />
+      <bl-view-switch
+        v-model:view="view"
+        :views="['cards', 'expanded-cards']"
+        show-labels
+      />
     </template>
     <bl-empty v-if="authors?.length === 0" icon="IconFeather">
       <template #label> There are no authors in your library </template>

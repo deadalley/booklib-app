@@ -20,50 +20,49 @@
       </NuxtLink>
     </template>
     <template #navbar>
-      <div class="flex justify-end gap-2">
-        <bl-view-switch v-model:view="view" show-labels />
-        <bl-dropdown
-          v-if="view === 'cards'"
-          :items="sortDropdownItems"
-          @click="onSortSelect"
-        >
-          {{ sortLabel || 'Sort' }}
+      <bl-search-bar @input="onSearch" />
+      <bl-view-switch v-model:view="view" show-labels />
+      <bl-dropdown
+        v-if="view === 'cards'"
+        :items="sortDropdownItems"
+        @click="onSortSelect"
+      >
+        {{ sortLabel || 'Sort' }}
+      </bl-dropdown>
+      <bl-tooltip v-if="view === 'table'">
+        <template #tooltip-content>Table</template>
+        <bl-button variant="secondary" @click="onTableSettingsOpen">
+          <template #prependIcon="iconProps">
+            <IconTable v-bind="iconProps" />
+          </template>
+          Table
+        </bl-button>
+      </bl-tooltip>
+      <bl-tooltip>
+        <template #tooltip-content>Filter</template>
+        <bl-button variant="secondary" @click="onFilterOpen">
+          <template #prependIcon="iconProps">
+            <IconFilter v-bind="iconProps" />
+          </template>
+          Filter
+        </bl-button>
+      </bl-tooltip>
+      <bl-tooltip>
+        <template #tooltip-content>Bulk actions</template>
+        <bl-button variant="secondary" @click="editing = true">
+          <template #prependIcon="iconProps">
+            <IconStack2 v-bind="iconProps" />
+          </template>
+          Manage
+        </bl-button>
+      </bl-tooltip>
+      <div v-if="editing" class="flex justify-end gap-3">
+        <bl-button expand variant="secondary" @click="onCancel">
+          Cancel
+        </bl-button>
+        <bl-dropdown :items="dropdownItems" @click="onActionSelect">
+          Select action
         </bl-dropdown>
-        <bl-tooltip v-if="view === 'table'">
-          <template #tooltip-content>Table</template>
-          <bl-button variant="secondary" @click="onTableSettingsOpen">
-            <template #prependIcon="iconProps">
-              <IconTable v-bind="iconProps" />
-            </template>
-            Table
-          </bl-button>
-        </bl-tooltip>
-        <bl-tooltip>
-          <template #tooltip-content>Filter</template>
-          <bl-button variant="secondary" @click="onFilterOpen">
-            <template #appendIcon="iconProps">
-              <IconFilter v-bind="iconProps" />
-            </template>
-            Filter
-          </bl-button>
-        </bl-tooltip>
-        <bl-tooltip>
-          <template #tooltip-content>Bulk actions</template>
-          <bl-button variant="secondary" @click="editing = true">
-            <template #prependIcon="iconProps">
-              <IconStack2 v-bind="iconProps" />
-            </template>
-            Manage
-          </bl-button>
-        </bl-tooltip>
-        <div v-if="editing" class="flex justify-end gap-3">
-          <bl-button expand variant="secondary" @click="onCancel">
-            Cancel
-          </bl-button>
-          <bl-dropdown :items="dropdownItems" @click="onActionSelect">
-            Select action
-          </bl-dropdown>
-        </div>
       </div>
     </template>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
@@ -200,6 +199,7 @@ const {
   onCloseSidebar,
   onResetFilter,
   onSortByChange,
+  onSearch,
 } = useSortBooks(viewBooks)
 
 const sortLabel = computed(

@@ -19,7 +19,7 @@
       <template #icon="iconProps">
         <IconMist v-bind="iconProps" />
       </template>
-      <template v-if="showLabels" #label>Expanded</template>
+      <template v-if="showLabels" #label>Rows</template>
       <template #tooltip>Expanded cars view</template>
     </bl-switch-option>
     <bl-switch-option
@@ -30,7 +30,7 @@
       <template #icon="iconProps">
         <IconList v-bind="iconProps" />
       </template>
-      <template v-if="showLabels" #label>List</template>
+      <template v-if="showLabels" #label>Table</template>
       <template #tooltip>Table view</template>
     </bl-switch-option>
   </bl-switch>

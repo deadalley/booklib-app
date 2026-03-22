@@ -3,7 +3,7 @@
     class="relative flex size-full flex-col overflow-x-visible"
     v-bind="$attrs"
   >
-    <div class="mb-8 flex flex-col gap-4">
+    <div class="mb-8 flex flex-col">
       <div class="flex items-baseline justify-between">
         <!-- Header -->
         <div class="flex w-full items-center gap-3">
@@ -26,20 +26,23 @@
       </div>
       <!-- Actions -->
       <div
-        class="z-10 flex w-full flex-col gap-3 overflow-x-auto transition-all duration-300 ease-in-out"
+        class="z-10 flex w-full flex-col gap-3 transition-all duration-300 ease-in-out"
         :class="{
           'max-h-96 opacity-100': actionsOpen,
           'max-h-0 opacity-0': !actionsOpen,
+          'mt-4': !isMobile(),
         }"
       >
         <div
-          class="flex w-fit w-full flex-1 flex-col justify-start gap-3 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          class="flex w-full flex-1 flex-col justify-start gap-3 overflow-x-auto transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
           :class="[
             { 'md:mr-[355px]': !!sidebarContent },
             actionsOpen ? 'translate-y-0' : '-translate-y-full',
           ]"
         >
-          <slot name="navbar" />
+          <div class="flex w-fit flex-1 justify-end gap-2">
+            <slot name="navbar" />
+          </div>
         </div>
         <slot v-if="isMobile()" name="headerActions" />
       </div>
