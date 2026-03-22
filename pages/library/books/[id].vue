@@ -5,7 +5,7 @@
   >
     <header class="flex flex-col gap-6">
       <button
-        class="hidden items-center gap-2 hover:text-primary sm:flex"
+        class="hover:text-primary hidden items-center gap-2 sm:flex"
         @click="$router.back()"
       >
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
@@ -120,7 +120,7 @@
                       ({ step }) => step === currentStep,
                     )"
                     :key="status.id"
-                    class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-stroke p-2 hover:bg-surface-subtle"
+                    class="border-stroke hover:bg-surface-subtle flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border p-2"
                     @click="onSelectProgress(status.id)"
                   >
                     <component
@@ -349,7 +349,7 @@
               </div>
               <div
                 v-if="!!collectionsDisplayed.length"
-                class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+                class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
               >
                 <bl-collection-tile
                   v-for="collection in collectionsDisplayed"

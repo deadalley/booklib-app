@@ -63,14 +63,6 @@
           Manage
         </bl-button>
       </bl-tooltip>
-      <div v-if="editing" class="flex justify-end gap-3">
-        <bl-button expand variant="secondary" @click="onCancel">
-          Cancel
-        </bl-button>
-        <bl-dropdown :items="dropdownItems" @click="onActionSelect">
-          Select action
-        </bl-dropdown>
-      </div>
     </template>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label> There are no books in your library </template>
@@ -129,6 +121,18 @@
       @apply="onCloseSidebar"
     />
   </bl-sidebar>
+
+  <bl-book-bulk-actions
+    v-model="editing"
+    :selected-books-count="selectedBooksCount"
+    :has-selected-books="hasSelectedBooks"
+    :collection-options="collectionActionOptions"
+    :author-options="authorActionOptions"
+    @close="onCancel"
+    @move-to-collection="onMoveBooksToCollection"
+    @edit-author="onEditBooksAuthor"
+    @delete="onDeleteSelectedBooks"
+  />
 </template>
 
 <script setup lang="ts">
@@ -140,7 +144,8 @@ import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 import type { Collection } from '~/types/collection'
 
-const { getBooks, getAuthors, getCollections, deleteBooks } = useBookLibrary()
+const { getBooks, getAuthors, getCollections, updateBook, deleteBooks } =
+  useBookLibrary()
 
 const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
 const collections = ref<Collection[]>(await getCollections())
@@ -149,10 +154,6 @@ const authors = ref<Author[]>(await getAuthors())
 const authorsById = computed(() =>
   authors.value ? indexBy(({ id }) => String(id), authors.value) : {},
 )
-
-const dropdownItems: DropdownItem[] = [
-  { label: 'Delete', value: 'delete', icon: 'IconTrash' },
-]
 
 const sortDropdownItems: DropdownItem[] = [
   { label: 'Title (A-Z)', value: 'title-asc' },
@@ -243,22 +244,97 @@ function onPageChange(page: number) {
   currentPage.value = page
 }
 
+const selectedBookIds = computed(() =>
+  viewBooks.value.filter(({ selected }) => !!selected).map(({ id }) => id),
+)
+const selectedBooksCount = computed(() => selectedBookIds.value.length)
+const hasSelectedBooks = computed(() => selectedBooksCount.value > 0)
+
+const collectionActionOptions = computed(() =>
+  collections.value.map(({ id, name }) => ({ value: id, label: name })),
+)
+const authorActionOptions = computed(() =>
+  authors.value.map(({ id, name }) => ({ value: id, label: name })),
+)
+
+function clearSelectedBooks() {
+  viewBooks.value.forEach((book) => {
+    book.selected = false
+  })
+}
+
 async function refresh() {
   books.value = await getBooks({ withBookCovers: true })
   authors.value = await getAuthors()
 }
 
-async function onActionSelect(action: string) {
-  loading.value = true
-  if (action === 'delete') {
-    await deleteBooks(
-      viewBooks.value.filter(({ selected }) => selected).map(({ id }) => id),
-    )
+async function onMoveBooksToCollection(collectionId: string) {
+  if (!collectionId || !hasSelectedBooks.value) {
+    return
   }
-  await refresh()
-  editing.value = false
-  onResetFilter()
-  loading.value = false
+
+  loading.value = true
+
+  try {
+    await Promise.all(
+      selectedBookIds.value.map(async (bookId) => {
+        const currentBook = books.value.find((book) => book.id === bookId)
+        if (!currentBook) return
+
+        const nextCollections = Array.from(
+          new Set([...(currentBook.collections ?? []), collectionId]),
+        )
+        await updateBook(bookId, { collections: nextCollections })
+      }),
+    )
+
+    await refresh()
+    clearSelectedBooks()
+    onResetFilter()
+  } finally {
+    loading.value = false
+  }
+}
+
+async function onEditBooksAuthor(authorId: string) {
+  if (!authorId || !hasSelectedBooks.value) {
+    return
+  }
+
+  loading.value = true
+
+  try {
+    await Promise.all(
+      selectedBookIds.value.map((bookId) =>
+        updateBook(bookId, { author: authorId }),
+      ),
+    )
+
+    await refresh()
+    clearSelectedBooks()
+    onResetFilter()
+  } finally {
+    loading.value = false
+  }
+}
+
+async function onDeleteSelectedBooks() {
+  if (!hasSelectedBooks.value) {
+    return
+  }
+
+  loading.value = true
+
+  try {
+    await deleteBooks(selectedBookIds.value)
+
+    await refresh()
+    clearSelectedBooks()
+    onResetFilter()
+    editing.value = false
+  } finally {
+    loading.value = false
+  }
 }
 
 function updateBookSelection(bookId: Book['id'], selected: boolean) {
@@ -278,9 +354,7 @@ function onBookSelect({
 
 function onCancel() {
   editing.value = false
-  viewBooks.value.forEach((b) => {
-    b.selected = false
-  })
+  clearSelectedBooks()
 }
 
 // TODO: return author name with book from server
