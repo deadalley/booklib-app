@@ -13,6 +13,9 @@
     </p>
 
     <PaginationList v-slot="{ items }" class="pagination-list">
+      <PaginationFirst class="pagination-arrow">
+        <IconChevronsLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
+      </PaginationFirst>
       <PaginationPrev class="pagination-arrow">
         <IconChevronLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationPrev>
@@ -37,14 +40,24 @@
       <PaginationNext class="pagination-arrow pagination-arrow-next">
         <IconChevronRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationNext>
+      <PaginationLast class="pagination-arrow">
+        <IconChevronsRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
+      </PaginationLast>
     </PaginationList>
   </PaginationRoot>
 </template>
 
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue'
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsLeft,
+  IconChevronsRight,
+} from '@tabler/icons-vue'
 import {
   PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
   PaginationList,
   PaginationListItem,
   PaginationNext,
