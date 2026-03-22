@@ -230,6 +230,8 @@ function onClear() {
   } else {
     selectValue.value = undefined
   }
+
+  searchTerm.value = undefined
 }
 
 function onRemoveItem(index: number) {

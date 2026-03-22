@@ -1,25 +1,26 @@
 <template>
-  <div v-if="!!elements.length">
-    <h6 class="mb-4">{{ title }}</h6>
-    <div class="flex w-full flex-wrap gap-3">
-      <bl-pill
-        v-for="element in elements"
-        v-if="!genre"
-        :key="element"
-        :selected="selectedElements.includes(element)"
-        @click="onSelect(element)"
+  <div v-if="!!elements.length" class="filter-section">
+    <div class="filter-section-header">
+      <label class="filter-section-label">{{ title }}</label>
+      <button
+        v-if="selectedElements?.length"
+        class="filter-section-reset"
+        @click="onReset"
       >
-        {{ getDisplayValue(element) }}
-      </bl-pill>
-      <bl-genre-tag
-        v-for="(element, index) in elements"
-        v-if="!!genre"
+        Reset
+      </button>
+    </div>
+    <div class="columns-2 gap-6">
+      <bl-checkbox
+        v-for="element in elements"
         :key="element"
-        :value="element"
-        :index="index"
-        :selected="selectedElements.includes(element)"
-        @click="onSelect(element)"
-      />
+        :id="element"
+        :checked="selectedElements?.includes(element)"
+        align="left"
+        @change="onSelect(element)"
+        class="mb-1"
+        >{{ getDisplayValue(element) }}</bl-checkbox
+      >
     </div>
   </div>
 </template>
@@ -49,5 +50,9 @@ function onSelect(element: string) {
   } else {
     selectedElements.value.push(element)
   }
+}
+
+function onReset() {
+  selectedElements.value = []
 }
 </script>

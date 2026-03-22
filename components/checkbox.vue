@@ -3,18 +3,21 @@
     :for="$attrs.id as string"
     class="checkbox-label"
     :class="{
-      'justify-center': !$slots['default'],
-      'flex-row-reverse': align === 'left',
+      'flex-row-reverse justify-end': align === 'left',
+      [$attrs.class as string]: !!$attrs.class,
     }"
+    @click="$emit('change', !!checked)"
   >
-    <span v-if="$slots['default']" class="size-full">
+    <span>
       <slot />
     </span>
     <input
-      v-bind="$attrs"
+      :id="$attrs.id as string"
+      :checked="$attrs.checked as boolean"
       v-model="checked"
       type="checkbox"
       class="checkbox-input"
+      @input="emit('change', !!checked)"
     />
   </label>
 </template>
@@ -23,4 +26,8 @@
 withDefaults(defineProps<{ align?: 'right' | 'left' }>(), { align: 'right' })
 
 const checked = defineModel<boolean>()
+
+const emit = defineEmits<{
+  (e: 'change', value: boolean): void
+}>()
 </script>

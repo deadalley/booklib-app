@@ -133,7 +133,7 @@ export const newTheme: ThemeTokens = {
     surface: {
       DEFAULT: '#f5f3f3',
       canvas: '#fbf9f8',
-      container: '#e4ddd9',
+      container: '#efeded',
       subtle: '#f5f3f3',
       elevated: '#ffffff',
       dark: '#1b1c1c',

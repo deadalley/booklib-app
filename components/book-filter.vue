@@ -1,99 +1,49 @@
 <template>
-  <div class="flex flex-col gap-10">
-    <div>
-      <h6 class="mb-4">Author</h6>
+  <div class="filter-sidebar">
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Author</label>
+      </div>
       <bl-raw-autocomplete
         v-model="selectedAuthor"
         with-wrapper
         clearable
-        placeholder="Select author"
+        placeholder="Filter by author..."
         :options="
           authors.map(({ id, name }) => ({ label: name, value: String(id) }))
         "
       />
     </div>
-    <div>
-      <h6 class="mb-4">Collections</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in DEFAULT_COLLECTIONS"
-          :key="item"
-          :value="item"
-          :selected="!!selectedCollections?.includes(item)"
-          @select="onSelectCollection"
-        >
-          <template #icon="iconProps">
-            <component
-              :is="
-                icons[
-                  (selectedCollections?.includes(item)
-                    ? DEFAULT_COLLECTION_ICONS_FILLED
-                    : DEFAULT_COLLECTION_ICONS)[item]!
-                ]
-              "
-              v-bind="iconProps"
-            />
-          </template>
-        </bl-multiselect-option>
-      </bl-multiselect>
-    </div>
+
     <bl-book-filter-section
       v-model="selectedPublishers"
       title="Publisher"
       :elements="publishers"
     />
+
     <bl-book-filter-section
       v-model="selectedLanguages"
       title="Language"
       :elements="languages"
     />
+
     <bl-book-filter-section
       v-model="selectedOriginalLanguages"
       title="Original Language"
       :elements="originalLanguages"
     />
+
     <bl-book-filter-section
       v-model="selectedGenres"
-      title="Genres"
+      title="Genre"
       :elements="genres"
-      :genre="true"
     />
-    <div>
-      <h6 class="mb-4">Progress Status</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in Object.values(PROGRESS_STATUS_MAP)"
-          :key="item.id"
-          :value="item.id"
-          :selected="!!selectedStatuses?.includes(item.id)"
-          @select="onSelectStatus"
-        >
-          <template #icon="iconProps">
-            <component :is="icons[item.icon]" v-bind="iconProps" />
-          </template>
-          <template #tooltip>{{ item.description }}</template>
-        </bl-multiselect-option>
-      </bl-multiselect>
-    </div>
-    <div>
-      <h6 class="mb-4">Book Format</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in Object.values(BOOK_FORMAT_MAP)"
-          :key="item.id"
-          :value="item.id"
-          :selected="!!selectedFormats?.includes(item.id)"
-          @select="onSelectFormat"
-        >
-          <template #icon="iconProps">
-            <component :is="icons[item.icon]" v-bind="iconProps" />
-          </template>
-          <template #tooltip>{{ item.description }}</template>
-        </bl-multiselect-option>
-      </bl-multiselect>
-    </div>
-    <div>
-      <h6>Year</h6>
+
+    <div class="filter-section">
+      <div class="range-header">
+        <h6>Year Range</h6>
+        <span>{{ yearLabel }}</span>
+      </div>
       <bl-slider
         v-if="selectedYearRange"
         v-model:values="selectedYearRange"
@@ -102,8 +52,12 @@
         :step="1"
       />
     </div>
-    <div>
-      <h6>Page</h6>
+
+    <div class="filter-section">
+      <div class="range-header">
+        <h6>Page Count</h6>
+        <span>{{ pageLabel }}</span>
+      </div>
       <bl-slider
         v-if="selectedPageRange"
         v-model:values="selectedPageRange"
@@ -112,12 +66,53 @@
         :step="50"
       />
     </div>
-    <div class="flex flex-col gap-2">
-      <bl-button expand variant="secondary" @click="$emit('reset')">
-        Reset filters
-      </bl-button>
-      <bl-button expand @click="$emit('apply')">Apply filters</bl-button>
+
+    <div class="filter-section">
+      <h6>Status</h6>
+      <bl-raw-select
+        v-model="selectedStatus"
+        with-wrapper
+        placeholder="Any Status"
+        :options="statusOptions"
+      />
     </div>
+
+    <div class="filter-section">
+      <h6>Collections</h6>
+      <div class="chip-group">
+        <button
+          v-for="item in DEFAULT_COLLECTIONS"
+          :key="item"
+          type="button"
+          class="chip"
+          :class="{ selected: !!selectedCollections?.includes(item) }"
+          @click="onSelectCollection(item)"
+        >
+          {{ collectionLabels[item] ?? item }}
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h6>Format</h6>
+      <div class="format-grid">
+        <button
+          v-for="item in Object.values(BOOK_FORMAT_MAP)"
+          :key="item.id"
+          type="button"
+          class="format-option"
+          :class="{ selected: !!selectedFormats?.includes(item.id) }"
+          @click="onSelectFormat(item.id)"
+        >
+          <component :is="icons[item.icon]" :size="14" stroke="1.8" />
+          <span>{{ item.description }}</span>
+        </button>
+      </div>
+    </div>
+
+    <bl-button expand class="filter-apply" @click="$emit('apply')">
+      Apply Filters
+    </bl-button>
   </div>
 </template>
 
@@ -157,6 +152,59 @@ const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
 
 defineEmits(['reset', 'apply'])
 
+const collectionLabels: Record<string, string> = {
+  favorite: 'Favorites',
+  wishlist: 'Wishlist',
+  tbr: 'To Be Read',
+}
+
+const statusOptions = computed(() =>
+  Object.values(PROGRESS_STATUS_MAP).map((status) => ({
+    label: status.description,
+    value: status.id,
+  })),
+)
+
+const selectedStatus = computed<string | undefined>({
+  get() {
+    return selectedStatuses.value?.[0]
+  },
+  set(value) {
+    selectedStatuses.value = value ? [value as BookProgressStatus] : []
+  },
+})
+
+const yearLabel = computed(() => {
+  if (!selectedYearRange.value) {
+    return ''
+  }
+
+  return `${selectedYearRange.value[0]} - ${selectedYearRange.value[1]}`
+})
+
+const pageLabel = computed(() => {
+  if (!selectedPageRange.value) {
+    return ''
+  }
+
+  return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}+`
+})
+
+function onSelectPublisher(publisher: string, selected: boolean) {
+  if (selectedPublishers.value) {
+    const index = selectedPublishers.value.findIndex((v) => v === publisher)
+    if (index === -1) {
+      selectedPublishers.value.push(publisher)
+    } else {
+      selectedPublishers.value.splice(index, 1)
+    }
+  }
+}
+
+function resetSelectedPublishers() {
+  selectedPublishers.value = []
+}
+
 function onSelectStatus(value: BookProgressStatus) {
   if (selectedStatuses.value) {
     const newValues = selectedStatuses.value.filter(
@@ -190,6 +238,18 @@ function onSelectCollection(value: string) {
       selectedCollections.value.push(value)
     } else {
       selectedCollections.value.splice(index, 1)
+    }
+  }
+}
+
+function onToggleGenre(value: string) {
+  if (selectedGenres.value) {
+    const index = selectedGenres.value.findIndex((genre) => genre === value)
+
+    if (index === -1) {
+      selectedGenres.value.push(value)
+    } else {
+      selectedGenres.value.splice(index, 1)
     }
   }
 }
