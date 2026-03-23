@@ -131,7 +131,7 @@
           </div>
         </bl-modal>
 
-        <bl-book-reading-summary-card
+        <bl-book-page-reading-progress
           :progress="readingProgress"
           :subtitle="readingProgressSubtitle"
           :stats="readingStats"
