@@ -126,7 +126,7 @@ export const legacyTheme: ThemeTokens = {
 export const newTheme: ThemeTokens = {
   colors: {
     primary: {
-      DEFAULT: '#C94545',
+      DEFAULT: '#b22227',
       50: '#fef3f2',
       100: '#fee5e3',
       200: '#fccbcd',
