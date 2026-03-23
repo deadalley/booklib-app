@@ -4,7 +4,7 @@
     @apply rounded-scholarly flex h-min w-fit items-center justify-center gap-2 border py-2 text-base font-semibold whitespace-nowrap lg:inline-flex lg:grow-0;
   }
   .button-primary {
-    @apply border-primary bg-primary text-ink-inverse hover:bg-primary-700 active:bg-primary-800 hover:border-transparent active:border-transparent;
+    @apply border-primary bg-primary text-ink-inverse hover:bg-primary/80 active:bg-primary-800 hover:border-transparent active:border-transparent;
   }
   .button-secondary {
     @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
