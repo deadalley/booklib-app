@@ -20,4 +20,10 @@
   .paper-sm {
     @apply bg-surface-elevated rounded-scholarly shadow-sm;
   }
+  .paper-flat {
+    @apply border-stroke-subtle bg-surface-elevated rounded-scholarly border;
+  }
+  .paper-dark {
+    @apply bg-surface rounded-scholarly;
+  }
 }
