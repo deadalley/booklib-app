@@ -38,18 +38,11 @@
     </div>
 
     <div
-      class="grid gap-16 xl:grid-cols-[20rem_minmax(0,1fr)] 2xl:grid-cols-[22rem_minmax(0,1fr)]"
+      class="grid gap-16 xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
       <aside class="flex flex-col gap-4">
         <!-- Cover -->
-        <div>
-          <div class="rounded-scholarly bg-surface-canvas shadow-md">
-            <bl-book-image
-              :book="book"
-              img-size-class="h-[29rem]! sm:h-[33rem]!"
-            />
-          </div>
-        </div>
+        <bl-book-page-cover :book="book" editing />
 
         <!-- Action -->
         <bl-button expand @click="onPrimaryAction">
