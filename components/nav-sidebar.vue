@@ -25,7 +25,7 @@
           <img
             :src="getAssetPath('/logo.svg')"
             alt="BookLib"
-            class="nav-sidebar-brand-mark"
+            class="nav-sidebar-brand-mark size-10"
           />
           BOOKLIB
         </NuxtLink>
