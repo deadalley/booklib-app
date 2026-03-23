@@ -45,7 +45,7 @@
         <bl-book-page-cover :book="book" editing />
 
         <!-- Action -->
-        <bl-button expand @click="onPrimaryAction">
+        <bl-button class="w-full" @click="onPrimaryAction">
           <template #prependIcon>
             <component
               :is="icons[primaryAction.icon]"
