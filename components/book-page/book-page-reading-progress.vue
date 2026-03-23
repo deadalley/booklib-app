@@ -1,5 +1,5 @@
 <template>
-  <section class="paper-sm flex gap-12 p-8">
+  <section class="paper flex gap-12 p-8">
     <div class="flex flex-1 flex-col gap-2">
       <div
         class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"

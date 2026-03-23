@@ -74,6 +74,23 @@
           :rating-summary="ratingSummary"
         />
 
+        <div class="border-stroke-subtle mb-6 border-b pb-16"></div>
+
+        <bl-book-page-fields :fields="bookFields" />
+
+        <div class="border-stroke-subtle mb-16 border-b pb-6"></div>
+
+        <div class="flex flex-col gap-4">
+          <p
+            class="text-primary text-base font-semibold tracking-widest uppercase"
+          >
+            Summary
+          </p>
+          <p class="text-ink-secondary text-lg font-normal tracking-wider">
+            {{ book.summary || 'No summary available.' }}
+          </p>
+        </div>
+
         <!-- <bl-book-lifecycle-card
           :current-step="currentStep"
           :current-status="book.progressStatus ?? 'not-owned'"
@@ -136,11 +153,6 @@
           :subtitle="readingProgressSubtitle"
           :stats="readingStats"
         />
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <bl-book-details-card :items="bookFactsPrimary" />
-          <bl-book-details-card :items="bookFactsSecondary" />
-        </div>
       </div>
     </div>
 
@@ -185,6 +197,7 @@ import {
 } from '~/utils/constants'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import languageOptions from '~/public/languages-2.json'
 
 const stepperModalOpen = defineModel<boolean>('stepperModalOpen', {
   default: false,
@@ -209,8 +222,6 @@ const props = defineProps<{
     label: string
     icon: keyof typeof icons
   }[]
-  bookFactsPrimary: { label: string; value: string | number }[]
-  bookFactsSecondary: { label: string; value: string | number }[]
   readingProgress: number
   readingProgressSubtitle: string
   readingSecondaryLabel: string
@@ -235,6 +246,25 @@ const ratingSummary = computed(() => {
     : rating.toFixed(1)
 
   return formattedRating
+})
+
+const bookFields = computed(() => {
+  return [
+    { label: 'Publisher', value: props.book.publisher },
+    {
+      label: 'Language',
+      value: languageOptions[props.book.language] ?? props.book.language,
+    },
+    { label: 'Year', value: props.book.year?.toString() },
+    { label: 'Original Title', value: props.book.originalTitle },
+    {
+      label: 'Original Language',
+      value:
+        languageOptions[props.book.originalLanguage] ??
+        props.book.originalLanguage,
+    },
+    { label: 'Pages', value: props.book.pages?.toString() },
+  ]
 })
 
 const primaryAction = computed(() => {
