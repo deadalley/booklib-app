@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center text-ink-primary"
+    class="text-ink-primary flex items-center"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
     @click="_onCommit"
@@ -26,7 +26,6 @@ const props = withDefaults(
     editing?: boolean
     rating: number
     iconSize?: number
-    onCommit?: (value: number) => Promise<void>
   }>(),
   { editing: false, iconSize: 24 },
 )
@@ -54,6 +53,10 @@ watch(
     currentRating.value = value
   },
 )
+
+const emit = defineEmits<{
+  (e: 'commit', rating: number): void
+}>()
 
 function setHovered(value: boolean) {
   hovered.value = value
@@ -90,7 +93,7 @@ function setRating($event: MouseEvent, id: number) {
 function _onCommit() {
   if (props.editing) {
     initialRating.value = currentRating.value
-    props.onCommit?.(currentRating.value)
+    emit('commit', currentRating.value)
   }
 }
 </script>

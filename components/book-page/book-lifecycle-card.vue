@@ -3,7 +3,7 @@
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p
-          class="text-ink-muted text-[11px] font-semibold tracking-[0.18em] uppercase"
+          class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
         >
           Reading Lifecycle
         </p>
@@ -12,7 +12,7 @@
         </p>
       </div>
       <span
-        class="bg-primary/10 text-primary rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.18em] uppercase"
+        class="bg-primary/10 text-primary tracking-caps rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
       >
         {{ badgeLabel }}
       </span>
@@ -60,7 +60,7 @@
 
     <div class="mt-6 flex flex-col gap-3">
       <p
-        class="text-ink-muted text-[11px] font-semibold tracking-[0.18em] uppercase"
+        class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
       >
         Quick State
       </p>

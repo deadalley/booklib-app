@@ -672,6 +672,7 @@ const typographyInk = [
     class: 'text-ink-secondary',
     hex: colors.ink.secondary,
   },
+  { label: 'ink-subtle', class: 'text-ink-subtle', hex: colors.ink.subtle },
   { label: 'ink-muted', class: 'text-ink-muted', hex: colors.ink.muted },
   {
     label: 'ink-inverse (on dark)',
@@ -719,6 +720,7 @@ const swatchGroups = [
     label: 'Ink',
     swatches: [
       { label: 'Muted', color: colors.ink.muted },
+      { label: 'Subtle', color: colors.ink.subtle },
       { label: 'Secondary', color: colors.ink.secondary },
       { label: 'Primary', color: colors.ink.primary },
       { label: 'Inverse', color: colors.ink.inverse },

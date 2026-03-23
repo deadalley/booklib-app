@@ -1,10 +1,50 @@
 <template>
   <section class="flex flex-1 flex-col gap-8 2xl:w-9/12 2xl:overflow-auto">
+    <div class="flex items-center justify-between">
+      <!-- Breadcrumbs -->
+      <div
+        class="tracking-caps flex items-center gap-2 text-xs font-semibold uppercase"
+      >
+        <span class="text-ink-muted">Library</span>
+        <span class="text-ink-muted"><IconChevronRight :size="13" /></span>
+        <span class="text-ink-muted">{{ primaryCollectionName }}</span>
+        <span class="text-ink-muted"><IconChevronRight :size="13" /></span>
+        <span class="text-primary font-bold">{{ book.title }}</span>
+      </div>
+      <!-- Actions -->
+      <div class="flex items-center gap-2 self-start">
+        <bl-button variant="secondary" @click="$emit('edit')">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Edit
+        </bl-button>
+        <bl-modal size="sm" @confirm="$emit('delete')">
+          <template #trigger>
+            <bl-button variant="secondary">
+              <template #prependIcon>
+                <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+              </template>
+            </bl-button>
+          </template>
+          <template #title>
+            Are you sure you want to delete
+            <strong class="contents">{{ book.title }}</strong>
+            ?
+          </template>
+          This action cannot be undone.
+          <template #cancel-label> Cancel </template>
+          <template #action-label> Delete </template>
+        </bl-modal>
+      </div>
+    </div>
+
     <div
-      class="grid gap-8 xl:grid-cols-[20rem_minmax(0,1fr)] 2xl:grid-cols-[22rem_minmax(0,1fr)]"
+      class="grid gap-16 xl:grid-cols-[20rem_minmax(0,1fr)] 2xl:grid-cols-[22rem_minmax(0,1fr)]"
     >
       <aside class="flex flex-col gap-4">
-        <div class="paper-flat p-5 sm:p-6">
+        <!-- Cover -->
+        <div>
           <div class="rounded-scholarly bg-surface-canvas shadow-md">
             <bl-book-image
               :book="book"
@@ -13,6 +53,7 @@
           </div>
         </div>
 
+        <!-- Action -->
         <bl-button expand @click="onPrimaryAction">
           <template #prependIcon>
             <component
@@ -23,110 +64,17 @@
           </template>
           {{ primaryAction.label }}
         </bl-button>
-
-        <p class="text-ink-muted px-1 text-sm">
-          {{ primaryAction.caption }}
-        </p>
       </aside>
 
       <div class="flex flex-col gap-6 pr-1">
-        <header class="paper-flat flex flex-col gap-6 p-6 sm:p-8">
-          <div
-            class="flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] uppercase"
-          >
-            <span class="text-ink-muted">Library</span>
-            <span class="text-ink-muted">/</span>
-            <span class="text-ink-muted">{{ primaryCollectionName }}</span>
-            <span class="text-ink-muted">/</span>
-            <span class="text-primary">{{ book.title }}</span>
-          </div>
+        <bl-book-page-header
+          :book="book"
+          :primary-collection-name="primaryCollectionName"
+          :author-name="authorName"
+          :rating-summary="ratingSummary"
+        />
 
-          <div
-            class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between"
-          >
-            <div class="flex max-w-3xl flex-col gap-3">
-              <div class="flex flex-col gap-2">
-                <h1
-                  class="text-ink-primary text-5xl leading-none font-semibold italic sm:text-6xl"
-                >
-                  {{ book.title }}
-                </h1>
-                <p
-                  v-if="authorName"
-                  class="text-primary text-2xl font-semibold italic"
-                >
-                  {{ authorName }}
-                </p>
-              </div>
-
-              <div
-                class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold"
-              >
-                <div class="flex items-center gap-3">
-                  <bl-rating
-                    :editing="false"
-                    :rating="book.rating ?? 0"
-                    :icon-size="18"
-                    :on-commit="onSelectRating"
-                  />
-                  <span class="text-ink-secondary tracking-[0.12em] uppercase">
-                    {{ ratingSummary }}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  class="text-ink-secondary hover:text-primary inline-flex cursor-pointer items-center gap-2 tracking-[0.12em] uppercase transition-colors"
-                  @click="emit('share')"
-                >
-                  <IconShare3 :size="16" stroke="1.75" />
-                  Share Progress
-                </button>
-
-                <button
-                  type="button"
-                  class="text-ink-secondary hover:text-primary inline-flex cursor-pointer items-center gap-2 tracking-[0.12em] uppercase transition-colors"
-                  @click="emit('favorite-toggle')"
-                >
-                  <component
-                    :is="isFavorite ? IconHeartFilled : IconHeart"
-                    :size="16"
-                    stroke="1.75"
-                  />
-                  {{ isFavorite ? 'Favorite' : 'Add Favorite' }}
-                </button>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2 self-start">
-              <bl-button variant="secondary" @click="emit('edit')">
-                <template #prependIcon>
-                  <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-                </template>
-                Edit
-              </bl-button>
-              <bl-modal size="sm" @confirm="emit('delete')">
-                <template #trigger>
-                  <bl-button variant="secondary">
-                    <template #prependIcon>
-                      <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
-                    </template>
-                  </bl-button>
-                </template>
-                <template #title>
-                  Are you sure you want to delete
-                  <strong class="contents">{{ book.title }}</strong>
-                  ?
-                </template>
-                This action cannot be undone.
-                <template #cancel-label> Cancel </template>
-                <template #action-label> Delete </template>
-              </bl-modal>
-            </div>
-          </div>
-        </header>
-
-        <bl-book-lifecycle-card
+        <!-- <bl-book-lifecycle-card
           :current-step="currentStep"
           :current-status="book.progressStatus ?? 'not-owned'"
           :badge-label="lifecycleBadgeLabel"
@@ -134,7 +82,7 @@
           :state-options="lifecycleStateOptions"
           @step-change="(step) => $emit('step-change', step)"
           @status-select="(status) => $emit('status-select', status)"
-        />
+        /> -->
 
         <bl-modal v-model="stepperModalOpen" :with-close-button="false">
           <div class="flex flex-col gap-5">
@@ -201,7 +149,7 @@
       class="border-stroke-subtle flex flex-col gap-4 border-t pt-8"
     >
       <p
-        class="text-ink-muted text-[11px] font-semibold tracking-[0.18em] uppercase"
+        class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
       >
         Collections
       </p>
@@ -222,10 +170,11 @@
 
 <script setup lang="ts">
 import {
+  icons,
+  IconChevronRight,
   IconEdit,
   IconHeart,
   IconHeartFilled,
-  icons,
   IconShare3,
   IconTrash,
 } from '@tabler/icons-vue'
@@ -279,13 +228,13 @@ const emit = defineEmits<{
 const ratingSummary = computed(() => {
   const rating = props.book.rating
 
-  if (!rating) return 'No rating yet'
+  if (!rating) return '-'
 
   const formattedRating = Number.isInteger(rating)
     ? rating.toFixed(0)
     : rating.toFixed(1)
 
-  return `${formattedRating} / 5 rating`
+  return formattedRating
 })
 
 const primaryAction = computed(() => {

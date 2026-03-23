@@ -6,7 +6,7 @@
       >
         <div>
           <p
-            class="text-ink-muted text-[11px] font-semibold tracking-[0.18em] uppercase"
+            class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
           >
             My Progress
           </p>
@@ -20,7 +20,7 @@
             {{ progress }}%
           </p>
           <p
-            class="text-ink-muted pb-1 text-[11px] font-semibold tracking-[0.18em] uppercase"
+            class="text-ink-muted tracking-caps pb-1 text-[11px] font-semibold uppercase"
           >
             Complete
           </p>
@@ -40,7 +40,7 @@
           class="border-stroke-subtle bg-surface-canvas/70 flex flex-col gap-2 rounded-2xl border p-4"
         >
           <p
-            class="text-ink-muted text-[11px] font-semibold tracking-[0.18em] uppercase"
+            class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
           >
             {{ stat.label }}
           </p>

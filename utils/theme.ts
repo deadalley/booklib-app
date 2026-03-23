@@ -25,6 +25,7 @@ export type ThemeTokens = {
     ink: {
       primary: string
       secondary: string
+      subtle: string
       muted: string
       inverse: string
     }
@@ -39,6 +40,9 @@ export type ThemeTokens = {
     body: string[]
     display: string[]
     mono: string[]
+  }
+  letterSpacing: {
+    caps: string
   }
   borderRadius: {
     scholarly: string
@@ -78,6 +82,7 @@ export const legacyTheme: ThemeTokens = {
     ink: {
       primary: '#202020',
       secondary: '#454545',
+      subtle: '#DEDEDE',
       muted: '#C9C9C9',
       inverse: '#FFFFFF',
     },
@@ -101,6 +106,9 @@ export const legacyTheme: ThemeTokens = {
       'Courier New',
       'monospace',
     ],
+  },
+  letterSpacing: {
+    caps: '0.18em',
   },
   borderRadius: {
     scholarly: '2.4rem',
@@ -142,6 +150,7 @@ export const newTheme: ThemeTokens = {
     ink: {
       primary: '#1b1c1c',
       secondary: '#584140',
+      subtle: '#A79A99',
       muted: '#8c7d7c',
       inverse: '#fbf9f8',
     },
@@ -165,6 +174,9 @@ export const newTheme: ThemeTokens = {
       'Courier New',
       'monospace',
     ],
+  },
+  letterSpacing: {
+    caps: '0.18em',
   },
   borderRadius: {
     scholarly: '0.5rem',
@@ -193,6 +205,7 @@ export function toTailwindTheme(theme: ThemeTokens) {
     extend: {
       colors: theme.colors,
       fontFamily: theme.fontFamily,
+      letterSpacing: theme.letterSpacing,
       borderRadius: theme.borderRadius,
       boxShadow: theme.boxShadow,
     },
