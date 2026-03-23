@@ -2,15 +2,13 @@
   <section class="flex flex-1 flex-col gap-8 2xl:w-9/12 2xl:overflow-auto">
     <div class="flex items-center justify-between">
       <!-- Breadcrumbs -->
-      <div
-        class="tracking-caps flex items-center gap-2 text-xs font-semibold uppercase"
-      >
-        <span class="text-ink-muted">Library</span>
-        <span class="text-ink-muted"><IconChevronRight :size="13" /></span>
-        <span class="text-ink-muted">{{ primaryCollectionName }}</span>
-        <span class="text-ink-muted"><IconChevronRight :size="13" /></span>
-        <span class="text-primary font-bold">{{ book.title }}</span>
-      </div>
+      <bl-breadcrumbs
+        :items="[
+          { label: 'Library', to: '../../' },
+          { label: primaryCollectionName, to: '../' },
+          { label: book.title },
+        ]"
+      />
       <!-- Actions -->
       <div class="flex items-center gap-2 self-start">
         <bl-button variant="secondary" @click="$emit('edit')">
@@ -183,7 +181,6 @@
 <script setup lang="ts">
 import {
   icons,
-  IconChevronRight,
   IconEdit,
   IconHeart,
   IconHeartFilled,
