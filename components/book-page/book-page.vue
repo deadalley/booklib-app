@@ -41,20 +41,13 @@
       class="grid gap-16 xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
       <aside class="flex flex-col gap-4">
-        <!-- Cover -->
         <bl-book-page-cover :book="book" editing />
 
-        <!-- Action -->
-        <bl-button class="w-full" @click="onPrimaryAction">
-          <template #prependIcon>
-            <component
-              :is="icons[primaryAction.icon]"
-              :size="ICON_SIZE_SMALL"
-              stroke="1.75"
-            />
-          </template>
-          {{ primaryAction.label }}
-        </bl-button>
+        <bl-book-page-reading-progress
+          :progress="readingProgress"
+          :subtitle="readingProgressSubtitle"
+          :stats="readingStats"
+        />
       </aside>
 
       <div class="flex flex-col gap-6 pr-1">
@@ -65,7 +58,7 @@
           :rating-summary="ratingSummary"
         />
 
-        <div class="border-stroke-subtle mb-6 border-b pb-16"></div>
+        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
 
         <bl-book-page-fields :fields="bookFields" />
 
@@ -82,7 +75,9 @@
           </p>
         </div>
 
-        <!-- <bl-book-lifecycle-card
+        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
+
+        <bl-book-page-status-progress
           :current-step="currentStep"
           :current-status="book.progressStatus ?? 'not-owned'"
           :badge-label="lifecycleBadgeLabel"
@@ -90,59 +85,6 @@
           :state-options="lifecycleStateOptions"
           @step-change="(step) => $emit('step-change', step)"
           @status-select="(status) => $emit('status-select', status)"
-        /> -->
-
-        <bl-modal v-model="stepperModalOpen" :with-close-button="false">
-          <div class="flex flex-col gap-5">
-            <div class="flex flex-col gap-3">
-              <div class="flex justify-center gap-3">
-                <div
-                  v-for="status in Object.values(PROGRESS_STATUS_MAP).filter(
-                    ({ step }) => step === currentStep,
-                  )"
-                  :key="status.id"
-                  class="border-stroke hover:bg-surface-subtle flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border p-2"
-                  @click="$emit('status-select', status.id)"
-                >
-                  <component
-                    :is="icons[status.icon]"
-                    :size="32"
-                    class="text-primary"
-                  />
-                  {{ status.description }}
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col">
-              <bl-checkbox
-                v-if="currentStep === 2"
-                v-model="startReadingBookToday"
-                align="left"
-              >
-                Update start reading date to today
-              </bl-checkbox>
-              <bl-checkbox
-                v-if="currentStep === 3"
-                v-model="finishReadingBookToday"
-                align="left"
-              >
-                Update finish reading date to today
-              </bl-checkbox>
-            </div>
-            <bl-button
-              variant="secondary"
-              expand
-              @click="stepperModalOpen = false"
-            >
-              Cancel
-            </bl-button>
-          </div>
-        </bl-modal>
-
-        <bl-book-page-reading-progress
-          :progress="readingProgress"
-          :subtitle="readingProgressSubtitle"
-          :stats="readingStats"
         />
       </div>
     </div>
@@ -243,15 +185,21 @@ const bookFields = computed(() => {
     { label: 'Publisher', value: props.book.publisher },
     {
       label: 'Language',
-      value: languageOptions[props.book.language] ?? props.book.language,
+      value: props.book.language
+        ? (languageOptions[
+            props.book.language as keyof typeof languageOptions
+          ] ?? props.book.language)
+        : undefined,
     },
     { label: 'Year', value: props.book.year?.toString() },
     { label: 'Original Title', value: props.book.originalTitle },
     {
       label: 'Original Language',
-      value:
-        languageOptions[props.book.originalLanguage] ??
-        props.book.originalLanguage,
+      value: props.book.originalLanguage
+        ? (languageOptions[
+            props.book.originalLanguage as keyof typeof languageOptions
+          ] ?? props.book.originalLanguage)
+        : undefined,
     },
     { label: 'Pages', value: props.book.pages?.toString() },
   ]
@@ -327,8 +275,4 @@ const readingStats = computed(() => {
     },
   ]
 })
-
-function onPrimaryAction() {
-  emit('status-select', primaryAction.value.nextStatus)
-}
 </script>

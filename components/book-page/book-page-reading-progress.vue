@@ -1,5 +1,5 @@
 <template>
-  <section class="paper flex gap-12 p-8">
+  <section class="paper flex gap-4 px-6 py-4">
     <div class="flex flex-1 flex-col gap-2">
       <div
         class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
@@ -8,7 +8,7 @@
         <p
           class="text-ink-secondary text-sm font-bold tracking-widest uppercase"
         >
-          Reading progress
+          Progress
         </p>
         <!-- Percentage -->
         <div class="flex items-end gap-3 self-start md:self-auto">
@@ -29,12 +29,12 @@
     <div class="bg-stroke h-full w-px text-right" />
 
     <div class="flex flex-col justify-end gap-1">
+      <h5 class="font-body text-right font-semibold">Owned</h5>
       <p
         class="text-ink-secondary text-right text-sm font-bold tracking-widest uppercase"
       >
         Current status
       </p>
-      <h5 class="font-body text-right font-semibold">Owned</h5>
     </div>
   </section>
 </template>

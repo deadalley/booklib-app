@@ -341,6 +341,24 @@
           </bl-tile>
         </div>
 
+        <div class="col-span-12">
+          <bl-tile>
+            <template #title>Book Status Stepper</template>
+            <div class="flex flex-col gap-3">
+              <bl-book-status-stepper
+                :current-status="stepperStatus"
+                @status-select="onStepperStatusSelect"
+              />
+              <p class="text-ink-secondary text-sm">
+                Selected status:
+                <span class="text-ink-primary font-semibold">{{
+                  stepperStatus
+                }}</span>
+              </p>
+            </div>
+          </bl-tile>
+        </div>
+
         <div class="col-span-12 xl:col-span-6">
           <bl-tile>
             <template #title>Nav Sidebar Buttons</template>
@@ -521,6 +539,7 @@ import {
   IconPalette,
   IconPlus,
 } from '@tabler/icons-vue'
+import type { BookProgressStatus } from '~/types/book'
 import { activeTheme } from '~/utils/theme'
 
 const title = ref('The Left Hand of Darkness')
@@ -543,6 +562,7 @@ const sortBy = ref('title')
 const owned = ref(true)
 const wishlist = ref(false)
 const rating = ref(4)
+const stepperStatus = ref<BookProgressStatus>('reading')
 
 const statusOptions = [
   { label: 'To read', value: 'to-read' },
@@ -578,6 +598,10 @@ function toggleMultiselectValue(value: string) {
   multiselectValues.value = multiselectValues.value.includes(value)
     ? multiselectValues.value.filter((item) => item !== value)
     : [...multiselectValues.value, value]
+}
+
+function onStepperStatusSelect(status: BookProgressStatus) {
+  stepperStatus.value = status
 }
 
 const colors = activeTheme.colors

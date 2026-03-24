@@ -15,7 +15,7 @@
 defineProps<{
   fields: {
     label: string
-    value?: string
+    value?: string | null
   }[]
 }>()
 </script>
