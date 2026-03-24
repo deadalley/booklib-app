@@ -9,9 +9,13 @@
       <!-- Author -->
       <div class="flex items-baseline gap-3">
         <p class="text-ink-secondary font-semibold tracking-wide">by</p>
-        <p v-if="authorName" class="text-xl font-bold tracking-wide">
+        <NuxtLink
+          v-if="authorName"
+          class="border-stroke hover:text-ink-secondary border-b text-xl font-bold tracking-wide"
+          :to="`/authors/${book.author}`"
+        >
           {{ authorName }}
-        </p>
+        </NuxtLink>
       </div>
 
       <p class="text-ink-subtle text-2xl">•</p>
