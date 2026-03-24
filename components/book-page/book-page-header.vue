@@ -1,7 +1,7 @@
 <template>
   <header class="mb-12 flex flex-col gap-1">
     <!-- Title -->
-    <h1 class="font-body">
+    <h1>
       {{ book.title }}
     </h1>
 
