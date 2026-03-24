@@ -56,6 +56,7 @@
           :primary-collection-name="primaryCollectionName"
           :author-name="authorName"
           :rating-summary="ratingSummary"
+          :formatted-date="formattedDate"
         />
 
         <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
@@ -127,6 +128,7 @@ import {
   ICON_SIZE_SMALL,
   PROGRESS_STATUS_MAP,
 } from '~/utils/constants'
+import { toFullDateCompact } from '~/utils/date'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
@@ -180,6 +182,8 @@ const ratingSummary = computed(() => {
   return formattedRating
 })
 
+const formattedDate = computed(() => toFullDateCompact(props.book.createdAt))
+
 const bookFields = computed(() => {
   return [
     { label: 'Publisher', value: props.book.publisher },
@@ -203,47 +207,6 @@ const bookFields = computed(() => {
     },
     { label: 'Pages', value: props.book.pages?.toString() },
   ]
-})
-
-const primaryAction = computed(() => {
-  const status = props.book.progressStatus ?? 'not-owned'
-
-  if (status === 'not-owned') {
-    return {
-      label: 'Mark as Owned',
-      caption:
-        'Move this book into your active library before you start reading.',
-      icon: PROGRESS_STATUS_MAP.owned.icon,
-      nextStatus: 'owned' as BookProgressStatus,
-    }
-  }
-
-  if (status === 'owned') {
-    return {
-      label: 'Start Reading',
-      caption:
-        'Begin tracking progress and move this title into your reading flow.',
-      icon: PROGRESS_STATUS_MAP.reading.icon,
-      nextStatus: 'reading' as BookProgressStatus,
-    }
-  }
-
-  if (status === 'read') {
-    return {
-      label: 'Read Again',
-      caption: 'Jump back into this book and reopen progress tracking.',
-      icon: PROGRESS_STATUS_MAP.reading.icon,
-      nextStatus: 'reading' as BookProgressStatus,
-    }
-  }
-
-  return {
-    label: 'Resume Reading',
-    caption:
-      'Keep the session moving and continue from the current reading state.',
-    icon: PROGRESS_STATUS_MAP.reading.icon,
-    nextStatus: 'reading' as BookProgressStatus,
-  }
 })
 
 const readingStats = computed(() => {
