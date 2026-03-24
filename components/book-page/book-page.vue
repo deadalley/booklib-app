@@ -63,14 +63,23 @@
 
         <bl-book-page-fields :fields="bookFields" />
 
+        <div v-if="(book.genres ?? []).length" class="flex flex-col gap-4">
+          <p class="section-title">Genres</p>
+          <div class="flex flex-wrap gap-2">
+            <bl-chip
+              v-for="genre in book.genres"
+              :key="genre"
+              variant="primary"
+            >
+              {{ genre }}
+            </bl-chip>
+          </div>
+        </div>
+
         <div class="border-stroke-subtle mb-16 border-b pb-6"></div>
 
         <div class="flex flex-col gap-4">
-          <p
-            class="text-primary text-base font-semibold tracking-widest uppercase"
-          >
-            Summary
-          </p>
+          <p class="section-title">Summary</p>
           <p class="text-ink-secondary text-lg font-normal tracking-wider">
             {{ book.summary || 'No summary available.' }}
           </p>
@@ -239,3 +248,11 @@ const readingStats = computed(() => {
   ]
 })
 </script>
+
+<style scoped>
+@reference '../../assets/css/main.css';
+
+.section-title {
+  @apply text-primary text-base font-semibold tracking-widest uppercase;
+}
+</style>

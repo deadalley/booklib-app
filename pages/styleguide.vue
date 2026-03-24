@@ -119,12 +119,40 @@
 
         <div class="col-span-12 xl:col-span-5">
           <bl-tile>
-            <template #title>Tags And Pills</template>
-            <div class="flex flex-wrap items-center gap-3">
-              <bl-pill>Default</bl-pill>
-              <bl-pill selected>Selected</bl-pill>
-              <bl-total-tag>128 books</bl-total-tag>
-              <bl-total-tag variant="primary">12 finished</bl-total-tag>
+            <template #title>Pills & Chips</template>
+            <div class="flex flex-col gap-2">
+              <p class="text-ink-secondary text-sm">Pills</p>
+              <div class="flex flex-wrap items-center gap-3">
+                <bl-pill>Default</bl-pill>
+                <bl-pill selected>Selected</bl-pill>
+              </div>
+
+              <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
+                <p class="text-ink-secondary text-sm">Tags</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-total-tag>128 books</bl-total-tag>
+                  <bl-total-tag variant="primary">12 finished</bl-total-tag>
+                </div>
+              </div>
+
+              <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
+                <p class="text-ink-secondary text-sm">Chips</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip>Science Fiction</bl-chip>
+                  <bl-chip>Fantasy</bl-chip>
+                  <bl-chip variant="primary">Currently Reading</bl-chip>
+                  <bl-chip variant="primary">Finished</bl-chip>
+                </div>
+              </div>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12">
+          <bl-tile>
+            <template #title>Breadcrumbs</template>
+            <div class="flex flex-col gap-2">
+              <bl-breadcrumbs :items="breadcrumbsLibrary" />
             </div>
           </bl-tile>
         </div>
@@ -292,7 +320,7 @@
 
         <div class="col-span-12 xl:col-span-4">
           <bl-tile>
-            <template #title>Selection</template>
+            <template #title>Tabs</template>
             <div class="flex flex-col gap-5">
               <bl-tabs default-value="grid" full>
                 <template #options>
@@ -563,6 +591,12 @@ const owned = ref(true)
 const wishlist = ref(false)
 const rating = ref(4)
 const stepperStatus = ref<BookProgressStatus>('reading')
+
+const breadcrumbsLibrary = [
+  { label: 'Library', to: '/library/books' },
+  { label: 'Books', to: '/library/books' },
+  { label: 'The Left Hand of Darkness' },
+]
 
 const statusOptions = [
   { label: 'To read', value: 'to-read' },

@@ -12,7 +12,7 @@
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
-        class="accordion-header flex w-full flex-1 items-start justify-between gap-3 sm:items-center"
+        class="accordion-header mb-3 flex w-full flex-1 items-start justify-between gap-3 sm:items-center"
       >
         <div
           class="flex w-full flex-1 items-center justify-between"
