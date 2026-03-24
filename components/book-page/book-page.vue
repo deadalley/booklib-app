@@ -234,8 +234,16 @@ const readingStats = computed(() => {
         pagesRemaining !== undefined ? `${pagesRemaining} pages` : 'Unknown',
     },
     {
-      label: props.readingSecondaryLabel,
-      value: props.readingSecondaryValue,
+      label: 'Started Reading',
+      value: props.book.startedAt
+        ? toFullDateCompact(props.book.startedAt)
+        : 'Not started',
+    },
+    {
+      label: 'Finished Reading',
+      value: props.book.finishedAt
+        ? toFullDateCompact(props.book.finishedAt)
+        : 'In progress',
     },
   ]
 })
