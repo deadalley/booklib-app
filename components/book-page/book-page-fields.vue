@@ -6,16 +6,26 @@
       class="bg-surface-canvas/70 flex flex-col gap-1 rounded-2xl p-4"
     >
       <p class="label">{{ field.label }}</p>
-      <p class="value">{{ field.value || '-' }}</p>
+      <div class="flex items-center gap-2">
+        <component
+          v-if="field.icon"
+          :is="icons[field.icon]"
+          :size="ICON_SIZE_SMALL"
+        />
+        <p class="value">{{ field.value || '-' }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { icons } from '@tabler/icons-vue'
+
 defineProps<{
   fields: {
     label: string
     value?: string | null
+    icon?: keyof typeof icons
   }[]
 }>()
 </script>

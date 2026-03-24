@@ -124,33 +124,16 @@
 </template>
 
 <script setup lang="ts">
+import { icons, IconEdit, IconTrash } from '@tabler/icons-vue'
 import {
-  icons,
-  IconEdit,
-  IconHeart,
-  IconHeartFilled,
-  IconShare3,
-  IconTrash,
-} from '@tabler/icons-vue'
-import {
+  BOOK_FORMAT_MAP,
   DEFAULT_COLLECTION_ICONS_FILLED,
   ICON_SIZE_SMALL,
-  PROGRESS_STATUS_MAP,
 } from '~/utils/constants'
 import { toFullDateCompact } from '~/utils/date'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
-
-const stepperModalOpen = defineModel<boolean>('stepperModalOpen', {
-  default: false,
-})
-const startReadingBookToday = defineModel<boolean>('startReadingBookToday', {
-  default: false,
-})
-const finishReadingBookToday = defineModel<boolean>('finishReadingBookToday', {
-  default: false,
-})
 
 const props = defineProps<{
   book: Book
@@ -215,6 +198,15 @@ const bookFields = computed(() => {
         : undefined,
     },
     { label: 'Pages', value: props.book.pages?.toString() },
+    {
+      label: 'Format',
+      value: props.book.format
+        ? BOOK_FORMAT_MAP[props.book.format]?.description
+        : undefined,
+      icon: props.book.format
+        ? (BOOK_FORMAT_MAP[props.book.format]?.icon as keyof typeof icons)
+        : undefined,
+    },
   ]
 })
 
