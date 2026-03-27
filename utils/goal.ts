@@ -2,20 +2,23 @@ import { sum } from 'ramda'
 import type { Goal } from '~/types/goal'
 
 export function getGoalProgressColor(
-  status: string,
+  goal: Goal,
   type: 'bg' | 'text',
 ): string | undefined {
-  if (status === 'not-tracking' || status === 'expired') {
-    return `${type}-ink-muted`
+  const goalStatus = getGoalStatus(goal)
+  if (goalStatus === 'not-tracking' || goalStatus === 'expired') {
+    // bg-ink-muted text-ink-muted
+    return `${type}-stroke`
   }
 
-  if (status === 'tracking') {
+  // bg-primary text-primary
+  if (goalStatus === 'tracking') {
     return `${type}-primary`
   }
 
-  // bg-primary-200 text-primary-200
-  if (status === 'finished') {
-    return `${type}-primary-200`
+  // bg-stroke text-stroke
+  if (goalStatus === 'completed') {
+    return `${type}-ink-muted`
   }
 
   return undefined
@@ -52,4 +55,34 @@ export function getGoalTimeProgressPercentage(goal: Goal): number {
     start: goal.startAt,
     end: goal.finishAt,
   })
+}
+
+export function getGoalStatus(
+  goal: Goal,
+): 'tracking' | 'not-tracking' | 'completed' | 'expired' {
+  if (isGoalCompleted(goal)) return 'completed'
+  if (isGoalExpired(goal)) return 'expired'
+  return goal.status || 'not-tracking'
+}
+
+export function getGoalStatusLabel(goal: Goal): string {
+  const status = getGoalStatus(goal)
+  switch (status) {
+    case 'tracking':
+      return 'Active'
+    case 'completed':
+      return 'Finished'
+    case 'expired':
+      return 'Expired'
+    default:
+      return 'Inactive'
+  }
+}
+
+export function isGoalCompleted(goal: Goal): boolean {
+  return now() >= goal.finishAt && getGoalProgress(goal) >= goal.amount
+}
+
+export function isGoalExpired(goal: Goal): boolean {
+  return now() >= goal.finishAt && getGoalProgress(goal) < goal.amount
 }

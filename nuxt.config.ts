@@ -43,6 +43,7 @@ export default defineNuxtConfig({
       {
         path: '~/components',
         prefix: 'bl',
+        pathPrefix: false,
       },
     ],
   },

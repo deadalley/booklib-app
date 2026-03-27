@@ -2,7 +2,7 @@ import { indexBy, prop } from 'ramda'
 import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import type { Goal, GoalStatus } from '~/types/goal'
+import type { Goal } from '~/types/goal'
 import { DEFAULT_COLLECTIONS } from '~/utils/constants'
 import {
   getBooksByAuthor,
@@ -105,15 +105,24 @@ export function sortCollections(collections: Collection[]) {
 }
 
 export function sortGoals(goals: Goal[]) {
-  const goalSortingOrder: Record<GoalStatus, number> = {
+  const goalSortingOrder: Record<
+    'tracking' | 'completed' | 'expired' | 'not-tracking',
+    number
+  > = {
     tracking: 0,
-    finished: 1,
+    completed: 1,
     expired: 2,
     'not-tracking': 3,
   }
 
   return goals.concat().sort((g1, g2) => {
-    return goalSortingOrder[g1.status] - goalSortingOrder[g2.status]
+    const status1 = getGoalStatus(g1)
+    const status2 = getGoalStatus(g2)
+
+    if (status1 === status2) {
+      return new Date(g1.createdAt).getTime() - new Date(g2.createdAt).getTime()
+    }
+    return goalSortingOrder[status1] - goalSortingOrder[status2]
   })
 }
 

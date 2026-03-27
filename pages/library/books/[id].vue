@@ -5,6 +5,8 @@
     v-model:start-reading-book-today="startReadingBookToday"
     v-model:finish-reading-book-today="finishReadingBookToday"
     :book="book"
+    :book-goals="bookGoals"
+    :authors="authors"
     :primary-collection-name="primaryCollectionName"
     :is-favorite="!!selectedDefaultCollections[FAVORITE_COLLECTION_ID]"
     :author-name="authorName"
@@ -72,6 +74,7 @@ import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { Goal } from '~/types/goal'
 import { toDefaultDate } from '../../../utils/date'
 
 const {
@@ -82,6 +85,7 @@ const {
   createBook,
   updateBook,
   searchGoogleBooks,
+  getGoals,
 } = useBookLibrary()
 
 const route = useRoute()
@@ -101,10 +105,12 @@ const finishReadingBookToday = ref(false)
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
+const goals = ref<Goal[]>([])
 
 const loadData = async () => {
   collections.value = await getCollections()
   authors.value = await getAuthors()
+  goals.value = await getGoals()
 }
 
 onMounted(loadData)
@@ -116,6 +122,20 @@ const collectionsDisplayed = computed(() => {
 })
 
 const formattedDate = computed(() => toFullDateCompact(book.value?.createdAt))
+
+const bookGoals = computed(() => {
+  if (!book.value) return []
+
+  return goals.value.filter((goal) => {
+    if (goal.type === 'books') {
+      return goal.entries.some(
+        (entry) => String(entry.book) === String(book.value?.id),
+      )
+    }
+
+    return false
+  })
+})
 
 const currentStep = ref<number | undefined>(
   book.value

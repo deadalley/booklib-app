@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-1 flex-col gap-8 2xl:w-9/12 2xl:overflow-auto">
+  <section class="flex flex-1 flex-col gap-8 2xl:w-8/12 2xl:overflow-auto">
     <div class="flex items-center justify-between">
       <!-- Breadcrumbs -->
       <bl-breadcrumbs
@@ -76,7 +76,7 @@
           </div>
         </div>
 
-        <div class="border-stroke-subtle mb-16 border-b pb-6"></div>
+        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
 
         <div class="flex flex-col gap-4">
           <p class="section-title">Summary</p>
@@ -100,16 +100,33 @@
     </div>
 
     <section
+      v-if="bookGoals.length"
+      class="border-stroke-subtle flex flex-col gap-4 border-t pt-8"
+    >
+      <p class="text-ink-muted tracking-caps text-sm font-semibold uppercase">
+        Goals
+      </p>
+      <div
+        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
+      >
+        <bl-goal-link-tile
+          v-for="goal in bookGoals"
+          :key="goal.id"
+          :goal="goal"
+          :authors="authors"
+        />
+      </div>
+    </section>
+
+    <section
       v-if="collectionsDisplayed.length"
       class="border-stroke-subtle flex flex-col gap-4 border-t pt-8"
     >
-      <p
-        class="text-ink-muted tracking-caps text-[11px] font-semibold uppercase"
-      >
+      <p class="text-ink-muted tracking-caps text-sm font-semibold uppercase">
         Collections
       </p>
       <div
-        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
       >
         <bl-collection-tile
           v-for="collection in collectionsDisplayed"
@@ -133,10 +150,13 @@ import {
 import { toFullDateCompact } from '~/utils/date'
 import type { Book, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { Goal } from '~/types/goal'
 import languageOptions from '~/public/languages-2.json'
+import type { Author } from '~/types/author'
 
 const props = defineProps<{
   book: Book
+  authors: Author[]
   primaryCollectionName: string
   isFavorite: boolean
   authorName?: string
@@ -153,6 +173,7 @@ const props = defineProps<{
   readingSecondaryLabel: string
   readingSecondaryValue: string
   collectionsDisplayed: (Collection & { selected?: boolean })[]
+  bookGoals: Goal[]
   onSelectRating: (rating: number) => Promise<void>
 }>()
 

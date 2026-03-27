@@ -4,7 +4,7 @@ export type GoalType = 'books' | 'pages' | 'hours'
 
 export type GoalInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'total'
 
-export type GoalStatus = 'tracking' | 'not-tracking' | 'finished' | 'expired'
+export type GoalStatus = 'tracking' | 'not-tracking'
 
 export type BookGoalEntry = {
   id: string

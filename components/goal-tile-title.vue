@@ -2,32 +2,35 @@
   <div class="flex max-w-80 flex-1 items-center gap-2 sm:max-w-[unset]">
     <component
       :is="icons[GOAL_TYPE_MAP[goal.type].icon]"
-      :class="getGoalProgressColor(goal.status, 'text')"
+      :class="getGoalProgressColor(goal, 'text')"
       :size="ICON_SIZE_LARGE"
       stroke="1.5"
     />
     <h5 class="truncate">{{ goal.title }}</h5>
     <span v-if="showActiveTag" class="mb-1 ml-2">
       <bl-total-tag
-        :variant="goal.status === 'tracking' ? 'primary' : 'secondary'"
+        :variant="goalStatus === 'tracking' ? 'primary' : 'secondary'"
       >
         <IconConfetti
-          v-if="goal.status === 'finished'"
+          v-if="goalStatus === 'completed'"
           class="text-primary"
           :size="16"
         />
-        {{ GOAL_STATUS_MAP[goal.status].description }}
+        {{ goalStatusLabel }}
       </bl-total-tag>
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { icons } from '@tabler/icons-vue'
+import { icons, IconConfetti } from '@tabler/icons-vue'
 import type { Goal } from '~/types/goal'
 
-defineProps<{
+const props = defineProps<{
   goal: Goal
   showActiveTag?: boolean
 }>()
+
+const goalStatus = computed(() => getGoalStatus(props.goal))
+const goalStatusLabel = computed(() => getGoalStatusLabel(props.goal))
 </script>
