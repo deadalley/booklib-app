@@ -10,7 +10,7 @@
           Progress
         </p>
         <div class="flex items-end gap-3 self-start md:self-auto">
-          <p class="text-primary text-4xl leading-none font-semibold">
+          <p class="text-primary text-3xl leading-none font-semibold">
             {{ progress }}%
           </p>
         </div>

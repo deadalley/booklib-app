@@ -126,13 +126,14 @@
         Collections
       </p>
       <div
-        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
       >
         <bl-collection-tile
           v-for="collection in collectionsDisplayed"
           :key="collection.id"
           :collection="collection"
           collection-type="collections"
+          layout="detailed"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
         />
       </div>

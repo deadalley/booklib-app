@@ -228,7 +228,7 @@ const progressBarColor = computed(() => getGoalProgressColor(props.goal, 'bg'))
 }
 
 .goal-link-tile-title {
-  @apply overflow-hidden pt-1 pb-0! text-xl leading-tight font-semibold;
+  @apply hover:text-primary cursor-pointer overflow-hidden pt-1 pb-0! text-xl leading-tight font-semibold;
   line-clamp: 2;
   display: -webkit-box;
   -webkit-line-clamp: 2;
