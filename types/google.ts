@@ -21,9 +21,3 @@ export type GoogleBook = {
     canonicalVolumeLink: string
   }
 }
-
-export type GoogleApiOptions = {
-  startIndex?: number
-  maxResults?: number
-  printType?: 'all' | 'books' | 'magazines'
-}

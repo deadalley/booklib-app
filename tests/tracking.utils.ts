@@ -28,17 +28,6 @@ export async function setInterval(page: Page, interval: string): Promise<void> {
   await page.getByLabel(interval).getByText(interval).click()
 }
 
-export async function setDateRange(
-  page: Page,
-  dateRange: string,
-): Promise<void> {
-  await page
-    .getByRole('combobox')
-    .filter({ hasText: 'Select date range' })
-    .click()
-  await page.getByLabel(dateRange).getByText(dateRange).click()
-}
-
 export async function setDateRangeDates(
   page: Page,
   startDate: string,
