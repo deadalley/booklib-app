@@ -59,12 +59,12 @@
         <bl-expanded-collection
           v-for="collection in filteredCollectionsByPage"
           :key="collection.id"
+          v-model:open="allExpanded"
           collection-type="collections"
           :collection="collection"
           :books="booksByCollectionId[collection.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
           :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
-          v-model:open="allExpanded"
           @delete="deleteCollection"
         />
       </div>

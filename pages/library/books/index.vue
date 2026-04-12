@@ -139,7 +139,6 @@
 import type { Book, ViewBook } from '~/types/book'
 import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
-import type { BookSortValue } from '~/composables/use-sort-books'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 import type { Collection } from '~/types/collection'

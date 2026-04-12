@@ -2,7 +2,7 @@
   <div
     v-if="goal"
     v-bind="$attrs"
-    class="overflow-visible rounded-xl border border-stroke px-6 py-2"
+    class="border-stroke overflow-visible rounded-xl border px-6 py-2"
   >
     <template v-if="entry">
       <div class="flex items-center justify-between">

@@ -131,10 +131,8 @@ const props = defineProps<{
 const open = defineModel<boolean>({ default: false })
 
 const emit = defineEmits<{
-  (e: 'close'): void
-  (e: 'move-to-collection', collectionId: string): void
-  (e: 'edit-author', authorId: string): void
-  (e: 'delete'): void
+  (e: 'close' | 'delete'): void
+  (e: 'move-to-collection' | 'edit-author', valueId: string): void
 }>()
 
 const moveCollectionModalOpen = ref(false)

@@ -13,12 +13,12 @@
     <div class="columns-2 gap-6">
       <bl-checkbox
         v-for="element in elements"
-        :key="element"
         :id="element"
+        :key="element"
         :checked="selectedElements?.includes(element)"
         align="left"
-        @change="onSelect(element)"
         class="mb-1"
+        @change="onSelect(element)"
         >{{ getDisplayValue(element) }}</bl-checkbox
       >
     </div>

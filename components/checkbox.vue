@@ -13,8 +13,8 @@
     </span>
     <input
       :id="$attrs.id as string"
-      :checked="$attrs.checked as boolean"
       v-model="checked"
+      :checked="$attrs.checked as boolean"
       type="checkbox"
       class="checkbox-input"
       @input="emit('change', !!checked)"

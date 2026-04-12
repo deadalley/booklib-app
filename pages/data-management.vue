@@ -261,13 +261,11 @@ import {
   IconDownload,
   IconFileTypeCsv,
   IconBraces,
-  IconInfoCircle,
   IconUpload,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
 import { indexBy, pick, prop, uniq } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
-import type { SelectOption } from '~/components/raw-select.vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import type { LibraryData } from '~/types/library'

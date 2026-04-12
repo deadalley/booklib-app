@@ -178,20 +178,6 @@ const pageLabel = computed(() => {
   return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}`
 })
 
-function onSelectStatus(value: BookProgressStatus) {
-  if (selectedStatuses.value) {
-    const newValues = selectedStatuses.value.filter(
-      (status) => status !== value,
-    )
-
-    if (newValues.length === selectedStatuses.value.length) {
-      selectedStatuses.value = selectedStatuses.value.concat(value)
-    } else {
-      selectedStatuses.value = newValues
-    }
-  }
-}
-
 function onSelectFormat(value: BookFormat) {
   if (selectedFormats.value) {
     const newValues = selectedFormats.value.filter((status) => status !== value)
@@ -200,29 +186,6 @@ function onSelectFormat(value: BookFormat) {
       selectedFormats.value = selectedFormats.value.concat(value)
     } else {
       selectedFormats.value = newValues
-    }
-  }
-}
-
-function onSelectCollection(value: string) {
-  if (selectedCollections.value) {
-    const index = selectedCollections.value.findIndex((v) => v === value)
-    if (index === -1) {
-      selectedCollections.value.push(value)
-    } else {
-      selectedCollections.value.splice(index, 1)
-    }
-  }
-}
-
-function onToggleGenre(value: string) {
-  if (selectedGenres.value) {
-    const index = selectedGenres.value.findIndex((genre) => genre === value)
-
-    if (index === -1) {
-      selectedGenres.value.push(value)
-    } else {
-      selectedGenres.value.splice(index, 1)
     }
   }
 }

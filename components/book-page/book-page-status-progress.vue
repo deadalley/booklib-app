@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { icons } from '@tabler/icons-vue'
+import type { icons } from '@tabler/icons-vue'
 import type { BookProgressStatus } from '~/types/book'
 
 const props = defineProps<{

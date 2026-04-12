@@ -4,13 +4,13 @@
     <div class="flex w-full flex-col items-center gap-6">
       <div class="flex w-full items-center justify-between gap-2">
         <IconChevronLeft
-          class="-mx-2 cursor-pointer text-primary hover:text-primary/60"
+          class="text-primary hover:text-primary/60 -mx-2 cursor-pointer"
           :size="ICON_SIZE_SMALL"
           @click="onClickBack"
         />
         <h6 class="text-center">{{ authors[index]?.author.name }}</h6>
         <IconChevronRight
-          class="-mx-2 cursor-pointer text-primary hover:text-primary/60"
+          class="text-primary hover:text-primary/60 -mx-2 cursor-pointer"
           :size="ICON_SIZE_SMALL"
           @click="onClickForward"
         />
@@ -20,7 +20,7 @@
           authors[index]?.average !== undefined ||
           authors[index]?.countByStatus === undefined
         "
-        class="flex flex-col items-center rounded-2xl border border-stroke bg-surface-elevated px-6 py-2 text-primary"
+        class="border-stroke bg-surface-elevated text-primary flex flex-col items-center rounded-2xl border px-6 py-2"
       >
         <div class="flex items-center">
           <template v-if="authors[0]?.average !== undefined">
@@ -48,7 +48,7 @@
             .filter(([, count]) => count > 0)
             .slice(0, 2)"
           :key="status"
-          class="flex flex-col items-center rounded-2xl border border-stroke bg-surface-elevated px-6 py-2 text-primary"
+          class="border-stroke bg-surface-elevated text-primary flex flex-col items-center rounded-2xl border px-6 py-2"
         >
           <div class="flex items-center">
             <h4>

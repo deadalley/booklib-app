@@ -130,7 +130,4 @@ const navigationItems = computed(() => {
 })
 
 const sidebarOpen = ref(false)
-const isWebEnvironment = ref<boolean>(
-  typeof window !== 'undefined' && !('electronAPI' in window),
-)
 </script>

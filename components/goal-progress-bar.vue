@@ -4,7 +4,7 @@
       <bl-progress-bar
         v-model:progress-value="progress"
         size="sm"
-        :color="getGoalProgressColor(goal.status, 'bg')"
+        :color="getGoalProgressColor(goal, 'bg')"
       />
       <div class="flex justify-between">
         <p class="text-ink-secondary">{{ toFullDate(goal.startAt) }}</p>

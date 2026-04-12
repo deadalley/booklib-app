@@ -68,7 +68,6 @@
 
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
-import { icons } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'

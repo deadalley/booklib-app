@@ -1,5 +1,5 @@
 <template>
-  <ul class="rounded-2xl border border-stroke">
+  <ul class="border-stroke rounded-2xl border">
     <slot />
   </ul>
 </template>

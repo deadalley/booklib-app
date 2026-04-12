@@ -8,7 +8,7 @@
       Uploading custom book covers is not available in this version.
     </template>
     <div
-      class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border border-stroke lg:flex-1"
+      class="border-stroke relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border lg:flex-1"
       :class="{ 'justify-center': loading }"
       @mouseenter="setHovered(true)"
       @mouseleave="setHovered(false)"
@@ -21,7 +21,7 @@
       />
       <bl-icon-button
         v-if="editing"
-        class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
+        class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-100': hovered,
@@ -34,7 +34,7 @@
       </bl-icon-button>
       <bl-icon-button
         v-if="editing"
-        class="absolute right-0 top-0 z-20 -translate-x-1/2 translate-y-1/2 transition-opacity duration-300"
+        class="absolute top-0 right-0 z-20 -translate-x-1/2 translate-y-1/2 transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-100': hovered,
@@ -47,7 +47,7 @@
       </bl-icon-button>
       <div
         v-if="editing"
-        class="absolute inset-0 z-10 size-full rounded-xl bg-surface-inverse transition-opacity duration-300"
+        class="bg-surface-inverse absolute inset-0 z-10 size-full rounded-xl transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-60': hovered,

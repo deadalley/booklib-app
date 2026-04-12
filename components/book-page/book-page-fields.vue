@@ -8,8 +8,8 @@
       <p class="label">{{ field.label }}</p>
       <div class="flex items-center gap-2">
         <component
-          v-if="field.icon"
           :is="icons[field.icon]"
+          v-if="field.icon"
           :size="ICON_SIZE_SMALL"
         />
         <p class="value">{{ field.value || '-' }}</p>

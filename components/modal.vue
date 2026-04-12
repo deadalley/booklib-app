@@ -6,10 +6,10 @@
     </DialogTrigger>
     <DialogPortal>
       <DialogOverlay
-        class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-surface-inverse/80"
+        class="data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 z-[100] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-surface-elevated p-7 focus:outline-none"
+        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-[100] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-[6px] p-7 focus:outline-none"
         :class="{
           'w-[90vw]': size !== undefined,
           'max-w-screen-sm': size === 'sm',

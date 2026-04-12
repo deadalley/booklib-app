@@ -48,8 +48,8 @@
       <template v-if="sortedGoals?.length">
         <bl-goal-tile
           v-for="(goal, index) in sortedGoals"
-          :key="goal.id"
           :id="'goal-' + goal.id"
+          :key="goal.id"
           :goal="goal"
           class="col-span-12"
           :default-open="index === 0"

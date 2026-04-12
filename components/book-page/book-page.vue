@@ -148,7 +148,8 @@
 </template>
 
 <script setup lang="ts">
-import { icons, IconEdit, IconTrash } from '@tabler/icons-vue'
+import type { icons } from '@tabler/icons-vue'
+import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import {
   BOOK_FORMAT_MAP,
   DEFAULT_COLLECTION_ICONS_FILLED,
@@ -184,7 +185,7 @@ const props = defineProps<{
   onSelectRating: (rating: number) => Promise<void>
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'share' | 'favorite-toggle' | 'edit' | 'delete'): void
   (e: 'step-change', step: number): void
   (e: 'status-select', status: BookProgressStatus): void

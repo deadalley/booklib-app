@@ -5,7 +5,7 @@
       width="512"
       height="512"
       alt="Error image"
-      class="-mb-24 -mt-64"
+      class="-mt-64 -mb-24"
     />
     <template v-if="error?.statusCode === 404">
       <h1>Not Found.</h1>

@@ -7,8 +7,8 @@
         <IconChevronRight :size="13" />
       </span>
       <component
-        v-if="item.to && index < items.length - 1"
         :is="NuxtLink"
+        v-if="item.to && index < items.length - 1"
         :to="item.to"
         :class="['text-ink-muted hover:text-primary transition-colors']"
       >

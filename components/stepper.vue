@@ -5,7 +5,7 @@
     :linear="linear"
   >
     <div
-      class="absolute left-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-surface-elevated group-data-[state=active]:block"
+      class="border-primary bg-surface-elevated absolute top-1/2 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border-2 group-data-[state=active]:block"
       :class="{
         'size-[46px]': !small,
         'size-[38px]': small,
@@ -19,7 +19,7 @@
       :disabled="!interactive"
     >
       <StepperTrigger
-        class="relative z-10 inline-flex shrink-0 items-center justify-center rounded-full bg-surface text-ink-inverse hover:bg-surface/80 active:bg-primary-800 group-data-[state=active]:bg-primary group-data-[state=completed]:bg-primary group-data-[disabled]:text-ink-inverse group-data-[state=active]:text-ink-inverse group-data-[state=completed]:text-ink-inverse"
+        class="bg-surface text-ink-inverse hover:bg-surface/80 active:bg-primary-800 group-data-[state=active]:bg-primary group-data-[state=completed]:bg-primary group-data-[disabled]:text-ink-inverse group-data-[state=active]:text-ink-inverse group-data-[state=completed]:text-ink-inverse relative z-10 inline-flex shrink-0 items-center justify-center rounded-full"
         :class="{
           'size-10': !small,
           'size-8': small,
@@ -38,18 +38,18 @@
 
       <StepperSeparator
         v-if="item.step !== steps[steps.length - 1]?.step"
-        class="absolute -right-1/2 left-1/2 top-1/2 block h-[5px] shrink-0 -translate-y-1/2 rounded-full bg-surface group-data-[disabled]:bg-surface group-data-[state=completed]:bg-primary"
+        class="bg-surface group-data-[disabled]:bg-surface group-data-[state=completed]:bg-primary absolute top-1/2 -right-1/2 left-1/2 block h-[5px] shrink-0 -translate-y-1/2 rounded-full"
       />
 
       <div
-        class="absolute top-full mt-2 w-full text-center text-ink-primary group-data-[state=active]:text-primary group-data-[state=inactive]:text-ink-muted"
+        class="text-ink-primary group-data-[state=active]:text-primary group-data-[state=inactive]:text-ink-muted absolute top-full mt-2 w-full text-center"
       >
         <StepperTitle v-if="item.title" :as="small ? 'h6' : 'h5'">
           {{ item.title }}
         </StepperTitle>
         <StepperDescription
           v-if="item.description"
-          class="text-base text-ink-primary group-data-[state=active]:text-ink-primary group-data-[state=inactive]:text-ink-muted"
+          class="text-ink-primary group-data-[state=active]:text-ink-primary group-data-[state=inactive]:text-ink-muted text-base"
         >
           {{ item.description }}
         </StepperDescription>

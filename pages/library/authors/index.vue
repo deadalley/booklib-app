@@ -54,12 +54,12 @@
         <bl-expanded-collection
           v-for="author in filteredAuthorsByPage"
           :key="author.id"
+          v-model:open="allExpanded"
           collection-type="authors"
           :collection="author"
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
           :can-delete="false"
-          v-model:open="allExpanded"
           @delete="deleteAuthor"
         />
       </div>

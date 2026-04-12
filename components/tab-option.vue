@@ -2,7 +2,7 @@
   <TabsTrigger
     v-bind="$attrs"
     :value="value"
-    class="flex cursor-pointer items-center justify-center px-4 py-2 font-display font-normal text-ink-secondary hover:text-primary focus-visible:relative data-[state=active]:font-medium data-[state=active]:text-primary"
+    class="font-display text-ink-secondary hover:text-primary data-[state=active]:text-primary flex cursor-pointer items-center justify-center px-4 py-2 font-normal focus-visible:relative data-[state=active]:font-medium"
   >
     <slot />
   </TabsTrigger>

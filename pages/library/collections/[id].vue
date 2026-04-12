@@ -5,7 +5,7 @@
   >
     <header class="flex flex-col gap-6">
       <button
-        class="flex items-center gap-2 hover:text-primary"
+        class="hover:text-primary flex items-center gap-2"
         @click="$router.back()"
       >
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />

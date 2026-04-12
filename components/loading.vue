@@ -2,7 +2,7 @@
   <svg
     v-bind="$attrs"
     aria-hidden="true"
-    class="inline size-8 animate-spin fill-primary dark:text-ink-muted"
+    class="fill-primary dark:text-ink-muted inline size-8 animate-spin"
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
