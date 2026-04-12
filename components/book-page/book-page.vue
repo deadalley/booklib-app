@@ -44,6 +44,13 @@
       <aside class="flex flex-col gap-4">
         <bl-book-page-cover :book="book" editing />
 
+        <bl-book-page-default-collections
+          :selected-default-collections="selectedDefaultCollections"
+          @default-collection-change="
+            $emit('default-collection-change', $event)
+          "
+        />
+
         <bl-book-page-reading-progress
           :progress="readingProgress"
           :subtitle="readingProgressSubtitle"
@@ -185,6 +192,7 @@ const props = defineProps<{
   readingProgressSubtitle: string
   readingSecondaryLabel: string
   readingSecondaryValue: string
+  selectedDefaultCollections: Record<string, boolean>
   collectionsDisplayed: (Collection & { selected?: boolean })[]
   bookGoals: Goal[]
   onSelectRating: (rating: number) => Promise<void>
@@ -200,6 +208,7 @@ const emit = defineEmits<{
   (e: 'delete-note', payload: { index: number }): void
   (e: 'step-change', step: number): void
   (e: 'status-select', status: BookProgressStatus): void
+  (e: 'default-collection-change', collectionId: string): void
 }>()
 
 const ratingSummary = computed(() => {

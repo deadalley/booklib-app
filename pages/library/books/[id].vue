@@ -20,6 +20,7 @@
     :reading-progress-subtitle="readingProgressSubtitle"
     :reading-secondary-label="readingSecondaryLabel"
     :reading-secondary-value="readingSecondaryValue"
+    :selected-default-collections="selectedDefaultCollections"
     :collections-displayed="collectionsDisplayed"
     :on-select-rating="onSelectRating"
     @share="onShare"
@@ -31,6 +32,7 @@
     @delete="deleteBook"
     @step-change="onProgressChange"
     @status-select="onSelectProgress"
+    @default-collection-change="onDefaultCollectionChange"
   />
 
   <bl-book-page-edit
