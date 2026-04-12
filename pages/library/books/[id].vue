@@ -23,6 +23,7 @@
     :collections-displayed="collectionsDisplayed"
     :on-select-rating="onSelectRating"
     @share="onShare"
+    @add-note="onAddNote"
     @favorite-toggle="onDefaultCollectionChange(FAVORITE_COLLECTION_ID)"
     @edit="onEdit(true)"
     @delete="deleteBook"
@@ -71,7 +72,7 @@ import { faker } from '@faker-js/faker'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
-import type { Book, BookProgressStatus } from '~/types/book'
+import type { Book, BookNote, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { toDefaultDate } from '../../../utils/date'
@@ -313,11 +314,13 @@ watch(isNew, () => {
 
 async function fetchBook() {
   if (isNew.value) {
-    book.value = {} as Book
+    book.value = { notes: [] as BookNote[] } as Book
   } else {
     loading.value = true
     const data = await getBook(route.params.id as string)
-    book.value = data || ({} as Book)
+    book.value = data
+      ? { ...data, notes: data.notes ?? [] }
+      : ({ notes: [] as BookNote[] } as Book)
     loading.value = false
   }
 
@@ -386,6 +389,7 @@ async function onSubmit(bookValues: Book) {
       .map(({ id }) => id),
     tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
     genres: book.value?.genres ?? [],
+    notes: book.value?.notes ?? bookValues.notes ?? [],
     rating: book.value?.rating,
     progressStatus: book.value?.progressStatus,
   } as Book
@@ -413,6 +417,25 @@ async function onSelectRating(rating: number) {
   if (book.value) {
     book.value.rating = rating
   }
+}
+
+async function onAddNote({
+  content,
+  page,
+}: Pick<BookNote, 'content' | 'page'>) {
+  if (!book.value || isNew.value) return
+
+  const nextNotes: BookNote[] = [
+    ...(book.value.notes ?? []),
+    {
+      createdAt: now(),
+      content,
+      ...(page ? { page } : {}),
+    },
+  ]
+
+  book.value.notes = nextNotes
+  await onSubmit(book.value)
 }
 
 async function onSelectGenre(genre: string | undefined, index: number) {

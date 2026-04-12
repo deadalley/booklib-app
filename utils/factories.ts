@@ -17,6 +17,7 @@ export function buildBook(overwrite?: Partial<BookDB>): BookDB {
     summary: faker.lorem.lines(5),
     year: faker.date.past().getFullYear(),
     genres: faker.helpers.multiple(faker.color.human, { count: 5 }),
+    notes: [],
     started_at: faker.date.past().toISOString(),
     finished_at: faker.date.past().toISOString(),
     collections: [],

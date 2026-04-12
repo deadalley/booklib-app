@@ -102,6 +102,13 @@
           />
         </section>
 
+        <section class="main-content-section">
+          <bl-book-page-notes
+            :book="book"
+            @add-note="(note) => $emit('add-note', note)"
+          />
+        </section>
+
         <section
           v-if="collectionsDisplayed.length"
           class="main-content-section"
@@ -185,8 +192,9 @@ const props = defineProps<{
   onSelectRating: (rating: number) => Promise<void>
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'share' | 'favorite-toggle' | 'edit' | 'delete'): void
+  (e: 'add-note', payload: { content: string; page?: number }): void
   (e: 'step-change', step: number): void
   (e: 'status-select', status: BookProgressStatus): void
 }>()

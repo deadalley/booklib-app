@@ -16,6 +16,12 @@ export type BookFormat =
   | 'audiobook'
   | 'other'
 
+export type BookNote = {
+  createdAt: string
+  page?: number
+  content: string
+}
+
 export type Book = {
   id: string
   title: string
@@ -31,6 +37,7 @@ export type Book = {
   summary: string | null
   year: number | null
   genres: string[] | null
+  notes: BookNote[]
   collections: Collection['id'][]
   progressStatus: BookProgressStatus | null
   format: BookFormat | null

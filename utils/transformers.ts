@@ -38,6 +38,7 @@ export function dbBookToBook(
     summary: dbBook.summary,
     year: dbBook.year,
     genres: dbBook.genres ?? [],
+    notes: dbBook.notes ?? [],
     progressStatus: dbBook.progress_status,
     format: dbBook.format,
     startedAt: dbBook.started_at ? dbBook.started_at : null,
@@ -65,6 +66,7 @@ export function bookToDbBook(
     title: book.title || '',
     year: nullify(book.year),
     genres: book.genres || null,
+    notes: book.notes ?? [],
     progress_status: book.progressStatus || 'not-owned',
     format: book.format || null,
     started_at: nullify(book.startedAt),
@@ -231,6 +233,7 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
       return isNaN(date.getTime()) ? null : date.getFullYear()
     })(),
     genres: googleBook.volumeInfo.categories || [],
+    notes: [],
     collections: [],
     progressStatus: null,
     format: null,
