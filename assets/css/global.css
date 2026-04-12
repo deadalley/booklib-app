@@ -21,9 +21,10 @@
     @apply bg-surface-elevated rounded-scholarly shadow-sm;
   }
   .paper-flat {
-    @apply border-stroke-subtle bg-surface-elevated rounded-scholarly border;
+    @apply bg-surface-elevated rounded-scholarly;
+    /* @apply border-stroke-subtle border; */
   }
   .paper-dark {
-    @apply bg-surface-container rounded-scholarly;
+    @apply bg-surface rounded-scholarly;
   }
 }

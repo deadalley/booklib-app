@@ -11,8 +11,7 @@
     @apply flex flex-col gap-4 sm:flex-row;
   }
   .form-label {
-    @apply ml-4;
-    @apply font-display text-ink-secondary text-base;
+    @apply text-ink-secondary tracking-caps text-xs font-semibold uppercase;
   }
   .form-inner {
     @apply border-stroke bg-surface-elevated placeholder:text-ink-muted;

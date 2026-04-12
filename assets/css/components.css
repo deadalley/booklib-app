@@ -9,6 +9,9 @@
   .button-secondary {
     @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
   }
+  .button-tertiary {
+    @apply text-primary hover:bg-surface-subtle active:bg-stroke-subtle hover:text-primary/80 border-transparent bg-transparent;
+  }
   .button-disabled {
     @apply bg-surface-subtle! text-ink-muted! border-surface-subtle;
   }

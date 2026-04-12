@@ -6,6 +6,7 @@
     :class="{
       'button-primary': variant === 'primary',
       'button-secondary': variant === 'secondary',
+      'button-tertiary': variant === 'tertiary',
       'button-disabled': !!disabled || !!loading,
       'cursor-pointer': !disabled && !loading,
       'w-full flex-1': !!expand,
@@ -31,7 +32,7 @@ withDefaults(
     expand?: boolean
     disabled?: boolean
     loading?: boolean
-    variant?: 'primary' | 'secondary'
+    variant?: 'primary' | 'secondary' | 'tertiary'
   }>(),
   { variant: 'primary' },
 )

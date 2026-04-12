@@ -103,21 +103,23 @@
         </section>
 
         <section class="main-content-section">
-          <bl-book-page-notes
-            :book="book"
-            @add-note="(note) => $emit('add-note', note)"
-          />
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Notes</p>
+
+            <bl-book-page-notes
+              :book="book"
+              @add-note="(note) => $emit('add-note', note)"
+              @update-note="(note) => $emit('update-note', note)"
+              @delete-note="(note) => $emit('delete-note', note)"
+            />
+          </div>
         </section>
 
         <section
           v-if="collectionsDisplayed.length"
           class="main-content-section"
         >
-          <p
-            class="text-ink-muted tracking-caps text-sm font-semibold uppercase"
-          >
-            Collections
-          </p>
+          <p class="section-title">Collections</p>
           <div
             class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
           >
@@ -133,11 +135,7 @@
         </section>
 
         <section v-if="bookGoals.length" class="main-content-section">
-          <p
-            class="text-ink-muted tracking-caps text-sm font-semibold uppercase"
-          >
-            Goals
-          </p>
+          <p class="section-title">Goals</p>
           <div
             class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
           >
@@ -195,6 +193,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'share' | 'favorite-toggle' | 'edit' | 'delete'): void
   (e: 'add-note', payload: { content: string; page?: number }): void
+  (
+    e: 'update-note',
+    payload: { index: number; content: string; page?: number },
+  ): void
+  (e: 'delete-note', payload: { index: number }): void
   (e: 'step-change', step: number): void
   (e: 'status-select', status: BookProgressStatus): void
 }>()

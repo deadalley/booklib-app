@@ -19,14 +19,15 @@
               <div class="flex flex-wrap gap-4">
                 <bl-button>Primary</bl-button>
                 <bl-button variant="secondary">Secondary</bl-button>
+                <bl-button variant="tertiary">Tertiary</bl-button>
                 <bl-button disabled>Disabled</bl-button>
                 <bl-button loading>Loading</bl-button>
-                <bl-button>
+                <!-- <bl-button>
                   <template #prependIcon="iconProps">
                     <IconPlus v-bind="iconProps" />
                   </template>
                   Add book
-                </bl-button>
+                </bl-button> -->
               </div>
 
               <div
@@ -101,6 +102,11 @@
                       </template>
                     </bl-icon-button>
                     <bl-icon-button variant="secondary">
+                      <template #default="iconProps">
+                        <IconPalette v-bind="iconProps" />
+                      </template>
+                    </bl-icon-button>
+                    <bl-icon-button variant="tertiary">
                       <template #default="iconProps">
                         <IconPalette v-bind="iconProps" />
                       </template>

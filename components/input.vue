@@ -1,18 +1,18 @@
 <template>
   <div v-if="!editing && !hidden" class="form-wrapper flex-1">
-    <label class="form-label">{{ $attrs.label }}</label>
-    <h5 v-if="inputModel && $attrs.type !== 'textarea'">{{ displayValue }}</h5>
-    <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
+    <label class="form-label">{{ attrs.label }}</label>
+    <h5 v-if="inputModel && attrs.type !== 'textarea'">{{ displayValue }}</h5>
+    <p v-if="inputModel && attrs.type === 'textarea'" class="italic">
       {{ displayValue }}
     </p>
     <IconCircleOff v-if="!inputModel" :size="14" class="text-ink-muted" />
   </div>
   <FormKit
     v-model="inputModel"
-    v-bind="$attrs"
+    v-bind="forwardedAttrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `flex flex-1 ${editing ? '' : '!hidden'}`,
+      outer: outerClass,
       wrapper: 'form-wrapper',
       label: 'form-label',
       inner: `form-inner ${focused ? 'border-primary' : 'border-stroke'}`,
@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { IconCircleOff, IconX } from '@tabler/icons-vue'
+import { normalizeClass } from 'vue'
 
 export type InputProps = {
   editing?: boolean
@@ -45,6 +46,7 @@ export type InputProps = {
 
 const inputModel = defineModel<string | undefined>()
 const focused = ref(false)
+const attrs = useAttrs()
 
 const props = withDefaults(defineProps<InputProps>(), {
   editing: true,
@@ -56,6 +58,17 @@ const props = withDefaults(defineProps<InputProps>(), {
 const displayValue = computed(() => {
   return props.formatter(inputModel.value)
 })
+
+const forwardedAttrs = computed(() => {
+  // FormKit class sections control the rendered wrappers, so we merge class manually.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { class: _class, ...rest } = attrs
+  return rest
+})
+
+const outerClass = computed(() =>
+  normalizeClass(['flex flex-1', props.editing ? '' : '!hidden', attrs.class]),
+)
 
 function onFocus() {
   focused.value = true

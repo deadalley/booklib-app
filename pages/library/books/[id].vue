@@ -24,6 +24,8 @@
     :on-select-rating="onSelectRating"
     @share="onShare"
     @add-note="onAddNote"
+    @update-note="onUpdateNote"
+    @delete-note="onDeleteNote"
     @favorite-toggle="onDefaultCollectionChange(FAVORITE_COLLECTION_ID)"
     @edit="onEdit(true)"
     @delete="deleteBook"
@@ -434,6 +436,43 @@ async function onAddNote({
     },
   ]
 
+  book.value.notes = nextNotes
+  await onSubmit(book.value)
+}
+
+async function onUpdateNote({
+  index,
+  content,
+  page,
+}: {
+  index: number
+  content: string
+  page?: number
+}) {
+  if (!book.value || isNew.value) return
+  if (index < 0 || index >= (book.value.notes ?? []).length) return
+
+  const nextNotes = [...(book.value.notes ?? [])]
+  const currentNote = nextNotes[index]
+  if (!currentNote) return
+
+  nextNotes[index] = {
+    ...currentNote,
+    content,
+    ...(page ? { page } : { page: undefined }),
+  }
+
+  book.value.notes = nextNotes
+  await onSubmit(book.value)
+}
+
+async function onDeleteNote({ index }: { index: number }) {
+  if (!book.value || isNew.value) return
+
+  const nextNotes = [...(book.value.notes ?? [])]
+  if (index < 0 || index >= nextNotes.length) return
+
+  nextNotes.splice(index, 1)
   book.value.notes = nextNotes
   await onSubmit(book.value)
 }

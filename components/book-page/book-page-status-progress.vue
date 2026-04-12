@@ -1,11 +1,11 @@
 <template>
-  <section class="paper-dark p-6">
+  <div class="paper-dark p-6">
     <bl-book-status-stepper
       :current-status="stepperStatus"
       @step-click="onStepperStepClick"
       @status-select="onStepperStatusSelect"
     />
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">

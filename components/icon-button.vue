@@ -1,12 +1,14 @@
 <template>
   <button
     type="button"
-    class="button !p-2"
+    class="button p-2"
     :class="{
       'button-primary': variant === 'primary',
       'button-secondary': variant === 'secondary',
+      'button-tertiary': variant === 'tertiary',
       'button-disabled': !!disabled && !keepStyle,
       'cursor-pointer': !disabled,
+      ...(typeof $attrs.class === 'string' ? { [$attrs.class]: true } : {}),
     }"
     :disabled="disabled"
   >
@@ -18,7 +20,7 @@
 withDefaults(
   defineProps<{
     disabled?: boolean
-    variant?: 'primary' | 'secondary'
+    variant?: 'primary' | 'secondary' | 'tertiary'
     keepStyle?: boolean // when button is disabled but is displayed in the same style
   }>(),
   { variant: 'primary' },
