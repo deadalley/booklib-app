@@ -1,5 +1,7 @@
 <template>
-  <section class="flex flex-1 flex-col gap-8 2xl:w-8/12 2xl:overflow-auto">
+  <section
+    class="flex min-h-0 flex-1 flex-col gap-8 overflow-hidden 2xl:w-8/12"
+  >
     <div class="flex items-center justify-between">
       <!-- Breadcrumbs -->
       <bl-breadcrumbs
@@ -11,12 +13,6 @@
       />
       <!-- Actions -->
       <div class="flex items-center gap-2 self-start">
-        <bl-button variant="secondary" @click="$emit('edit')">
-          <template #prependIcon>
-            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-          </template>
-          Edit
-        </bl-button>
         <bl-modal size="sm" @confirm="$emit('delete')">
           <template #trigger>
             <bl-button variant="secondary">
@@ -34,11 +30,16 @@
           <template #cancel-label> Cancel </template>
           <template #action-label> Delete </template>
         </bl-modal>
+        <bl-button variant="secondary" @click="$emit('edit')">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+        </bl-button>
       </div>
     </div>
 
     <div
-      class="grid gap-16 xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
+      class="grid h-full min-h-0 flex-1 gap-16 xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
       <aside class="flex flex-col gap-4">
         <bl-book-page-cover :book="book" editing />
@@ -50,94 +51,99 @@
         />
       </aside>
 
-      <div class="flex flex-col gap-6 pr-1">
-        <bl-book-page-header
-          :book="book"
-          :primary-collection-name="primaryCollectionName"
-          :author-name="authorName"
-          :rating-summary="ratingSummary"
-          :formatted-date="formattedDate"
-        />
+      <div class="flex h-full min-h-0 flex-col gap-6 overflow-y-auto pr-1">
+        <section class="main-content-section">
+          <bl-book-page-header
+            :book="book"
+            :primary-collection-name="primaryCollectionName"
+            :author-name="authorName"
+            :rating-summary="ratingSummary"
+            :formatted-date="formattedDate"
+          />
+        </section>
 
-        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
+        <section class="main-content-section">
+          <bl-book-page-fields :fields="bookFields" />
+        </section>
 
-        <bl-book-page-fields :fields="bookFields" />
-
-        <div v-if="(book.genres ?? []).length" class="flex flex-col gap-4">
-          <p class="section-title">Genres</p>
-          <div class="flex flex-wrap gap-2">
-            <bl-chip
-              v-for="genre in book.genres"
-              :key="genre"
-              variant="primary"
-            >
-              {{ genre }}
-            </bl-chip>
+        <section v-if="(book.genres ?? []).length" class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Genres</p>
+            <div class="flex flex-wrap gap-2">
+              <bl-chip
+                v-for="genre in book.genres"
+                :key="genre"
+                variant="primary"
+              >
+                {{ genre }}
+              </bl-chip>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
+        <section class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Summary</p>
+            <p class="text-ink-secondary text-lg font-normal tracking-wider">
+              {{ book.summary || 'No summary available.' }}
+            </p>
+          </div>
+        </section>
 
-        <div class="flex flex-col gap-4">
-          <p class="section-title">Summary</p>
-          <p class="text-ink-secondary text-lg font-normal tracking-wider">
-            {{ book.summary || 'No summary available.' }}
+        <section class="main-content-section">
+          <bl-book-page-status-progress
+            :current-step="currentStep"
+            :current-status="book.progressStatus ?? 'not-owned'"
+            :badge-label="lifecycleBadgeLabel"
+            :steps="progressSteps"
+            :state-options="lifecycleStateOptions"
+            @step-change="(step) => $emit('step-change', step)"
+            @status-select="(status) => $emit('status-select', status)"
+          />
+        </section>
+
+        <section
+          v-if="collectionsDisplayed.length"
+          class="main-content-section"
+        >
+          <p
+            class="text-ink-muted tracking-caps text-sm font-semibold uppercase"
+          >
+            Collections
           </p>
-        </div>
+          <div
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+          >
+            <bl-collection-tile
+              v-for="collection in collectionsDisplayed"
+              :key="collection.id"
+              :collection="collection"
+              collection-type="collections"
+              layout="compact"
+              :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
+            />
+          </div>
+        </section>
 
-        <div class="border-stroke-subtle mb-6 border-b pb-6"></div>
-
-        <bl-book-page-status-progress
-          :current-step="currentStep"
-          :current-status="book.progressStatus ?? 'not-owned'"
-          :badge-label="lifecycleBadgeLabel"
-          :steps="progressSteps"
-          :state-options="lifecycleStateOptions"
-          @step-change="(step) => $emit('step-change', step)"
-          @status-select="(status) => $emit('status-select', status)"
-        />
+        <section v-if="bookGoals.length" class="main-content-section">
+          <p
+            class="text-ink-muted tracking-caps text-sm font-semibold uppercase"
+          >
+            Goals
+          </p>
+          <div
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
+          >
+            <bl-goal-link-tile
+              v-for="goal in bookGoals"
+              :key="goal.id"
+              :goal="goal"
+              :authors="authors"
+            />
+          </div>
+        </section>
       </div>
     </div>
-
-    <section
-      v-if="bookGoals.length"
-      class="border-stroke-subtle flex flex-col gap-4 border-t pt-8"
-    >
-      <p class="text-ink-muted tracking-caps text-sm font-semibold uppercase">
-        Goals
-      </p>
-      <div
-        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
-      >
-        <bl-goal-link-tile
-          v-for="goal in bookGoals"
-          :key="goal.id"
-          :goal="goal"
-          :authors="authors"
-        />
-      </div>
-    </section>
-
-    <section
-      v-if="collectionsDisplayed.length"
-      class="border-stroke-subtle flex flex-col gap-4 border-t pt-8"
-    >
-      <p class="text-ink-muted tracking-caps text-sm font-semibold uppercase">
-        Collections
-      </p>
-      <div
-        class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
-      >
-        <bl-collection-tile
-          v-for="collection in collectionsDisplayed"
-          :key="collection.id"
-          :collection="collection"
-          collection-type="collections"
-          layout="detailed"
-          :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
-        />
-      </div>
-    </section>
   </section>
 </template>
 
@@ -276,5 +282,9 @@ const readingStats = computed(() => {
 
 .section-title {
   @apply text-primary text-base font-semibold tracking-widest uppercase;
+}
+
+.main-content-section {
+  @apply border-stroke-subtle flex flex-col gap-4 border-b pb-6;
 }
 </style>

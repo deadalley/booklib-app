@@ -14,7 +14,11 @@
           v-if="icon"
           :size="ICON_SIZE_MEDIUM"
           stroke="1.5"
-          :class="icon !== 'IconArchive' ? 'text-primary' : 'text-ink-muted'"
+          :class="
+            icon !== 'IconArchive'
+              ? 'text-primary shrink-0'
+              : 'text-ink-muted shrink-0'
+          "
         />
         <div class="collection-tile-detailed-accent-copy">
           <p class="collection-tile-detailed-accent-label">Collection</p>
@@ -139,7 +143,7 @@
             v-if="icon"
             :size="ICON_SIZE_SMALL"
             stroke="1.5"
-            class="text-primary"
+            class="text-primary shrink-0"
           />
           <h6 class="collection-tile-title">
             {{ collection.name }}
