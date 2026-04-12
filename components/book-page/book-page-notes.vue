@@ -1,104 +1,61 @@
 <template>
   <div class="notes">
-    <div
-      v-for="(note, index) in sortedNotes"
+    <!-- Add new note at top -->
+    <bl-book-page-note
+      :note="{
+        content: '',
+        page: undefined,
+        createdAt: new Date().toISOString(),
+      }"
+      :is-editing="editing === -2"
+      :is-new="true"
+      :content-input="noteContentInput ?? ''"
+      :page-input="notePageInput"
+      @edit="onEdit(-2)"
+      @cancel="onCancel"
+      @save="onSave"
+      @update:content-input="noteContentInput = $event"
+      @update:page-input="notePageInput = $event"
+    />
+
+    <!-- Existing notes -->
+    <bl-book-page-note
+      v-for="(note, index) in displayedNotes"
       :key="`${note.createdAt}-${note.content}-${index}`"
-      class="note-section"
-      :class="{ 'items-start!': editing === index }"
-    >
-      <div class="note-date-wrapper">
-        <IconNote :size="ICON_SIZE_SMALL" stroke="1.5" class="note-icon" />
-      </div>
+      :note="note"
+      :is-editing="editing === index"
+      :content-input="noteContentInput ?? ''"
+      :page-input="notePageInput"
+      @edit="onEdit(index)"
+      @cancel="onCancel"
+      @save="onSave"
+      @delete="onDelete(index)"
+      @update:content-input="noteContentInput = $event"
+      @update:page-input="notePageInput = $event"
+    />
 
-      <div class="note-values-wrapper" :class="{ 'mt-0.5': note.isNew }">
-        <span v-if="!note.isNew" class="note-date">
-          {{ new Date(note.createdAt).toLocaleDateString() }}
-        </span>
-
-        <div class="note-values">
-          <bl-input
-            v-if="editing === index"
-            class="w-24! min-w-24! flex-none!"
-            v-model="notePageInput"
-            type="number"
-            min="1"
-            placeholder="Page (opt.)"
+    <!-- See more button -->
+    <div v-if="hasMoreNotes" class="pt-2">
+      <bl-button
+        variant="tertiary"
+        class="w-full"
+        @click="showAllNotes = !showAllNotes"
+      >
+        {{ showAllNotes ? 'Show less' : `Show all (${hiddenCount} more)` }}
+        <template #appendIcon="iconProps">
+          <IconChevronDown
+            :class="showAllNotes ? 'rotate-180' : ''"
+            v-bind="iconProps"
           />
-          <span
-            v-if="note.page !== undefined && editing !== index"
-            class="note-page"
-          >
-            p. {{ note.page }}
-          </span>
-
-          <bl-input
-            v-if="editing === index"
-            class="min-w-0 flex-1!"
-            v-model="noteContentInput"
-            type="textarea"
-            placeholder="Write a note..."
-            :rows="3"
-          />
-          <p
-            v-else
-            class="note-content"
-            @click="note.isNew ? onEdit(index) : undefined"
-          >
-            {{ note.isNew ? 'Add new note' : note.content }}
-          </p>
-        </div>
-
-        <div class="note-actions">
-          <bl-button
-            v-if="editing === index"
-            variant="secondary"
-            class="self-start"
-            @click="onCancel()"
-          >
-            Cancel
-          </bl-button>
-          <bl-button
-            v-if="editing === index"
-            :disabled="!canAddNote"
-            class="self-start"
-            @click="onSave"
-          >
-            <template #prependIcon>
-              <IconDeviceFloppy :size="14" />
-            </template>
-            Save
-          </bl-button>
-        </div>
-      </div>
-
-      <template v-if="editing !== index && !note.isNew">
-        <bl-icon-button variant="tertiary" class="p-0!" @click="onEdit(index)">
-          <template #default="iconProps">
-            <IconEdit v-bind="iconProps" />
-          </template>
-        </bl-icon-button>
-        <bl-icon-button
-          variant="tertiary"
-          class="p-0!"
-          @click="onDelete(index)"
-        >
-          <template #default="iconProps">
-            <IconTrash v-bind="iconProps" />
-          </template>
-        </bl-icon-button>
-      </template>
+        </template>
+      </bl-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  IconEdit,
-  IconDeviceFloppy,
-  IconNote,
-  IconTrash,
-} from '@tabler/icons-vue'
-import type { BookNote, ViewBook } from '~/types/book'
+import type { ViewBook } from '~/types/book'
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-vue'
 
 const props = defineProps<{
   book: ViewBook
@@ -117,36 +74,47 @@ const notePageInput = ref<string | undefined>()
 const noteContentInput = ref<string | undefined>()
 const editing = ref(-1)
 const editingBookIndex = ref(-1)
-
-const canAddNote = computed(
-  () => (noteContentInput.value ?? '').trim().length > 0,
-)
+const showAllNotes = ref(false)
 
 const sortedNotes = computed(() => {
-  return [...(props.book.notes ?? [])]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .concat([
-      {
-        content: '',
-        page: undefined,
-        createdAt: new Date().toISOString(),
-        isNew: true,
-      } as BookNote & { isNew?: boolean },
-    ]) as (BookNote & { isNew?: boolean })[]
+  return [...(props.book.notes ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+})
+
+const displayedNotes = computed(() => {
+  if (showAllNotes.value) {
+    return sortedNotes.value
+  }
+  return sortedNotes.value.slice(0, 3)
+})
+
+const hasMoreNotes = computed(() => sortedNotes.value.length > 3)
+
+const hiddenCount = computed(() => {
+  const total = sortedNotes.value.length
+  return Math.max(0, total - 3)
 })
 
 function onEdit(index: number) {
-  const note = sortedNotes.value?.[index]
+  if (index === -2) {
+    // Editing new note
+    editing.value = -2
+    editingBookIndex.value = -1
+    notePageInput.value = undefined
+    noteContentInput.value = ''
+  } else {
+    // Editing existing note
+    const note = displayedNotes.value?.[index]
+    if (!note) return
 
-  if (!note) return
-
-  editing.value = index
-  editingBookIndex.value = (props.book.notes ?? []).findIndex((n) => n === note)
-  notePageInput.value = note.page?.toString()
-  noteContentInput.value = note.content
+    editing.value = index
+    editingBookIndex.value = (props.book.notes ?? []).findIndex(
+      (n) => n === note,
+    )
+    notePageInput.value = note.page?.toString()
+    noteContentInput.value = note.content
+  }
 }
 
 function onCancel() {
@@ -177,7 +145,7 @@ function onSave() {
 }
 
 function onDelete(index: number) {
-  const note = sortedNotes.value?.[index]
+  const note = displayedNotes.value?.[index]
 
   if (!note) return
 
@@ -193,42 +161,5 @@ function onDelete(index: number) {
 
 .notes {
   @apply flex flex-col gap-4;
-}
-
-.note-section {
-  @apply flex items-start justify-between gap-2 p-4;
-  @apply bg-surface rounded-scholarly;
-}
-
-.note-content {
-  @apply text-ink-secondary mt-0.5 flex-1 italic;
-}
-
-.note-page {
-  @apply text-ink-muted mt-1 text-sm font-semibold;
-}
-
-.note-icon {
-  @apply text-primary mt-1 shrink-0;
-}
-
-.note-date-wrapper {
-  @apply flex flex-col items-end gap-2;
-}
-
-.note-date {
-  @apply text-primary mt-1 text-base font-medium tracking-wider;
-}
-
-.note-values-wrapper {
-  @apply mr-2 flex min-w-0 flex-1 flex-col gap-2;
-}
-
-.note-values {
-  @apply flex gap-3;
-}
-
-.note-actions {
-  @apply flex gap-2;
 }
 </style>
