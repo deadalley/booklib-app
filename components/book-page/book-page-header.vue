@@ -1,11 +1,11 @@
 <template>
-  <header class="mb-12 flex flex-col gap-1">
+  <header class="mb-12 flex flex-col gap-4">
     <!-- Title -->
     <h1>
       {{ book.title }}
     </h1>
 
-    <div class="flex items-center gap-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
       <!-- Author -->
       <div class="flex items-baseline gap-3">
         <p class="text-ink-secondary font-semibold tracking-wide">by</p>
@@ -18,7 +18,7 @@
         </NuxtLink>
       </div>
 
-      <p class="text-ink-subtle text-2xl">•</p>
+      <p class="text-ink-subtle hidden text-2xl md:block">•</p>
 
       <!-- Rating -->
       <div
@@ -32,12 +32,12 @@
         {{ ratingSummary }}
       </div>
 
-      <p class="text-ink-subtle text-2xl">•</p>
+      <p class="text-ink-subtle hidden text-2xl md:block">•</p>
 
       <!-- Created date -->
       <div
         v-if="formattedDate"
-        class="flex flex-1 items-baseline gap-3 leading-tight"
+        class="flex items-baseline gap-3 leading-tight md:flex-1"
       >
         <p class="text-ink-secondary font-semibold tracking-wide">Added on</p>
         <h6 class="font-body font-bold">{{ formattedDate }}</h6>

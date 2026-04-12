@@ -1,6 +1,6 @@
 <template>
   <section
-    class="flex min-h-0 flex-1 flex-col gap-8 overflow-hidden 2xl:w-8/12"
+    class="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto md:overflow-hidden 2xl:w-8/12"
   >
     <div class="flex items-center justify-between">
       <!-- Breadcrumbs -->
@@ -39,7 +39,7 @@
     </div>
 
     <div
-      class="grid h-full min-h-0 flex-1 gap-16 xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
+      class="grid min-h-0 flex-1 gap-16 md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
       <aside class="flex flex-col gap-4">
         <bl-book-page-cover :book="book" editing />
@@ -58,7 +58,9 @@
         />
       </aside>
 
-      <div class="flex h-full min-h-0 flex-col gap-6 overflow-y-auto pr-1">
+      <div
+        class="flex min-h-0 flex-col gap-6 pr-1 md:h-full md:overflow-y-auto"
+      >
         <section class="main-content-section">
           <bl-book-page-header
             :book="book"
