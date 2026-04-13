@@ -1,39 +1,144 @@
 <template>
-  <bl-book-page
+  <section
     v-if="book && !editing && !isNew"
-    v-model:stepper-modal-open="stepperModalOpen"
-    v-model:start-reading-book-today="startReadingBookToday"
-    v-model:finish-reading-book-today="finishReadingBookToday"
-    :book="book"
-    :book-goals="bookGoals"
-    :authors="authors"
-    :primary-collection-name="primaryCollectionName"
-    :is-favorite="!!selectedDefaultCollections[FAVORITE_COLLECTION_ID]"
-    :author-name="authorName"
-    :current-step="currentStep ?? 1"
-    :lifecycle-badge-label="lifecycleBadgeLabel"
-    :progress-steps="progressSteps"
-    :lifecycle-state-options="lifecycleStateOptions"
-    :book-facts-primary="bookFactsPrimary"
-    :book-facts-secondary="bookFactsSecondary"
-    :reading-progress="readingProgress"
-    :reading-progress-subtitle="readingProgressSubtitle"
-    :reading-secondary-label="readingSecondaryLabel"
-    :reading-secondary-value="readingSecondaryValue"
-    :selected-default-collections="selectedDefaultCollections"
-    :collections-displayed="collectionsDisplayed"
-    :on-select-rating="onSelectRating"
-    @share="onShare"
-    @add-note="onAddNote"
-    @update-note="onUpdateNote"
-    @delete-note="onDeleteNote"
-    @favorite-toggle="onDefaultCollectionChange(FAVORITE_COLLECTION_ID)"
-    @edit="onEdit(true)"
-    @delete="deleteBook"
-    @step-change="onProgressChange"
-    @status-select="onSelectProgress"
-    @default-collection-change="onDefaultCollectionChange"
-  />
+    class="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto md:overflow-hidden"
+  >
+    <div class="flex items-center justify-between">
+      <bl-breadcrumbs
+        :items="[
+          { label: 'Library', to: '../../' },
+          { label: primaryCollectionName, to: '../' },
+          { label: book.title },
+        ]"
+      />
+
+      <div class="flex items-center gap-2 self-start">
+        <bl-modal size="sm" @confirm="deleteBook">
+          <template #trigger>
+            <bl-button variant="secondary">
+              <template #prependIcon>
+                <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+              </template>
+            </bl-button>
+          </template>
+          <template #title>
+            Are you sure you want to delete
+            <strong class="contents">{{ book.title }}</strong>
+            ?
+          </template>
+          This action cannot be undone.
+          <template #cancel-label> Cancel </template>
+          <template #action-label> Delete </template>
+        </bl-modal>
+        <bl-button variant="secondary" @click="onEdit(true)">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+        </bl-button>
+      </div>
+    </div>
+
+    <div
+      class="grid min-h-0 flex-1 gap-16 md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
+    >
+      <aside class="flex flex-col gap-4">
+        <bl-book-page-cover :book="book" editing />
+
+        <bl-book-page-default-collections
+          :book="book"
+          @default-collection-change="onDefaultCollectionChange"
+        />
+
+        <bl-book-page-progress
+          :book="book"
+          @step-change="onProgressChange"
+          @status-select="onSelectProgress"
+        />
+      </aside>
+
+      <div
+        class="flex min-h-0 max-w-7xl flex-col gap-6 pr-1 pb-2 md:h-full md:overflow-y-auto"
+      >
+        <section class="main-content-section">
+          <bl-book-page-header :book="book" :authors="authors" />
+        </section>
+
+        <section class="main-content-section">
+          <bl-book-page-fields :book="book" />
+        </section>
+
+        <section v-if="(book.genres ?? []).length" class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Genres</p>
+            <div class="flex flex-wrap gap-2">
+              <bl-chip
+                v-for="genre in book.genres"
+                :key="genre"
+                variant="primary"
+              >
+                {{ genre }}
+              </bl-chip>
+            </div>
+          </div>
+        </section>
+
+        <section class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Summary</p>
+            <p class="text-ink-secondary text-lg font-normal tracking-wider">
+              {{ book.summary || 'No summary available.' }}
+            </p>
+          </div>
+        </section>
+
+        <section class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Notes</p>
+
+            <bl-book-page-notes
+              :book="book"
+              @add-note="onAddNote"
+              @update-note="onUpdateNote"
+              @delete-note="onDeleteNote"
+            />
+          </div>
+        </section>
+
+        <section
+          v-if="collectionsDisplayed.length"
+          class="main-content-section"
+        >
+          <p class="section-title">Collections</p>
+          <div
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+          >
+            <bl-collection-tile
+              v-for="collection in collectionsDisplayed"
+              :key="collection.id"
+              :collection="collection"
+              collection-type="collections"
+              layout="compact"
+              :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
+            />
+          </div>
+        </section>
+
+        <section v-if="bookGoals.length" class="main-content-section">
+          <p class="section-title">Goals</p>
+          <div
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
+          >
+            <bl-goal-link-tile
+              v-for="goal in bookGoals"
+              :key="goal.id"
+              :goal="goal"
+              :authors="authors"
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
 
   <bl-book-page-edit
     v-else-if="book"
@@ -73,12 +178,14 @@
 
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
+import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
 import type { Book, BookNote, BookProgressStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
+import { ICON_SIZE_SMALL } from '~/utils/constants'
 import { toDefaultDate } from '../../../utils/date'
 
 const {
@@ -190,128 +297,6 @@ const primaryCollectionName = computed(() => {
   return firstCollection?.name ?? 'Books'
 })
 
-const lifecycleBadgeLabel = computed(() => {
-  const status = book.value?.progressStatus ?? 'not-owned'
-
-  if (status === 'reading' || status === 'paused') {
-    return 'Active Tracking'
-  }
-
-  if (status === 'read') {
-    return 'Finished'
-  }
-
-  if (status === 'not-finished') {
-    return 'Archived'
-  }
-
-  if (status === 'owned') {
-    return 'Owned'
-  }
-
-  return 'Pending'
-})
-
-const lifecycleStateOptions = computed(() => [
-  {
-    id: 'reading' as BookProgressStatus,
-    label: 'Reading',
-    icon: PROGRESS_STATUS_MAP.reading.icon,
-  },
-  {
-    id: 'paused' as BookProgressStatus,
-    label: 'Paused',
-    icon: PROGRESS_STATUS_MAP.paused.icon,
-  },
-  {
-    id: 'owned' as BookProgressStatus,
-    label: 'Owned',
-    icon: PROGRESS_STATUS_MAP.owned.icon,
-  },
-  {
-    id: 'not-owned' as BookProgressStatus,
-    label: 'Pending',
-    icon: PROGRESS_STATUS_MAP['not-owned'].icon,
-  },
-])
-
-const bookFactsPrimary = computed(() => [
-  {
-    label: 'Publisher',
-    value: book.value?.publisher || 'Unknown',
-  },
-  {
-    label: 'Release Year',
-    value: book.value?.year || 'Unknown',
-  },
-  {
-    label: 'Format',
-    value: book.value?.format
-      ? BOOK_FORMAT_MAP[book.value.format].description
-      : 'Unknown',
-  },
-])
-
-const bookFactsSecondary = computed(() => [
-  {
-    label: 'Pages',
-    value: book.value?.pages || 'Unknown',
-  },
-  {
-    label: 'ISBN-13',
-    value: book.value?.isbn || 'Unknown',
-  },
-  {
-    label: 'Language',
-    value: book.value?.language || 'Unknown',
-  },
-])
-
-const readingProgress = computed(() => {
-  const status = book.value?.progressStatus ?? 'not-owned'
-
-  if (status === 'read') return 100
-  if (status === 'not-finished') return 75
-  if (status === 'reading' || status === 'paused') return 50
-  if (status === 'owned') return 8
-
-  return 0
-})
-
-const readingProgressSubtitle = computed(() => {
-  const pages = book.value?.pages
-  if (!pages) {
-    return PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-owned']
-      .description
-  }
-
-  const pagesRead = Math.round((pages * readingProgress.value) / 100)
-  return `${pagesRead} of ${pages} pages`
-})
-
-const readingTrackingDays = computed(() => {
-  if (!book.value?.startedAt) return undefined
-
-  const startedAt = new Date(book.value.startedAt)
-  const endDate = book.value.finishedAt
-    ? new Date(book.value.finishedAt)
-    : new Date()
-  const diff = endDate.getTime() - startedAt.getTime()
-
-  return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)))
-})
-
-const readingSecondaryLabel = computed(() =>
-  readingTrackingDays.value ? 'Days Tracked' : 'Current Status',
-)
-
-const readingSecondaryValue = computed(() =>
-  readingTrackingDays.value
-    ? `${readingTrackingDays.value} days`
-    : PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-owned']
-        .description,
-)
-
 watch(isNew, () => {
   managingCollections.value = isNew.value
 })
@@ -349,23 +334,6 @@ async function fetchBook() {
 async function deleteBook() {
   await _deleteBook(route.params.id as string)
   navigateTo('/library/books')
-}
-
-async function onShare() {
-  if (!book.value || typeof window === 'undefined') return
-
-  const shareData = {
-    title: book.value.title,
-    text: authorName.value ?? undefined,
-    url: window.location.href,
-  }
-
-  if (navigator.share) {
-    await navigator.share(shareData)
-    return
-  }
-
-  await navigator.clipboard.writeText(window.location.href)
 }
 
 function onEdit(value: boolean) {
@@ -590,3 +558,15 @@ definePageMeta({
   alias: ['/new'],
 })
 </script>
+
+<style scoped>
+@reference '../../../assets/css/main.css';
+
+.section-title {
+  @apply text-primary text-base font-semibold tracking-widest uppercase;
+}
+
+.main-content-section {
+  @apply border-stroke-subtle flex flex-col gap-4 border-b pb-6;
+}
+</style>

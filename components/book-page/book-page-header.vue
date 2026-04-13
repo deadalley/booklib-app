@@ -48,14 +48,28 @@
 
 <script setup lang="ts">
 import { IconStarFilled } from '@tabler/icons-vue'
+import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
+import { toFullDateCompact } from '~/utils/date'
 
-defineProps<{
+const props = defineProps<{
   book: Book
-  authorName?: string
-  ratingSummary: string
-  formattedDate?: string
+  authors: Author[]
 }>()
+
+const authorName = computed(
+  () => props.authors?.find(({ id }) => props.book.author === id)?.name,
+)
+
+const ratingSummary = computed(() => {
+  const rating = props.book.rating
+
+  if (!rating) return '-'
+
+  return Number.isInteger(rating) ? rating.toFixed(0) : rating.toFixed(1)
+})
+
+const formattedDate = computed(() => toFullDateCompact(props.book.createdAt))
 </script>
 
 <style scoped></style>

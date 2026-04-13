@@ -20,14 +20,47 @@
 
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
+import type { Book } from '~/types/book'
+import languageOptions from '~/public/languages-2.json'
+import { BOOK_FORMAT_MAP } from '~/utils/constants'
 
-defineProps<{
-  fields: {
-    label: string
-    value?: string | null
-    icon?: keyof typeof icons
-  }[]
+const props = defineProps<{
+  book: Book
 }>()
+
+const fields = computed(() => {
+  return [
+    { label: 'Publisher', value: props.book.publisher },
+    {
+      label: 'Language',
+      value: props.book.language
+        ? (languageOptions[
+            props.book.language as keyof typeof languageOptions
+          ] ?? props.book.language)
+        : undefined,
+    },
+    { label: 'Year', value: props.book.year?.toString() },
+    { label: 'Original Title', value: props.book.originalTitle },
+    {
+      label: 'Original Language',
+      value: props.book.originalLanguage
+        ? (languageOptions[
+            props.book.originalLanguage as keyof typeof languageOptions
+          ] ?? props.book.originalLanguage)
+        : undefined,
+    },
+    { label: 'Pages', value: props.book.pages?.toString() },
+    {
+      label: 'Format',
+      value: props.book.format
+        ? BOOK_FORMAT_MAP[props.book.format]?.description
+        : undefined,
+      icon: props.book.format
+        ? (BOOK_FORMAT_MAP[props.book.format]?.icon as keyof typeof icons)
+        : undefined,
+    },
+  ]
+})
 </script>
 
 <style scoped>

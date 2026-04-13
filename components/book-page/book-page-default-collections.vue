@@ -5,14 +5,14 @@
         v-for="item in DEFAULT_COLLECTIONS"
         :key="item"
         :value="item"
-        :selected="!!selectedDefaultCollections[item]"
+        :selected="isSelected(item)"
         @select="$emit('default-collection-change', item)"
       >
         <template #icon="iconProps">
           <component
             :is="
               icons[
-                (selectedDefaultCollections[item]
+                (isSelected(item)
                   ? DEFAULT_COLLECTION_ICONS_FILLED
                   : DEFAULT_COLLECTION_ICONS)[item]!!
               ]
@@ -28,14 +28,21 @@
 
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
+import type { Book } from '~/types/book'
 
-defineProps<{
-  selectedDefaultCollections: Record<string, boolean>
+const props = defineProps<{
+  book: Book
 }>()
 
 defineEmits<{
   (e: 'default-collection-change', collectionId: string): void
 }>()
+
+function isSelected(collectionId: string) {
+  return (props.book.collections ?? []).some(
+    (id) => String(id) === String(collectionId),
+  )
+}
 </script>
 
 <style scoped></style>

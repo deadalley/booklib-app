@@ -1,9 +1,11 @@
 <template>
   <div class="relative">
     <!-- Line -->
-    <div class="bg-stroke absolute top-5 right-8 left-8 h-px" />
+    <div
+      class="bg-stroke absolute top-5 right-6 left-6 h-px sm:right-8 sm:left-8"
+    />
 
-    <div class="relative grid grid-cols-3 gap-2">
+    <div class="relative grid grid-cols-3 gap-1.5 sm:gap-2">
       <div
         v-for="step in steps"
         :key="step.id"
@@ -19,7 +21,7 @@
         </button>
 
         <p
-          class="tracking-caps text-[11px] font-semibold uppercase"
+          class="tracking-caps text-center text-[10px] font-semibold uppercase sm:text-[11px]"
           :class="stepLabelClass(step.id)"
         >
           {{ step.label }}
@@ -29,10 +31,10 @@
           <DropdownMenuTrigger as-child>
             <button
               type="button"
-              class="tracking-caps inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase transition-colors"
+              class="tracking-caps inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase transition-colors sm:px-2.5"
               :class="stepChipClass(step.id)"
             >
-              {{ chipLabel(step.id) }}
+              <span class="truncate">{{ chipLabel(step.id) }}</span>
               <IconChevronDown :size="12" stroke="2" />
             </button>
           </DropdownMenuTrigger>
