@@ -41,7 +41,7 @@
     <div
       class="grid min-h-0 flex-1 gap-16 md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
-      <aside class="flex flex-col gap-4">
+      <aside class="flex flex-col gap-4 overflow-y-auto">
         <bl-book-page-cover :book="book" editing />
 
         <bl-book-page-default-collections
