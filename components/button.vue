@@ -22,7 +22,7 @@
     <slot name="prependIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
     <slot />
     <slot name="appendIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
-    <bl-loading v-if="loading" class="!size-4" />
+    <bl-loading v-if="loading" class="size-4!" />
   </button>
 </template>
 

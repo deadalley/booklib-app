@@ -12,10 +12,10 @@
     <template #headerActions>
       <NuxtLink to="/library/books/new">
         <bl-button variant="primary" :expand="isMobile()">
-          <template #appendIcon="iconProps">
+          <template #prependIcon="iconProps">
             <IconPlus v-bind="iconProps" />
-            Add book
           </template>
+          Add book
         </bl-button>
       </NuxtLink>
     </template>

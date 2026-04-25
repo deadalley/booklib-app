@@ -318,7 +318,7 @@
   }
   .nav-sidebar-collapse-toggle {
     @apply hover:text-primary;
-    @apply hidden size-9 translate-x-0 cursor-pointer self-start transition-all duration-300 ease-out will-change-transform sm:block;
+    @apply hidden size-9 translate-x-0 cursor-pointer self-end transition-all duration-300 ease-out will-change-transform sm:block;
   }
   .nav-sidebar[data-state='expanded'] .nav-sidebar-collapse-toggle:hover,
   .nav-sidebar[data-state='expanded']
@@ -377,32 +377,6 @@
   .sidebar-title {
     @apply tracking-widest uppercase;
   }
-  .sidebar-slide-right-enter-active,
-  .sidebar-slide-right-leave-active {
-    transition: all 0.3s ease-in-out;
-  }
-  .sidebar-slide-right-enter-to,
-  .sidebar-slide-rightr-leave-from {
-    @apply translate-x-0;
-  }
-
-  .sidebar-slide-right-enter-from,
-  .sidebar-slide-right-leave-to {
-    @apply translate-x-full;
-  }
-  .sidebar-slide-left-enter-active,
-  .sidebar-slide-left-leave-active {
-    transition: all 0.3s ease-in-out;
-  }
-  .sidebar-slide-left-enter-to,
-  .sidebar-slide-leftr-leave-from {
-    @apply translate-x-0;
-  }
-  .sidebar-slide-left-enter-from,
-  .sidebar-slide-left-leave-to {
-    @apply -translate-x-full;
-  }
-
   .filter-sidebar {
     @apply flex flex-col gap-12;
   }

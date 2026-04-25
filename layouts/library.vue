@@ -34,18 +34,13 @@
         }"
       >
         <div
-          class="flex w-full flex-1 flex-col justify-end gap-3 overflow-x-auto overflow-y-visible p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          class="flex w-full flex-1 flex-col justify-start gap-3 overflow-x-auto overflow-y-visible p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
           :class="[
             { 'md:mr-[355px]': !!sidebarContent },
             actionsOpen ? 'translate-y-0' : '-translate-y-full',
           ]"
         >
-          <div
-            class="flex w-fit justify-end gap-2 overflow-visible"
-            :class="{
-              'paper-sm p-2': !isMobile(),
-            }"
-          >
+          <div class="flex w-fit justify-end gap-2 overflow-visible">
             <slot name="navbar" />
           </div>
         </div>
