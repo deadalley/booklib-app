@@ -49,11 +49,7 @@
           @default-collection-change="onDefaultCollectionChange"
         />
 
-        <bl-book-page-progress
-          :book="book"
-          @step-change="onProgressChange"
-          @status-select="onSelectProgress"
-        />
+        <bl-book-page-progress-overview :book="book" />
       </aside>
 
       <div
@@ -88,6 +84,13 @@
             <p class="text-ink-secondary text-lg font-normal tracking-wider">
               {{ book.summary || 'No summary available.' }}
             </p>
+          </div>
+        </section>
+
+        <section class="main-content-section">
+          <div class="flex flex-col gap-4">
+            <p class="section-title">Progress</p>
+            <bl-book-page-progress :book="book" />
           </div>
         </section>
 
