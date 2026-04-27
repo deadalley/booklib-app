@@ -8,6 +8,7 @@
     <IconCircleOff v-if="!inputModel" :size="14" class="text-ink-muted" />
   </div>
   <FormKit
+    ref="formkitRef"
     v-model="inputModel"
     v-bind="forwardedAttrs"
     :class="{ hidden: !(editing && !hidden) }"
@@ -40,6 +41,7 @@ export type InputProps = {
   editing?: boolean
   hidden?: boolean
   clearable?: boolean
+  autofocus?: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatter?: (value: any) => string | undefined
 }
@@ -47,10 +49,20 @@ export type InputProps = {
 const inputModel = defineModel<string | undefined>()
 const focused = ref(false)
 const attrs = useAttrs()
+const formkitRef = ref<{ $el: HTMLElement } | null>(null)
+
+onMounted(() => {
+  if (props.autofocus) {
+    nextTick(() => {
+      formkitRef.value?.$el?.querySelector<HTMLElement>('input, textarea')?.focus()
+    })
+  }
+})
 
 const props = withDefaults(defineProps<InputProps>(), {
   editing: true,
   hidden: false,
+  autofocus: false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatter: (value: any) => value && `${value}`,
 })

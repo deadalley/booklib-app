@@ -38,6 +38,7 @@
           type="textarea"
           placeholder="Write a note..."
           :rows="3"
+          autofocus
           @update:model-value="emit('update:contentInput', $event ?? '')"
         />
         <p
