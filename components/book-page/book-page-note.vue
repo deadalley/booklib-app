@@ -1,10 +1,10 @@
 <template>
-  <div class="note-section" :class="{ 'items-start!': isEditing }">
-    <div class="note-date-wrapper">
+  <div class="note-section" :class="{ editing: isEditing }">
+    <div class="note-date-wrapper" :class="{ 'text-ink-muted': isNew }">
       <IconNote :size="ICON_SIZE_SMALL" stroke="1.5" class="note-icon" />
     </div>
 
-    <div :class="{ 'note-values-wrapper': true, 'mt-0.5': isNew }">
+    <div :class="{ 'note-values-wrapper': true, new: isNew }">
       <span v-if="!isNew" class="note-date">
         {{ new Date(note.createdAt).toLocaleDateString() }}
       </span>
@@ -43,6 +43,7 @@
         <p
           v-else
           class="note-content"
+          :class="{ 'text-ink-muted!': isNew }"
           @click="isNew ? emit('edit') : undefined"
         >
           {{ isNew ? 'Add new note' : note.content }}
@@ -122,11 +123,15 @@ const canSave = computed(() => (props.contentInput ?? '').trim().length > 0)
 
 .note-section {
   @apply flex items-start justify-between gap-2 p-4;
-  @apply bg-surface rounded-scholarly;
+  @apply bg-surface-elevated rounded-scholarly border-stroke border border-dashed;
+}
+
+.note-section.editing {
+  @apply bg-surface rounded-scholarly items-start border-none;
 }
 
 .note-content {
-  @apply text-ink-secondary mt-0.5 flex-1 whitespace-pre-wrap italic;
+  @apply text-ink-primary mt-0.5 flex-1 whitespace-pre-wrap;
 }
 
 .note-page {
@@ -149,11 +154,15 @@ const canSave = computed(() => (props.contentInput ?? '').trim().length > 0)
   @apply mr-2 flex min-w-0 flex-1 flex-col gap-2;
 }
 
+.note-values-wrapper.new {
+  @apply mt-0.5;
+}
+
 .note-values {
   @apply flex gap-3;
 }
 
 .note-actions {
-  @apply flex gap-2;
+  @apply flex justify-end gap-2;
 }
 </style>
