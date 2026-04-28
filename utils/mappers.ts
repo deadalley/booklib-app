@@ -126,7 +126,7 @@ export function getBooksByStatus(
       return {
         ...acc,
         [currentStatus]: books.filter(
-          (book) => book.progressStatus === currentStatus,
+          (book) => book.progress.status === currentStatus,
         ).length,
       }
     },

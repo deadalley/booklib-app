@@ -10,19 +10,58 @@
       transform: translateY(0);
     }
   }
-  .books-grid > *:nth-child(1)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 0ms; }
-  .books-grid > *:nth-child(2)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 40ms; }
-  .books-grid > *:nth-child(3)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 80ms; }
-  .books-grid > *:nth-child(4)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 120ms; }
-  .books-grid > *:nth-child(5)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 160ms; }
-  .books-grid > *:nth-child(6)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 200ms; }
-  .books-grid > *:nth-child(7)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 240ms; }
-  .books-grid > *:nth-child(8)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 280ms; }
-  .books-grid > *:nth-child(9)   .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 320ms; }
-  .books-grid > *:nth-child(10)  .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 360ms; }
-  .books-grid > *:nth-child(11)  .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 400ms; }
-  .books-grid > *:nth-child(12)  .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 440ms; }
-  .books-grid > *:nth-child(n+13) .book-tile { animation: book-tile-slide-up 0.4s ease-out both; animation-delay: 480ms; }
+  .books-grid > *:nth-child(1) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 0ms;
+  }
+  .books-grid > *:nth-child(2) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 40ms;
+  }
+  .books-grid > *:nth-child(3) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 80ms;
+  }
+  .books-grid > *:nth-child(4) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 120ms;
+  }
+  .books-grid > *:nth-child(5) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 160ms;
+  }
+  .books-grid > *:nth-child(6) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 200ms;
+  }
+  .books-grid > *:nth-child(7) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 240ms;
+  }
+  .books-grid > *:nth-child(8) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 280ms;
+  }
+  .books-grid > *:nth-child(9) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 320ms;
+  }
+  .books-grid > *:nth-child(10) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 360ms;
+  }
+  .books-grid > *:nth-child(11) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 400ms;
+  }
+  .books-grid > *:nth-child(12) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 440ms;
+  }
+  .books-grid > *:nth-child(n + 13) .book-tile {
+    animation: book-tile-slide-up 0.4s ease-out both;
+    animation-delay: 480ms;
+  }
 
   /* Sidebar slide transitions */
   .sidebar-slide-right-enter-active,

@@ -253,7 +253,7 @@ const bookGoals = computed(() => {
 
 const currentStep = ref<number | undefined>(
   book.value
-    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'not-owned'].step
+    ? PROGRESS_STATUS_MAP[book.value.progress.status ?? 'not-owned'].step
     : undefined,
 )
 
@@ -277,13 +277,13 @@ const authorSelectOptions = computed(() =>
 )
 
 const progressSteps = computed(() => [
-  book.value?.progressStatus === 'owned'
+  book.value?.progress.status === 'owned'
     ? PROGRESS_STATUS_MAP.owned
     : PROGRESS_STATUS_MAP['not-owned'],
-  book.value?.progressStatus === 'paused'
+  book.value?.progress.status === 'paused'
     ? PROGRESS_STATUS_MAP.paused
     : PROGRESS_STATUS_MAP.reading,
-  book.value?.progressStatus === 'not-finished'
+  book.value?.progress.status === 'not-finished'
     ? PROGRESS_STATUS_MAP['not-finished']
     : PROGRESS_STATUS_MAP.read,
 ])
@@ -306,13 +306,25 @@ watch(isNew, () => {
 
 async function fetchBook() {
   if (isNew.value) {
-    book.value = { notes: [] as BookNote[] } as Book
+    book.value = {
+      progress: { status: null, startedAt: null, finishedAt: null, notes: [] },
+    } as unknown as Book
   } else {
     loading.value = true
     const data = await getBook(route.params.id as string)
     book.value = data
-      ? { ...data, notes: data.notes ?? [] }
-      : ({ notes: [] as BookNote[] } as Book)
+      ? {
+          ...data,
+          progress: { ...data.progress, notes: data.progress?.notes ?? [] },
+        }
+      : ({
+          progress: {
+            status: null,
+            startedAt: null,
+            finishedAt: null,
+            notes: [],
+          },
+        } as unknown as Book)
     loading.value = false
   }
 
@@ -322,7 +334,7 @@ async function fetchBook() {
   }))
 
   currentStep.value =
-    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-owned'].step
+    PROGRESS_STATUS_MAP[book.value?.progress.status ?? 'not-owned'].step
 
   selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
     !!book.value &&
@@ -364,9 +376,12 @@ async function onSubmit(bookValues: Book) {
       .map(({ id }) => id),
     tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
     genres: book.value?.genres ?? [],
-    notes: book.value?.notes ?? bookValues.notes ?? [],
+    progress: {
+      ...bookValues.progress,
+      notes: book.value?.progress.notes ?? bookValues.progress?.notes ?? [],
+      status: book.value?.progress.status ?? bookValues.progress?.status,
+    },
     rating: book.value?.rating,
-    progressStatus: book.value?.progressStatus,
   } as Book
 
   if (isNew.value) {
@@ -401,7 +416,7 @@ async function onAddNote({
   if (!book.value || isNew.value) return
 
   const nextNotes: BookNote[] = [
-    ...(book.value.notes ?? []),
+    ...(book.value.progress.notes ?? []),
     {
       createdAt: now(),
       content,
@@ -409,7 +424,7 @@ async function onAddNote({
     },
   ]
 
-  book.value.notes = nextNotes
+  book.value.progress.notes = nextNotes
   await onSubmit(book.value)
 }
 
@@ -423,9 +438,9 @@ async function onUpdateNote({
   page?: number
 }) {
   if (!book.value || isNew.value) return
-  if (index < 0 || index >= (book.value.notes ?? []).length) return
+  if (index < 0 || index >= (book.value.progress.notes ?? []).length) return
 
-  const nextNotes = [...(book.value.notes ?? [])]
+  const nextNotes = [...(book.value.progress.notes ?? [])]
   const currentNote = nextNotes[index]
   if (!currentNote) return
 
@@ -435,18 +450,18 @@ async function onUpdateNote({
     ...(page ? { page } : { page: undefined }),
   }
 
-  book.value.notes = nextNotes
+  book.value.progress.notes = nextNotes
   await onSubmit(book.value)
 }
 
 async function onDeleteNote({ index }: { index: number }) {
   if (!book.value || isNew.value) return
 
-  const nextNotes = [...(book.value.notes ?? [])]
+  const nextNotes = [...(book.value.progress.notes ?? [])]
   if (index < 0 || index >= nextNotes.length) return
 
   nextNotes.splice(index, 1)
-  book.value.notes = nextNotes
+  book.value.progress.notes = nextNotes
   await onSubmit(book.value)
 }
 
@@ -499,12 +514,12 @@ async function onDefaultCollectionChange(collectionId: string) {
 
 async function onSelectProgress(progressStatus: BookProgressStatus) {
   if (book.value) {
-    book.value.progressStatus = progressStatus
+    book.value.progress.status = progressStatus
 
     if (progressStatus === 'reading' && startReadingBookToday.value) {
-      book.value.startedAt = now()
+      book.value.progress.startedAt = now()
     } else if (progressStatus === 'read' && finishReadingBookToday.value) {
-      book.value.finishedAt = now()
+      book.value.progress.finishedAt = now()
     }
 
     if (!isNew.value) {
@@ -529,7 +544,7 @@ function onProgressChange(progressStatusStep: number) {
     ) {
       stepperModalOpen.value = true
     } else if (book.value) {
-      book.value.progressStatus = progressStatus.id
+      book.value.progress.status = progressStatus.id
 
       if (!isNew.value) {
         onSubmit(book.value)

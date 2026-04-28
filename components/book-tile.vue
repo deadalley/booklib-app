@@ -82,7 +82,7 @@ const props = defineProps<{
     | 'selected'
     | 'order'
     | 'authorName'
-    | 'progressStatus'
+    | 'progress'
     | 'rating'
     | 'genres'
   >
@@ -96,7 +96,7 @@ const emit = defineEmits(['selected'])
 const href = computed(() => `/library/books/${props.book.id}`)
 
 const statusLabel = computed(() => {
-  switch (props.book.progressStatus) {
+  switch (props.book.progress.status) {
     case 'read':
       return 'Completed'
     case 'reading':
@@ -107,7 +107,7 @@ const statusLabel = computed(() => {
 })
 
 const statusClass = computed(() => {
-  switch (props.book.progressStatus) {
+  switch (props.book.progress.status) {
     case 'read':
       return 'book-tile-status-completed'
     case 'reading':

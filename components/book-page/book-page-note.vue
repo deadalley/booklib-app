@@ -108,10 +108,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'edit'): void
-  (e: 'cancel'): void
-  (e: 'save'): void
-  (e: 'delete'): void
+  (e: 'edit' | 'cancel' | 'save' | 'delete'): void
   (e: 'update:contentInput', value: string): void
   (e: 'update:pageInput', value: string | undefined): void
 }>()

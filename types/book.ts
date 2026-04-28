@@ -22,6 +22,13 @@ export type BookNote = {
   content: string
 }
 
+export type BookProgress = {
+  startedAt: string | null
+  finishedAt: string | null
+  status: BookProgressStatus | null
+  notes: BookNote[]
+}
+
 export type Book = {
   id: string
   title: string
@@ -37,13 +44,10 @@ export type Book = {
   summary: string | null
   year: number | null
   genres: string[] | null
-  notes: BookNote[]
   collections: Collection['id'][]
-  progressStatus: BookProgressStatus | null
   format: BookFormat | null
-  startedAt: string | null
-  finishedAt: string | null
   author: Author['id'] | null
+  progress: BookProgress
 }
 
 export type ViewBook = Book & {

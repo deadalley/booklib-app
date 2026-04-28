@@ -69,7 +69,6 @@ const displayValue = computed(() => {
 })
 
 const forwardedAttrs = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { class: _class, ...rest } = attrs
   return rest
 })

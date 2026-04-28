@@ -38,11 +38,13 @@ export function dbBookToBook(
     summary: dbBook.summary,
     year: dbBook.year,
     genres: dbBook.genres ?? [],
-    notes: dbBook.notes ?? [],
-    progressStatus: dbBook.progress_status,
     format: dbBook.format,
-    startedAt: dbBook.started_at ? dbBook.started_at : null,
-    finishedAt: dbBook.finished_at ? dbBook.finished_at : null,
+    progress: {
+      status: dbBook.progress_status,
+      startedAt: dbBook.started_at ?? null,
+      finishedAt: dbBook.finished_at ?? null,
+      notes: dbBook.notes ?? [],
+    },
     collections,
     author: dbBook.author_id,
   }
@@ -66,11 +68,11 @@ export function bookToDbBook(
     title: book.title || '',
     year: nullify(book.year),
     genres: book.genres || null,
-    notes: book.notes ?? [],
-    progress_status: book.progressStatus || 'not-owned',
+    notes: book.progress?.notes ?? [],
+    progress_status: book.progress?.status || 'not-owned',
     format: book.format || null,
-    started_at: nullify(book.startedAt),
-    finished_at: nullify(book.finishedAt),
+    started_at: nullify(book.progress?.startedAt),
+    finished_at: nullify(book.progress?.finishedAt),
     collections: book.collections ?? [],
   }
 }
@@ -233,12 +235,14 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
       return isNaN(date.getTime()) ? null : date.getFullYear()
     })(),
     genres: googleBook.volumeInfo.categories || [],
-    notes: [],
     collections: [],
-    progressStatus: null,
     format: null,
-    startedAt: null,
-    finishedAt: null,
+    progress: {
+      status: null,
+      startedAt: null,
+      finishedAt: null,
+      notes: [],
+    },
     author: null,
   }
 }

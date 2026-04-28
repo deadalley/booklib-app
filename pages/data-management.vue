@@ -295,7 +295,7 @@ const selectedTableColumns = {
   originalTitle: { label: 'Original Title', checked: true },
   originalLanguage: { label: 'Original Language', checked: true },
   isbn: { label: 'ISBN', checked: true },
-  progressStatus: { label: 'Progress Status', checked: true },
+  progress: { label: 'Progress Status', checked: true },
 }
 
 const fileInput = ref()
@@ -387,19 +387,23 @@ async function onSubmit() {
     const authorNameToId = indexBy(prop('name'), authors)
     const databaseData = {
       authors,
-      books: selectedBooksForUpload.value.map((book) => ({
-        ...book,
-        created_at: book.createdAt,
-        author_id: book.author
-          ? (authorNameToId[book.author as string]?.id ?? null)
-          : null,
-        progress_status: book.progressStatus,
-        cover_src: book.coverSrc,
-        original_title: book.originalTitle,
-        original_language: book.originalLanguage,
-        started_at: book.startedAt,
-        finished_at: book.finishedAt,
-      })),
+      books: selectedBooksForUpload.value.map((book) => {
+        const { progress, ...bookRest } = book
+        return {
+          ...bookRest,
+          created_at: book.createdAt,
+          author_id: book.author
+            ? (authorNameToId[book.author as string]?.id ?? null)
+            : null,
+          progress_status: progress.status,
+          cover_src: book.coverSrc,
+          original_title: book.originalTitle,
+          original_language: book.originalLanguage,
+          started_at: progress.startedAt,
+          finished_at: progress.finishedAt,
+          notes: progress.notes,
+        }
+      }),
       collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
         ...c,
         created_at: now(),

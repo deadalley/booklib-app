@@ -30,7 +30,7 @@ export const useSortBooksByOrder = <T extends ViewBook>(
     originalTitle: { label: 'Original Title', checked: false },
     originalLanguage: { label: 'Original Language', checked: false },
     isbn: { label: 'ISBN', checked: false },
-    progressStatus: { label: 'Progress Status', checked: false },
+    progress: { label: 'Progress Status', checked: false },
   }
 
   const selectedBooks = computed(() =>

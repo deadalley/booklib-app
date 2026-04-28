@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import type { ViewBook } from '~/types/book'
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-vue'
+import { IconChevronDown } from '@tabler/icons-vue'
 
 const props = defineProps<{
   book: ViewBook
@@ -77,7 +77,7 @@ const editingBookIndex = ref(-1)
 const showAllNotes = ref(false)
 
 const sortedNotes = computed(() => {
-  return [...(props.book.notes ?? [])].sort(
+  return [...(props.book.progress.notes ?? [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 })
@@ -109,7 +109,7 @@ function onEdit(index: number) {
     if (!note) return
 
     editing.value = index
-    editingBookIndex.value = (props.book.notes ?? []).findIndex(
+    editingBookIndex.value = (props.book.progress.notes ?? []).findIndex(
       (n) => n === note,
     )
     notePageInput.value = note.page?.toString()
@@ -149,7 +149,9 @@ function onDelete(index: number) {
 
   if (!note) return
 
-  const sourceIndex = (props.book.notes ?? []).findIndex((n) => n === note)
+  const sourceIndex = (props.book.progress.notes ?? []).findIndex(
+    (n) => n === note,
+  )
   if (sourceIndex === -1) return
 
   emit('delete-note', { index: sourceIndex })

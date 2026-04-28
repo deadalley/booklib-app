@@ -74,24 +74,23 @@ const options = computed(() => {
   const _books = viewBooks.value ?? []
 
   const unreadBooks = _books.filter(
-    ({ progressStatus }) => progressStatus === 'owned',
+    ({ progress: { status } }) => status === 'owned',
   )
   const unreadBook = unreadBooks[getRandomIndex(unreadBooks)]
 
   const readingBooks = _books.filter(
-    ({ progressStatus }) => progressStatus === 'reading',
+    ({ progress: { status } }) => status === 'reading',
   )
   const readingBook = readingBooks[getRandomIndex(readingBooks)]
 
   const finishedBooksWithNoRating = _books.filter(
-    ({ progressStatus, rating }) =>
-      progressStatus === 'read' && rating === null,
+    ({ progress: { status }, rating }) => status === 'read' && rating === null,
   )
   const finishedBookWithNoRating =
     finishedBooksWithNoRating[getRandomIndex(finishedBooksWithNoRating)]
 
   const pausedBooks = _books.filter(
-    ({ progressStatus }) => progressStatus === 'paused',
+    ({ progress: { status } }) => status === 'paused',
   )
   const pausedBook = pausedBooks[getRandomIndex(pausedBooks)]
 
@@ -154,13 +153,19 @@ async function onClick() {
       case 'startNewBook':
         await onUpdateBook({
           ...selectedOption.value.book,
-          progressStatus: 'reading',
+          progress: {
+            ...selectedOption.value.book?.progress,
+            status: 'reading',
+          },
         } as Book)
         break
       case 'finishCurrentBook':
         await onUpdateBook({
           ...selectedOption.value.book,
-          progressStatus: 'read',
+          progress: {
+            ...selectedOption.value.book?.progress,
+            status: 'read',
+          },
         } as Book)
         break
       case 'rateFinishedBook':
@@ -169,7 +174,10 @@ async function onClick() {
       case 'resumePausedBook':
         await onUpdateBook({
           ...selectedOption.value.book,
-          progressStatus: 'reading',
+          progress: {
+            ...selectedOption.value.book?.progress,
+            status: 'reading',
+          },
         } as Book)
         break
       default:

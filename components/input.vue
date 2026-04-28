@@ -54,7 +54,9 @@ const formkitRef = ref<{ $el: HTMLElement } | null>(null)
 onMounted(() => {
   if (props.autofocus) {
     nextTick(() => {
-      formkitRef.value?.$el?.querySelector<HTMLElement>('input, textarea')?.focus()
+      formkitRef.value?.$el
+        ?.querySelector<HTMLElement>('input, textarea')
+        ?.focus()
     })
   }
 })
@@ -73,7 +75,7 @@ const displayValue = computed(() => {
 
 const forwardedAttrs = computed(() => {
   // FormKit class sections control the rendered wrappers, so we merge class manually.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { class: _class, ...rest } = attrs
   return rest
 })

@@ -65,7 +65,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     originalTitle: { label: 'Original Title', checked: false },
     originalLanguage: { label: 'Original Language', checked: false },
     isbn: { label: 'ISBN', checked: false },
-    progressStatus: { label: 'Progress Status', checked: false },
+    progress: { label: 'Progress Status', checked: false },
   }
 
   const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))
@@ -204,10 +204,10 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       selectedPageRange.value,
     )
 
-    const filterByStatus = filterByPages.filter(({ progressStatus }) => {
+    const filterByStatus = filterByPages.filter(({ progress }) => {
       return (
         !selectedStatuses.value.length ||
-        (progressStatus && selectedStatuses.value.includes(progressStatus))
+        (progress.status && selectedStatuses.value.includes(progress.status))
       )
     })
 

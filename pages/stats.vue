@@ -149,7 +149,7 @@ onMounted(loadData)
 
 const totalReadBooks = computed(() => {
   const totalBooks =
-    books.value?.filter((book) => book.progressStatus === 'read').length ?? 0
+    books.value?.filter((book) => book.progress.status === 'read').length ?? 0
 
   return totalBooks.toLocaleString('en-US', {
     maximumFractionDigits: 0,
@@ -169,7 +169,7 @@ const totalReadPages = computed(() => {
 const totalReadAuthors = computed(() => {
   const totalAuthors = uniq(
     books.value
-      ?.filter((book) => !!book.author && book.progressStatus === 'read')
+      ?.filter((book) => !!book.author && book.progress.status === 'read')
       .map((book) => book.author) ?? [],
   ).length
 
@@ -193,10 +193,9 @@ const totalFavoriteBooks = computed(() => {
 
 const pieChartPropertyOptions: (SelectOption & { unit?: string })[] = [
   { label: 'Rating', value: 'rating', unit: '★' },
-  { label: 'Progress status', value: 'progressStatus' },
+  { label: 'Progress status', value: 'progress' },
 ]
-const pieChartProperty =
-  ref<keyof Pick<Book, 'rating' | 'progressStatus'>>('rating')
+const pieChartProperty = ref<keyof Pick<Book, 'rating' | 'progress'>>('rating')
 
 const rankingChartPropertyOptions: (SelectOption & {
   value: 'rating' | 'year' | 'pages'

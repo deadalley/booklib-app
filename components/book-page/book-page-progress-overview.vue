@@ -24,7 +24,7 @@ const props = defineProps<{
 }>()
 
 const currentStatus = computed(
-  () => props.book.progressStatus ?? ('not-owned' as BookProgressStatus),
+  () => props.book.progress.status ?? ('not-owned' as BookProgressStatus),
 )
 
 const progress = computed(() => {

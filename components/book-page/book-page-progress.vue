@@ -31,8 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookProgressStatus } from '~/types/book'
-import type { Book } from '~/types/book'
+import type { BookProgressStatus, Book } from '~/types/book'
 import { toFullDateCompact } from '~/utils/date'
 
 const props = defineProps<{
@@ -45,7 +44,7 @@ const emit = defineEmits<{
 }>()
 
 const currentStatus = computed(
-  () => props.book.progressStatus ?? ('not-owned' as BookProgressStatus),
+  () => props.book.progress.status ?? ('not-owned' as BookProgressStatus),
 )
 
 const progress = computed(() => {
@@ -77,14 +76,14 @@ const stats = computed(() => {
     },
     {
       label: 'Started Reading',
-      value: props.book.startedAt
-        ? toFullDateCompact(props.book.startedAt)
+      value: props.book.progress.startedAt
+        ? toFullDateCompact(props.book.progress.startedAt)
         : 'Not started',
     },
     {
       label: 'Finished Reading',
-      value: props.book.finishedAt
-        ? toFullDateCompact(props.book.finishedAt)
+      value: props.book.progress.finishedAt
+        ? toFullDateCompact(props.book.progress.finishedAt)
         : 'In progress',
     },
   ]

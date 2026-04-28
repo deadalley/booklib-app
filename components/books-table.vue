@@ -118,10 +118,10 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
         header: 'ISBN',
         cell,
       }),
-      columnHelper.accessor('progressStatus', {
+      columnHelper.accessor('progress', {
         header: 'Status',
         cell: (info) => {
-          const status = info.getValue()
+          const status = info.getValue().status
 
           if (status) {
             return h(BlProgressStatusIcon, {
