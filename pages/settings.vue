@@ -19,11 +19,12 @@
             </template>
             <p>
               Resetting your library will permanently delete your books and
-              collections. <strong>This action cannot be undone.</strong>
+              collections.
+              <strong>This action cannot be undone.</strong>
             </p>
 
-            <template #cancel-label> Cancel </template>
-            <template #action-label> Reset library </template>
+            <template #cancel-label>Cancel</template>
+            <template #action-label>Reset library</template>
           </bl-modal>
         </section>
         <section class="book-section">

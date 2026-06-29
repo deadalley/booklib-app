@@ -21,7 +21,9 @@
 
   <!-- Log entry modal -->
   <bl-modal v-model="showLogModal" size="sm" @confirm="onSaveLogEntry">
-    <template #title>{{ editingNote ? 'Edit Log Entry' : 'Log Reading Entry' }}</template>
+    <template #title>
+      {{ editingNote ? 'Edit Log Entry' : 'Log Reading Entry' }}
+    </template>
     <div class="flex flex-col gap-4">
       <p class="text-ink-muted font-medium">
         {{ book.title }} · {{ book.pages }} total pages
@@ -139,7 +141,7 @@
         <p class="text-primary-600 text-sm font-semibold tracking-wide">
           Ready to log today's reading?
         </p>
-        <bl-button @click="openLogModal" size="sm">Log entry</bl-button>
+        <bl-button size="sm" @click="openLogModal">Log entry</bl-button>
       </div>
     </template>
 
@@ -237,7 +239,15 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'status-select', status: BookProgressStatus, startedAt?: string): void
   (e: 'log-entry', page: number, note: string, date: string): void
-  (e: 'update-note', payload: { index: number; content: string; page?: number; createdAt: string }): void
+  (
+    e: 'update-note',
+    payload: {
+      index: number
+      content: string
+      page?: number
+      createdAt: string
+    },
+  ): void
   (e: 'delete-note', payload: { index: number }): void
 }>()
 
@@ -273,6 +283,8 @@ const startDatePrefix = computed(() => {
   if (currentStatus.value === 'reading') {
     return 'Missing start date:'
   }
+
+  return undefined
 })
 const startDate = computed(() => {
   if (props.book.progress.startedAt) {
@@ -282,6 +294,8 @@ const startDate = computed(() => {
   if (currentStatus.value === 'reading') {
     return 'Set start date'
   }
+
+  return undefined
 })
 
 const progress = computed(() => {
@@ -408,7 +422,12 @@ function onSaveLogEntry() {
     })
     editingNote.value = null
   } else if (logPageNumber.value) {
-    emit('log-entry', logPageNumber.value, logNote.value, fromSimpleDate(logDate.value))
+    emit(
+      'log-entry',
+      logPageNumber.value,
+      logNote.value,
+      fromSimpleDate(logDate.value),
+    )
   }
 }
 

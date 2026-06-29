@@ -4,8 +4,10 @@
     :disabled="!isWebEnvironment"
   >
     <template #tooltip-content>
-      You are running a <b class="contents">demo</b> version of BookLib.
-      Uploading custom book covers is not available in this version.
+      You are running a
+      <b class="contents">demo</b>
+      version of BookLib. Uploading custom book covers is not available in this
+      version.
     </template>
     <div
       class="border-stroke relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border lg:flex-1"

@@ -6,7 +6,7 @@
     :unit="bookProperty === 'averageRatingAuthor' ? '★' : 'books'"
   />
   <bl-empty v-if="series.length === 0" icon="IconChartBar" variant="primary">
-    <template #label> No data </template>
+    <template #label>No data</template>
   </bl-empty>
 </template>
 

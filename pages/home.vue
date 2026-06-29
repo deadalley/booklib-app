@@ -77,7 +77,7 @@
               {{ authors?.length }}
               {{ (authors?.length ?? 0) > 1 ? 'authors' : 'author' }}
             </template>
-            <template v-if="!authors?.length"> No authors </template>
+            <template v-if="!authors?.length">No authors</template>
           </template>
         </bl-section-tile>
       </div>

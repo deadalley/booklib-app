@@ -64,7 +64,7 @@
           </template>
           <template v-if="collapsed" #tooltip>Settings</template>
           <template #default>
-            <span class="nav-sidebar-label"> Settings </span>
+            <span class="nav-sidebar-label">Settings</span>
           </template>
         </bl-nav-sidebar-button>
       </div>

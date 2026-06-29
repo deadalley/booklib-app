@@ -22,9 +22,9 @@
                 <bl-button variant="secondary" @click="onCancel">
                   {{ isNew ? 'Cancel' : 'Discard changes' }}
                 </bl-button>
-                <bl-button @click="onSubmit(collection)">{{
-                  isNew ? 'Create collection' : 'Save changes'
-                }}</bl-button>
+                <bl-button @click="onSubmit(collection)">
+                  {{ isNew ? 'Create collection' : 'Save changes' }}
+                </bl-button>
               </div>
 
               <bl-button
@@ -60,15 +60,19 @@
                 </template>
                 <bl-checkbox v-model="deleteBooks" align="left">
                   <template v-if="!deleteBooks">
-                    Your books will <strong>not</strong> be deleted.
+                    Your books will
+                    <strong>not</strong>
+                    be deleted.
                   </template>
                   <template v-if="deleteBooks">
-                    Your books <strong>will</strong> be deleted.
+                    Your books
+                    <strong>will</strong>
+                    be deleted.
                   </template>
                   This action cannot be undone.
                 </bl-checkbox>
-                <template #cancel-label> Cancel </template>
-                <template #action-label> Delete </template>
+                <template #cancel-label>Cancel</template>
+                <template #action-label>Delete</template>
               </bl-modal>
             </div>
           </div>

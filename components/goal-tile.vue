@@ -26,8 +26,8 @@
             </div>
           </template>
           This action cannot be undone.
-          <template #cancel-label> Cancel </template>
-          <template #action-label> Delete </template>
+          <template #cancel-label>Cancel</template>
+          <template #action-label>Delete</template>
         </bl-modal>
         <bl-goal-modal
           v-if="authors && books"
@@ -103,7 +103,7 @@
             >
               <template #label>This goal has no entries</template>
               <template #action>
-                <bl-button @click="onCreateNew"> Create first entry </bl-button>
+                <bl-button @click="onCreateNew">Create first entry</bl-button>
               </template>
             </bl-empty>
             <bl-goal-entry

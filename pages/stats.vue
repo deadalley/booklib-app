@@ -31,47 +31,90 @@
         <template #unit>favorite books</template>
       </bl-kpi-tile>
       <bl-tile class="col-span-12 lg:col-span-6">
-        <template #title>{{
-          pieChartPropertyOptions.find(
-            ({ value }) => value === pieChartProperty,
-          )?.label
-        }}</template>
+        <template #title>
+          {{
+            pieChartPropertyOptions.find(
+              ({ value }) => value === pieChartProperty,
+            )?.label
+          }}
+        </template>
         <template #actions>
           <div>
-            <bl-raw-select v-model="pieChartProperty" align="end" :options="pieChartPropertyOptions"
-              class="w-full sm:ml-4" />
+            <bl-raw-select
+              v-model="pieChartProperty"
+              align="end"
+              :options="pieChartPropertyOptions"
+              class="w-full sm:ml-4"
+            />
           </div>
         </template>
-        <bl-books-pie-chart v-if="books" :books="books" :book-property="pieChartProperty" :unit="pieChartPropertyOptions.find(
-          ({ value }) => value === pieChartProperty,
-        )?.unit
-          " />
+        <bl-books-pie-chart
+          v-if="books"
+          :books="books"
+          :book-property="pieChartProperty"
+          :unit="
+            pieChartPropertyOptions.find(
+              ({ value }) => value === pieChartProperty,
+            )?.unit
+          "
+        />
       </bl-tile>
-      <bl-tile class="col-span-12 lg:col-span-6" align-header-vertical-on-small-screens>
+      <bl-tile
+        class="col-span-12 lg:col-span-6"
+        align-header-vertical-on-small-screens
+      >
         <template #title>{{ getRankedTitle() }}</template>
         <template #actions>
-          <div class="flex w-full justify-end gap-1 sm:w-[unset] [&_div:last-child_.form-inner]:!w-28">
-            <bl-raw-select v-model="rankingChartProperty" align="end" :options="rankingChartPropertyOptions"
-              class="!min-w-0 sm:min-w-[unset]" />
-            <bl-raw-select v-model="rankingChartPropertyOrder" align="end" :options="rankingChartPropertyOrderOptions"
-              class="!min-w-0 sm:min-w-[unset]" />
-            <bl-input id="rankingChartQuantity" v-model="rankingChartQuantity" editing type="number" :min="1"
-              :max="15" />
+          <div
+            class="flex w-full justify-end gap-1 sm:w-[unset] [&_div:last-child_.form-inner]:!w-28"
+          >
+            <bl-raw-select
+              v-model="rankingChartProperty"
+              align="end"
+              :options="rankingChartPropertyOptions"
+              class="!min-w-0 sm:min-w-[unset]"
+            />
+            <bl-raw-select
+              v-model="rankingChartPropertyOrder"
+              align="end"
+              :options="rankingChartPropertyOrderOptions"
+              class="!min-w-0 sm:min-w-[unset]"
+            />
+            <bl-input
+              id="rankingChartQuantity"
+              v-model="rankingChartQuantity"
+              editing
+              type="number"
+              :min="1"
+              :max="15"
+            />
           </div>
         </template>
-        <bl-ranking :items="rankedBooks" :label-position="+rankingChartQuantity < 8 ? 'bottom' : 'right'"
-          :unit="getRankingUnit" />
+        <bl-ranking
+          :items="rankedBooks"
+          :label-position="+rankingChartQuantity < 8 ? 'bottom' : 'right'"
+          :unit="getRankingUnit"
+        />
       </bl-tile>
       <bl-tile class="col-span-12">
         <template #title>Books</template>
         <template #actions>
           <div>
-            <bl-raw-select v-model="barChartProperty" align="end" :options="barChartPropertyOptions"
-              class="w-full sm:ml-4" />
+            <bl-raw-select
+              v-model="barChartProperty"
+              align="end"
+              :options="barChartPropertyOptions"
+              class="w-full sm:ml-4"
+            />
           </div>
         </template>
-        <bl-books-bar-chart v-if="books && barChartProperty" :authors="authors ?? []" :collections="collections ?? []"
-          :books="books" :book-property="barChartProperty" />
+        <bl-books-bar-chart
+          v-if="books && barChartProperty"
+          :authors="authors ?? []"
+          :collections="collections ?? []"
+          :books="books"
+          :book-property="barChartProperty"
+        />
       </bl-tile>
     </div>
   </NuxtLayout>
@@ -159,10 +202,10 @@ const pieChartProperty = ref<keyof Pick<Book, 'rating' | 'progress'>>('rating')
 const rankingChartPropertyOptions: (SelectOption & {
   value: 'rating' | 'year' | 'pages'
 })[] = [
-    { label: 'Rating', value: 'rating' },
-    { label: 'Year', value: 'year' },
-    { label: 'Pages', value: 'pages' },
-  ]
+  { label: 'Rating', value: 'rating' },
+  { label: 'Year', value: 'year' },
+  { label: 'Pages', value: 'pages' },
+]
 const rankingChartProperty = ref<'rating' | 'year' | 'pages'>('rating')
 
 const rankingChartPropertyOrderOptions: SelectOption[] = [

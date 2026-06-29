@@ -45,8 +45,7 @@
       :src="coverSrc ?? undefined"
       :alt="alt"
       class="h-auto w-full rounded-xl object-cover object-top md:h-48"
-    >
-    </NuxtImg>
+    ></NuxtImg>
   </NuxtLink>
 </template>
 

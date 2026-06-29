@@ -8,9 +8,9 @@
       <div class="flex justify-between">
         <div>
           <h5 v-if="selectedBooksForUpload.length">
-            <span class="text-primary">{{
-              selectedBooksForUpload.length
-            }}</span>
+            <span class="text-primary">
+              {{ selectedBooksForUpload.length }}
+            </span>
             books selected for import
           </h5>
           <h5 v-else>No books selected for import</h5>
@@ -146,7 +146,8 @@
               <IconAlertTriangle v-bind="iconProps" />
             </template>
             <template #content>
-              <b>Error importing file: </b>{{ importError }}
+              <b>Error importing file:</b>
+              {{ importError }}
             </template>
           </bl-warning-badge>
 
@@ -231,9 +232,9 @@
           >
             <p class="text-ink-secondary text-sm">
               Total Books:
-              <span class="text-ink-primary font-semibold">{{
-                totalBooks
-              }}</span>
+              <span class="text-ink-primary font-semibold">
+                {{ totalBooks }}
+              </span>
             </p>
             <bl-button
               :disabled="!exportType"

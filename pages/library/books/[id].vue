@@ -27,8 +27,8 @@
             ?
           </template>
           This action cannot be undone.
-          <template #cancel-label> Cancel </template>
-          <template #action-label> Delete </template>
+          <template #cancel-label>Cancel</template>
+          <template #action-label>Delete</template>
         </bl-modal>
         <bl-button variant="secondary" @click="onEdit(true)">
           <template #prependIcon>
@@ -533,7 +533,10 @@ async function onLogEntry(page: number, note: string, date: string) {
   await onSubmit(book.value)
 }
 
-async function onSelectProgress(progressStatus: BookProgressStatus, startedAt?: string) {
+async function onSelectProgress(
+  progressStatus: BookProgressStatus,
+  startedAt?: string,
+) {
   if (book.value) {
     book.value.progress.status = progressStatus
 

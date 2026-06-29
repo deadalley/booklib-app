@@ -44,6 +44,7 @@ export function dbBookToBook(
       startedAt: dbBook.started_at ?? null,
       finishedAt: dbBook.finished_at ?? null,
       notes: dbBook.notes ?? [],
+      currentPage: null,
     },
     collections,
     author: dbBook.author_id,
@@ -242,6 +243,7 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
       startedAt: null,
       finishedAt: null,
       notes: [],
+      currentPage: null,
     },
     author: null,
   }

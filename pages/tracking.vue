@@ -37,9 +37,9 @@
             :reload-goals="refresh"
           >
             <template #trigger="triggerProps">
-              <bl-button v-bind="triggerProps" class="mt-2"
-                >Create a new goal</bl-button
-              >
+              <bl-button v-bind="triggerProps" class="mt-2">
+                Create a new goal
+              </bl-button>
             </template>
           </bl-goal-modal>
         </div>

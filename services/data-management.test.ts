@@ -256,6 +256,7 @@ describe('StorageService', () => {
           startedAt: null,
           finishedAt: null,
           notes: [],
+          currentPage: null,
         },
       }
 

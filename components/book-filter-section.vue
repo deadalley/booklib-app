@@ -19,8 +19,9 @@
         align="left"
         class="mb-1"
         @change="onSelect(element)"
-        >{{ getDisplayValue(element) }}</bl-checkbox
       >
+        {{ getDisplayValue(element) }}
+      </bl-checkbox>
     </div>
   </div>
 </template>

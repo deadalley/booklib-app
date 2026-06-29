@@ -7,8 +7,9 @@
       <span
         v-if="book.order !== undefined"
         class="text-ink-inverse w-full text-center text-lg"
-        >{{ book.order + 1 }}</span
       >
+        {{ book.order + 1 }}
+      </span>
       <IconDirectionArrows
         class="text-ink-inverse absolute top-1/2 right-4 -translate-y-1/2"
         :size="ICON_SIZE_SMALL"

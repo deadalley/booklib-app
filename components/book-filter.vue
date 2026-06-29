@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <bl-button expand @click="$emit('apply')"> Apply Filters </bl-button>
+    <bl-button expand @click="$emit('apply')">Apply Filters</bl-button>
   </div>
 </template>
 

@@ -29,13 +29,13 @@
       />
     </template>
     <bl-empty v-if="authors?.length === 0" icon="IconFeather">
-      <template #label> There are no authors in your library </template>
+      <template #label>There are no authors in your library</template>
     </bl-empty>
     <bl-empty
       v-if="authors?.length >= 0 && sortedAuthors?.length === 0"
       icon="IconFeather"
     >
-      <template #label> No authors found </template>
+      <template #label>No authors found</template>
     </bl-empty>
     <div
       v-if="view === 'cards'"

@@ -23,9 +23,9 @@
     @blur="onBlur"
   >
     <!-- @vue-skip -->
-    <template v-for="(_, name) in $slots" #[name]="slotData"
-      ><slot :name="name" v-bind="slotData"
-    /></template>
+    <template v-for="(_, name) in $slots" #[name]="slotData">
+      <slot :name="name" v-bind="slotData" />
+    </template>
     <!-- @vue-skip -->
     <template v-if="clearable && !$slots['suffixIcon']" #suffixIcon>
       <IconX class="cursor-pointer" :size="14" @click="onClear" />

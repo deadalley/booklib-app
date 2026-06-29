@@ -66,15 +66,19 @@
               </template>
               <template #title>
                 Are you sure you want to delete
-                <strong class="contents">{{ collection.name }}</strong
-                >?
+                <strong class="contents">{{ collection.name }}</strong>
+                ?
               </template>
               <bl-checkbox v-model="deleteBooks" align="left">
                 <template v-if="!deleteBooks">
-                  Your books will <strong>not</strong> be deleted.
+                  Your books will
+                  <strong>not</strong>
+                  be deleted.
                 </template>
                 <template v-if="deleteBooks">
-                  Your books <strong>will</strong> be deleted.
+                  Your books
+                  <strong>will</strong>
+                  be deleted.
                 </template>
                 This action cannot be undone.
               </bl-checkbox>

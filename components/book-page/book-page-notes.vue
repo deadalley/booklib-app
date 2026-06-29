@@ -151,7 +151,11 @@ function onSave() {
 
   if (editingBookIndex.value !== -1) {
     const note = (props.book.progress.notes ?? [])[editingBookIndex.value]
-    emit('update-note', { index: editingBookIndex.value, content, page: note?.page })
+    emit('update-note', {
+      index: editingBookIndex.value,
+      content,
+      page: note?.page,
+    })
   } else {
     emit('add-note', { content })
   }

@@ -65,7 +65,7 @@
       </bl-tooltip>
     </template>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
-      <template #label> There are no books in your library </template>
+      <template #label>There are no books in your library</template>
       <template #action>
         <NuxtLink to="/library/books/new">
           <bl-button>Create a book</bl-button>
@@ -87,7 +87,7 @@
       v-if="books?.length >= 0 && sortedBooks?.length === 0"
       icon="IconBooks"
     >
-      <template #label> No books found </template>
+      <template #label>No books found</template>
     </bl-empty>
   </NuxtLayout>
   <bl-sidebar

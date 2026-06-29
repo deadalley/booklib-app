@@ -56,8 +56,8 @@
                   ?
                 </template>
                 This action cannot be undone.
-                <template #cancel-label> Cancel </template>
-                <template #action-label> Delete </template>
+                <template #cancel-label>Cancel</template>
+                <template #action-label>Delete</template>
               </bl-modal>
             </div>
           </div>
@@ -363,9 +363,9 @@
             <section v-if="!externalBooks.length && false" class="book-section">
               <template v-if="!externalBooks.length && false">
                 <h4>Find books</h4>
-                <bl-button @click="$emit('fetch-google-books')"
-                  >Fetch</bl-button
-                >
+                <bl-button @click="$emit('fetch-google-books')">
+                  Fetch
+                </bl-button>
               </template>
               <div
                 v-if="externalBooks.length"

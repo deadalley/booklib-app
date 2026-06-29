@@ -29,7 +29,7 @@
       />
     </template>
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
-      <template #label> There are no collections in your library </template>
+      <template #label>There are no collections in your library</template>
       <template #action>
         <NuxtLink to="/library/collections/new">
           <bl-button>Create a collection</bl-button>
@@ -40,7 +40,7 @@
       v-if="collections?.length >= 0 && sortedCollections?.length === 0"
       icon="IconArchive"
     >
-      <template #label> No collections found </template>
+      <template #label>No collections found</template>
     </bl-empty>
     <div
       v-if="view === 'cards'"
