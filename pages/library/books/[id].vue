@@ -48,8 +48,6 @@
           :book="book"
           @default-collection-change="onDefaultCollectionChange"
         />
-
-        <bl-book-page-progress-overview :book="book" />
       </aside>
 
       <div
@@ -129,19 +127,6 @@
               :key="goal.id"
               :goal="goal"
               :authors="authors"
-            />
-          </div>
-        </section>
-
-        <section class="main-content-section">
-          <div class="flex flex-col gap-4">
-            <p class="section-title">Notes</p>
-
-            <bl-book-page-notes
-              :book="book"
-              @add-note="onAddNote"
-              @update-note="onUpdateNote"
-              @delete-note="onDeleteNote"
             />
           </div>
         </section>

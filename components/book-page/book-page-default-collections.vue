@@ -1,5 +1,5 @@
 <template>
-  <section class="paper flex flex-col gap-6 px-6 py-4">
+  <section class="paper-sm flex flex-col gap-6 px-6 py-4">
     <bl-multiselect class="w-full">
       <bl-multiselect-option
         v-for="item in DEFAULT_COLLECTIONS"

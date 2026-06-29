@@ -11,7 +11,7 @@
     </template>
 
     <div
-      class="group/cover paper relative inline-flex flex-col items-stretch overflow-hidden p-6"
+      class="group/cover paper-sm relative inline-flex flex-col items-stretch overflow-hidden p-6"
       :class="{ 'cursor-pointer': !isWebEnvironment }"
       @mouseenter="setHovered(true)"
       @mouseleave="setHovered(false)"
