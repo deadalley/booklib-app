@@ -2,9 +2,7 @@
   <div class="paper flex flex-col gap-3 p-5">
     <p class="eyebrow">Reading Progress</p>
 
-    <p
-      class="text-primary text-end text-3xl leading-none font-semibold sm:text-4xl"
-    >
+    <p class="text-primary text-end text-3xl leading-none font-semibold">
       {{ progress }}%
     </p>
 

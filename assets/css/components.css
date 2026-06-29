@@ -1,16 +1,30 @@
 @layer components {
   /* Buttons */
   .button {
-    @apply rounded-scholarly flex h-min w-fit items-center justify-center gap-2 border py-2 text-base font-semibold whitespace-nowrap lg:inline-flex lg:grow-0;
+    @apply rounded-scholarly flex h-min w-fit items-center justify-center gap-2 border text-base font-semibold whitespace-nowrap lg:inline-flex lg:grow-0;
   }
-  .button-primary {
+  .button-primary:not(.primary):not(.secondary):not(.button-disabled),
+  .button-primary.primary {
     @apply border-primary bg-primary text-ink-inverse hover:bg-primary/80 active:bg-primary-800 hover:border-transparent active:border-transparent;
   }
-  .button-secondary {
+  .button-primary.secondary {
+    @apply border-secondary bg-secondary text-ink-inverse hover:bg-secondary/80 active:bg-secondary-800 hover:border-transparent active:border-transparent;
+  }
+  .button-secondary:not(.primary):not(.secondary):not(.button-disabled) {
     @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
   }
-  .button-tertiary {
+  .button-secondary.primary {
+    @apply border-primary bg-surface-elevated text-primary hover:bg-surface-subtle active:bg-stroke-subtle;
+  }
+  .button-secondary.secondary {
+    @apply border-secondary-400 bg-secondary-50 text-secondary-600 hover:bg-secondary-200 active:bg-secondary-300;
+  }
+  .button-tertiary:not(.primary):not(.secondary):not(.button-disabled),
+  .button-tertiary.primary {
     @apply text-primary hover:bg-surface-subtle active:bg-stroke-subtle hover:text-primary/80 border-transparent bg-transparent;
+  }
+  .button-tertiary.secondary {
+    @apply text-secondary hover:bg-surface-subtle active:bg-stroke-subtle hover:text-secondary/80 border-transparent bg-transparent;
   }
   .button-disabled {
     @apply bg-surface-subtle! text-ink-muted! border-surface-subtle;

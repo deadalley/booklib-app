@@ -46,6 +46,10 @@ export function toMonthYearCompact(date: ConfigType) {
   return dayjs(date).utc().format('MMM YYYY')
 }
 
+export function toShortDate(date: ConfigType) {
+  return dayjs(date).utc().format('MMM D')
+}
+
 export function getDateRange(
   date: ConfigType,
   range: OpUnitType,

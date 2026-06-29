@@ -13,6 +13,19 @@ export type ThemeTokens = {
       800: string
       900: string
     }
+    secondary: {
+      DEFAULT: string
+      50: string
+      100: string
+      200: string
+      300: string
+      400: string
+      500: string
+      600: string
+      700: string
+      800: string
+      900: string
+    }
     surface: {
       DEFAULT: string
       canvas: string
@@ -69,6 +82,19 @@ export const legacyTheme: ThemeTokens = {
       700: '#962020',
       800: '#791616',
       900: '#5f1111',
+    },
+    secondary: {
+      DEFAULT: '#c47f2b',
+      50: '#fef3dc',
+      100: '#fce4b8',
+      200: '#f7d28a',
+      300: '#f0c060',
+      400: '#dca044',
+      500: '#c47f2b',
+      600: '#b06f1e',
+      700: '#a06010',
+      800: '#804d0e',
+      900: '#5c380a',
     },
     surface: {
       DEFAULT: '#F6F6F6',
@@ -137,6 +163,19 @@ export const newTheme: ThemeTokens = {
       700: '#b22227',
       800: '#941f23',
       900: '#7b1f22',
+    },
+    secondary: {
+      DEFAULT: '#c47f2b',
+      50: '#fef3dc',
+      100: '#fce4b8',
+      200: '#f7d28a',
+      300: '#f0c060',
+      400: '#dca044',
+      500: '#c47f2b',
+      600: '#b06f1e',
+      700: '#a06010',
+      800: '#804d0e',
+      900: '#5c380a',
     },
     surface: {
       DEFAULT: '#f5f3f3',

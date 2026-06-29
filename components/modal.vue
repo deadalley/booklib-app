@@ -9,7 +9,7 @@
         class="data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-[100] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-[6px] p-7 focus:outline-none"
+        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-xl p-7 focus:outline-none"
         :class="{
           'w-[90vw]': size !== undefined,
           'max-w-screen-sm': size === 'sm',
@@ -45,7 +45,12 @@
         <div class="relative">
           <slot />
         </div>
-        <div class="flex items-baseline justify-end gap-2">
+        <div
+          class="flex items-baseline justify-end gap-2"
+          :class="{
+            'mt-4': $slots['cancel-label'] || $slots['action-label'],
+          }"
+        >
           <DialogClose>
             <bl-button
               v-if="$slots['cancel-label']"

@@ -92,7 +92,7 @@
           <div
             v-for="book in sortBooksByOrder(books)"
             :key="book.title"
-            class="w-40 shrink-0"
+            class="w-40 shrink-0 [&>div]:h-full"
           >
             <bl-book-tile :book="book" />
           </div>

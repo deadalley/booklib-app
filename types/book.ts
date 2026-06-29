@@ -27,6 +27,7 @@ export type BookProgress = {
   finishedAt: string | null
   status: BookProgressStatus | null
   notes: BookNote[]
+  currentPage: number | null
 }
 
 export type Book = {

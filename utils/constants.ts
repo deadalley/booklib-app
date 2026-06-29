@@ -83,7 +83,7 @@ export const PROGRESS_STATUS_MAP: Record<
     id: 'reading',
     step: 2,
     description: 'Reading',
-    icon: 'IconEyeglass2',
+    icon: 'IconNotes',
   },
   paused: {
     id: 'paused',

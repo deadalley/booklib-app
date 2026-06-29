@@ -3,6 +3,7 @@
     v-model="progressValue"
     class="bg-surface relative w-full overflow-hidden rounded-full"
     :class="{
+      'h-1': size === 'xs',
       'h-2': size === 'sm',
       'h-3': size === 'md',
       'h-4': size === 'lg',
@@ -26,7 +27,7 @@ import { ProgressIndicator, ProgressRoot } from 'radix-vue'
 
 withDefaults(
   defineProps<{
-    size?: 'sm' | 'md' | 'lg'
+    size?: 'xs' | 'sm' | 'md' | 'lg'
     color?: string
   }>(),
   { size: 'md', color: 'bg-primary' },

@@ -8,8 +8,13 @@
       'button-secondary': variant === 'secondary',
       'button-tertiary': variant === 'tertiary',
       'button-disabled': !!disabled || !!loading,
+      primary: color === 'primary' && !disabled && !loading,
+      secondary: color === 'secondary' && !disabled && !loading,
+      [size]: !!size,
       'cursor-pointer': !disabled && !loading,
       'w-full flex-1': !!expand,
+      'py-2': size === 'md' || size === 'lg',
+      'py-1': size === 'sm',
       'px-2':
         !$slots['default'] && ($slots['prependIcon'] || $slots['appendIcon']),
       'px-4': !(
@@ -33,7 +38,9 @@ withDefaults(
     disabled?: boolean
     loading?: boolean
     variant?: 'primary' | 'secondary' | 'tertiary'
+    color?: 'primary' | 'secondary'
+    size?: 'sm' | 'md' | 'lg'
   }>(),
-  { variant: 'primary' },
+  { variant: 'primary', size: 'md' },
 )
 </script>

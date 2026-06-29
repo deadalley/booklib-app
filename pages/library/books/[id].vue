@@ -39,9 +39,9 @@
     </div>
 
     <div
-      class="grid min-h-0 flex-1 gap-16 md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
+      class="grid min-h-0 flex-1 gap-16 overflow-y-auto md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
     >
-      <aside class="flex flex-col gap-4 overflow-y-auto">
+      <aside class="flex flex-col gap-4 lg:overflow-y-auto">
         <bl-book-page-cover :book="book" editing />
 
         <bl-book-page-default-collections
@@ -53,7 +53,7 @@
       </aside>
 
       <div
-        class="flex min-h-0 max-w-7xl flex-col gap-6 pr-1 pb-2 md:h-full md:overflow-y-auto"
+        class="flex min-h-0 max-w-7xl flex-col gap-6 pr-1 pb-2 md:h-full lg:overflow-y-auto"
       >
         <section class="main-content-section">
           <bl-book-page-header :book="book" :authors="authors" />
@@ -90,7 +90,13 @@
         <section class="main-content-section">
           <div class="flex flex-col gap-4">
             <p class="section-title">Progress</p>
-            <bl-book-page-progress :book="book" />
+            <bl-book-page-progress
+              :book="book"
+              @status-select="onSelectProgress"
+              @log-entry="onLogEntry"
+              @update-note="onUpdateNote"
+              @delete-note="onDeleteNote"
+            />
           </div>
         </section>
 
@@ -432,10 +438,12 @@ async function onUpdateNote({
   index,
   content,
   page,
+  createdAt,
 }: {
   index: number
   content: string
   page?: number
+  createdAt?: string
 }) {
   if (!book.value || isNew.value) return
   if (index < 0 || index >= (book.value.progress.notes ?? []).length) return
@@ -447,6 +455,7 @@ async function onUpdateNote({
   nextNotes[index] = {
     ...currentNote,
     content,
+    ...(createdAt ? { createdAt } : {}),
     ...(page ? { page } : { page: undefined }),
   }
 
@@ -512,11 +521,25 @@ async function onDefaultCollectionChange(collectionId: string) {
   }
 }
 
-async function onSelectProgress(progressStatus: BookProgressStatus) {
+async function onLogEntry(page: number, note: string, date: string) {
+  if (!book.value || isNew.value) return
+
+  book.value.progress.currentPage = page
+  book.value.progress.notes = [
+    ...(book.value.progress.notes ?? []),
+    { createdAt: date, content: note, page },
+  ]
+
+  await onSubmit(book.value)
+}
+
+async function onSelectProgress(progressStatus: BookProgressStatus, startedAt?: string) {
   if (book.value) {
     book.value.progress.status = progressStatus
 
-    if (progressStatus === 'reading' && startReadingBookToday.value) {
+    if (startedAt) {
+      book.value.progress.startedAt = startedAt
+    } else if (progressStatus === 'reading' && startReadingBookToday.value) {
       book.value.progress.startedAt = now()
     } else if (progressStatus === 'read' && finishReadingBookToday.value) {
       book.value.progress.finishedAt = now()

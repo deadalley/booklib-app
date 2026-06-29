@@ -17,6 +17,19 @@
             <template #title>Buttons</template>
             <div class="flex flex-col gap-6">
               <div class="flex flex-wrap gap-4">
+                <bl-button size="sm">Primary</bl-button>
+                <bl-button size="sm" variant="secondary">Secondary</bl-button>
+                <bl-button size="sm" variant="tertiary">Tertiary</bl-button>
+                <bl-button size="sm" disabled>Disabled</bl-button>
+                <bl-button size="sm" loading>Loading</bl-button>
+                <bl-button size="sm">
+                  <template #prependIcon="iconProps">
+                    <IconPlus v-bind="iconProps" />
+                  </template>
+                  Add book
+                </bl-button>
+              </div>
+              <div class="flex flex-wrap gap-4">
                 <bl-button>Primary</bl-button>
                 <bl-button variant="secondary">Secondary</bl-button>
                 <bl-button variant="tertiary">Tertiary</bl-button>
@@ -28,6 +41,24 @@
                   </template>
                   Add book
                 </bl-button> -->
+              </div>
+              <div class="flex flex-wrap gap-4">
+                <bl-button color="primary">Primary</bl-button>
+                <bl-button color="primary" variant="secondary">
+                  Secondary
+                </bl-button>
+                <bl-button color="primary" variant="tertiary">
+                  Tertiary
+                </bl-button>
+              </div>
+              <div class="flex flex-wrap gap-4">
+                <bl-button color="secondary">Primary</bl-button>
+                <bl-button color="secondary" variant="secondary">
+                  Secondary
+                </bl-button>
+                <bl-button color="secondary" variant="tertiary">
+                  Tertiary
+                </bl-button>
               </div>
 
               <div
@@ -144,10 +175,39 @@
               <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
                 <p class="text-ink-secondary text-sm">Chips</p>
                 <div class="flex flex-wrap items-center gap-2">
-                  <bl-chip>Science Fiction</bl-chip>
-                  <bl-chip>Fantasy</bl-chip>
-                  <bl-chip variant="primary">Currently Reading</bl-chip>
-                  <bl-chip variant="primary">Finished</bl-chip>
+                  <bl-chip>Default</bl-chip>
+                  <bl-chip bold>Bold</bl-chip>
+                  <bl-chip rounded>Rounded</bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip variant="primary">Primary</bl-chip>
+                  <bl-chip variant="primary" bold>Bold</bl-chip>
+                  <bl-chip variant="primary" rounded>Rounded</bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip variant="secondary">Secondary</bl-chip>
+                  <bl-chip variant="secondary" bold>Bold</bl-chip>
+                  <bl-chip variant="secondary" rounded>Rounded</bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip variant="primary" color="secondary">Primary</bl-chip>
+                  <bl-chip variant="primary" color="secondary" bold>
+                    Bold
+                  </bl-chip>
+                  <bl-chip variant="primary" color="secondary" rounded>
+                    Rounded
+                  </bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip variant="secondary" color="secondary">
+                    Secondary
+                  </bl-chip>
+                  <bl-chip variant="secondary" color="secondary" bold>
+                    Bold
+                  </bl-chip>
+                  <bl-chip variant="secondary" color="secondary" rounded>
+                    Rounded
+                  </bl-chip>
                 </div>
               </div>
             </div>
@@ -186,9 +246,9 @@
                   />
                 </div>
                 <div class="flex-start flex flex-col gap-3">
-                  <bl-checkbox v-model="owned"
-                    >Checkbox align right</bl-checkbox
-                  >
+                  <bl-checkbox v-model="owned">
+                    Checkbox align right
+                  </bl-checkbox>
                   <bl-checkbox v-model="wishlist" align="left">
                     Checkbox align left
                   </bl-checkbox>
@@ -385,9 +445,9 @@
               />
               <p class="text-ink-secondary text-sm">
                 Selected status:
-                <span class="text-ink-primary font-semibold">{{
-                  stepperStatus
-                }}</span>
+                <span class="text-ink-primary font-semibold">
+                  {{ stepperStatus }}
+                </span>
               </p>
             </div>
           </bl-tile>
@@ -436,13 +496,14 @@
                     :key="heading.tag"
                     class="border-stroke flex flex-wrap items-baseline gap-4 border-b pb-3 last:border-b-0"
                   >
-                    <component :is="heading.tag" class="flex-1">{{
-                      heading.sample
-                    }}</component>
+                    <component :is="heading.tag" class="flex-1">
+                      {{ heading.sample }}
+                    </component>
                     <span
                       class="text-ink-muted font-mono text-xs whitespace-nowrap"
-                      >{{ heading.tag }} &mdash; {{ heading.size }}</span
                     >
+                      {{ heading.tag }} &mdash; {{ heading.size }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -515,8 +576,9 @@
                     <span
                       class="font-mono text-xs whitespace-nowrap"
                       :style="{ color: ink.hex }"
-                      >{{ ink.label }} — {{ ink.hex }}</span
                     >
+                      {{ ink.label }} — {{ ink.hex }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -769,6 +831,21 @@ const swatchGroups = [
       { label: '700', color: colors.primary[700] },
       { label: '800', color: colors.primary[800] },
       { label: '900', color: colors.primary[900] },
+    ],
+  },
+  {
+    label: 'Secondary',
+    swatches: [
+      { label: '50', color: colors.secondary[50] },
+      { label: '100', color: colors.secondary[100] },
+      { label: '200', color: colors.secondary[200] },
+      { label: '300', color: colors.secondary[300] },
+      { label: '400', color: colors.secondary[400] },
+      { label: 'Default', color: colors.secondary.DEFAULT },
+      { label: '600', color: colors.secondary[600] },
+      { label: '700', color: colors.secondary[700] },
+      { label: '800', color: colors.secondary[800] },
+      { label: '900', color: colors.secondary[900] },
     ],
   },
   {
