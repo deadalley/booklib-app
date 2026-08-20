@@ -1,4 +1,4 @@
-import type { BookFormat, BookNote, BookProgressStatus } from './book'
+import type { BookFormat, BookNote, BookProgressStatus, BookPropertyStatus } from './book'
 import type { GoalInterval, GoalStatus, GoalType } from './goal'
 
 export type AuthorDB = {
@@ -20,6 +20,7 @@ export type BookDB = {
   original_title: string | null
   pages: number | null
   progress_status: BookProgressStatus | null
+  property_status: BookPropertyStatus | null
   format: BookFormat | null
   publisher: string | null
   rating: number | null

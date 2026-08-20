@@ -22,7 +22,8 @@ export function buildBook(overwrite?: Partial<BookDB>): BookDB {
     finished_at: faker.date.past().toISOString(),
     collections: [],
     author_id: faker.string.uuid(),
-    progress_status: 'not-owned',
+    progress_status: null,
+    property_status: 'not-owned',
     format: 'paperback',
     ...overwrite,
   }

@@ -104,6 +104,7 @@
       v-model:selected-original-languages="selectedOriginalLanguages"
       v-model:selected-genres="selectedGenres"
       v-model:selected-statuses="selectedStatuses"
+      v-model:selected-property-statuses="selectedPropertyStatuses"
       v-model:selected-formats="selectedFormats"
       v-model:selected-year-range="selectedYearRange"
       v-model:selected-page-range="selectedPageRange"

@@ -1,9 +1,9 @@
 import type { Author } from './author'
 import type { Collection } from './collection'
 
+export type BookPropertyStatus = 'owned' | 'not-owned' | 'wishlist'
+
 export type BookProgressStatus =
-  | 'owned'
-  | 'not-owned'
   | 'reading'
   | 'paused'
   | 'read'
@@ -49,6 +49,7 @@ export type Book = {
   format: BookFormat | null
   author: Author['id'] | null
   progress: BookProgress
+  propertyStatus: BookPropertyStatus | null
 }
 
 export type ViewBook = Book & {
@@ -56,5 +57,4 @@ export type ViewBook = Book & {
   selected?: boolean
   order?: number
   isFavorite?: boolean
-  isWishlist?: boolean
 }

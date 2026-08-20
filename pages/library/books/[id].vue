@@ -91,6 +91,7 @@
             <bl-book-page-progress
               :book="book"
               @status-select="onSelectProgress"
+              @property-status-select="onPropertyStatusSelect"
               @log-entry="onLogEntry"
               @update-note="onUpdateNote"
               @delete-note="onDeleteNote"
@@ -165,6 +166,7 @@
     @default-collection-change="onDefaultCollectionChange"
     @progress-change="onProgressChange"
     @status-select="onSelectProgress"
+    @property-status-select="onPropertyStatusSelect"
     @collection-select="onSelectCollection"
     @fetch-google-books="fetchBooksFromGoogle"
   />
@@ -176,7 +178,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
-import type { Book, BookNote, BookProgressStatus } from '~/types/book'
+import type { Book, BookNote, BookProgressStatus, BookPropertyStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { ICON_SIZE_SMALL } from '~/utils/constants'
@@ -243,13 +245,12 @@ const bookGoals = computed(() => {
 })
 
 const currentStep = ref<number | undefined>(
-  book.value
-    ? PROGRESS_STATUS_MAP[book.value.progress.status ?? 'not-owned'].step
+  book.value?.progress.status
+    ? PROGRESS_STATUS_MAP[book.value.progress.status].step
     : undefined,
 )
 
 const selectedDefaultCollections = ref<Record<string, boolean>>({
-  [WISHLIST_COLLECTION_ID]: false,
   [TBR_COLLECTION_ID]: false,
   [FAVORITE_COLLECTION_ID]: false,
 })
@@ -268,9 +269,6 @@ const authorSelectOptions = computed(() =>
 )
 
 const progressSteps = computed(() => [
-  book.value?.progress.status === 'owned'
-    ? PROGRESS_STATUS_MAP.owned
-    : PROGRESS_STATUS_MAP['not-owned'],
   book.value?.progress.status === 'paused'
     ? PROGRESS_STATUS_MAP.paused
     : PROGRESS_STATUS_MAP.reading,
@@ -324,15 +322,13 @@ async function fetchBook() {
     selected: !!book.value?.collections?.includes(collection.id),
   }))
 
-  currentStep.value =
-    PROGRESS_STATUS_MAP[book.value?.progress.status ?? 'not-owned'].step
+  currentStep.value = book.value?.progress.status
+    ? PROGRESS_STATUS_MAP[book.value.progress.status].step
+    : undefined
 
   selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
     !!book.value &&
     isBookInDefaultCollection(book.value, FAVORITE_COLLECTION_ID)
-  selectedDefaultCollections.value[WISHLIST_COLLECTION_ID] =
-    !!book.value &&
-    isBookInDefaultCollection(book.value, WISHLIST_COLLECTION_ID)
   selectedDefaultCollections.value[TBR_COLLECTION_ID] =
     !!book.value && isBookInDefaultCollection(book.value, TBR_COLLECTION_ID)
 }
@@ -518,8 +514,18 @@ async function onLogEntry(page: number, note: string, date: string) {
   await onSubmit(book.value)
 }
 
+async function onPropertyStatusSelect(propertyStatus: BookPropertyStatus) {
+  if (book.value) {
+    book.value.propertyStatus = propertyStatus
+
+    if (!isNew.value) {
+      await onSubmit(book.value)
+    }
+  }
+}
+
 async function onSelectProgress(
-  progressStatus: BookProgressStatus,
+  progressStatus: BookProgressStatus | null,
   startedAt?: string,
 ) {
   if (book.value) {
@@ -549,7 +555,6 @@ function onProgressChange(progressStatusStep: number) {
 
   if (progressStatus) {
     if (
-      progressStatus.step === PROGRESS_STATUS_MAP.owned.step ||
       progressStatus.step === PROGRESS_STATUS_MAP.reading.step ||
       progressStatus.step === PROGRESS_STATUS_MAP.read.step
     ) {

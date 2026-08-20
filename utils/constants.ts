@@ -1,19 +1,16 @@
 import type { icons } from '@tabler/icons-vue'
-import type { BookFormat, BookProgressStatus } from '~/types/book'
+import type { BookFormat, BookProgressStatus, BookPropertyStatus } from '~/types/book'
 import type { GoalInterval, GoalType } from '~/types/goal'
 
 export const FAVORITE_COLLECTION_ID = 'favorite'
-export const WISHLIST_COLLECTION_ID = 'wishlist'
 export const TBR_COLLECTION_ID = 'tbr'
 export const DEFAULT_COLLECTIONS = [
   FAVORITE_COLLECTION_ID,
-  WISHLIST_COLLECTION_ID,
   TBR_COLLECTION_ID,
 ]
 
 export const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeart',
-  [WISHLIST_COLLECTION_ID]: 'IconGift',
   [TBR_COLLECTION_ID]: 'IconStack2',
 }
 
@@ -22,15 +19,10 @@ export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
   keyof typeof icons
 > = {
   [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
-  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
   [TBR_COLLECTION_ID]: 'IconStack2Filled',
 }
 
 export const DEFAULT_COLLECTIONS_INIT = [
-  {
-    id: WISHLIST_COLLECTION_ID,
-    name: 'Wishlist',
-  },
   {
     id: FAVORITE_COLLECTION_ID,
     name: 'Favorites',
@@ -50,8 +42,6 @@ export const ICON_SIZE_MEDIUM = 22
 export const ICON_SIZE_LARGE = 26
 
 export const PROGRESS_STATUS = [
-  'owned',
-  'not-owned',
   'reading',
   'paused',
   'read',
@@ -67,41 +57,54 @@ export const PROGRESS_STATUS_MAP: Record<
     icon: keyof typeof icons
   }
 > = {
-  'not-owned': {
-    id: 'not-owned',
-    step: 1,
-    description: 'Not owned',
-    icon: 'IconArchiveOff',
-  },
-  owned: {
-    id: 'owned',
-    step: 1,
-    description: 'Owned',
-    icon: 'IconArchive',
-  },
   reading: {
     id: 'reading',
-    step: 2,
+    step: 1,
     description: 'Reading',
     icon: 'IconNotes',
   },
   paused: {
     id: 'paused',
-    step: 2,
+    step: 1,
     description: 'Paused',
     icon: 'IconPlayerPause',
   },
   read: {
     id: 'read',
-    step: 3,
+    step: 2,
     description: 'Read',
     icon: 'IconBook',
   },
   'not-finished': {
     id: 'not-finished',
-    step: 3,
+    step: 2,
     description: 'Not finished',
     icon: 'IconBookOff',
+  },
+}
+
+export const PROPERTY_STATUS_MAP: Record<
+  BookPropertyStatus,
+  {
+    id: BookPropertyStatus
+    description: string
+    icon: keyof typeof icons
+  }
+> = {
+  'not-owned': {
+    id: 'not-owned',
+    description: 'Not owned',
+    icon: 'IconArchiveOff',
+  },
+  owned: {
+    id: 'owned',
+    description: 'Owned',
+    icon: 'IconArchive',
+  },
+  wishlist: {
+    id: 'wishlist',
+    description: 'Wishlist',
+    icon: 'IconGift',
   },
 }
 

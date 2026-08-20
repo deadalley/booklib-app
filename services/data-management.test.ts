@@ -252,12 +252,13 @@ describe('StorageService', () => {
         genres: null,
         format: null,
         progress: {
-          status: 'not-owned',
+          status: null,
           startedAt: null,
           finishedAt: null,
           notes: [],
           currentPage: null,
         },
+        propertyStatus: 'not-owned',
       }
 
       const createdBook = await service.createBook(newBook)

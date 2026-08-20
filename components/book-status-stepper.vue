@@ -80,19 +80,14 @@ import type { BookProgressStatus } from '~/types/book'
 import { PROGRESS_STATUS_MAP } from '~/utils/constants'
 
 type Step = {
-  id: 1 | 2 | 3
+  id: 1 | 2
   label: string
   options: BookProgressStatus[]
 }
 
-const props = withDefaults(
-  defineProps<{
-    currentStatus?: BookProgressStatus
-  }>(),
-  {
-    currentStatus: 'not-owned',
-  },
-)
+const props = defineProps<{
+  currentStatus?: BookProgressStatus | null
+}>()
 
 defineEmits<{
   (e: 'status-select', status: BookProgressStatus): void
@@ -102,31 +97,25 @@ defineEmits<{
 const steps: Step[] = [
   {
     id: 1,
-    label: 'Not Read',
-    options: ['not-owned', 'owned'],
-  },
-  {
-    id: 2,
     label: 'In Progress',
     options: ['reading', 'paused'],
   },
   {
-    id: 3,
+    id: 2,
     label: 'Finished',
     options: ['read', 'not-finished'],
   },
 ]
 
-const currentStep = computed(
-  () => PROGRESS_STATUS_MAP[props.currentStatus].step,
+const currentStep = computed(() =>
+  props.currentStatus ? PROGRESS_STATUS_MAP[props.currentStatus].step : 0,
 )
 
 function resolvedStatus(step: number): BookProgressStatus | null {
-  if (step === currentStep.value) return props.currentStatus
+  if (step === currentStep.value) return props.currentStatus ?? null
 
   if (step < currentStep.value) {
-    if (step === 1) return 'owned'
-    if (step === 2) return 'reading'
+    if (step === 1) return 'reading'
   }
 
   return null
@@ -145,8 +134,7 @@ function stepIcon(step: number): keyof typeof icons {
 
   if (status) return PROGRESS_STATUS_MAP[status].icon
 
-  if (step === 1) return PROGRESS_STATUS_MAP['not-owned'].icon
-  if (step === 2) return PROGRESS_STATUS_MAP.reading.icon
+  if (step === 1) return PROGRESS_STATUS_MAP.reading.icon
 
   return PROGRESS_STATUS_MAP.read.icon
 }

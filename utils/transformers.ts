@@ -46,6 +46,7 @@ export function dbBookToBook(
       notes: dbBook.notes ?? [],
       currentPage: null,
     },
+    propertyStatus: dbBook.property_status,
     collections,
     author: dbBook.author_id,
   }
@@ -70,7 +71,8 @@ export function bookToDbBook(
     year: nullify(book.year),
     genres: book.genres || null,
     notes: book.progress?.notes ?? [],
-    progress_status: book.progress?.status || 'not-owned',
+    progress_status: book.progress?.status || null,
+    property_status: book.propertyStatus || null,
     format: book.format || null,
     started_at: nullify(book.progress?.startedAt),
     finished_at: nullify(book.progress?.finishedAt),
@@ -245,6 +247,7 @@ export function googleBookToBook(googleBook: GoogleBook): Book {
       notes: [],
       currentPage: null,
     },
+    propertyStatus: null,
     author: null,
   }
 }

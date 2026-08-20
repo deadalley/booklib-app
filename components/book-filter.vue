@@ -17,7 +17,19 @@
 
     <div class="filter-section">
       <div class="filter-section-header">
-        <label class="filter-section-label">Status</label>
+        <label class="filter-section-label">Ownership</label>
+      </div>
+      <bl-raw-select
+        v-model="selectedPropertyStatus"
+        with-wrapper
+        placeholder="Any Ownership"
+        :options="propertyStatusOptions"
+      />
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Reading Status</label>
       </div>
       <bl-raw-select
         v-model="selectedStatus"
@@ -111,7 +123,7 @@
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
-import type { Book, BookFormat, BookProgressStatus } from '~/types/book'
+import type { Book, BookFormat, BookProgressStatus, BookPropertyStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 defineProps<{
@@ -140,6 +152,7 @@ const selectedOriginalLanguages = defineModel<string[]>(
 )
 const selectedGenres = defineModel<string[]>('selectedGenres')
 const selectedStatuses = defineModel<BookProgressStatus[]>('selectedStatuses')
+const selectedPropertyStatuses = defineModel<BookPropertyStatus[]>('selectedPropertyStatuses')
 const selectedFormats = defineModel<BookFormat[]>('selectedFormats')
 const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
@@ -159,6 +172,22 @@ const selectedStatus = computed<string | undefined>({
   },
   set(value) {
     selectedStatuses.value = value ? [value as BookProgressStatus] : []
+  },
+})
+
+const propertyStatusOptions = computed(() =>
+  Object.values(PROPERTY_STATUS_MAP).map((status) => ({
+    label: status.description,
+    value: status.id,
+  })),
+)
+
+const selectedPropertyStatus = computed<string | undefined>({
+  get() {
+    return selectedPropertyStatuses.value?.[0]
+  },
+  set(value) {
+    selectedPropertyStatuses.value = value ? [value as BookPropertyStatus] : []
   },
 })
 

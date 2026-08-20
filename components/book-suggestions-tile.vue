@@ -74,7 +74,8 @@ const options = computed(() => {
   const _books = viewBooks.value ?? []
 
   const unreadBooks = _books.filter(
-    ({ progress: { status } }) => status === 'owned',
+    ({ propertyStatus, progress: { status } }) =>
+      propertyStatus === 'owned' && status === null,
   )
   const unreadBook = unreadBooks[getRandomIndex(unreadBooks)]
 

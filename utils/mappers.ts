@@ -1,5 +1,5 @@
 import type { Author } from '~/types/author'
-import type { BookProgressStatus, ViewBook } from '~/types/book'
+import type { BookProgressStatus, BookPropertyStatus, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 import { sum, uniq } from 'ramda'
@@ -131,12 +131,23 @@ export function getBooksByStatus(
       }
     },
     {
-      owned: 0,
-      'not-owned': 0,
       reading: 0,
       paused: 0,
       read: 0,
       'not-finished': 0,
     },
+  )
+}
+
+export function getBooksByPropertyStatus(
+  books: ViewBook[],
+): Record<BookPropertyStatus, number> {
+  const statuses: BookPropertyStatus[] = ['owned', 'not-owned', 'wishlist']
+  return statuses.reduce(
+    (acc, status) => ({
+      ...acc,
+      [status]: books.filter((book) => book.propertyStatus === status).length,
+    }),
+    { owned: 0, 'not-owned': 0, wishlist: 0 },
   )
 }

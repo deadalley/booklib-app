@@ -1,6 +1,11 @@
 <template>
   <!-- Finish modal -->
-  <bl-modal v-model="showFinishModal" size="sm" icon="IconCircleCheck">
+  <bl-modal
+    v-if="showFinishModal"
+    v-model="showFinishModal"
+    size="sm"
+    icon="IconCircleCheck"
+  >
     <template #title>Finish "{{ book.title }}"</template>
     <p class="text-ink-muted mt-1 text-sm">How did it go?</p>
     <div class="mt-4 flex flex-col gap-2">
@@ -20,7 +25,12 @@
   </bl-modal>
 
   <!-- Log entry modal -->
-  <bl-modal v-model="showLogModal" size="sm" @confirm="onSaveLogEntry">
+  <bl-modal
+    v-if="showLogModal"
+    v-model="showLogModal"
+    size="sm"
+    @confirm="onSaveLogEntry"
+  >
     <template #title>
       {{ editingNote ? 'Edit Log Entry' : 'Log Reading Entry' }}
     </template>
@@ -68,6 +78,7 @@
 
   <!-- Start date modal -->
   <bl-modal
+    v-if="showStartDateModal"
     v-model="showStartDateModal"
     size="sm"
     icon="IconCalendarEvent"
@@ -94,13 +105,54 @@
 
   <div class="paper-sm flex flex-col gap-3 p-5">
     <div class="flex justify-between">
-      <!-- Status -->
-      <bl-chip :variant="statusVariant" rounded>
-        <template #prependIcon="$iconProps">
-          <component :is="statusIcon" v-bind="$iconProps" />
-        </template>
-        {{ statusLabel }}
-      </bl-chip>
+      <div class="flex gap-2">
+        <!-- Property status -->
+        <DropdownMenuRoot>
+          <DropdownMenuTrigger as-child>
+            <bl-chip
+              rounded
+              :color="propertyStatusChipColor"
+              class="cursor-pointer"
+            >
+              <component
+                :is="icons[PROPERTY_STATUS_MAP[currentPropertyStatus].icon]"
+                :size="13"
+                stroke="1.9"
+              />
+              {{ PROPERTY_STATUS_MAP[currentPropertyStatus].description }}
+              <IconChevronDown :size="11" stroke="2" />
+            </bl-chip>
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              align="start"
+              :avoid-collisions="false"
+              position="popper"
+              class="menu-content"
+            >
+              <DropdownMenuItem
+                v-for="status in Object.values(PROPERTY_STATUS_MAP)"
+                :key="status.id"
+                class="menu-item"
+                @click="emit('property-status-select', status.id)"
+              >
+                <component :is="icons[status.icon]" :size="14" stroke="1.8" />
+                {{ status.description }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenuRoot>
+
+        <!-- Reading status chip -->
+        <div v-if="currentStatus !== null" class="flex items-center gap-2">
+          <bl-chip :variant="statusVariant" rounded>
+            <template #prependIcon="$iconProps">
+              <component :is="statusIcon" v-bind="$iconProps" />
+            </template>
+            {{ statusLabel }}
+          </bl-chip>
+        </div>
+      </div>
 
       <!-- Date -->
       <div
@@ -119,7 +171,7 @@
     </div>
 
     <!-- Progress bar -->
-    <div v-if="currentStatus !== 'not-owned'" class="mt-4 flex flex-col gap-4">
+    <div class="mt-4 flex flex-col gap-4">
       <p class="text-primary text-end text-3xl leading-none font-semibold">
         {{ progress }}%
       </p>
@@ -133,10 +185,26 @@
       </p>
     </div>
 
+    <!-- Actions -->
+    <div class="mt-2 flex gap-3">
+      <bl-button
+        v-for="(action, index) in actions"
+        :key="index"
+        :variant="action.variant"
+        expand
+        @click="onActionClick(action)"
+      >
+        <template #prependIcon="$iconProps">
+          <component :is="icons[action.icon]" v-bind="$iconProps" />
+        </template>
+        {{ action.label }}
+      </bl-button>
+    </div>
+
     <!-- Reading: log entry prompt -->
     <template v-if="currentStatus === 'reading'">
       <div
-        class="border-primary bg-primary-50 rounded-scholarly mt-2 flex items-center justify-between border px-4 py-3"
+        class="border-primary bg-primary-100 rounded-scholarly mt-2 flex items-center justify-between border px-4 py-3"
       >
         <p class="text-primary-600 text-sm font-semibold tracking-wide">
           Ready to log today's reading?
@@ -163,23 +231,7 @@
       </div>
     </template>
 
-    <!-- Actions -->
-    <div class="mt-2 flex gap-3">
-      <bl-button
-        v-for="(action, index) in actions"
-        :key="index"
-        :variant="action.variant"
-        expand
-        @click="onActionClick(action)"
-      >
-        <template #prependIcon="$iconProps">
-          <component :is="icons[action.icon]" v-bind="$iconProps" />
-        </template>
-        {{ action.label }}
-      </bl-button>
-    </div>
-
-    <template v-if="currentStatus !== 'not-owned' && currentStatus !== 'owned'">
+    <template v-if="currentStatus !== null">
       <hr class="border-stroke-subtle -mx-5 my-2" />
 
       <div class="flex flex-col gap-3">
@@ -223,21 +275,44 @@
 </template>
 
 <script setup lang="ts">
-import type { BookProgressStatus, Book, BookNote } from '~/types/book'
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
+} from 'radix-vue'
+import type {
+  BookProgressStatus,
+  BookPropertyStatus,
+  Book,
+  BookNote,
+} from '~/types/book'
 import {
   toFullDateCompact,
   toSimpleDate,
   fromSimpleDate,
   now,
 } from '~/utils/date'
-import { icons, IconCheck, IconX, IconCalendarEvent } from '@tabler/icons-vue'
+import {
+  icons,
+  IconCheck,
+  IconX,
+  IconCalendarEvent,
+  IconChevronDown,
+} from '@tabler/icons-vue'
 
 const props = defineProps<{
   book: Book
 }>()
 
 const emit = defineEmits<{
-  (e: 'status-select', status: BookProgressStatus, startedAt?: string): void
+  (
+    e: 'status-select',
+    status: BookProgressStatus | null,
+    startedAt?: string,
+  ): void
+  (e: 'property-status-select', status: BookPropertyStatus): void
   (e: 'log-entry', page: number, note: string, date: string): void
   (
     e: 'update-note',
@@ -261,16 +336,35 @@ const logDate = ref('')
 
 const editingNote = ref<BookNote | null>(null)
 
-const currentStatus = computed(
-  () => props.book.progress.status ?? ('not-owned' as BookProgressStatus),
+const currentPropertyStatus = computed<BookPropertyStatus>(
+  () => props.book.propertyStatus ?? 'not-owned',
 )
 
-const statusLabel = computed(
-  () => PROGRESS_STATUS_MAP[currentStatus.value].description,
+const currentStatus = computed<BookProgressStatus | null>(
+  () => props.book.progress.status ?? null,
 )
-const statusIcon = computed(
-  () => icons[PROGRESS_STATUS_MAP[currentStatus.value].icon],
+
+const propertyStatusChipColor = computed<'primary' | 'secondary' | undefined>(
+  () => {
+    switch (currentPropertyStatus.value) {
+      case 'owned':
+        return 'primary'
+      case 'wishlist':
+        return 'secondary'
+      default:
+        return undefined
+    }
+  },
 )
+
+const statusLabel = computed(() => {
+  if (!currentStatus.value) return ''
+  return PROGRESS_STATUS_MAP[currentStatus.value].description
+})
+const statusIcon = computed(() => {
+  if (!currentStatus.value) return undefined
+  return icons[PROGRESS_STATUS_MAP[currentStatus.value].icon]
+})
 const statusVariant = computed<'primary' | 'secondary' | undefined>(() =>
   currentStatus.value === 'read' ? 'primary' : 'secondary',
 )
@@ -313,7 +407,9 @@ const progress = computed(() => {
 const progressSubtitle = computed(() => {
   const pages = props.book.pages
   if (!pages) {
-    return PROGRESS_STATUS_MAP[currentStatus.value].description
+    return currentStatus.value
+      ? PROGRESS_STATUS_MAP[currentStatus.value].description
+      : ''
   }
 
   const pagesRead = Math.round((pages * progress.value) / 100)
@@ -322,17 +418,17 @@ const progressSubtitle = computed(() => {
 
 const actions = computed<
   {
+    id: string
     icon: keyof typeof icons
     label: string
     variant: 'primary' | 'secondary'
   }[]
 >(() => {
   switch (currentStatus.value) {
-    case 'not-owned':
-      return [{ icon: 'IconPlus', label: 'Add to library', variant: 'primary' }]
-    case 'owned':
+    case null:
       return [
         {
+          id: PROGRESS_STATUS_MAP.reading.id,
           icon: PROGRESS_STATUS_MAP.reading.icon,
           label: 'Start reading',
           variant: 'primary',
@@ -340,13 +436,35 @@ const actions = computed<
       ]
     case 'reading':
       return [
-        { icon: 'IconPlayerPause', label: 'Pause', variant: 'secondary' },
-        { icon: 'IconCircleCheck', label: 'Finish', variant: 'secondary' },
+        {
+          id: 'stop',
+          icon: 'IconNotesOff',
+          label: 'Stop',
+          variant: 'secondary',
+        },
+        {
+          id: PROGRESS_STATUS_MAP.paused.id,
+          icon: 'IconPlayerPause',
+          label: 'Pause',
+          variant: 'secondary',
+        },
+        {
+          id: PROGRESS_STATUS_MAP.read.id,
+          icon: 'IconCircleCheck',
+          label: 'Finish',
+          variant: 'secondary',
+        },
       ]
     case 'read':
       return [
-        { icon: 'IconNotesOff', label: 'Mark as unread', variant: 'secondary' },
         {
+          id: PROGRESS_STATUS_MAP['not-finished'].id,
+          icon: 'IconNotesOff',
+          label: 'Mark as unread',
+          variant: 'secondary',
+        },
+        {
+          id: PROGRESS_STATUS_MAP.reading.id,
           icon: PROGRESS_STATUS_MAP.reading.icon,
           label: 'Start reading again',
           variant: 'primary',
@@ -354,11 +472,29 @@ const actions = computed<
       ]
     case 'paused':
       return [
-        { icon: 'IconCircleCheck', label: 'Finish', variant: 'secondary' },
+        {
+          id: 'stop',
+          icon: 'IconNotesOff',
+          label: 'Stop',
+          variant: 'secondary',
+        },
+        {
+          id: PROGRESS_STATUS_MAP.reading.id,
+          icon: 'IconPlayerPlay',
+          label: 'Resume',
+          variant: 'primary',
+        },
+        {
+          id: PROGRESS_STATUS_MAP.read.id,
+          icon: 'IconCircleCheck',
+          label: 'Finish',
+          variant: 'secondary',
+        },
       ]
     case 'not-finished':
       return [
         {
+          id: PROGRESS_STATUS_MAP.reading.id,
           icon: PROGRESS_STATUS_MAP.reading.icon,
           label: 'Start reading again',
           variant: 'primary',
@@ -439,48 +575,45 @@ function openStartDateModal() {
 }
 
 function onActionClick(action: (typeof actions.value)[number]) {
-  switch (currentStatus.value) {
-    case 'not-owned':
-      emit('status-select', 'owned')
+  switch (action.id) {
+    case 'stop':
+      emit('status-select', null)
       break
-    case 'owned':
-      openStartDateModal()
-      break
-    case 'reading':
-      if (action.label === 'Pause') {
-        emit('status-select', 'paused')
+    case PROGRESS_STATUS_MAP.reading.id:
+      if (currentStatus.value === null) {
+        openStartDateModal()
       } else {
-        showFinishModal.value = true
+        emit('status-select', PROGRESS_STATUS_MAP.reading.id)
       }
       break
-    case 'read':
-      emit('status-select', 'owned')
+    case PROGRESS_STATUS_MAP.paused.id:
+      emit('status-select', PROGRESS_STATUS_MAP.paused.id)
       break
-    case 'paused':
+    case PROGRESS_STATUS_MAP.read.id:
       showFinishModal.value = true
       break
-    case 'not-finished':
-      openStartDateModal()
+    case PROGRESS_STATUS_MAP['not-finished'].id:
+      emit('status-select', PROGRESS_STATUS_MAP['not-finished'].id)
       break
   }
 }
 
 function onFinishBook() {
   showFinishModal.value = false
-  emit('status-select', 'read')
+  emit('status-select', PROGRESS_STATUS_MAP.read.id)
 }
 
 function onDNF() {
   showFinishModal.value = false
-  emit('status-select', 'not-finished')
+  emit('status-select', PROGRESS_STATUS_MAP['not-finished'].id)
 }
 
 function onConfirmStartDate() {
-  const targetStatus =
-    currentStatus.value === 'owned' || currentStatus.value === 'not-finished'
-      ? 'reading'
-      : currentStatus.value
-  emit('status-select', targetStatus, fromSimpleDate(pendingStartDate.value))
+  emit(
+    'status-select',
+    PROGRESS_STATUS_MAP.reading.id,
+    fromSimpleDate(pendingStartDate.value),
+  )
 }
 
 function deleteNote(note: BookNote) {

@@ -1,4 +1,4 @@
-import type { BookFormat, BookProgressStatus, ViewBook } from '~/types/book'
+import type { BookFormat, BookProgressStatus, BookPropertyStatus, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
 export type BookSortValue =
@@ -98,6 +98,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const selectedOriginalLanguages = ref<string[]>([])
   const selectedGenres = ref<string[]>([])
   const selectedStatuses = ref<BookProgressStatus[]>([])
+  const selectedPropertyStatuses = ref<BookPropertyStatus[]>([])
   const selectedFormats = ref<BookFormat[]>([])
   const selectedYearRange = ref<[number, number]>([
     minYear.value,
@@ -211,7 +212,14 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       )
     })
 
-    const filterByFormat = filterByStatus.filter(({ format }) => {
+    const filterByPropertyStatus = filterByStatus.filter(({ propertyStatus }) => {
+      return (
+        !selectedPropertyStatuses.value.length ||
+        (propertyStatus && selectedPropertyStatuses.value.includes(propertyStatus))
+      )
+    })
+
+    const filterByFormat = filterByPropertyStatus.filter(({ format }) => {
       return (
         !selectedFormats.value.length ||
         (format && selectedFormats.value.includes(format))
@@ -235,7 +243,6 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     const booksWithCollections = filterByCollections.map((book) => ({
       ...book,
       isFavorite: isBookInDefaultCollection(book, FAVORITE_COLLECTION_ID),
-      isWishlist: isBookInDefaultCollection(book, WISHLIST_COLLECTION_ID),
     }))
 
     if (sortBy.value === 'custom') {
@@ -328,6 +335,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     selectedOriginalLanguages.value = []
     selectedGenres.value = []
     selectedStatuses.value = []
+    selectedPropertyStatuses.value = []
 
     selectedYearRange.value = [minYear.value, maxYear.value]
     selectedPageRange.value = [minPages.value, maxPages.value]
@@ -366,6 +374,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     selectedOriginalLanguages,
     selectedGenres,
     selectedStatuses,
+    selectedPropertyStatuses,
     selectedFormats,
     selectedYearRange,
     selectedPageRange,
