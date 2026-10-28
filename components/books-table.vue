@@ -55,10 +55,12 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
             href: `/library/books/${book.id}`,
             alt: book.title,
             coverSrc: book.coverSrc,
+            compact: true,
+            class: 'w-fit border-0',
           })
         },
         enableSorting: false,
-        size: 12,
+        size: 8,
       }),
       columnHelper.accessor('title', {
         header: 'Title',
