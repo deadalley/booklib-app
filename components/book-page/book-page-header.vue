@@ -1,53 +1,70 @@
 <template>
-  <header class="mb-12 flex flex-col gap-4">
-    <!-- Title -->
-    <h1>
-      {{ book.title }}
-    </h1>
+  <header class="book-page-hero">
+    <div class="book-page-hero-cover book-page-cover-frame">
+      <NuxtImg
+        v-if="book.coverSrc"
+        :src="book.coverSrc"
+        :alt="book.title"
+        class="size-full object-cover object-center"
+      />
+      <bl-empty-book-image
+        v-else
+        class="rounded-none! p-4! text-base!"
+        :icon-size="28"
+      >
+        {{ book.title }}
+      </bl-empty-book-image>
+    </div>
 
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
-      <!-- Author -->
-      <div class="flex items-baseline gap-3">
-        <p class="text-ink-secondary font-semibold tracking-wide">by</p>
-        <NuxtLink
+    <div class="flex min-w-0 flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <h1 class="book-page-title">{{ book.title }}</h1>
+        <p
           v-if="authorName"
-          class="border-stroke hover:text-ink-secondary border-b text-xl font-bold tracking-wide"
-          :to="`/authors/${book.author}`"
+          class="text-ink-secondary text-[1.125rem] font-medium"
         >
-          {{ authorName }}
-        </NuxtLink>
+          by
+          <span class="text-ink-primary border-stroke border-b font-bold">
+            {{ authorName }}
+          </span>
+        </p>
       </div>
 
-      <p class="text-ink-subtle hidden text-2xl md:block">•</p>
-
-      <!-- Rating -->
       <div
-        class="text-ink-primary inline-flex items-center gap-1 text-lg font-semibold"
+        class="text-ink-primary flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.9375rem] font-semibold"
       >
-        <IconStarFilled
-          :size="ICON_SIZE_SMALL"
-          stroke="1.5"
-          class="text-primary"
-        />
-        {{ ratingSummary }}
+        <div
+          class="inline-flex items-center gap-2"
+          :title="book.rating ? `${ratingSummary} out of 5` : undefined"
+        >
+          <bl-rating :rating="book.rating ?? 0" :icon-size="16" />
+          <span>{{ ratingSummary }}</span>
+        </div>
+        <span class="bg-stroke h-4 w-px" aria-hidden="true" />
+        <div v-if="formattedDate" class="inline-flex items-center gap-2">
+          <span class="text-ink-muted font-medium">Added</span>
+          <span>{{ formattedDate }}</span>
+        </div>
       </div>
 
-      <p class="text-ink-subtle hidden text-2xl md:block">•</p>
-
-      <!-- Created date -->
-      <div
-        v-if="formattedDate"
-        class="flex items-baseline gap-3 leading-tight md:flex-1"
-      >
-        <p class="text-ink-secondary font-semibold tracking-wide">Added on</p>
-        <h6 class="font-body font-bold">{{ formattedDate }}</h6>
+      <div v-if="(book.genres ?? []).length" class="flex flex-wrap gap-2">
+        <bl-chip v-for="genre in book.genres" :key="genre" rounded>
+          {{ genre }}
+        </bl-chip>
       </div>
+
+      <bl-book-page-default-collections
+        class="mt-1"
+        :selected="selectedDefaultCollections"
+        @default-collection-change="
+          (id) => $emit('default-collection-change', id)
+        "
+      />
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { IconStarFilled } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import { toFullDateCompact } from '~/utils/date'
@@ -55,6 +72,11 @@ import { toFullDateCompact } from '~/utils/date'
 const props = defineProps<{
   book: Book
   authors: Author[]
+  selectedDefaultCollections: Record<string, boolean>
+}>()
+
+defineEmits<{
+  (e: 'default-collection-change', collectionId: string): void
 }>()
 
 const authorName = computed(
@@ -64,7 +86,7 @@ const authorName = computed(
 const ratingSummary = computed(() => {
   const rating = props.book.rating
 
-  if (!rating) return '-'
+  if (!rating) return 'Not rated'
 
   return Number.isInteger(rating) ? rating.toFixed(0) : rating.toFixed(1)
 })
@@ -72,4 +94,23 @@ const ratingSummary = computed(() => {
 const formattedDate = computed(() => toFullDateCompact(props.book.createdAt))
 </script>
 
-<style scoped></style>
+<style scoped>
+@reference '../../assets/css/main.css';
+
+.book-page-hero {
+  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-5;
+  @apply @min-[480px]:grid-cols-[9rem_minmax(0,1fr)] @min-[480px]:gap-6;
+  @apply @min-[720px]:grid-cols-[12rem_minmax(0,1fr)] @min-[720px]:gap-8;
+  @apply @min-[960px]:grid-cols-[14rem_minmax(0,1fr)] @min-[960px]:gap-10;
+}
+
+.book-page-hero-cover {
+  @apply w-36 @min-[720px]:w-48 @min-[960px]:w-56;
+}
+
+.book-page-title {
+  @apply leading-[1.05] wrap-anywhere;
+  font-size: clamp(1.75rem, 5cqi, 2.986rem);
+  text-wrap: balance;
+}
+</style>

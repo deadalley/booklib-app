@@ -1,9 +1,9 @@
 <template>
   <section
     v-if="book && !editing && !isNew"
-    class="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto md:overflow-hidden"
+    class="@container mx-auto flex w-full max-w-[90rem] flex-col gap-8"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <bl-breadcrumbs
         :items="[
           { label: 'Library', to: '../../' },
@@ -12,10 +12,20 @@
         ]"
       />
 
-      <div class="flex items-center gap-2 self-start">
+      <div class="flex items-center gap-2">
+        <bl-button variant="secondary" @click="onEdit(true)">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Edit
+        </bl-button>
         <bl-modal size="sm" @confirm="deleteBook">
           <template #trigger>
-            <bl-button variant="secondary">
+            <bl-button
+              variant="secondary"
+              aria-label="Delete book"
+              title="Delete book"
+            >
               <template #prependIcon>
                 <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
               </template>
@@ -30,82 +40,48 @@
           <template #cancel-label>Cancel</template>
           <template #action-label>Delete</template>
         </bl-modal>
-        <bl-button variant="secondary" @click="onEdit(true)">
-          <template #prependIcon>
-            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-          </template>
-        </bl-button>
       </div>
     </div>
 
-    <div
-      class="grid min-h-0 flex-1 gap-16 overflow-y-auto md:h-full xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[24rem_minmax(0,1fr)]"
-    >
-      <aside class="flex flex-col gap-4 lg:overflow-y-auto">
-        <bl-book-page-cover :book="book" editing />
+    <bl-book-page-header
+      :book="book"
+      :authors="authors"
+      :selected-default-collections="selectedDefaultCollections"
+      @default-collection-change="onDefaultCollectionChange"
+    />
 
-        <bl-book-page-default-collections
+    <div class="book-page-body">
+      <div class="book-page-body-progress">
+        <bl-book-page-progress
           :book="book"
-          @default-collection-change="onDefaultCollectionChange"
+          @status-select="onSelectProgress"
+          @property-status-select="onPropertyStatusSelect"
+          @log-entry="onLogEntry"
+          @update-note="onUpdateNote"
+          @delete-note="onDeleteNote"
         />
-      </aside>
+      </div>
 
-      <div
-        class="flex min-h-0 max-w-7xl flex-col gap-6 pr-1 pb-2 md:h-full lg:overflow-y-auto"
-      >
-        <section class="main-content-section">
-          <bl-book-page-header :book="book" :authors="authors" />
+      <div class="book-page-body-main">
+        <section class="book-page-section">
+          <p class="book-page-section-title">Summary</p>
+          <p class="summary" :class="{ empty: !book.summary }">
+            {{ book.summary || 'No summary yet.' }}
+          </p>
         </section>
 
-        <section class="main-content-section">
+        <section class="book-page-section">
+          <p class="book-page-section-title">Details</p>
           <bl-book-page-fields :book="book" />
         </section>
 
-        <section v-if="(book.genres ?? []).length" class="main-content-section">
-          <div class="flex flex-col gap-4">
-            <p class="section-title">Genres</p>
-            <div class="flex flex-wrap gap-2">
-              <bl-chip
-                v-for="genre in book.genres"
-                :key="genre"
-                variant="primary"
-              >
-                {{ genre }}
-              </bl-chip>
-            </div>
+        <section v-if="collectionsDisplayed.length" class="book-page-section">
+          <div class="flex items-center justify-between gap-3">
+            <p class="book-page-section-title">Collections</p>
+            <bl-total-tag>{{ collectionsDisplayed.length }}</bl-total-tag>
           </div>
-        </section>
-
-        <section class="main-content-section">
-          <div class="flex flex-col gap-4">
-            <p class="section-title">Summary</p>
-            <p class="text-ink-secondary text-lg font-normal tracking-wider">
-              {{ book.summary || 'No summary available.' }}
-            </p>
-          </div>
-        </section>
-
-        <section class="main-content-section">
-          <div class="flex flex-col gap-4">
-            <p class="section-title">Progress</p>
-            <bl-book-page-progress
-              :book="book"
-              @status-select="onSelectProgress"
-              @property-status-select="onPropertyStatusSelect"
-              @log-entry="onLogEntry"
-              @update-note="onUpdateNote"
-              @delete-note="onDeleteNote"
-            />
-          </div>
-        </section>
-
-        <section
-          v-if="collectionsDisplayed.length"
-          class="main-content-section"
-        >
-          <p class="section-title">Collections</p>
           <div
-            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+            class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4"
           >
             <bl-collection-tile
               v-for="collection in collectionsDisplayed"
@@ -118,8 +94,8 @@
           </div>
         </section>
 
-        <section v-if="bookGoals.length" class="main-content-section">
-          <p class="section-title">Goals</p>
+        <section v-if="bookGoals.length" class="book-page-section">
+          <p class="book-page-section-title">Goals</p>
           <div
             class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
           >
@@ -178,7 +154,12 @@ import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
-import type { Book, BookNote, BookProgressStatus, BookPropertyStatus } from '~/types/book'
+import type {
+  Book,
+  BookNote,
+  BookProgressStatus,
+  BookPropertyStatus,
+} from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { ICON_SIZE_SMALL } from '~/utils/constants'
@@ -596,11 +577,34 @@ definePageMeta({
 <style scoped>
 @reference '../../../assets/css/main.css';
 
-.section-title {
-  @apply text-primary text-base font-semibold tracking-widest uppercase;
+.book-page-body {
+  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-6;
+  grid-template-areas: 'progress' 'main';
+  @apply @min-[960px]:grid-cols-[minmax(0,1fr)_23rem];
 }
 
-.main-content-section {
-  @apply border-stroke-subtle flex flex-col gap-4 border-b pb-6;
+@container (min-width: 960px) {
+  .book-page-body {
+    grid-template-areas: 'main progress';
+  }
+}
+
+.book-page-body-progress {
+  @apply min-w-0 @min-[960px]:sticky @min-[960px]:top-0;
+  grid-area: progress;
+}
+
+.book-page-body-main {
+  @apply flex min-w-0 flex-col gap-6;
+  grid-area: main;
+}
+
+.summary {
+  @apply text-ink-secondary max-w-[68ch] text-[1.0625rem] leading-[1.65];
+  text-wrap: pretty;
+}
+
+.summary.empty {
+  @apply text-ink-muted;
 }
 </style>

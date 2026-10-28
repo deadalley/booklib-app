@@ -10,7 +10,9 @@
   .button-primary.secondary {
     @apply border-secondary bg-secondary text-ink-inverse hover:bg-secondary/80 active:bg-secondary-800 hover:border-transparent active:border-transparent;
   }
-  .button-secondary:not(.primary):not(.secondary):not(.button-disabled) {
+  .button-secondary:not(.primary):not(.secondary):not(.button-disabled):not(
+      .button-active
+    ) {
     @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-surface-subtle active:bg-stroke-subtle;
   }
   .button-secondary.primary {
@@ -28,6 +30,9 @@
   }
   .button-disabled {
     @apply bg-surface-subtle! text-ink-muted! border-surface-subtle;
+  }
+  .button-active {
+    @apply border-primary/40 bg-primary/10 text-primary hover:bg-primary/14;
   }
 
   /* Switches */
@@ -461,4 +466,15 @@
 }
 .export-format-radio-dot {
   @apply bg-primary h-2 w-2 rounded-full;
+}
+
+/* Book page */
+.book-page-section {
+  @apply border-stroke-subtle flex flex-col gap-4 border-b pb-6 last:border-b-0 last:pb-0;
+}
+.book-page-section-title {
+  @apply text-primary text-[0.8125rem] font-bold tracking-[0.12em] uppercase;
+}
+.book-page-cover-frame {
+  @apply rounded-scholarly border-stroke-subtle bg-surface-subtle aspect-[2/3] w-full overflow-hidden border shadow-md;
 }

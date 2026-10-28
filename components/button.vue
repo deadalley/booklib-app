@@ -8,6 +8,7 @@
       'button-secondary': variant === 'secondary',
       'button-tertiary': variant === 'tertiary',
       'button-disabled': !!disabled || !!loading,
+      'button-active': !!pressed && !disabled && !loading,
       primary: color === 'primary' && !disabled && !loading,
       secondary: color === 'secondary' && !disabled && !loading,
       [size]: !!size,
@@ -23,6 +24,7 @@
       ),
     }"
     :disabled="disabled"
+    :aria-pressed="pressed"
   >
     <slot name="prependIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
     <slot />
@@ -40,7 +42,8 @@ withDefaults(
     variant?: 'primary' | 'secondary' | 'tertiary'
     color?: 'primary' | 'secondary'
     size?: 'sm' | 'md' | 'lg'
+    pressed?: boolean
   }>(),
-  { variant: 'primary', size: 'md' },
+  { variant: 'primary', size: 'md', pressed: undefined },
 )
 </script>
