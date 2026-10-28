@@ -483,7 +483,11 @@ async function onDefaultCollectionChange(collectionId: string) {
   }
 }
 
-async function onLogEntry(page: number, note: string, date: string) {
+async function onLogEntry(
+  page: number | undefined,
+  note: string,
+  date: string,
+) {
   if (!book.value || isNew.value) return
 
   book.value.progress.currentPage = page

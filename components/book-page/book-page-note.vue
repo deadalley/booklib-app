@@ -1,78 +1,100 @@
 <template>
-  <div class="note-section">
-    <div class="note-date-wrapper">
-      <IconNote :size="ICON_SIZE_SMALL" stroke="1.5" class="note-icon" />
-    </div>
-
-    <div class="note-values-wrapper">
-      <div class="flex items-center gap-3">
-        <span class="note-date">
-          {{ new Date(note.createdAt).toLocaleDateString() }}
-        </span>
-        <span v-if="note.page !== undefined" class="note-page">
+  <li class="log-item" :class="{ latest }">
+    <div class="flex min-w-0 flex-1 flex-col gap-[0.1875rem]">
+      <div class="flex items-baseline gap-2">
+        <span class="log-date">{{ formattedDate }}</span>
+        <span v-if="note.page !== undefined" class="log-page">
           p. {{ note.page }}
         </span>
       </div>
-      <div v-if="note.content" class="note-values">
-        <p class="note-content">{{ note.content }}</p>
-      </div>
+      <p v-if="note.content" class="log-text">{{ note.content }}</p>
     </div>
 
-    <bl-icon-button variant="tertiary" class="p-0!" @click="emit('edit')">
-      <template #default="iconProps">
-        <IconEdit v-bind="iconProps" />
-      </template>
-    </bl-icon-button>
-    <bl-icon-button variant="tertiary" class="p-0!" @click="emit('delete')">
-      <template #default="iconProps">
-        <IconTrash v-bind="iconProps" />
-      </template>
-    </bl-icon-button>
-  </div>
+    <div class="log-tools">
+      <bl-icon-button
+        variant="tertiary"
+        class="p-1!"
+        aria-label="Edit entry"
+        @click="emit('edit')"
+      >
+        <template #default="iconProps">
+          <IconEdit v-bind="iconProps" />
+        </template>
+      </bl-icon-button>
+      <bl-icon-button
+        variant="tertiary"
+        class="p-1!"
+        aria-label="Delete entry"
+        @click="emit('delete')"
+      >
+        <template #default="iconProps">
+          <IconTrash v-bind="iconProps" />
+        </template>
+      </bl-icon-button>
+    </div>
+  </li>
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconNote, IconTrash } from '@tabler/icons-vue'
-import { ICON_SIZE_SMALL } from '~/utils/constants'
+import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import type { BookNote } from '~/types/book'
 
-defineProps<{ note: BookNote }>()
+const props = defineProps<{ note: BookNote; latest?: boolean }>()
 const emit = defineEmits<{ (e: 'edit' | 'delete'): void }>()
+
+const formattedDate = computed(() =>
+  new Date(props.note.createdAt).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }),
+)
 </script>
 
 <style scoped>
 @reference '../../assets/css/main.css';
 
-.note-section {
-  @apply flex items-start justify-between gap-2 px-3 py-2;
-  @apply bg-surface-elevated rounded-scholarly border-stroke border border-dashed;
+.log-item {
+  @apply relative flex items-start gap-2 py-2.5;
 }
 
-.note-content {
-  @apply text-ink-primary flex-1 whitespace-pre-wrap;
+.log-item + .log-item {
+  @apply border-stroke-subtle border-t;
 }
 
-.note-page {
-  @apply text-ink-muted text-sm font-semibold;
+.log-item::before {
+  @apply bg-surface-elevated border-primary-300 absolute top-4 -left-[1.125rem] box-border size-[11px] rounded-full border-2;
+  content: '';
 }
 
-.note-icon {
-  @apply text-primary mt-0.5 shrink-0;
+.log-item.latest::before {
+  @apply bg-primary border-primary;
 }
 
-.note-date-wrapper {
-  @apply flex flex-col items-end gap-2;
+.log-date {
+  @apply text-ink-primary text-[0.8125rem] font-bold;
 }
 
-.note-date {
-  @apply text-primary text-base font-medium tracking-wider;
+.log-page {
+  @apply text-primary bg-primary-100 rounded-full px-[0.4375rem] py-px text-[0.6875rem] font-bold tracking-[0.06em];
 }
 
-.note-values-wrapper {
-  @apply mr-2 flex min-w-0 flex-1 flex-col gap-2;
+.log-text {
+  @apply text-ink-secondary text-[0.8125rem] leading-[1.45] whitespace-pre-wrap;
 }
 
-.note-values {
-  @apply flex gap-3;
+.log-tools {
+  @apply flex gap-0.5 opacity-0 transition-opacity duration-150;
+}
+
+.log-item:hover .log-tools,
+.log-item:focus-within .log-tools {
+  @apply opacity-100;
+}
+
+@media (hover: none) {
+  .log-tools {
+    @apply opacity-100;
+  }
 }
 </style>
