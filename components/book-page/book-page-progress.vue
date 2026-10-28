@@ -103,6 +103,34 @@
     <template #action-label>Save</template>
   </bl-modal>
 
+  <!-- DNF follow-up modal -->
+  <bl-modal
+    v-if="showDnfModal"
+    v-model="showDnfModal"
+    size="sm"
+    icon="IconNote"
+    @confirm="onSaveDnfNote"
+  >
+    <template #title>Would you like to add a comment?</template>
+    <div class="flex flex-col gap-4">
+      <!-- prettier-ignore -->
+      <p class="text-ink-muted text-sm">
+        Note why you stopped reading <b class="text-ink-primary">{{ book.title }}</b>{{ dnfPageClause }}.
+      </p>
+      <bl-input
+        v-model="dnfNote"
+        type="textarea"
+        label="Note"
+        placeholder="What made you stop?"
+        :rows="4"
+        autofocus
+        editing
+      />
+    </div>
+    <template #cancel-label>Skip</template>
+    <template #action-label>Save note</template>
+  </bl-modal>
+
   <div class="progress-card">
     <div class="flex flex-wrap items-baseline justify-between gap-3">
       <p class="book-page-section-title">Progress</p>
@@ -341,6 +369,8 @@ const emit = defineEmits<{
 const showStartDateModal = ref(false)
 const pendingStartDate = ref('')
 const showFinishModal = ref(false)
+const showDnfModal = ref(false)
+const dnfNote = ref('')
 const showLogModal = ref(false)
 const logPage = ref<string | undefined>(undefined)
 const logNote = ref('')
@@ -532,7 +562,7 @@ const actions = computed<
 
 const sortedNotes = computed(() =>
   [...(props.book.progress.notes ?? [])]
-    .filter((note) => note.page !== undefined)
+    .filter((note) => note.page !== undefined || note.content)
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -631,6 +661,27 @@ function onFinishBook() {
 function onDNF() {
   showFinishModal.value = false
   emit('status-select', PROGRESS_STATUS_MAP['not-finished'].id)
+  dnfNote.value = ''
+  showDnfModal.value = true
+}
+
+const dnfPageClause = computed(() =>
+  props.book.progress.currentPage
+    ? ` at page ${props.book.progress.currentPage}`
+    : '',
+)
+
+function onSaveDnfNote() {
+  const content = dnfNote.value.trim()
+
+  if (content) {
+    emit(
+      'log-entry',
+      props.book.progress.currentPage ?? undefined,
+      content,
+      now(),
+    )
+  }
 }
 
 function onConfirmStartDate() {

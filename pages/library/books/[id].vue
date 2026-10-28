@@ -490,7 +490,7 @@ async function onLogEntry(
 ) {
   if (!book.value || isNew.value) return
 
-  book.value.progress.currentPage = page
+  book.value.progress.currentPage = page ?? book.value.progress.currentPage
   book.value.progress.notes = [
     ...(book.value.progress.notes ?? []),
     { createdAt: date, content: note, page },
