@@ -4,10 +4,36 @@
       v-if="open"
       class="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4"
     >
-      <div class="bulk-actions-bar pointer-events-auto">
+      <div
+        class="bulk-actions-bar pointer-events-auto"
+        role="toolbar"
+        aria-label="Bulk actions"
+      >
         <div class="bulk-actions-section">
           <span class="bulk-actions-count">{{ selectedBooksCount }}</span>
-          <p class="bulk-actions-title">Items Selected</p>
+          <div class="flex flex-col gap-0.5">
+            <p class="bulk-actions-title">
+              {{ selectedBooksCount === 1 ? 'Item' : 'Items' }} Selected
+            </p>
+            <div class="flex min-h-4 gap-3">
+              <button
+                v-if="selectedBooksCount < totalBooksCount"
+                type="button"
+                class="bulk-actions-link"
+                @click="emit('select-all')"
+              >
+                Select all {{ totalBooksCount }}
+              </button>
+              <button
+                v-if="selectedBooksCount > 0"
+                type="button"
+                class="bulk-actions-link"
+                @click="emit('clear')"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="bulk-actions-divider" />
@@ -123,6 +149,7 @@ type ActionOption = {
 
 const props = defineProps<{
   selectedBooksCount: number
+  totalBooksCount: number
   hasSelectedBooks: boolean
   collectionOptions: ActionOption[]
   authorOptions: ActionOption[]
@@ -131,7 +158,7 @@ const props = defineProps<{
 const open = defineModel<boolean>({ default: false })
 
 const emit = defineEmits<{
-  (e: 'close' | 'delete'): void
+  (e: 'close' | 'delete' | 'select-all' | 'clear'): void
   (e: 'move-to-collection' | 'edit-author', valueId: string): void
 }>()
 
@@ -150,6 +177,29 @@ watch(open, (isOpen) => {
     selectedAuthorId.value = undefined
   }
 })
+
+const anyModalOpen = computed(
+  () =>
+    moveCollectionModalOpen.value ||
+    editAuthorModalOpen.value ||
+    deleteModalOpen.value,
+)
+
+function onKeydown(event: KeyboardEvent) {
+  if (
+    event.key !== 'Escape' ||
+    !open.value ||
+    anyModalOpen.value ||
+    document.querySelector('[role="dialog"]')
+  ) {
+    return
+  }
+
+  onClose()
+}
+
+onMounted(() => document.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 function onClose() {
   open.value = false
@@ -179,7 +229,8 @@ function onAuthorConfirm() {
 @reference '../assets/css/main.css';
 
 .bulk-actions-bar {
-  @apply bg-surface-inverse text-ink-inverse flex items-center gap-6 rounded-xl px-6 py-4 shadow-2xl;
+  @apply bg-surface-inverse text-ink-inverse flex max-w-full flex-wrap items-center justify-center gap-6 rounded-xl px-6 py-4 shadow-2xl;
+  @apply max-sm:gap-3 max-sm:px-4 max-sm:py-3;
 }
 
 .bulk-actions-section {
@@ -191,7 +242,11 @@ function onAuthorConfirm() {
 }
 
 .bulk-actions-title {
-  @apply text-ink-inverse text-base font-medium tracking-wider;
+  @apply text-ink-inverse text-base font-medium tracking-wider whitespace-nowrap;
+}
+
+.bulk-actions-link {
+  @apply text-ink-inverse/65 hover:text-ink-inverse cursor-pointer text-xs font-semibold tracking-wide underline underline-offset-2;
 }
 
 .bulk-actions-subtitle {
@@ -199,7 +254,7 @@ function onAuthorConfirm() {
 }
 
 .bulk-actions-divider {
-  @apply bg-ink-inverse/15 h-10 w-px;
+  @apply bg-ink-inverse/15 h-10 w-px max-sm:hidden;
 }
 
 .bulk-action-btn {

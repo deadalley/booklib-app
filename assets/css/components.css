@@ -86,8 +86,21 @@
   .book-tile-status-to-read {
     @apply bg-stroke-strong text-ink-inverse;
   }
-  .book-tile-selected-badge {
-    @apply bg-primary text-ink-inverse absolute right-3 bottom-3 inline-flex items-center justify-center rounded-full p-1;
+  .book-tile.selectable {
+    @apply cursor-pointer;
+  }
+  .book-tile.selectable:hover {
+    @apply border-stroke-strong shadow-md shadow-black/10;
+  }
+  .book-tile.selected,
+  .book-tile.selected:hover {
+    @apply border-primary ring-primary shadow-md ring-2 shadow-black/10;
+  }
+  .book-tile-select {
+    @apply border-surface-elevated bg-surface-dark/35 text-ink-inverse absolute right-3 bottom-3 inline-flex size-6 items-center justify-center rounded-full border-2 shadow-sm;
+  }
+  .book-tile-select.on {
+    @apply bg-primary border-primary;
   }
   .book-tile-content {
     @apply flex flex-1 flex-col justify-between gap-2 p-4;

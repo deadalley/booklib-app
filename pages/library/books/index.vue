@@ -56,7 +56,11 @@
       </bl-tooltip>
       <bl-tooltip>
         <template #tooltip-content>Bulk actions</template>
-        <bl-button variant="secondary" @click="editing = true">
+        <bl-button
+          variant="secondary"
+          :pressed="editing"
+          @click="editing ? onCancel() : (editing = true)"
+        >
           <template #prependIcon="iconProps">
             <IconStack2 v-bind="iconProps" />
           </template>
@@ -83,6 +87,7 @@
       @update:page="onPageChange"
       @book-select="onBookSelect"
     />
+    <div v-if="editing" class="h-36 shrink-0" aria-hidden="true" />
     <bl-empty
       v-if="books?.length >= 0 && sortedBooks?.length === 0"
       icon="IconBooks"
@@ -126,10 +131,13 @@
   <bl-book-bulk-actions
     v-model="editing"
     :selected-books-count="selectedBooksCount"
+    :total-books-count="sortedBooks.length"
     :has-selected-books="hasSelectedBooks"
     :collection-options="collectionActionOptions"
     :author-options="authorActionOptions"
     @close="onCancel"
+    @select-all="selectAll"
+    @clear="clearSelectedBooks"
     @move-to-collection="onMoveBooksToCollection"
     @edit-author="onEditBooksAuthor"
     @delete="onDeleteSelectedBooks"
@@ -260,6 +268,14 @@ const authorActionOptions = computed(() =>
 function clearSelectedBooks() {
   viewBooks.value.forEach((book) => {
     book.selected = false
+  })
+}
+
+function selectAll() {
+  const ids = new Set(sortedBooks.value.map(({ id }) => id))
+
+  viewBooks.value.forEach((book) => {
+    if (ids.has(book.id)) book.selected = true
   })
 }
 
