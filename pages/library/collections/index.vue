@@ -59,12 +59,13 @@
         <bl-expanded-collection
           v-for="collection in filteredCollectionsByPage"
           :key="collection.id"
-          v-model:open="allExpanded"
+          :open="isOpen(collection.id)"
           collection-type="collections"
           :collection="collection"
           :books="booksByCollectionId[collection.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
           :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
+          @update:open="(value) => (openOverrides[collection.id] = value)"
           @delete="deleteCollection"
         />
       </div>
@@ -123,9 +124,15 @@ function onPageChange(page: number) {
 }
 
 const allExpanded = ref(true)
+const openOverrides = ref<Record<string, boolean>>({})
+
+function isOpen(id: Collection['id']) {
+  return openOverrides.value[id] ?? allExpanded.value
+}
 
 function toggleAll() {
   allExpanded.value = !allExpanded.value
+  openOverrides.value = {}
 }
 
 async function refresh() {
