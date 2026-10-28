@@ -230,6 +230,8 @@ watch(isNew, () => {
 async function fetchBook() {
   if (isNew.value) {
     book.value = {
+      collections: [],
+      genres: [],
       progress: { status: null, startedAt: null, finishedAt: null, notes: [] },
     } as unknown as Book
   } else {
