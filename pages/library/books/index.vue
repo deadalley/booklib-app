@@ -199,6 +199,7 @@ const {
   selectedOriginalLanguages,
   selectedGenres,
   selectedStatuses,
+  selectedPropertyStatuses,
   selectedFormats,
   selectedYearRange,
   selectedPageRange,

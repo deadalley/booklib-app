@@ -397,6 +397,7 @@ async function onSubmit() {
             ? (authorNameToId[book.author as string]?.id ?? null)
             : null,
           progress_status: progress.status,
+          property_status: book.propertyStatus,
           cover_src: book.coverSrc,
           original_title: book.originalTitle,
           original_language: book.originalLanguage,

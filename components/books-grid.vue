@@ -37,6 +37,10 @@
 import draggable from 'vuedraggable'
 import type { ViewBook } from '~/types/book'
 import type { icons } from '@tabler/icons-vue'
+import {
+  DEFAULT_COLLECTION_ICONS,
+  FAVORITE_COLLECTION_ID,
+} from '~/utils/constants'
 
 const props = defineProps<{
   small?: boolean
