@@ -16,14 +16,14 @@
             }"
             :style="{
               padding: header.column.id === 'checked' ? '0' : undefined,
-              width:
-                header.column.getSize() === 0
-                  ? 'auto'
-                  : `${header.column.getSize()}%`,
+              width: columnWidth(header.column),
             }"
             @click="header.column.getToggleSortingHandler()?.($event)"
           >
-            <span v-if="!header.isPlaceholder">
+            <span
+              v-if="!header.isPlaceholder"
+              :class="{ 'justify-center': header.column.id === 'checked' }"
+            >
               <FlexRender
                 :render="header.column.columnDef.header"
                 :props="header.getContext()"
@@ -61,6 +61,7 @@
           :key="row.id"
           :class="{
             'hover:bg-surface-subtle/40 cursor-pointer': !!rowClickable,
+            'bg-primary-50': withCheck && row.getIsSelected(),
           }"
           @click="rowClickable ? $emit('click:row', row.original) : undefined"
         >
@@ -72,10 +73,7 @@
             }"
             :style="{
               padding: cell.column.id === 'checked' ? '0' : undefined,
-              width:
-                cell.column.getSize() === 0
-                  ? 'auto'
-                  : `${cell.column.getSize()}%`,
+              width: columnWidth(cell.column),
             }"
           >
             <FlexRender
@@ -119,6 +117,7 @@ import {
   FlexRender,
 } from '@tanstack/vue-table'
 import type {
+  Column,
   ColumnDef,
   ColumnOrderState,
   RowSelectionState,
@@ -126,7 +125,6 @@ import type {
   HeaderContext,
 } from '@tanstack/vue-table'
 import { IconSelector, IconChevronUp, IconChevronDown } from '@tabler/icons-vue'
-import { BlCheckbox } from '#components'
 
 const props = defineProps<{
   data: T[]
@@ -148,6 +146,29 @@ const rowSelection = ref<RowSelectionState>(
   ),
 )
 
+watch(
+  () => props.data.map(({ id, selected }) => [id, selected] as const),
+  (rows) => {
+    const next = { ...rowSelection.value }
+    let changed = false
+
+    rows.forEach(([id, selected]) => {
+      if (selected !== undefined && !!next[id] !== selected) {
+        next[id] = selected
+        changed = true
+      }
+    })
+
+    if (changed) rowSelection.value = next
+  },
+)
+
+function columnWidth(column: Column<T, unknown>) {
+  if (column.id === 'checked') return '52px'
+
+  return column.getSize() === 0 ? 'auto' : `${column.getSize()}%`
+}
+
 const emit = defineEmits<{
   (e: 'click:row', val: T): void
   (e: 'select:row', val: { id: T['id']; selected: boolean }): void
@@ -164,9 +185,12 @@ const table = useVueTable({
         {
           id: 'checked',
           header: (info: HeaderContext<T, string | undefined>) => {
-            return h(BlCheckbox, {
-              id: 'all-checked',
-              modelValue: info.table.getIsAllRowsSelected(),
+            return h('input', {
+              type: 'checkbox',
+              class: 'table-check',
+              'aria-label': 'Select all rows',
+              checked: info.table.getIsAllRowsSelected(),
+              indeterminate: info.table.getIsSomeRowsSelected(),
               onChange: info.table.getToggleAllRowsSelectedHandler(),
             })
           },
@@ -175,9 +199,12 @@ const table = useVueTable({
               return null
             }
 
-            return h(BlCheckbox, {
-              id: `${info.row.original.id}-checked`,
-              modelValue: info.row.getIsSelected(),
+            return h('input', {
+              type: 'checkbox',
+              class: 'table-check',
+              'aria-label': 'Select row',
+              checked: info.row.getIsSelected(),
+              onClick: (event: MouseEvent) => event.stopPropagation(),
               onChange: info.row.getToggleSelectedHandler(),
             })
           },
@@ -227,3 +254,11 @@ const table = useVueTable({
   },
 })
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+.table-check {
+  @apply accent-primary m-0 size-4 cursor-pointer align-middle;
+}
+</style>

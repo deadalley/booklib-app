@@ -1,20 +1,27 @@
 <template>
-  <div class="grid grid-cols-3 gap-6">
-    <div
-      v-for="field in fields"
-      :key="field.label"
-      class="bg-surface-canvas/70 flex flex-col gap-1 rounded-2xl p-4"
+  <div class="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-6">
+    <dl
+      v-for="(group, index) in fieldGroups"
+      :key="index"
+      class="m-0 flex min-w-0 flex-col gap-4"
     >
-      <p class="label">{{ field.label }}</p>
-      <div class="flex items-center gap-2">
-        <component
-          :is="icons[field.icon]"
-          v-if="field.icon"
-          :size="ICON_SIZE_SMALL"
-        />
-        <p class="value">{{ field.value || '-' }}</p>
+      <div
+        v-for="field in group"
+        :key="field.label"
+        class="flex min-w-0 flex-col gap-1"
+      >
+        <dt class="label">{{ field.label }}</dt>
+        <dd class="value" :class="{ empty: !field.value }">
+          <component
+            :is="icons[field.icon]"
+            v-if="field.icon"
+            :size="16"
+            stroke="1.6"
+          />
+          {{ field.value || '—' }}
+        </dd>
       </div>
-    </div>
+    </dl>
   </div>
 </template>
 
@@ -24,41 +31,50 @@ import type { Book } from '~/types/book'
 import languageOptions from '~/public/languages-2.json'
 import { BOOK_FORMAT_MAP } from '~/utils/constants'
 
+type Field = {
+  label: string
+  value?: string | null
+  icon?: keyof typeof icons
+}
+
 const props = defineProps<{
   book: Book
 }>()
 
-const fields = computed(() => {
+function languageLabel(code: string | null) {
+  return code
+    ? (languageOptions[code as keyof typeof languageOptions] ?? code)
+    : undefined
+}
+
+const fieldGroups = computed<Field[][]>(() => {
+  const format = props.book.format
+    ? BOOK_FORMAT_MAP[props.book.format]
+    : undefined
+
   return [
-    { label: 'Publisher', value: props.book.publisher },
-    {
-      label: 'Language',
-      value: props.book.language
-        ? (languageOptions[
-            props.book.language as keyof typeof languageOptions
-          ] ?? props.book.language)
-        : undefined,
-    },
-    { label: 'Year', value: props.book.year?.toString() },
-    { label: 'Original Title', value: props.book.originalTitle },
-    {
-      label: 'Original Language',
-      value: props.book.originalLanguage
-        ? (languageOptions[
-            props.book.originalLanguage as keyof typeof languageOptions
-          ] ?? props.book.originalLanguage)
-        : undefined,
-    },
-    { label: 'Pages', value: props.book.pages?.toString() },
-    {
-      label: 'Format',
-      value: props.book.format
-        ? BOOK_FORMAT_MAP[props.book.format]?.description
-        : undefined,
-      icon: props.book.format
-        ? (BOOK_FORMAT_MAP[props.book.format]?.icon as keyof typeof icons)
-        : undefined,
-    },
+    [
+      { label: 'Publisher', value: props.book.publisher },
+      { label: 'Original Title', value: props.book.originalTitle },
+    ],
+    [
+      { label: 'Year', value: props.book.year?.toString() },
+      { label: 'Pages', value: props.book.pages?.toString() },
+    ],
+    [
+      { label: 'Language', value: languageLabel(props.book.language) },
+      {
+        label: 'Original Language',
+        value: languageLabel(props.book.originalLanguage),
+      },
+    ],
+    [
+      {
+        label: 'Format',
+        value: format?.description,
+        icon: format?.icon as keyof typeof icons | undefined,
+      },
+    ],
   ]
 })
 </script>
@@ -67,9 +83,12 @@ const fields = computed(() => {
 @reference '../../assets/css/main.css';
 
 .label {
-  @apply text-ink-muted text-sm font-semibold tracking-wider uppercase;
+  @apply text-ink-muted text-xs font-semibold tracking-[0.08em] uppercase;
 }
 .value {
-  @apply text-ink-primary text-xl font-bold;
+  @apply text-ink-primary m-0 flex items-center gap-1.5 text-base font-semibold wrap-anywhere;
+}
+.value.empty {
+  @apply text-ink-subtle font-medium;
 }
 </style>

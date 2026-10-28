@@ -1,6 +1,17 @@
 <template>
   <div>
-    <div class="book-tile" v-bind="$attrs">
+    <div
+      class="book-tile"
+      :class="{ selectable, selected: selectable && book.selected }"
+      v-bind="$attrs"
+      :role="selectable ? 'checkbox' : undefined"
+      :aria-checked="selectable ? !!book.selected : undefined"
+      :aria-label="selectable ? book.title : undefined"
+      :tabindex="selectable ? 0 : undefined"
+      @click="onSelect"
+      @keydown.space.prevent="onSelect"
+      @keydown.enter.prevent="onSelect"
+    >
       <div v-if="draggable" class="book-tile-drag-handle">
         <span v-if="book.order !== undefined" class="book-tile-drag-order">
           {{ book.order + 1 }}
@@ -11,7 +22,6 @@
       <NuxtLink
         :to="selectable ? undefined : href"
         class="book-tile-cover-wrap"
-        @click="onSelect"
       >
         <NuxtImg
           v-if="book.coverSrc"
@@ -35,16 +45,18 @@
         </span>
 
         <span
-          v-if="selectable && book.selected"
-          class="book-tile-selected-badge"
+          v-if="selectable"
+          class="book-tile-select"
+          :class="{ on: book.selected }"
+          aria-hidden="true"
         >
-          <IconCheck :size="14" stroke="2" />
+          <IconCheck v-if="book.selected" :size="14" stroke="2.4" />
         </span>
       </NuxtLink>
 
       <div class="book-tile-content">
         <div class="book-tile-header">
-          <NuxtLink :to="selectable ? undefined : href" @click="onSelect">
+          <NuxtLink :to="selectable ? undefined : href">
             <h6 class="book-tile-title">{{ book.title }}</h6>
           </NuxtLink>
           <p class="book-tile-author">

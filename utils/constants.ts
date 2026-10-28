@@ -1,13 +1,14 @@
 import type { icons } from '@tabler/icons-vue'
-import type { BookFormat, BookProgressStatus, BookPropertyStatus } from '~/types/book'
+import type {
+  BookFormat,
+  BookProgressStatus,
+  BookPropertyStatus,
+} from '~/types/book'
 import type { GoalInterval, GoalType } from '~/types/goal'
 
 export const FAVORITE_COLLECTION_ID = 'favorite'
 export const TBR_COLLECTION_ID = 'tbr'
-export const DEFAULT_COLLECTIONS = [
-  FAVORITE_COLLECTION_ID,
-  TBR_COLLECTION_ID,
-]
+export const DEFAULT_COLLECTIONS = [FAVORITE_COLLECTION_ID, TBR_COLLECTION_ID]
 
 export const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeart',
@@ -41,12 +42,7 @@ export const ICON_SIZE_SMALL = 20
 export const ICON_SIZE_MEDIUM = 22
 export const ICON_SIZE_LARGE = 26
 
-export const PROGRESS_STATUS = [
-  'reading',
-  'paused',
-  'read',
-  'not-finished',
-]
+export const PROGRESS_STATUS = ['reading', 'paused', 'read', 'not-finished']
 
 export const PROGRESS_STATUS_MAP: Record<
   BookProgressStatus,

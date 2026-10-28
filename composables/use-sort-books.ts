@@ -1,4 +1,9 @@
-import type { BookFormat, BookProgressStatus, BookPropertyStatus, ViewBook } from '~/types/book'
+import type {
+  BookFormat,
+  BookProgressStatus,
+  BookPropertyStatus,
+  ViewBook,
+} from '~/types/book'
 import type { View } from '~/types/ui'
 
 export type BookSortValue =
@@ -212,12 +217,15 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       )
     })
 
-    const filterByPropertyStatus = filterByStatus.filter(({ propertyStatus }) => {
-      return (
-        !selectedPropertyStatuses.value.length ||
-        (propertyStatus && selectedPropertyStatuses.value.includes(propertyStatus))
-      )
-    })
+    const filterByPropertyStatus = filterByStatus.filter(
+      ({ propertyStatus }) => {
+        return (
+          !selectedPropertyStatuses.value.length ||
+          (propertyStatus &&
+            selectedPropertyStatuses.value.includes(propertyStatus))
+        )
+      },
+    )
 
     const filterByFormat = filterByPropertyStatus.filter(({ format }) => {
       return (

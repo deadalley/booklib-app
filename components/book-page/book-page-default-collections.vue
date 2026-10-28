@@ -1,48 +1,54 @@
 <template>
-  <section class="paper-sm flex flex-col gap-6 px-6 py-4">
-    <bl-multiselect class="w-full">
-      <bl-multiselect-option
-        v-for="item in DEFAULT_COLLECTIONS"
-        :key="item"
-        :value="item"
-        :selected="isSelected(item)"
-        @select="$emit('default-collection-change', item)"
-      >
-        <template #icon="iconProps">
-          <component
-            :is="
-              icons[
-                (isSelected(item)
-                  ? DEFAULT_COLLECTION_ICONS_FILLED
-                  : DEFAULT_COLLECTION_ICONS)[item]!!
-              ]
-            "
-            class="text-primary"
-            v-bind="iconProps"
-          />
-        </template>
-      </bl-multiselect-option>
-    </bl-multiselect>
-  </section>
+  <div class="flex flex-wrap gap-2">
+    <bl-button
+      v-for="item in DEFAULT_COLLECTIONS"
+      :key="item"
+      variant="secondary"
+      :pressed="!!selected[item]"
+      @click="$emit('default-collection-change', item)"
+    >
+      <template #prependIcon>
+        <component
+          :is="
+            icons[
+              ((selected[item]
+                ? DEFAULT_COLLECTION_ICONS_FILLED
+                : DEFAULT_COLLECTION_ICONS)[item] ??
+                'IconHeart') as keyof typeof icons
+            ]
+          "
+          :size="18"
+          stroke="1.6"
+        />
+      </template>
+      {{ selected[item] ? LABELS[item]?.on : LABELS[item]?.off }}
+    </bl-button>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
-import type { Book } from '~/types/book'
 
-const props = defineProps<{
-  book: Book
+defineProps<{
+  selected: Record<string, boolean>
 }>()
 
 defineEmits<{
   (e: 'default-collection-change', collectionId: string): void
 }>()
 
-function isSelected(collectionId: string) {
-  return (props.book.collections ?? []).some(
-    (id) => String(id) === String(collectionId),
-  )
+const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeart',
+  [TBR_COLLECTION_ID]: 'IconBook',
+}
+
+const DEFAULT_COLLECTION_ICONS_FILLED: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
+  [TBR_COLLECTION_ID]: 'IconBookFilled',
+}
+
+const LABELS: Record<string, { on: string; off: string }> = {
+  [FAVORITE_COLLECTION_ID]: { on: 'Favorited', off: 'Favorite' },
+  [TBR_COLLECTION_ID]: { on: 'In To Be Read', off: 'To Be Read' },
 }
 </script>
-
-<style scoped></style>

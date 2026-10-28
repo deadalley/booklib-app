@@ -1,5 +1,9 @@
 import type { Author } from '~/types/author'
-import type { BookProgressStatus, BookPropertyStatus, ViewBook } from '~/types/book'
+import type {
+  BookProgressStatus,
+  BookPropertyStatus,
+  ViewBook,
+} from '~/types/book'
 import type { Collection } from '~/types/collection'
 import languageOptions from '~/public/languages-2.json'
 import { sum, uniq } from 'ramda'

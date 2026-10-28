@@ -42,10 +42,7 @@
       :with-check="editing"
       :row-clickable="!editing"
       interactive
-      @select:row="
-        (args) =>
-          $emit('book-select', { bookId: args.id, selected: args.selected })
-      "
+      @select:rows="onSelectRows"
       @click:row="(args: Book) => navigateTo(`/library/books/${args.id}`)"
     />
   </div>
@@ -91,7 +88,7 @@ const { sortedBooks, onSearch } = useSortBooks(notSelectedBooks)
 const { sortedBooks: sortedBooksForTable, onSearch: onSearchTable } =
   useSortBooks(books)
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
   (
     e: 'book-drag',
@@ -99,4 +96,14 @@ defineEmits<{
   ): void
   (e: 'update:page', val: number): void
 }>()
+
+function onSelectRows(selection: Record<string, boolean>) {
+  sortedBooksForTable.value.forEach((book) => {
+    const selected = !!selection[String(book.id)]
+
+    if (!!book.selected !== selected) {
+      emit('book-select', { bookId: book.id, selected })
+    }
+  })
+}
 </script>

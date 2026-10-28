@@ -103,95 +103,135 @@
     <template #action-label>Save</template>
   </bl-modal>
 
-  <div class="paper-sm flex flex-col gap-3 p-5">
-    <div class="flex justify-between">
-      <div class="flex gap-2">
-        <!-- Property status -->
-        <DropdownMenuRoot>
-          <DropdownMenuTrigger as-child>
-            <bl-chip
-              rounded
-              :color="propertyStatusChipColor"
-              class="cursor-pointer"
-            >
-              <component
-                :is="icons[PROPERTY_STATUS_MAP[currentPropertyStatus].icon]"
-                :size="13"
-                stroke="1.9"
-              />
-              {{ PROPERTY_STATUS_MAP[currentPropertyStatus].description }}
-              <IconChevronDown :size="11" stroke="2" />
-            </bl-chip>
-          </DropdownMenuTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuContent
-              align="start"
-              :avoid-collisions="false"
-              position="popper"
-              class="menu-content"
-            >
-              <DropdownMenuItem
-                v-for="status in Object.values(PROPERTY_STATUS_MAP)"
-                :key="status.id"
-                class="menu-item"
-                @click="emit('property-status-select', status.id)"
-              >
-                <component :is="icons[status.icon]" :size="14" stroke="1.8" />
-                {{ status.description }}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenuPortal>
-        </DropdownMenuRoot>
+  <!-- DNF follow-up modal -->
+  <bl-modal
+    v-if="showDnfModal"
+    v-model="showDnfModal"
+    size="sm"
+    icon="IconNote"
+    @confirm="onSaveDnfNote"
+  >
+    <template #title>Would you like to add a comment?</template>
+    <div class="flex flex-col gap-4">
+      <!-- prettier-ignore -->
+      <p class="text-ink-muted text-sm">
+        Note why you stopped reading <b class="text-ink-primary">{{ book.title }}</b>{{ dnfPageClause }}.
+      </p>
+      <bl-input
+        v-model="dnfNote"
+        type="textarea"
+        label="Note"
+        placeholder="What made you stop?"
+        :rows="4"
+        autofocus
+        editing
+      />
+    </div>
+    <template #cancel-label>Skip</template>
+    <template #action-label>Save note</template>
+  </bl-modal>
 
-        <!-- Reading status chip -->
-        <div v-if="currentStatus !== null" class="flex items-center gap-2">
-          <bl-chip :variant="statusVariant" rounded>
-            <template #prependIcon="$iconProps">
-              <component :is="statusIcon" v-bind="$iconProps" />
-            </template>
-            {{ statusLabel }}
-          </bl-chip>
-        </div>
-      </div>
+  <div class="progress-card">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <p class="book-page-section-title">Progress</p>
 
       <!-- Date -->
-      <div
+      <button
         v-if="startDate"
+        type="button"
         class="text-ink-muted inline-flex cursor-pointer items-center gap-1 text-sm"
         @click="openStartDateModal"
       >
-        <IconCalendarEvent class="mr-1 inline-block" size="14" stroke="1.5" />
+        <IconCalendarEvent :size="13" stroke="1.5" />
         {{ startDatePrefix }}
-        <p
+        <span
           class="text-ink-secondary decoration-stroke underline decoration-dashed"
         >
           {{ startDate }}
-        </p>
-      </div>
+        </span>
+      </button>
     </div>
 
-    <!-- Progress bar -->
-    <div class="mt-4 flex flex-col gap-4">
-      <p class="text-primary text-end text-3xl leading-none font-semibold">
-        {{ progress }}%
+    <div class="flex flex-wrap gap-2">
+      <!-- Property status -->
+      <DropdownMenuRoot>
+        <DropdownMenuTrigger as-child>
+          <bl-chip
+            rounded
+            :color="propertyStatusChipColor"
+            class="cursor-pointer"
+          >
+            <component
+              :is="icons[PROPERTY_STATUS_MAP[currentPropertyStatus].icon]"
+              :size="13"
+              stroke="1.9"
+            />
+            {{ PROPERTY_STATUS_MAP[currentPropertyStatus].description }}
+            <IconChevronDown :size="11" stroke="2" />
+          </bl-chip>
+        </DropdownMenuTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            align="start"
+            :avoid-collisions="false"
+            position="popper"
+            class="menu-content"
+          >
+            <DropdownMenuItem
+              v-for="status in Object.values(PROPERTY_STATUS_MAP)"
+              :key="status.id"
+              class="menu-item"
+              @click="emit('property-status-select', status.id)"
+            >
+              <component :is="icons[status.icon]" :size="14" stroke="1.8" />
+              {{ status.description }}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenuRoot>
+
+      <!-- Reading status chip -->
+      <bl-chip v-if="currentStatus !== null" :variant="statusVariant" rounded>
+        <template #prependIcon="$iconProps">
+          <component :is="statusIcon" v-bind="$iconProps" />
+        </template>
+        {{ statusLabel }}
+      </bl-chip>
+    </div>
+
+    <!-- Figure -->
+    <p
+      v-if="currentStatus === null"
+      class="text-ink-muted text-sm leading-normal"
+    >
+      Not started yet{{ book.pages ? ` · ${book.pages} pages` : '' }}.
+    </p>
+    <div v-else class="flex flex-col gap-2.5">
+      <p class="progress-percentage">
+        {{ progress }}
+        <small>%</small>
       </p>
       <bl-progress-bar
         :progress-value="progress"
         size="xs"
         color="bg-primary"
       />
-      <p class="text-ink-muted text-end text-sm leading-snug font-semibold">
-        {{ progressSubtitle }}
-      </p>
+      <div v-if="book.pages" class="progress-stats">
+        <div v-for="stat in stats" :key="stat.label" class="progress-stat">
+          <span class="progress-stat-value">{{ stat.value }}</span>
+          <span class="progress-stat-label">{{ stat.label }}</span>
+        </div>
+      </div>
+      <p v-else class="progress-stat-label">{{ progressSubtitle }}</p>
     </div>
 
     <!-- Actions -->
-    <div class="mt-2 flex gap-3">
+    <div class="flex flex-wrap gap-2">
       <bl-button
         v-for="(action, index) in actions"
         :key="index"
         :variant="action.variant"
-        expand
+        class="min-w-26 flex-[1_1_auto]"
         @click="onActionClick(action)"
       >
         <template #prependIcon="$iconProps">
@@ -201,40 +241,35 @@
       </bl-button>
     </div>
 
-    <!-- Reading: log entry prompt -->
-    <template v-if="currentStatus === 'reading'">
-      <div
-        class="border-primary bg-primary-100 rounded-scholarly mt-2 flex items-center justify-between border px-4 py-3"
-      >
-        <p class="text-primary-600 text-sm font-semibold tracking-wide">
-          Ready to log today's reading?
-        </p>
-        <bl-button size="sm" @click="openLogModal">Log entry</bl-button>
-      </div>
-    </template>
+    <!-- Reading: log entry -->
+    <bl-button v-if="currentStatus === 'reading'" expand @click="openLogModal">
+      <template #prependIcon="$iconProps">
+        <IconNote v-bind="$iconProps" />
+      </template>
+      Log entry
+    </bl-button>
 
     <!-- Paused state -->
-    <template v-if="currentStatus === 'paused'">
-      <div
-        class="border-secondary-200 bg-secondary-50 rounded-scholarly mt-2 flex items-center justify-between border px-4 py-3"
+    <div
+      v-if="currentStatus === 'paused'"
+      class="border-secondary-200 bg-secondary-50 rounded-scholarly flex items-center justify-between gap-3 border px-4 py-3"
+    >
+      <p class="text-secondary-600 text-sm font-semibold tracking-wide">
+        This book is paused.
+      </p>
+      <bl-button
+        color="secondary"
+        size="sm"
+        @click="emit('status-select', 'reading')"
       >
-        <p class="text-secondary-600 text-sm font-semibold tracking-wide">
-          This book is paused.
-        </p>
-        <bl-button
-          color="secondary"
-          size="sm"
-          @click="emit('status-select', 'reading')"
-        >
-          Continue →
-        </bl-button>
-      </div>
-    </template>
+        Continue →
+      </bl-button>
+    </div>
 
     <template v-if="currentStatus !== null">
-      <hr class="border-stroke-subtle -mx-5 my-2" />
+      <hr class="border-stroke-subtle -mx-6 my-1" />
 
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <!-- Empty state -->
         <bl-button
           v-if="!sortedNotes.length"
@@ -242,6 +277,9 @@
           expand
           @click="openLogModal"
         >
+          <template #prependIcon="$iconProps">
+            <IconNote v-bind="$iconProps" />
+          </template>
           Log first entry
         </bl-button>
 
@@ -259,15 +297,16 @@
             </p>
           </div>
 
-          <div class="flex flex-col gap-2">
+          <ol class="log-list">
             <bl-book-page-note
-              v-for="note in sortedNotes"
+              v-for="(note, index) in sortedNotes"
               :key="note.createdAt"
               :note="note"
+              :latest="index === 0"
               @edit="openLogModalForEdit(note)"
               @delete="deleteNote(note)"
             />
-          </div>
+          </ol>
         </template>
       </div>
     </template>
@@ -300,6 +339,7 @@ import {
   IconX,
   IconCalendarEvent,
   IconChevronDown,
+  IconNote,
 } from '@tabler/icons-vue'
 
 const props = defineProps<{
@@ -313,7 +353,7 @@ const emit = defineEmits<{
     startedAt?: string,
   ): void
   (e: 'property-status-select', status: BookPropertyStatus): void
-  (e: 'log-entry', page: number, note: string, date: string): void
+  (e: 'log-entry', page: number | undefined, note: string, date: string): void
   (
     e: 'update-note',
     payload: {
@@ -329,6 +369,8 @@ const emit = defineEmits<{
 const showStartDateModal = ref(false)
 const pendingStartDate = ref('')
 const showFinishModal = ref(false)
+const showDnfModal = ref(false)
+const dnfNote = ref('')
 const showLogModal = ref(false)
 const logPage = ref<string | undefined>(undefined)
 const logNote = ref('')
@@ -412,8 +454,21 @@ const progressSubtitle = computed(() => {
       : ''
   }
 
-  const pagesRead = Math.round((pages * progress.value) / 100)
-  return `${pagesRead} of ${pages} pages`
+  return `${pagesRead.value} of ${pages} pages`
+})
+
+const pagesRead = computed(() =>
+  Math.round(((props.book.pages ?? 0) * progress.value) / 100),
+)
+
+const stats = computed(() => {
+  const pages = props.book.pages ?? 0
+
+  return [
+    { label: 'Read', value: pagesRead.value },
+    { label: 'Left', value: Math.max(0, pages - pagesRead.value) },
+    { label: 'Total', value: pages },
+  ]
 })
 
 const actions = computed<
@@ -507,7 +562,7 @@ const actions = computed<
 
 const sortedNotes = computed(() =>
   [...(props.book.progress.notes ?? [])]
-    .filter((note) => note.page !== undefined)
+    .filter((note) => note.page !== undefined || note.content)
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -606,6 +661,27 @@ function onFinishBook() {
 function onDNF() {
   showFinishModal.value = false
   emit('status-select', PROGRESS_STATUS_MAP['not-finished'].id)
+  dnfNote.value = ''
+  showDnfModal.value = true
+}
+
+const dnfPageClause = computed(() =>
+  props.book.progress.currentPage
+    ? ` at page ${props.book.progress.currentPage}`
+    : '',
+)
+
+function onSaveDnfNote() {
+  const content = dnfNote.value.trim()
+
+  if (content) {
+    emit(
+      'log-entry',
+      props.book.progress.currentPage ?? undefined,
+      content,
+      now(),
+    )
+  }
 }
 
 function onConfirmStartDate() {
@@ -621,3 +697,44 @@ function deleteNote(note: BookNote) {
   emit('delete-note', { index })
 }
 </script>
+
+<style scoped>
+@reference '../../assets/css/main.css';
+
+.progress-card {
+  @apply bg-surface-elevated border-stroke-subtle flex flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
+}
+
+.progress-percentage {
+  @apply font-display text-primary flex items-baseline text-[3.25rem] leading-[0.9] font-semibold tracking-[-0.02em];
+}
+
+.progress-percentage small {
+  @apply font-body text-[1.125rem] font-semibold tracking-normal;
+}
+
+.progress-stats {
+  @apply border-stroke-subtle grid grid-cols-3 gap-2 border-t pt-3;
+}
+
+.progress-stat {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.progress-stat-value {
+  @apply text-ink-primary text-base leading-[1.1] font-bold;
+}
+
+.progress-stat-label {
+  @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
+}
+
+.log-list {
+  @apply relative flex flex-col pl-[1.125rem];
+}
+
+.log-list::before {
+  @apply bg-stroke absolute top-3 bottom-3 left-[0.3125rem] w-px;
+  content: '';
+}
+</style>

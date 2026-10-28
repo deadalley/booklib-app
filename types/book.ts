@@ -3,11 +3,7 @@ import type { Collection } from './collection'
 
 export type BookPropertyStatus = 'owned' | 'not-owned' | 'wishlist'
 
-export type BookProgressStatus =
-  | 'reading'
-  | 'paused'
-  | 'read'
-  | 'not-finished'
+export type BookProgressStatus = 'reading' | 'paused' | 'read' | 'not-finished'
 
 export type BookFormat =
   | 'hardcover'
