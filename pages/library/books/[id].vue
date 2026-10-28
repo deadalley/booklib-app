@@ -136,12 +136,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
-import type {
-  Book,
-  BookNote,
-  BookProgressStatus,
-  BookPropertyStatus,
-} from '~/types/book'
+import type { Book, BookProgressStatus, BookPropertyStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { ICON_SIZE_SMALL } from '~/utils/constants'
@@ -327,25 +322,6 @@ async function onSelectRating(rating: number | null) {
   if (book.value) {
     book.value.rating = rating
   }
-}
-
-async function onAddNote({
-  content,
-  page,
-}: Pick<BookNote, 'content' | 'page'>) {
-  if (!book.value || isNew.value) return
-
-  const nextNotes: BookNote[] = [
-    ...(book.value.progress.notes ?? []),
-    {
-      createdAt: now(),
-      content,
-      ...(page ? { page } : {}),
-    },
-  ]
-
-  book.value.progress.notes = nextNotes
-  await onSubmit(book.value)
 }
 
 async function onUpdateNote({

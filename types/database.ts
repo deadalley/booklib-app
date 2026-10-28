@@ -1,4 +1,9 @@
-import type { BookFormat, BookNote, BookProgressStatus, BookPropertyStatus } from './book'
+import type {
+  BookFormat,
+  BookNote,
+  BookProgressStatus,
+  BookPropertyStatus,
+} from './book'
 import type { GoalInterval, GoalStatus, GoalType } from './goal'
 
 export type AuthorDB = {

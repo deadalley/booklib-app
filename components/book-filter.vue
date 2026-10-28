@@ -123,7 +123,12 @@
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
-import type { Book, BookFormat, BookProgressStatus, BookPropertyStatus } from '~/types/book'
+import type {
+  Book,
+  BookFormat,
+  BookProgressStatus,
+  BookPropertyStatus,
+} from '~/types/book'
 import type { Collection } from '~/types/collection'
 
 defineProps<{
@@ -152,7 +157,9 @@ const selectedOriginalLanguages = defineModel<string[]>(
 )
 const selectedGenres = defineModel<string[]>('selectedGenres')
 const selectedStatuses = defineModel<BookProgressStatus[]>('selectedStatuses')
-const selectedPropertyStatuses = defineModel<BookPropertyStatus[]>('selectedPropertyStatuses')
+const selectedPropertyStatuses = defineModel<BookPropertyStatus[]>(
+  'selectedPropertyStatuses',
+)
 const selectedFormats = defineModel<BookFormat[]>('selectedFormats')
 const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')

@@ -11,9 +11,10 @@
         <component
           :is="
             icons[
-              (selected[item]
+              ((selected[item]
                 ? DEFAULT_COLLECTION_ICONS_FILLED
-                : DEFAULT_COLLECTION_ICONS)[item]!!
+                : DEFAULT_COLLECTION_ICONS)[item] ??
+                'IconHeart') as keyof typeof icons
             ]
           "
           :size="18"
@@ -35,6 +36,16 @@ defineProps<{
 defineEmits<{
   (e: 'default-collection-change', collectionId: string): void
 }>()
+
+const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeart',
+  [TBR_COLLECTION_ID]: 'IconBook',
+}
+
+const DEFAULT_COLLECTION_ICONS_FILLED: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
+  [TBR_COLLECTION_ID]: 'IconBookFilled',
+}
 
 const LABELS: Record<string, { on: string; off: string }> = {
   [FAVORITE_COLLECTION_ID]: { on: 'Favorited', off: 'Favorite' },
