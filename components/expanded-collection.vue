@@ -19,7 +19,6 @@
             :size="18"
           />
           <NuxtLink
-            v-if="collectionType === 'collections'"
             :to="`/library/${collectionType}/${collection.id}`"
             class="text-ink-primary group-hover:text-primary hover:text-primary font-semibold underline-offset-[3px] hover:underline"
             @click="(event: Event) => event.stopPropagation()"
@@ -28,26 +27,20 @@
               {{ collection.name }}
             </h6>
           </NuxtLink>
-          <h6
-            v-else
-            class="text-ink-primary group-hover:text-primary font-semibold"
-          >
-            {{ collection.name }}
-          </h6>
           <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
           <div
             class="ml-auto flex items-center gap-4"
             @click="(event: Event) => event.stopPropagation()"
           >
             <NuxtLink
-              v-if="open && showSeeAll"
+              v-if="open"
               :to="`/library/${collectionType}/${collection.id}`"
               class="text-primary text-xs font-bold tracking-widest uppercase"
             >
               See All
             </NuxtLink>
             <button
-              v-else-if="!open"
+              v-else
               type="button"
               class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
               @click="open = true"
@@ -136,8 +129,6 @@ const openValue = computed({
     open.value = val === 'items'
   },
 })
-
-const showSeeAll = computed(() => props.collectionType === 'collections')
 
 const bookCountLabel = computed(() =>
   props.books.length
