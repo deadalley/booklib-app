@@ -18,6 +18,13 @@
     @apply rounded-scholarly flex h-min w-full items-center gap-3 border px-4 py-2 text-base transition-all duration-100 ease-in outline-none;
   }
 
+  .form-inner:focus-within {
+    @apply border-primary;
+  }
+  .form-error {
+    @apply text-primary-600 text-[0.8125rem] font-semibold;
+  }
+
   select.form-input {
     @apply bg-surface-elevated w-full cursor-pointer;
   }

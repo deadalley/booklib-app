@@ -16,9 +16,11 @@
       outer: outerClass,
       wrapper: 'form-wrapper',
       label: 'form-label',
-      inner: `form-inner ${focused ? 'border-primary' : 'border-stroke'}`,
+      inner: `form-inner ${error ? 'border-primary-500' : focused ? 'border-primary' : 'border-stroke'}`,
       input: 'form-input',
+      help: 'form-error',
     }"
+    :help="error || undefined"
     @focus="onFocus"
     @blur="onBlur"
   >
@@ -42,6 +44,7 @@ export type InputProps = {
   hidden?: boolean
   clearable?: boolean
   autofocus?: boolean
+  error?: string | false | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatter?: (value: any) => string | undefined
 }
@@ -81,7 +84,11 @@ const forwardedAttrs = computed(() => {
 })
 
 const outerClass = computed(() =>
-  normalizeClass(['flex flex-1', props.editing ? '' : '!hidden', attrs.class]),
+  normalizeClass([
+    'flex flex-1 flex-col gap-1',
+    props.editing ? '' : '!hidden',
+    attrs.class,
+  ]),
 )
 
 function onFocus() {

@@ -114,37 +114,19 @@
   <bl-book-page-edit
     v-else-if="book"
     v-model:book="book"
-    v-model:current-step="currentStep"
-    v-model:stepper-modal-open="stepperModalOpen"
-    v-model:start-reading-book-today="startReadingBookToday"
-    v-model:finish-reading-book-today="finishReadingBookToday"
     :is-new="isNew"
-    :editing="editing"
-    :author-name="authorName"
-    :formatted-date="formattedDate"
     :temp-cover-src="tempCoverSrc"
     :selected-default-collections="selectedDefaultCollections"
-    :progress-steps="progressSteps"
-    :managing-collections="managingCollections"
     :author-select-options="authorSelectOptions"
     :language-select-options="languageSelectOptions"
     :collections-displayed="collectionsDisplayed"
-    :external-books="externalBooks"
-    :date-formatter="dateFormatter"
     :on-select-rating="onSelectRating"
     :on-select-genre="onSelectGenre"
     :on-remove-genre="onRemoveGenre"
-    @back="$router.back()"
     @cancel="onCancel"
     @save="onSaveChanges"
-    @edit="onEdit(true)"
-    @delete="deleteBook"
     @default-collection-change="onDefaultCollectionChange"
-    @progress-change="onProgressChange"
-    @status-select="onSelectProgress"
-    @property-status-select="onPropertyStatusSelect"
     @collection-select="onSelectCollection"
-    @fetch-google-books="fetchBooksFromGoogle"
   />
 </template>
 
@@ -163,7 +145,6 @@ import type {
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { ICON_SIZE_SMALL } from '~/utils/constants'
-import { toDefaultDate } from '../../../utils/date'
 
 const {
   getCollections,
@@ -172,7 +153,6 @@ const {
   deleteBook: _deleteBook,
   createBook,
   updateBook,
-  searchGoogleBooks,
   getGoals,
 } = useBookLibrary()
 
@@ -180,16 +160,12 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const externalBooks = ref<Book[]>([])
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
-const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)
 const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
-const startReadingBookToday = ref(false)
-const finishReadingBookToday = ref(false)
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
@@ -201,15 +177,11 @@ const loadData = async () => {
   goals.value = await getGoals()
 }
 
-onMounted(loadData)
-
 const collectionsDisplayed = computed(() => {
   return managingCollections.value
     ? allCollections.value
     : allCollections.value.filter((collection) => collection.selected)
 })
-
-const formattedDate = computed(() => toFullDateCompact(book.value?.createdAt))
 
 const bookGoals = computed(() => {
   if (!book.value) return []
@@ -224,12 +196,6 @@ const bookGoals = computed(() => {
     return false
   })
 })
-
-const currentStep = ref<number | undefined>(
-  book.value?.progress.status
-    ? PROGRESS_STATUS_MAP[book.value.progress.status].step
-    : undefined,
-)
 
 const selectedDefaultCollections = ref<Record<string, boolean>>({
   [TBR_COLLECTION_ID]: false,
@@ -247,19 +213,6 @@ const authorSelectOptions = computed(() =>
       value: String(author.id),
     }))
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2)),
-)
-
-const progressSteps = computed(() => [
-  book.value?.progress.status === 'paused'
-    ? PROGRESS_STATUS_MAP.paused
-    : PROGRESS_STATUS_MAP.reading,
-  book.value?.progress.status === 'not-finished'
-    ? PROGRESS_STATUS_MAP['not-finished']
-    : PROGRESS_STATUS_MAP.read,
-])
-
-const authorName = computed(
-  () => authors.value?.find(({ id }) => book.value?.author === id)?.name,
 )
 
 const primaryCollectionName = computed(() => {
@@ -303,10 +256,6 @@ async function fetchBook() {
     selected: !!book.value?.collections?.includes(collection.id),
   }))
 
-  currentStep.value = book.value?.progress.status
-    ? PROGRESS_STATUS_MAP[book.value.progress.status].step
-    : undefined
-
   selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
     !!book.value &&
     isBookInDefaultCollection(book.value, FAVORITE_COLLECTION_ID)
@@ -328,10 +277,11 @@ function onEdit(value: boolean) {
   }))
 }
 
-function onCancel() {
+async function onCancel() {
   if (isNew.value) {
     navigateTo('/library/books')
   } else {
+    await fetchBook()
     onEdit(false)
   }
 }
@@ -371,7 +321,7 @@ async function onSaveChanges() {
   }
 }
 
-async function onSelectRating(rating: number) {
+async function onSelectRating(rating: number | null) {
   if (book.value) {
     book.value.rating = rating
   }
@@ -474,7 +424,7 @@ async function onDefaultCollectionChange(collectionId: string) {
     selected: selectedDefaultCollections.value[collectionId],
   })
 
-  if (book.value) {
+  if (book.value && !editing.value) {
     book.value.collections = allCollections.value
       .filter(({ selected }) => !!selected)
       .map(({ id }) => id)
@@ -518,55 +468,17 @@ async function onSelectProgress(
 
     if (startedAt) {
       book.value.progress.startedAt = startedAt
-    } else if (progressStatus === 'reading' && startReadingBookToday.value) {
-      book.value.progress.startedAt = now()
-    } else if (progressStatus === 'read' && finishReadingBookToday.value) {
-      book.value.progress.finishedAt = now()
     }
 
     if (!isNew.value) {
       await onSubmit(book.value)
     }
   }
-  stepperModalOpen.value = false
-  startReadingBookToday.value = false
-  finishReadingBookToday.value = false
 }
 
-function onProgressChange(progressStatusStep: number) {
-  const progressStatus = progressSteps.value.find(
-    ({ step }) => progressStatusStep === step,
-  )
-
-  if (progressStatus) {
-    if (
-      progressStatus.step === PROGRESS_STATUS_MAP.reading.step ||
-      progressStatus.step === PROGRESS_STATUS_MAP.read.step
-    ) {
-      stepperModalOpen.value = true
-    } else if (book.value) {
-      book.value.progress.status = progressStatus.id
-
-      if (!isNew.value) {
-        onSubmit(book.value)
-      }
-    }
-  }
-}
-
-function dateFormatter(date: Date | undefined): string | undefined {
-  return date && toDefaultDate(date)
-}
-
-async function fetchBooksFromGoogle() {
-  if (book.value) {
-    const books = await searchGoogleBooks(book.value.title || '')
-    externalBooks.value = books as Book[]
-  }
-}
-
-onMounted(() => {
-  fetchBook()
+onMounted(async () => {
+  await loadData()
+  await fetchBook()
 })
 
 useHead({

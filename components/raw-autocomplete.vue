@@ -19,6 +19,7 @@
       :reset-search-term-on-blur="false"
     >
       <ComboboxAnchor
+        class="flex items-center gap-2"
         :class="{
           'form-inner': withWrapper,
           'border-primary!': focused,
