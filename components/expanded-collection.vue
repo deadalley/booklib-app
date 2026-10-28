@@ -51,7 +51,8 @@
               v-if="canDelete"
               :name="collection.name"
               @confirm="
-                (deleteBooks) => $emit('delete', collection.id, deleteBooks)
+                (deleteBooks: boolean) =>
+                  $emit('delete', collection.id, deleteBooks)
               "
             >
               <template #trigger>

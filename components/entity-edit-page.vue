@@ -31,11 +31,13 @@
 
     <div class="book-page-edit-grid">
       <aside class="flex min-w-0 flex-col gap-6">
-        <div class="book-page-cover-frame w-48 @min-[720px]:w-56">
-          <bl-entity-cover-mosaic
-            :books="selectedBooks"
-            :empty-icon="isCollection ? 'IconArchive' : 'IconFeather'"
-          />
+        <div class="w-48 @min-[720px]:w-56">
+          <div class="book-page-cover-frame">
+            <bl-entity-cover-mosaic
+              :books="selectedBooks"
+              :empty-icon="isCollection ? 'IconArchive' : 'IconFeather'"
+            />
+          </div>
         </div>
 
         <div class="flex flex-col gap-2.5">
