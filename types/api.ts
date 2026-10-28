@@ -11,6 +11,12 @@ export type DeleteAuthorParams = {
   deleteBooks?: boolean
 }
 
+export type UpdateAuthorParams = {
+  name?: string
+  // When set, these books get this author and its other books are unassigned
+  bookIds?: BookDB['id'][]
+}
+
 export type DeleteCollectionParams = {
   deleteBooks?: boolean
 }

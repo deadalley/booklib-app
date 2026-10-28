@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import type {
   Database,
   DeleteAuthorParams,
+  UpdateAuthorParams,
   DeleteCollectionParams,
   GetBooksQuerySearchParams,
   GetOrderedBooksQuerySearchParams,
@@ -120,6 +121,36 @@ export class BookLibDataManagementService {
     this.client.read()
     const data = this.client.data.authors
     return data.map(dbAuthorToAuthor)
+  }
+
+  async updateAuthor(
+    id: AuthorDB['id'],
+    params: UpdateAuthorParams,
+  ): Promise<Author | null> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    this.client.read()
+
+    const author = this.client.data.authors.find((a) => a.id === id)
+    if (!author) return null
+
+    if (params.name !== undefined) {
+      author.name = params.name
+    }
+
+    if (params.bookIds !== undefined) {
+      const bookIds = new Set(params.bookIds)
+
+      this.client.data.books = this.client.data.books.map((book) => {
+        if (bookIds.has(book.id)) return { ...book, author_id: id }
+        if (book.author_id === id) return { ...book, author_id: null }
+        return book
+      })
+    }
+
+    await this.client.write()
+    return dbAuthorToAuthor(author)
   }
 
   async deleteAuthor(
