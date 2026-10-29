@@ -386,17 +386,8 @@ const currentStatus = computed<BookProgressStatus | null>(
   () => props.book.progress.status ?? null,
 )
 
-const propertyStatusChipColor = computed<'primary' | 'secondary' | undefined>(
-  () => {
-    switch (currentPropertyStatus.value) {
-      case 'owned':
-        return 'primary'
-      case 'wishlist':
-        return 'secondary'
-      default:
-        return undefined
-    }
-  },
+const propertyStatusChipColor = computed<'primary' | undefined>(() =>
+  currentPropertyStatus.value === 'owned' ? 'primary' : undefined,
 )
 
 const statusLabel = computed(() => {

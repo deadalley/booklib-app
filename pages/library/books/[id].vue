@@ -192,10 +192,9 @@ const bookGoals = computed(() => {
   })
 })
 
-const selectedDefaultCollections = ref<Record<string, boolean>>({
-  [TBR_COLLECTION_ID]: false,
-  [FAVORITE_COLLECTION_ID]: false,
-})
+const selectedDefaultCollections = ref<Record<string, boolean>>(
+  Object.fromEntries(DEFAULT_COLLECTIONS.map((id) => [id, false])),
+)
 
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
@@ -253,11 +252,10 @@ async function fetchBook() {
     selected: !!book.value?.collections?.includes(collection.id),
   }))
 
-  selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
-    !!book.value &&
-    isBookInDefaultCollection(book.value, FAVORITE_COLLECTION_ID)
-  selectedDefaultCollections.value[TBR_COLLECTION_ID] =
-    !!book.value && isBookInDefaultCollection(book.value, TBR_COLLECTION_ID)
+  DEFAULT_COLLECTIONS.forEach((id) => {
+    selectedDefaultCollections.value[id] =
+      !!book.value && isBookInDefaultCollection(book.value, id)
+  })
 }
 
 async function deleteBook() {

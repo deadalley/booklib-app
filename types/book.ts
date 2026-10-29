@@ -1,7 +1,7 @@
 import type { Author } from './author'
 import type { Collection } from './collection'
 
-export type BookPropertyStatus = 'owned' | 'not-owned' | 'wishlist'
+export type BookPropertyStatus = 'owned' | 'not-owned'
 
 export type BookProgressStatus = 'reading' | 'paused' | 'read' | 'not-finished'
 

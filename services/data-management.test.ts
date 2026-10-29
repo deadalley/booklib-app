@@ -46,6 +46,7 @@ vi.mock('../utils', () => ({
     { id: '3', name: 'Want to Read' },
   ],
   now: vi.fn(() => '2023-01-01T00:00:00.000Z'),
+  migrateWishlistToCollection: vi.fn(() => false),
   dbBookToBook: vi.fn((book: BookDB, collections: string[]) => ({
     ...book,
     collections,
