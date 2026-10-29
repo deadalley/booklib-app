@@ -260,7 +260,10 @@ const selectedBooksCount = computed(() => selectedBookIds.value.length)
 const hasSelectedBooks = computed(() => selectedBooksCount.value > 0)
 
 const collectionActionOptions = computed(() =>
-  collections.value.map(({ id, name }) => ({ value: id, label: name })),
+  sortCollections(collections.value).map(({ id, name }) => ({
+    value: id,
+    label: name,
+  })),
 )
 const authorActionOptions = computed(() =>
   authors.value.map(({ id, name }) => ({ value: id, label: name })),
