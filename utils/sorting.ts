@@ -89,7 +89,10 @@ export function sortCollections(collections: Collection[]) {
     const isB2Favorite = DEFAULT_COLLECTIONS.includes(String(b2.id))
 
     if (isB1Favorite && isB2Favorite) {
-      return b1.name.localeCompare(b2.name, undefined, { numeric: true })
+      return (
+        DEFAULT_COLLECTIONS.indexOf(String(b1.id)) -
+        DEFAULT_COLLECTIONS.indexOf(String(b2.id))
+      )
     }
 
     if (isB1Favorite) {
