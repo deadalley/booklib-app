@@ -93,24 +93,3 @@ const ratingSummary = computed(() => {
 
 const formattedDate = computed(() => toFullDateCompact(props.book.createdAt))
 </script>
-
-<style scoped>
-@reference '../../assets/css/main.css';
-
-.book-page-hero {
-  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-5;
-  @apply @min-[480px]:grid-cols-[9rem_minmax(0,1fr)] @min-[480px]:gap-6;
-  @apply @min-[720px]:grid-cols-[12rem_minmax(0,1fr)] @min-[720px]:gap-8;
-  @apply @min-[960px]:grid-cols-[14rem_minmax(0,1fr)] @min-[960px]:gap-10;
-}
-
-.book-page-hero-cover {
-  @apply w-36 @min-[720px]:w-48 @min-[960px]:w-56;
-}
-
-.book-page-title {
-  @apply leading-[1.05] wrap-anywhere;
-  font-size: clamp(1.75rem, 5cqi, 2.986rem);
-  text-wrap: balance;
-}
-</style>

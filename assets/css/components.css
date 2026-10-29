@@ -491,3 +491,62 @@
 .book-page-cover-frame {
   @apply rounded-scholarly border-stroke-subtle bg-surface-subtle aspect-[2/3] w-full overflow-hidden border shadow-md;
 }
+.book-page-hero {
+  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-5;
+  @apply @min-[480px]:grid-cols-[9rem_minmax(0,1fr)] @min-[480px]:gap-6;
+  @apply @min-[720px]:grid-cols-[12rem_minmax(0,1fr)] @min-[720px]:gap-8;
+  @apply @min-[960px]:grid-cols-[14rem_minmax(0,1fr)] @min-[960px]:gap-10;
+}
+.book-page-hero-cover {
+  @apply w-36 @min-[720px]:w-48 @min-[960px]:w-56;
+}
+.book-page-title {
+  @apply leading-[1.05] wrap-anywhere;
+  font-size: clamp(1.75rem, 5cqi, 2.986rem);
+  text-wrap: balance;
+}
+.book-page-body {
+  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-6;
+  grid-template-areas: 'progress' 'main';
+  @apply @min-[960px]:grid-cols-[minmax(0,1fr)_23rem];
+}
+@container (min-width: 960px) {
+  .book-page-body {
+    grid-template-areas: 'main progress';
+  }
+}
+.book-page-body-progress {
+  @apply min-w-0 @min-[960px]:sticky @min-[960px]:top-0;
+  grid-area: progress;
+}
+.book-page-body-main {
+  @apply flex min-w-0 flex-col gap-6;
+  grid-area: main;
+}
+.book-page-edit-grid {
+  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-8;
+  @apply @min-[720px]:grid-cols-[14rem_minmax(0,1fr)] @min-[720px]:gap-12;
+}
+
+/* Progress card */
+.progress-card {
+  @apply bg-surface-elevated border-stroke-subtle flex flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
+}
+.progress-percentage {
+  @apply font-display text-primary flex items-baseline text-[3.25rem] leading-[0.9] font-semibold tracking-[-0.02em];
+}
+.progress-percentage small {
+  @apply font-body text-[1.125rem] font-semibold tracking-normal;
+}
+.progress-stats {
+  @apply border-stroke-subtle grid grid-cols-3 gap-2 border-t pt-3;
+}
+.progress-stat {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+.progress-stat-value {
+  @apply text-ink-primary text-base leading-[1.1] font-bold;
+}
+.progress-stat-label {
+  @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
+}

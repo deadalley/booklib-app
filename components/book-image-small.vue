@@ -32,8 +32,17 @@
       }"
     />
 
-    <bl-empty-book-image v-if="!coverSrc" :icon="icon" class="!h-48 !p-5">
-      <template v-if="title" #default>
+    <bl-empty-book-image
+      v-if="!coverSrc"
+      :icon="icon"
+      :icon-size="compact ? 14 : undefined"
+      :class="
+        compact
+          ? '!h-12 !w-8 !p-0.5 [&_span]:hidden [&>div]:!p-0'
+          : '!h-48 !p-5'
+      "
+    >
+      <template v-if="title && !compact" #default>
         {{ title }}
       </template>
       <template v-if="$slots['emptyLabel']" #emptyLabel>
@@ -44,7 +53,12 @@
       v-if="coverSrc"
       :src="coverSrc ?? undefined"
       :alt="alt"
-      class="h-auto w-full rounded-xl object-cover object-top md:h-48"
+      class="object-cover object-top"
+      :class="
+        compact
+          ? 'rounded-scholarly h-12 w-8'
+          : 'h-auto w-full rounded-xl md:h-48'
+      "
     ></NuxtImg>
   </NuxtLink>
 </template>
@@ -61,6 +75,7 @@ defineProps<{
   selectable?: boolean
   selected?: boolean
   icon?: keyof typeof icons
+  compact?: boolean
 }>()
 
 defineEmits(['click'])

@@ -10,12 +10,12 @@
     <template v-if="isDetailedLayout">
       <div class="collection-tile-detailed-accent">
         <component
-          :is="icons[icon]"
-          v-if="icon"
+          :is="icons[tileIcon]"
+          v-if="tileIcon"
           :size="ICON_SIZE_MEDIUM"
           stroke="1.5"
           :class="
-            icon !== 'IconArchive'
+            tileIcon !== 'IconArchive'
               ? 'text-primary shrink-0'
               : 'text-ink-muted shrink-0'
           "
@@ -139,8 +139,8 @@
           @click="onSelect"
         >
           <component
-            :is="icons[icon]"
-            v-if="icon"
+            :is="icons[tileIcon]"
+            v-if="tileIcon"
             :size="ICON_SIZE_SMALL"
             stroke="1.5"
             class="text-primary shrink-0"
@@ -181,8 +181,13 @@ const props = withDefaults(
   {
     selectable: false,
     layout: 'compact',
-    icon: 'IconArchive',
   },
+)
+
+const tileIcon = computed(
+  () =>
+    props.icon ??
+    (props.collectionType === 'collections' ? 'IconArchive' : undefined),
 )
 
 const collectionHref = computed(

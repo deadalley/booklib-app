@@ -26,10 +26,12 @@
       <p class="book-page-section-title">
         {{ isNew ? 'New book' : 'Editing' }}
       </p>
-      <h2 class="edit-title">{{ book.title?.trim() || 'Untitled book' }}</h2>
+      <h2 class="book-page-title">
+        {{ book.title?.trim() || 'Untitled book' }}
+      </h2>
     </header>
 
-    <div class="edit-grid">
+    <div class="book-page-edit-grid">
       <aside class="flex min-w-0 flex-col gap-6">
         <div class="w-48 @min-[720px]:w-56">
           <bl-book-page-cover :book="book" :temp-cover-src="tempCoverSrc" />
@@ -376,17 +378,6 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 <style scoped>
 @reference '../../assets/css/main.css';
-
-.edit-title {
-  @apply leading-[1.05] wrap-anywhere;
-  font-size: clamp(1.75rem, 5cqi, 2.986rem);
-  text-wrap: balance;
-}
-
-.edit-grid {
-  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-8;
-  @apply @min-[720px]:grid-cols-[14rem_minmax(0,1fr)] @min-[720px]:gap-12;
-}
 
 .edit-row {
   @apply flex flex-col gap-4 @min-[480px]:flex-row;

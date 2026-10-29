@@ -701,34 +701,6 @@ function deleteNote(note: BookNote) {
 <style scoped>
 @reference '../../assets/css/main.css';
 
-.progress-card {
-  @apply bg-surface-elevated border-stroke-subtle flex flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
-}
-
-.progress-percentage {
-  @apply font-display text-primary flex items-baseline text-[3.25rem] leading-[0.9] font-semibold tracking-[-0.02em];
-}
-
-.progress-percentage small {
-  @apply font-body text-[1.125rem] font-semibold tracking-normal;
-}
-
-.progress-stats {
-  @apply border-stroke-subtle grid grid-cols-3 gap-2 border-t pt-3;
-}
-
-.progress-stat {
-  @apply flex min-w-0 flex-col gap-0.5;
-}
-
-.progress-stat-value {
-  @apply text-ink-primary text-base leading-[1.1] font-bold;
-}
-
-.progress-stat-label {
-  @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
-}
-
 .log-list {
   @apply relative flex flex-col pl-[1.125rem];
 }

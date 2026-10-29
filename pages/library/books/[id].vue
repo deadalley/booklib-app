@@ -471,28 +471,6 @@ definePageMeta({
 <style scoped>
 @reference '../../../assets/css/main.css';
 
-.book-page-body {
-  @apply grid grid-cols-[minmax(0,1fr)] items-start gap-6;
-  grid-template-areas: 'progress' 'main';
-  @apply @min-[960px]:grid-cols-[minmax(0,1fr)_23rem];
-}
-
-@container (min-width: 960px) {
-  .book-page-body {
-    grid-template-areas: 'main progress';
-  }
-}
-
-.book-page-body-progress {
-  @apply min-w-0 @min-[960px]:sticky @min-[960px]:top-0;
-  grid-area: progress;
-}
-
-.book-page-body-main {
-  @apply flex min-w-0 flex-col gap-6;
-  grid-area: main;
-}
-
 .summary {
   @apply text-ink-secondary max-w-[68ch] text-[1.0625rem] leading-[1.65];
   text-wrap: pretty;

@@ -150,6 +150,36 @@ describe('StorageService', () => {
       expect(authors[0]?.name).toBe('John Doe')
     })
 
+    it('should update an author name and reassign books', async () => {
+      service['client']!.data.books = [
+        { id: '1', title: 'Book 1', author_id: '1' } as BookDB,
+        { id: '2', title: 'Book 2', author_id: '2' } as BookDB,
+        { id: '3', title: 'Book 3', author_id: null } as BookDB,
+      ]
+
+      const author = await service.updateAuthor('1', {
+        name: 'Renamed',
+        bookIds: ['2', '3'],
+      })
+
+      expect(author?.name).toBe('Renamed')
+      expect(
+        service['client']!.data.books.map(({ id, author_id, title }) => [
+          id,
+          author_id,
+          title,
+        ]),
+      ).toEqual([
+        ['1', null, 'Book 1'],
+        ['2', '1', 'Book 2'],
+        ['3', '1', 'Book 3'],
+      ])
+    })
+
+    it('should return null when updating an unknown author', async () => {
+      expect(await service.updateAuthor('missing', { name: 'x' })).toBeNull()
+    })
+
     it('should delete an author and optionally delete books', async () => {
       service['client']!.data.books = [
         {

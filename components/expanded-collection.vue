@@ -19,43 +19,41 @@
             :size="18"
           />
           <NuxtLink
-            v-if="collectionType === 'collections'"
             :to="`/library/${collectionType}/${collection.id}`"
-            class="text-ink-primary group-hover:text-primary font-semibold"
+            class="text-ink-primary group-hover:text-primary hover:text-primary font-semibold underline-offset-[3px] hover:underline"
             @click="(event: Event) => event.stopPropagation()"
           >
             <h6>
               {{ collection.name }}
             </h6>
           </NuxtLink>
-          <h6
-            v-else
-            class="text-ink-primary group-hover:text-primary font-semibold"
-          >
-            {{ collection.name }}
-          </h6>
           <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
           <div
             class="ml-auto flex items-center gap-4"
             @click="(event: Event) => event.stopPropagation()"
           >
             <NuxtLink
-              v-if="isOpen && showSeeAll"
+              v-if="open"
               :to="`/library/${collectionType}/${collection.id}`"
               class="text-primary text-xs font-bold tracking-widest uppercase"
             >
               See All
             </NuxtLink>
-            <span
+            <button
               v-else
-              class="text-ink-muted text-xs font-bold tracking-widest uppercase"
+              type="button"
+              class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
+              @click="open = true"
             >
               Expand
-            </span>
-            <bl-modal
+            </button>
+            <bl-delete-collection-modal
               v-if="canDelete"
-              size="sm"
-              @confirm="$emit('delete', collection.id, deleteBooks)"
+              :name="collection.name"
+              @confirm="
+                (deleteBooks: boolean) =>
+                  $emit('delete', collection.id, deleteBooks)
+              "
             >
               <template #trigger>
                 <IconTrash
@@ -64,27 +62,7 @@
                   stroke="1.5"
                 />
               </template>
-              <template #title>
-                Are you sure you want to delete
-                <strong class="contents">{{ collection.name }}</strong>
-                ?
-              </template>
-              <bl-checkbox v-model="deleteBooks" align="left">
-                <template v-if="!deleteBooks">
-                  Your books will
-                  <strong>not</strong>
-                  be deleted.
-                </template>
-                <template v-if="deleteBooks">
-                  Your books
-                  <strong>will</strong>
-                  be deleted.
-                </template>
-                This action cannot be undone.
-              </bl-checkbox>
-              <template #cancel-label>Cancel</template>
-              <template #action-label>Delete</template>
-            </bl-modal>
+            </bl-delete-collection-modal>
           </div>
         </AccordionTrigger>
       </AccordionHeader>
@@ -152,11 +130,6 @@ const openValue = computed({
     open.value = val === 'items'
   },
 })
-
-const isOpen = computed(() => open.value)
-const showSeeAll = computed(() => props.collectionType === 'collections')
-
-const deleteBooks = ref(false)
 
 const bookCountLabel = computed(() =>
   props.books.length
