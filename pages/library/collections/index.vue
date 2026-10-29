@@ -19,14 +19,24 @@
     </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
-      <bl-button v-if="view === 'expanded-cards'" @click="toggleAll">
-        {{ allExpanded ? 'Collapse All' : 'Expand All' }}
-      </bl-button>
       <bl-view-switch
         v-model:view="view"
         :views="['cards', 'expanded-cards']"
         show-labels
       />
+      <bl-button
+        v-if="view === 'expanded-cards'"
+        variant="secondary"
+        @click="toggleAll"
+      >
+        <template #prependIcon="iconProps">
+          <component
+            :is="allExpanded ? IconMinimize : IconMaximize"
+            v-bind="iconProps"
+          />
+        </template>
+        {{ allExpanded ? 'Collapse' : 'Expand' }}
+      </bl-button>
     </template>
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
       <template #label>There are no collections in your library</template>
@@ -88,7 +98,7 @@
 <script setup lang="ts">
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Collection } from '~/types/collection'
-import { IconPlus } from '@tabler/icons-vue'
+import { IconMaximize, IconMinimize, IconPlus } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
 
