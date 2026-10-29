@@ -22,6 +22,7 @@ import {
   DEFAULT_COLLECTIONS_INIT,
   goalToDbGoal,
   logger,
+  migrateWishlistToCollection,
   now,
 } from '../utils'
 import type { DatabaseClient } from './database-client'
@@ -83,6 +84,11 @@ export class BookLibDataManagementService {
       }
 
       this.client = await createDatabaseClient(this.dbPath, this.getDbSeed({}))
+
+      await this.client.read()
+      if (migrateWishlistToCollection(this.client.data)) {
+        await this.client.write()
+      }
 
       this.isInitialized = true
     } catch (error) {
@@ -818,6 +824,7 @@ export class BookLibDataManagementService {
         })),
       ],
     }
+    migrateWishlistToCollection(this.client.data)
     await this.client.write()
   }
 
