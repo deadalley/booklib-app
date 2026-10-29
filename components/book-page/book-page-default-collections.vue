@@ -21,7 +21,11 @@
           stroke="1.6"
         />
       </template>
-      {{ selected[item] ? LABELS[item]?.on : LABELS[item]?.off }}
+      {{
+        selected[item]
+          ? DEFAULT_COLLECTION_TOGGLE_LABELS[item]?.on
+          : DEFAULT_COLLECTION_TOGGLE_LABELS[item]?.off
+      }}
     </bl-button>
   </div>
 </template>
@@ -40,15 +44,12 @@ defineEmits<{
 const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeart',
   [TBR_COLLECTION_ID]: 'IconBook',
+  [WISHLIST_COLLECTION_ID]: 'IconGift',
 }
 
 const DEFAULT_COLLECTION_ICONS_FILLED: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
   [TBR_COLLECTION_ID]: 'IconBookFilled',
-}
-
-const LABELS: Record<string, { on: string; off: string }> = {
-  [FAVORITE_COLLECTION_ID]: { on: 'Favorited', off: 'Favorite' },
-  [TBR_COLLECTION_ID]: { on: 'In To Be Read', off: 'To Be Read' },
+  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
 }
 </script>
