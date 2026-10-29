@@ -550,3 +550,35 @@
 .progress-stat-label {
   @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
 }
+
+/* Tracking */
+.goal-card {
+  @apply bg-surface-elevated border-stroke-subtle flex min-w-0 flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
+}
+.goal-section-label {
+  @apply text-ink-muted border-stroke-subtle flex w-full items-center gap-2 border-b pb-2 text-left text-xs font-bold tracking-[0.18em] uppercase;
+}
+.goal-tag {
+  @apply inline-flex rounded-full px-2.5 py-0.5 text-[0.6875rem] font-bold tracking-widest whitespace-nowrap uppercase;
+}
+.goal-tag-tracking {
+  @apply bg-primary text-ink-inverse;
+}
+.goal-tag-not-tracking {
+  @apply bg-secondary-50 text-secondary-600 border-secondary-200 border;
+}
+.goal-tag-completed {
+  @apply bg-surface-container text-ink-secondary;
+}
+.goal-tag-expired {
+  @apply bg-surface text-ink-muted;
+}
+.goal-modal-sub {
+  @apply font-body text-ink-muted mt-1 block text-sm font-semibold;
+}
+.goal-legend {
+  @apply text-ink-secondary flex flex-wrap gap-4 text-[0.8125rem] font-semibold;
+}
+.goal-legend li {
+  @apply flex items-center gap-1.5 whitespace-nowrap;
+}
