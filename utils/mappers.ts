@@ -146,12 +146,12 @@ export function getBooksByStatus(
 export function getBooksByPropertyStatus(
   books: ViewBook[],
 ): Record<BookPropertyStatus, number> {
-  const statuses: BookPropertyStatus[] = ['owned', 'not-owned', 'wishlist']
+  const statuses: BookPropertyStatus[] = ['owned', 'not-owned']
   return statuses.reduce(
     (acc, status) => ({
       ...acc,
       [status]: books.filter((book) => book.propertyStatus === status).length,
     }),
-    { owned: 0, 'not-owned': 0, wishlist: 0 },
+    { owned: 0, 'not-owned': 0 },
   )
 }

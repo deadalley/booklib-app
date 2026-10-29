@@ -8,11 +8,17 @@ import type { GoalInterval, GoalType } from '~/types/goal'
 
 export const FAVORITE_COLLECTION_ID = 'favorite'
 export const TBR_COLLECTION_ID = 'tbr'
-export const DEFAULT_COLLECTIONS = [FAVORITE_COLLECTION_ID, TBR_COLLECTION_ID]
+export const WISHLIST_COLLECTION_ID = 'wishlist'
+export const DEFAULT_COLLECTIONS = [
+  FAVORITE_COLLECTION_ID,
+  TBR_COLLECTION_ID,
+  WISHLIST_COLLECTION_ID,
+]
 
 export const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
   [FAVORITE_COLLECTION_ID]: 'IconHeart',
   [TBR_COLLECTION_ID]: 'IconStack2',
+  [WISHLIST_COLLECTION_ID]: 'IconGift',
 }
 
 export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
@@ -21,6 +27,16 @@ export const DEFAULT_COLLECTION_ICONS_FILLED: Record<
 > = {
   [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
   [TBR_COLLECTION_ID]: 'IconStack2Filled',
+  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
+}
+
+export const DEFAULT_COLLECTION_TOGGLE_LABELS: Record<
+  string,
+  { on: string; off: string }
+> = {
+  [FAVORITE_COLLECTION_ID]: { on: 'Favorited', off: 'Favorite' },
+  [TBR_COLLECTION_ID]: { on: 'In To Be Read', off: 'To Be Read' },
+  [WISHLIST_COLLECTION_ID]: { on: 'In Wishlist', off: 'Wishlist' },
 }
 
 export const DEFAULT_COLLECTIONS_INIT = [
@@ -31,6 +47,10 @@ export const DEFAULT_COLLECTIONS_INIT = [
   {
     id: TBR_COLLECTION_ID,
     name: 'To Be Read',
+  },
+  {
+    id: WISHLIST_COLLECTION_ID,
+    name: 'Wishlist',
   },
 ]
 
@@ -96,11 +116,6 @@ export const PROPERTY_STATUS_MAP: Record<
     id: 'owned',
     description: 'Owned',
     icon: 'IconArchive',
-  },
-  wishlist: {
-    id: 'wishlist',
-    description: 'Wishlist',
-    icon: 'IconGift',
   },
 }
 
