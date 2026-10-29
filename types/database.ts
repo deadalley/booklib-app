@@ -56,6 +56,7 @@ export type GoalDB = {
   author_id: string | null
   genres: string[]
   entries: GoalEntryDB[]
+  auto?: boolean
 }
 
 export type GoalEntryDB = {

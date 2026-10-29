@@ -164,6 +164,7 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     author: dbGoal.author_id,
     genres: dbGoal.genres,
     completedAt: dbGoal.completed_at,
+    auto: !!dbGoal.auto,
     ...typeAndEntries,
   } as Goal
 }
@@ -172,11 +173,13 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
   if (goal.type === 'books') {
     return {
       type: 'books',
-      entries: (goal.entries || []).map((entry) => ({
-        id: entry.id ?? uuidv4(),
-        book_id: entry.book,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
-      })),
+      entries: (goal.entries || [])
+        .filter((entry) => !entry.auto)
+        .map((entry) => ({
+          id: entry.id ?? uuidv4(),
+          book_id: entry.book,
+          created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+        })),
     }
   } else if (goal.type === 'pages') {
     return {
@@ -214,6 +217,7 @@ export function goalToDbGoal(goal: Goal): GoalDB {
     author_id: goal.author,
     genres: goal.genres || [],
     completed_at: goal.completedAt || null,
+    auto: goal.type === 'books' && !!goal.auto,
     ...getGoalTypeAndEntriesDb(goal),
   }
 }
