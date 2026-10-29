@@ -337,12 +337,15 @@ const templates = computed(() => {
 })
 
 const sortedAuthors = computed(() =>
-  [...props.authors].sort((a, b) => a.name.localeCompare(b.name)),
+  // Imports can create authors without a name
+  props.authors
+    .filter((author) => !!author.name)
+    .sort((a, b) => a.name.localeCompare(b.name)),
 )
 
 const genres = computed(() =>
   uniq(props.books.flatMap((book) => book.genres ?? []))
-    .filter(Boolean)
+    .filter((genre): genre is string => typeof genre === 'string' && !!genre)
     .sort((a, b) => a.localeCompare(b)),
 )
 
