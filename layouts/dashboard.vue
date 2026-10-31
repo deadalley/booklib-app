@@ -105,7 +105,7 @@
         <slot />
 
         <!-- Loading indicator -->
-        <NuxtLoadingIndicator color="#985858" />
+        <NuxtLoadingIndicator :color="loadingColor" />
       </div>
     </main>
   </div>
@@ -113,8 +113,11 @@
 
 <script setup lang="ts">
 import { IconMenu2 } from '@tabler/icons-vue'
+import { activeTheme } from '~/utils/theme'
 
 const route = useRoute()
+
+const loadingColor = activeTheme.colors.primary.DEFAULT
 
 const props = defineProps<{
   title: string

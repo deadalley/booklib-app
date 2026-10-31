@@ -2,7 +2,6 @@ import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
 import { toISOString, fromSimpleDate, now } from './date'
-import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
 import { v4 as uuidv4 } from 'uuid'
@@ -101,15 +100,6 @@ export function dbCollectionToCollection(
     books: books
       .map(({ book_id, order }) => ({ id: book_id, order }))
       .sort(({ order: order1 }, { order: order2 }) => order1 - order2),
-  }
-}
-
-export function collectionToDbCollection(
-  collection: Collection,
-): Omit<CollectionDB, 'created_at' | 'id'> {
-  return {
-    ...(collection.id ? { id: collection.id } : {}),
-    name: collection.name,
   }
 }
 
@@ -229,39 +219,5 @@ export function goalToDbGoal(goal: Goal): GoalDB {
     completed_at: goal.completedAt || null,
     auto: goal.type === 'books' && !!goal.auto,
     ...getGoalTypeAndEntriesDb(goal),
-  }
-}
-
-export function googleBookToBook(googleBook: GoogleBook): Book {
-  return {
-    id: '0',
-    title: googleBook.volumeInfo.title,
-    coverSrc: googleBook.volumeInfo.imageLinks?.thumbnail || null,
-    createdAt: '',
-    isbn: null,
-    language: googleBook.volumeInfo.language,
-    originalTitle: null,
-    originalLanguage: null,
-    pages: googleBook.volumeInfo.pageCount,
-    publisher: googleBook.volumeInfo.publisher,
-    rating: 0,
-    summary: googleBook.volumeInfo.description,
-    year: (() => {
-      if (!googleBook.volumeInfo.publishedDate) return null
-      const date = new Date(googleBook.volumeInfo.publishedDate)
-      return isNaN(date.getTime()) ? null : date.getFullYear()
-    })(),
-    genres: googleBook.volumeInfo.categories || [],
-    collections: [],
-    format: null,
-    progress: {
-      status: null,
-      startedAt: null,
-      finishedAt: null,
-      notes: [],
-      currentPage: null,
-    },
-    propertyStatus: null,
-    author: null,
   }
 }

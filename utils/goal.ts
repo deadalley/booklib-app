@@ -8,12 +8,7 @@ import type {
   GoalPeriodUnit,
 } from '~/types/goal'
 import { GOAL_INTERVAL_MAP } from './constants'
-import {
-  getElapsedTimePercentage,
-  now,
-  todaySimpleDate,
-  toSimpleDate,
-} from './date'
+import { todaySimpleDate, toSimpleDate } from './date'
 
 type GoalEntry = Goal['entries'][number]
 
@@ -91,13 +86,6 @@ export function getGoalProgressPercentage(goal: Goal): number {
   return Math.round((getGoalProgress(goal) / goal.amount) * 100)
 }
 
-export function getGoalTimeProgressPercentage(goal: Goal): number {
-  return getElapsedTimePercentage(now(), {
-    start: goal.startAt,
-    end: goal.finishAt,
-  })
-}
-
 export function getGoalStatus(
   goal: Goal,
   today = todayKey(),
@@ -133,14 +121,6 @@ export const GOAL_STATUS_LABELS: Record<GoalDisplayStatus, string> = {
 
 export function getGoalStatusLabel(goal: Goal): string {
   return GOAL_STATUS_LABELS[getGoalStatus(goal)]
-}
-
-export function isGoalCompleted(goal: Goal): boolean {
-  return getGoalStatus(goal) === 'completed'
-}
-
-export function isGoalExpired(goal: Goal): boolean {
-  return getGoalStatus(goal) === 'expired'
 }
 
 export function getGoalPeriodUnit(goal: Goal): GoalPeriodUnit | undefined {

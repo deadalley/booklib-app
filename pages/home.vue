@@ -29,7 +29,7 @@
           <h6>OR</h6>
           <hr />
         </div>
-        <NuxtLink to="/import">
+        <NuxtLink to="/data-management">
           <bl-button expand>
             <template #prependIcon="prependIcon">
               <IconUpload v-bind="prependIcon" />

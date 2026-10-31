@@ -65,42 +65,6 @@
                 class="border-t-stroke flex flex-wrap items-center gap-4 border-t pt-4"
               >
                 <div class="flex flex-col gap-2">
-                  <p class="text-ink-secondary text-sm">Multiselect</p>
-                  <bl-multiselect>
-                    <bl-multiselect-option
-                      value="books"
-                      :selected="multiselectValues.includes('books')"
-                      @select="toggleMultiselectValue"
-                    >
-                      <template #icon="iconProps">
-                        <IconBooks v-bind="iconProps" />
-                      </template>
-                      <template #tooltip>Books</template>
-                    </bl-multiselect-option>
-                    <bl-multiselect-option
-                      value="home"
-                      :selected="multiselectValues.includes('home')"
-                      @select="toggleMultiselectValue"
-                    >
-                      <template #icon="iconProps">
-                        <IconHome v-bind="iconProps" />
-                      </template>
-                      <template #tooltip>Home</template>
-                    </bl-multiselect-option>
-                    <bl-multiselect-option
-                      value="palette"
-                      :selected="multiselectValues.includes('palette')"
-                      @select="toggleMultiselectValue"
-                    >
-                      <template #icon="iconProps">
-                        <IconPalette v-bind="iconProps" />
-                      </template>
-                      <template #tooltip>Palette</template>
-                    </bl-multiselect-option>
-                  </bl-multiselect>
-                </div>
-
-                <div class="flex flex-col gap-2">
                   <p class="text-ink-secondary text-sm">Switch</p>
                   <bl-switch v-model="previewView">
                     <bl-switch-option
@@ -652,7 +616,6 @@ const statusRaw = ref<string | undefined>('finished')
 const genreRaw = ref<string | undefined>('sci-fi')
 const menuSide = ref<'top' | 'bottom'>('bottom')
 const previewView = ref<'grid' | 'list'>('grid')
-const multiselectValues = ref<string[]>(['books'])
 const pageRange = ref<[number, number]>([100, 500])
 const sortBy = ref('title')
 const owned = ref(true)
@@ -694,12 +657,6 @@ const sortLabel = computed(
 
 function onSortClick(value: string) {
   sortBy.value = value
-}
-
-function toggleMultiselectValue(value: string) {
-  multiselectValues.value = multiselectValues.value.includes(value)
-    ? multiselectValues.value.filter((item) => item !== value)
-    : [...multiselectValues.value, value]
 }
 
 function onStepperStatusSelect(status: BookProgressStatus) {

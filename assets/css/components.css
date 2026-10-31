@@ -134,7 +134,7 @@
 
   /* Collection tile */
   .collection-tile {
-    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full w-full flex-col text-left overflow-hidden border shadow-sm transition-shadow duration-200;
+    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full w-full flex-col overflow-hidden border text-left shadow-sm transition-shadow duration-200;
     @apply hover:border-primary hover:shadow-primary/50;
   }
   .collection-tile-selected {
@@ -400,7 +400,7 @@
   .nav-sidebar-button-active {
     @apply border-primary/40 bg-primary/10 text-primary;
     @apply hover:border-primary/50 hover:bg-primary/12 hover:text-primary;
-    @apply shadow-[inset_0_0_0_1px_rgba(152,88,88,0.08)];
+    @apply ring-primary/10 ring-1 ring-inset;
   }
   .nav-sidebar-button-icon-only {
     @apply h-11 w-11 justify-center gap-0 p-0;
