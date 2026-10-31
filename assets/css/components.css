@@ -582,3 +582,14 @@
 .goal-legend li {
   @apply flex items-center gap-1.5 whitespace-nowrap;
 }
+
+/* Statistics */
+.stats-title {
+  @apply font-body text-primary text-[0.8125rem] leading-[1.3] font-bold tracking-[0.12em] uppercase;
+}
+.stats-sub {
+  @apply text-ink-muted text-[0.8125rem] font-medium;
+}
+.stats-link {
+  @apply text-primary cursor-pointer self-start p-0 text-left text-[0.8125rem] font-bold tracking-widest whitespace-nowrap uppercase underline-offset-[3px] hover:underline;
+}
