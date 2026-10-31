@@ -27,14 +27,24 @@
         </label>
         <label class="form-wrapper">
           <span class="form-label">Read on</span>
-          <span class="form-inner">
-            <input v-model="date" type="date" class="form-input" />
+          <span class="form-inner" :class="{ error: !dateValid }">
+            <input
+              v-model="date"
+              type="date"
+              class="form-input"
+              :min="windowStart"
+              :max="windowEnd"
+            />
           </span>
         </label>
       </div>
+      <p v-if="!dateValid" class="form-error -mt-2">
+        Pick a date between {{ formatGoalDate(windowStart) }} and
+        {{ formatGoalDate(windowEnd) }}.
+      </p>
       <div class="flex justify-end gap-2">
         <bl-button variant="secondary" @click="open = false">Cancel</bl-button>
-        <bl-button :disabled="!(+amount > 0)" @click="save">
+        <bl-button :disabled="!(+amount > 0) || !dateValid" @click="save">
           Log {{ goal.type }}
         </bl-button>
       </div>
@@ -56,7 +66,12 @@ const emit = defineEmits<{
 const open = defineModel<boolean>({ default: false })
 
 const amount = ref('')
-const date = ref(toSimpleDate(now()))
+const windowStart = computed(() => toSimpleDate(props.goal.startAt))
+const windowEnd = computed(() => toSimpleDate(props.goal.finishAt))
+const date = ref(getGoalDefaultLogDate(props.goal))
+const dateValid = computed(
+  () => !!date.value && isInGoalWindow(props.goal, date.value),
+)
 const amountInput = ref<HTMLInputElement>()
 
 watch(
@@ -64,14 +79,15 @@ watch(
   (isOpen) => {
     if (!isOpen) return
     amount.value = ''
-    date.value = toSimpleDate(now())
+    date.value = getGoalDefaultLogDate(props.goal)
     nextTick(() => amountInput.value?.focus())
   },
   { immediate: true },
 )
 
 function save() {
-  if (!(+amount.value > 0) || props.goal.type === 'books') return
+  if (!(+amount.value > 0) || !dateValid.value || props.goal.type === 'books')
+    return
 
   emit('save', {
     id: uuidv4(),

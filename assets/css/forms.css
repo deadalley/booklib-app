@@ -21,6 +21,9 @@
   .form-inner:focus-within {
     @apply border-primary;
   }
+  .form-inner.error {
+    @apply border-primary-500;
+  }
   .form-error {
     @apply text-primary-600 text-[0.8125rem] font-semibold;
   }

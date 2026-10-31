@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Book } from '~/types/book'
 import type { Goal } from '~/types/goal'
 import {
+  getGoalDefaultLogDate,
   getGoalInfo,
   getGoalPaceUnit,
   getGoalPeriods,
@@ -10,6 +11,7 @@ import {
   getGoalStatus,
   getRepeatedGoal,
   getUnloggedGoalBooks,
+  isInGoalWindow,
   resolveGoal,
   stripAutoEntries,
 } from './goal'
@@ -286,5 +288,20 @@ describe('getGoalRangePreset', () => {
       '2026-10-29',
       '2027-04-28',
     ])
+  })
+})
+
+describe('goal window', () => {
+  const goal = pageGoal({ startAt: '2027-01-01', finishAt: '2027-12-31' })
+
+  it('checks whether a date falls inside the goal', () => {
+    expect(isInGoalWindow(goal, '2026-10-31')).toBe(false)
+    expect(isInGoalWindow(goal, '2027-01-01T00:00:00.000Z')).toBe(true)
+  })
+
+  it('moves the default log date into the goal window', () => {
+    expect(getGoalDefaultLogDate(goal, '2026-10-31')).toBe('2027-01-01')
+    expect(getGoalDefaultLogDate(goal, '2027-05-02')).toBe('2027-05-02')
+    expect(getGoalDefaultLogDate(goal, '2028-02-01')).toBe('2027-12-31')
   })
 })

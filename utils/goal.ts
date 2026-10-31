@@ -129,6 +129,20 @@ export function isGoalExpired(goal: Goal): boolean {
   return getGoalStatus(goal) === 'expired'
 }
 
+export function isInGoalWindow(goal: Goal, date: string): boolean {
+  const key = dayKey(date)
+  return key >= dayKey(goal.startAt) && key <= dayKey(goal.finishAt)
+}
+
+/** Today, moved into the goal window when the goal hasn't started or has ended. */
+export function getGoalDefaultLogDate(goal: Goal, today = todayKey()): string {
+  const start = dayKey(goal.startAt)
+  const end = dayKey(goal.finishAt)
+  if (today < start) return start
+  if (today > end) return end
+  return today
+}
+
 export function getGoalPeriodUnit(goal: Goal): GoalPeriodUnit | undefined {
   return GOAL_INTERVAL_MAP[goal.interval].unit
 }
