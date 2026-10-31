@@ -56,7 +56,7 @@ const emit = defineEmits<{
 const open = defineModel<boolean>({ default: false })
 
 const amount = ref('')
-const date = ref(toSimpleDate(now()))
+const date = ref(todaySimpleDate())
 const amountInput = ref<HTMLInputElement>()
 
 watch(
@@ -64,7 +64,7 @@ watch(
   (isOpen) => {
     if (!isOpen) return
     amount.value = ''
-    date.value = toSimpleDate(now())
+    date.value = todaySimpleDate()
     nextTick(() => amountInput.value?.focus())
   },
   { immediate: true },

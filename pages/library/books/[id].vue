@@ -440,10 +440,26 @@ async function onSelectProgress(
   startedAt?: string,
 ) {
   if (book.value) {
-    book.value.progress.status = progressStatus
+    const progress = book.value.progress
+    progress.status = progressStatus
 
     if (startedAt) {
-      book.value.progress.startedAt = startedAt
+      progress.startedAt = startedAt
+    }
+
+    if (progressStatus === 'read' || progressStatus === 'not-finished') {
+      // Record when the book was finished/abandoned so goals and stats count it
+      progress.finishedAt = progress.finishedAt ?? now()
+    } else {
+      // Back to reading (or reset): a previous finish date no longer applies
+      progress.finishedAt = null
+    }
+
+    if (progressStatus === null) {
+      progress.startedAt = null
+      progress.currentPage = null
+    } else if (progressStatus === 'reading' && !startedAt) {
+      progress.startedAt = progress.startedAt ?? now()
     }
 
     if (!isNew.value) {

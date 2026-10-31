@@ -52,7 +52,7 @@ import type { GoalInfo } from '~/utils/goal'
 
 const props = defineProps<{ goal: Goal; info: GoalInfo }>()
 
-const today = toSimpleDate(now())
+const today = todaySimpleDate()
 
 const periods = computed(() => props.info.periods)
 const unit = computed(() => getGoalPeriodUnit(props.goal))

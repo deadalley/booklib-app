@@ -158,7 +158,7 @@ const authorName = computed(
 const scope = ref<'period' | 'author' | 'all'>('all')
 const view = ref<View>('cards')
 const selectedId = ref<string | null>(null)
-const date = ref(toSimpleDate(now()))
+const date = ref(todaySimpleDate())
 
 watch(
   open,
@@ -171,7 +171,7 @@ watch(
         ? 'period'
         : 'all'
     selectedId.value = null
-    date.value = toSimpleDate(now())
+    date.value = todaySimpleDate()
   },
   { immediate: true },
 )

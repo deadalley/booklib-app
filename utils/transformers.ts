@@ -11,6 +11,15 @@ export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
 }
 
+/**
+ * Goal entries are stored as ISO timestamps. Entries coming from forms carry a
+ * calendar day (`YYYY-MM-DD`), while entries loaded from the database already
+ * carry an ISO timestamp; `fromSimpleDate` handles both without shifting days.
+ */
+function toEntryDate(createdAt: string | undefined | null) {
+  return createdAt ? fromSimpleDate(createdAt) : now()
+}
+
 export function dbAuthorToAuthor(dbAuthor: AuthorDB): Author {
   return {
     id: dbAuthor.id,
@@ -44,7 +53,7 @@ export function dbBookToBook(
       startedAt: dbBook.started_at ?? null,
       finishedAt: dbBook.finished_at ?? null,
       notes: dbBook.notes ?? [],
-      currentPage: null,
+      currentPage: dbBook.current_page ?? null,
     },
     propertyStatus: dbBook.property_status,
     collections,
@@ -76,6 +85,7 @@ export function bookToDbBook(
     format: book.format || null,
     started_at: nullify(book.progress?.startedAt),
     finished_at: nullify(book.progress?.finishedAt),
+    current_page: nullify(book.progress?.currentPage),
     collections: book.collections ?? [],
   }
 }
@@ -178,7 +188,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
         .map((entry) => ({
           id: entry.id ?? uuidv4(),
           book_id: entry.book,
-          created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+          created_at: toEntryDate(entry.createdAt),
         })),
     }
   } else if (goal.type === 'pages') {
@@ -187,7 +197,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         pages: entry.pages,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+        created_at: toEntryDate(entry.createdAt),
       })),
     }
   } else if (goal.type === 'hours') {
@@ -196,7 +206,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         hours: entry.hours,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+        created_at: toEntryDate(entry.createdAt),
       })),
     }
   }

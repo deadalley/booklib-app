@@ -8,7 +8,12 @@ import type {
   GoalPeriodUnit,
 } from '~/types/goal'
 import { GOAL_INTERVAL_MAP } from './constants'
-import { getElapsedTimePercentage, now, toSimpleDate } from './date'
+import {
+  getElapsedTimePercentage,
+  now,
+  todaySimpleDate,
+  toSimpleDate,
+} from './date'
 
 type GoalEntry = Goal['entries'][number]
 
@@ -18,7 +23,7 @@ function dayKey(date: string): string {
 }
 
 function todayKey(): string {
-  return toSimpleDate(now())
+  return todaySimpleDate()
 }
 
 function day(key: string) {

@@ -331,6 +331,7 @@ import {
   toFullDateCompact,
   toSimpleDate,
   fromSimpleDate,
+  todaySimpleDate,
   now,
 } from '~/utils/date'
 import {
@@ -504,7 +505,7 @@ const actions = computed<
     case 'read':
       return [
         {
-          id: PROGRESS_STATUS_MAP['not-finished'].id,
+          id: 'stop',
           icon: 'IconNotesOff',
           label: 'Mark as unread',
           variant: 'secondary',
@@ -581,7 +582,7 @@ function openLogModal() {
     ? String(props.book.progress.currentPage)
     : undefined
   logNote.value = ''
-  logDate.value = toSimpleDate(now())
+  logDate.value = todaySimpleDate()
   showLogModal.value = true
 }
 
@@ -616,7 +617,7 @@ function onSaveLogEntry() {
 function openStartDateModal() {
   pendingStartDate.value = props.book.progress.startedAt
     ? toSimpleDate(props.book.progress.startedAt)
-    : toSimpleDate(now())
+    : todaySimpleDate()
   showStartDateModal.value = true
 }
 

@@ -32,6 +32,7 @@ export class BookLibDataManagementService {
   private client: DatabaseClient | null = null
   private dbPath: string | null = null
   private isInitialized = false
+  private initPromise: Promise<void> | null = null
 
   constructor(dbPath?: string) {
     if (dbPath) {
@@ -75,9 +76,19 @@ export class BookLibDataManagementService {
     }
   }
 
-  async initialize(): Promise<void> {
-    if (this.isInitialized) return
+  initialize(): Promise<void> {
+    if (this.isInitialized) return Promise.resolve()
+    // Share a single in-flight initialisation between concurrent callers
+    if (!this.initPromise) {
+      this.initPromise = this.doInitialize().catch((error) => {
+        this.initPromise = null
+        throw error
+      })
+    }
+    return this.initPromise
+  }
 
+  private async doInitialize(): Promise<void> {
     try {
       if (!this.dbPath) {
         this.dbPath = await this.getDefaultDbPath()
@@ -103,6 +114,41 @@ export class BookLibDataManagementService {
     }
   }
 
+  /**
+   * Resolves an author reference to an author id. `value` may be an existing
+   * author id or, for new authors, the author's name (a new author is created).
+   */
+  private resolveAuthorId(value: string | null): AuthorDB['id'] | null {
+    if (!value || !this.client) return null
+    const authors = this.client.data.authors
+    const existing =
+      authors.find((a) => a.id === value) ??
+      authors.find(
+        (a) => a.name.trim().toLowerCase() === value.trim().toLowerCase(),
+      )
+    if (existing) return existing.id
+
+    const author: AuthorDB = {
+      id: uuidv4(),
+      name: value.trim(),
+      created_at: now(),
+    }
+    authors.push(author)
+    return author.id
+  }
+
+  /** Removes goal entries that point at books which no longer exist. */
+  private removeGoalBookReferences(bookIds: BookDB['id'][]) {
+    if (!this.client || !bookIds.length) return
+    const removed = new Set(bookIds)
+    this.client.data.goals = this.client.data.goals.map((goal) => ({
+      ...goal,
+      entries: goal.entries.filter(
+        (entry) => !entry.book_id || !removed.has(entry.book_id),
+      ),
+    }))
+  }
+
   private isBookCover(id: BookDB['id']) {
     return (fileName: string) => fileName.split('.')[0] === id
   }
@@ -124,7 +170,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
     const data = this.client.data.authors
     return data.map(dbAuthorToAuthor)
   }
@@ -136,7 +182,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const author = this.client.data.authors.find((a) => a.id === id)
     if (!author) return null
@@ -166,19 +212,30 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     this.client.data.authors = this.client.data.authors.filter(
       (author) => author.id !== id,
     )
 
+    // Goals scoped to this author no longer have an author filter
+    this.client.data.goals = this.client.data.goals.map((goal) =>
+      goal.author_id === id ? { ...goal, author_id: null } : goal,
+    )
+
     if (params.deleteBooks) {
+      const removedBookIds: BookDB['id'][] = []
       this.client.data.books = this.client.data.books.filter((book) => {
         if (book.author_id === id) {
+          removedBookIds.push(book.id)
           this.deleteBookCover(book.id)
         }
         return book.author_id !== id
       })
+      this.client.data['collection-book'] = this.client.data[
+        'collection-book'
+      ].filter(({ book_id }) => !removedBookIds.includes(book_id))
+      this.removeGoalBookReferences(removedBookIds)
     } else {
       this.client.data.books = this.client.data.books.map((book) =>
         book.author_id === id ? { ...book, author_id: null } : book,
@@ -194,7 +251,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const book = this.client.data.books.find((book) => book.id === id)
     if (!book) return null
@@ -216,7 +273,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     let books = [...this.client.data.books]
 
@@ -255,27 +312,14 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
-    let author = null
-    if (book.author) {
-      author = this.client.data.authors.find((a) => a.id === book.author)
-
-      if (!author) {
-        // If author doesn't exist, create a new one
-        author = {
-          id: uuidv4(),
-          name: book.author,
-          created_at: now(),
-        }
-        this.client.data.authors.push(author)
-      }
-    }
+    const authorId = this.resolveAuthorId(book.author ?? null)
 
     const bookDb: BookDB = {
       ...bookToDbBook(book),
       id: book.id ?? uuidv4(),
-      author_id: author?.id || null,
+      author_id: authorId,
       created_at: book.createdAt || now(),
     }
 
@@ -305,7 +349,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
     if (bookIndex === -1) return null
@@ -316,26 +360,28 @@ export class BookLibDataManagementService {
       throw new Error('Book not found')
     }
 
-    let author = null
-    if (book.author) {
-      author = this.client.data.authors.find((a) => a.id === book.author)
+    // `book` is a patch: only the provided keys change, everything else is
+    // kept from the stored book.
+    const existingCollections = this.client.data['collection-book']
+      .filter(({ book_id }) => book_id === id)
+      .map(({ collection_id }) => collection_id)
+    const current = dbBookToBook(existingBook, existingCollections)
+    const merged: Book = {
+      ...current,
+      ...book,
+      progress: { ...current.progress, ...(book.progress ?? {}) },
+    }
 
-      if (!author) {
-        // If author doesn't exist, create a new one
-        author = {
-          id: uuidv4(),
-          name: book.author,
-          created_at: now(),
-        }
-        this.client.data.authors.push(author)
-      }
+    let authorId = existingBook.author_id
+    if ('author' in book) {
+      authorId = this.resolveAuthorId(book.author ?? null)
     }
 
     const updatedBookDb: BookDB = {
       ...existingBook,
-      ...bookToDbBook(book as Book),
+      ...bookToDbBook(merged),
       id,
-      author_id: author?.id || null,
+      author_id: authorId,
       created_at: existingBook.created_at,
     }
 
@@ -364,7 +410,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const bookExists = this.client.data.books.some((book) => book.id === id)
     if (!bookExists) return null
@@ -379,6 +425,8 @@ export class BookLibDataManagementService {
       'collection-book'
     ].filter(({ book_id }) => book_id !== id)
 
+    this.removeGoalBookReferences([id])
+
     // Delete book cover
     await this.deleteBookCover(id)
 
@@ -390,7 +438,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const deletedIds: BookDB['id'][] = []
 
@@ -413,6 +461,8 @@ export class BookLibDataManagementService {
       'collection-book'
     ].filter(({ book_id }) => !ids.includes(book_id))
 
+    this.removeGoalBookReferences(deletedIds)
+
     await this.client.write()
     return deletedIds
   }
@@ -421,7 +471,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
     return this.client.data.books.length
   }
 
@@ -429,7 +479,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const books = [...this.client.data.books]
       .sort(
@@ -460,7 +510,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const books = [...this.client.data.books]
       .filter((book) => book[params.property] != null)
@@ -512,7 +562,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const collection = this.client.data.collections.find((c) => c.id === id)
     if (!collection) return null
@@ -528,7 +578,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     return this.client.data.collections.map((collection) => {
       const collectionBooks = this.client!.data['collection-book'].filter(
@@ -543,7 +593,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
     return this.client.data.collections.length
   }
 
@@ -557,7 +607,7 @@ export class BookLibDataManagementService {
       created_at: collection.createdAt || now(),
     }
 
-    this.client.read()
+    await this.client.read()
 
     // Add collection
     this.client.data.collections.push(collectionDb)
@@ -583,7 +633,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const collectionIndex = this.client.data.collections.findIndex(
       (c) => c.id === id,
@@ -636,7 +686,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const collectionExists = this.client.data.collections.some(
       (c) => c.id === id,
@@ -672,7 +722,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
     return this.client.data.goals.map(dbGoalToGoal)
   }
 
@@ -686,7 +736,7 @@ export class BookLibDataManagementService {
       created_at: goal.createdAt || now(),
     }
 
-    this.client.read()
+    await this.client.read()
 
     const existingGoalIndex = this.client.data.goals.findIndex(
       (g) => g.id === goalDb.id,
@@ -707,7 +757,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const goalExists = this.client.data.goals.some((g) => g.id === id)
     if (!goalExists) return null
@@ -723,7 +773,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
     return this.client.data.books.length === 0
   }
 
@@ -739,7 +789,7 @@ export class BookLibDataManagementService {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
-    this.client.read()
+    await this.client.read()
 
     const result: LibraryIntegrityResult = {
       books: [],
