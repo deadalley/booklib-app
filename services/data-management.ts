@@ -19,6 +19,7 @@ import {
   dbBookToBook,
   dbCollectionToCollection,
   dbGoalToGoal,
+  DEFAULT_COLLECTIONS,
   DEFAULT_COLLECTIONS_INIT,
   goalToDbGoal,
   logger,
@@ -835,46 +836,132 @@ export class BookLibDataManagementService {
     return result
   }
 
-  async importLibrary(data: Database): Promise<void> {
+  /**
+   * Adds books in a single write. `book.author` may be an author id or a name;
+   * authors are matched by name and created when missing. Collections are not
+   * imported.
+   */
+  async importBooks(books: Book[]): Promise<number> {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
     await this.client.read()
 
-    this.client.data = {
-      authors: [...this.client.data.authors, ...data.authors],
-      books: [
-        ...this.client.data.books,
-        ...data.books.map((book) => ({
-          ...book,
-          id: uuidv4(),
-          created_at: now(),
-        })),
-      ],
-      collections: [
-        ...this.client.data.collections,
-        ...data.collections
-          .filter((collection) => !DEFAULT_COLLECTIONS.includes(collection.id))
-          .map((collection) => ({
-            ...collection,
-            id: uuidv4(),
-            created_at: now(),
-          })),
-      ],
-      'collection-book': [
-        ...this.client.data['collection-book'],
-        ...data['collection-book'],
-      ],
-      goals: [
-        ...this.client.data.goals,
-        ...data.goals.map((goal) => ({
-          ...goal,
-          id: uuidv4(),
-          created_at: now(),
-        })),
-      ],
+    for (const book of books) {
+      this.client.data.books.push({
+        ...bookToDbBook({ ...book, collections: [] }),
+        id: uuidv4(),
+        author_id: this.resolveAuthorId(book.author ?? null),
+        created_at: book.createdAt || now(),
+        collections: [],
+      })
     }
-    migrateWishlistToCollection(this.client.data)
+
+    await this.client.write()
+    return books.length
+  }
+
+  /**
+   * Restores a full library backup by merging it into the current library.
+   * Every imported entity gets a new id and all references between them
+   * (book authors, collection memberships, goal entries) are remapped, so
+   * nothing is orphaned. Authors and collections are matched by name.
+   */
+  async importLibrary(data: Database): Promise<void> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    await this.client.read()
+    const db = this.client.data
+    const key = (value: string) => value.trim().toLowerCase()
+
+    const authorIds = new Map<string, string>()
+    const authorsByName = new Map(db.authors.map((a) => [key(a.name), a.id]))
+    for (const author of data.authors ?? []) {
+      const existing = authorsByName.get(key(author.name))
+      if (existing) {
+        authorIds.set(author.id, existing)
+      } else {
+        const id = uuidv4()
+        db.authors.push({ ...author, id })
+        authorsByName.set(key(author.name), id)
+        authorIds.set(author.id, id)
+      }
+    }
+
+    const collectionIds = new Map<string, string>()
+    const collectionsByName = new Map(
+      db.collections.map((c) => [key(c.name), c.id]),
+    )
+    for (const collection of data.collections ?? []) {
+      if (DEFAULT_COLLECTIONS.includes(collection.id)) {
+        collectionIds.set(collection.id, collection.id)
+        continue
+      }
+      const existing = collectionsByName.get(key(collection.name))
+      if (existing) {
+        collectionIds.set(collection.id, existing)
+      } else {
+        const id = uuidv4()
+        db.collections.push({ ...collection, id })
+        collectionsByName.set(key(collection.name), id)
+        collectionIds.set(collection.id, id)
+      }
+    }
+
+    const bookIds = new Map<string, string>()
+    for (const book of data.books ?? []) {
+      const id = uuidv4()
+      bookIds.set(book.id, id)
+      db.books.push({
+        ...book,
+        id,
+        author_id: book.author_id
+          ? (authorIds.get(book.author_id) ?? null)
+          : null,
+        collections: (book.collections ?? [])
+          .map((c) => collectionIds.get(c))
+          .filter((c): c is string => !!c),
+        created_at: book.created_at || now(),
+      })
+    }
+
+    const memberships = new Set(
+      db['collection-book'].map((cb) => `${cb.collection_id}|${cb.book_id}`),
+    )
+    for (const link of data['collection-book'] ?? []) {
+      const bookId = bookIds.get(link.book_id)
+      const collectionId = collectionIds.get(link.collection_id)
+      if (!bookId || !collectionId) continue
+      const linkKey = `${collectionId}|${bookId}`
+      if (memberships.has(linkKey)) continue
+      memberships.add(linkKey)
+      db['collection-book'].push({
+        ...link,
+        book_id: bookId,
+        collection_id: collectionId,
+      })
+    }
+
+    for (const goal of data.goals ?? []) {
+      db.goals.push({
+        ...goal,
+        id: uuidv4(),
+        author_id: goal.author_id
+          ? (authorIds.get(goal.author_id) ?? null)
+          : null,
+        entries: goal.entries
+          .filter((entry) => !entry.book_id || bookIds.has(entry.book_id))
+          .map((entry) => ({
+            ...entry,
+            id: uuidv4(),
+            ...(entry.book_id ? { book_id: bookIds.get(entry.book_id) } : {}),
+          })),
+        created_at: goal.created_at || now(),
+      })
+    }
+
+    migrateWishlistToCollection(db)
     await this.client.write()
   }
 
