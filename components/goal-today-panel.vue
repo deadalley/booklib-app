@@ -66,6 +66,15 @@ const rows = computed(() =>
   props.goals.map((goal) => {
     const info = getGoalInfo(goal)
 
+    if (!info.started) {
+      return {
+        goal,
+        info,
+        state: 'todo',
+        message: `Starts ${formatGoalDate(goal.startAt)}`,
+      }
+    }
+
     if (goal.interval === 'total') {
       const rate = getGoalRequiredRate(goal, info)
       const offset = info.paceOffset

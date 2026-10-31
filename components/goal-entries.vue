@@ -14,6 +14,18 @@
       </bl-button>
     </div>
 
+    <div v-if="outsideCount" class="banner warning">
+      <IconCalendar :size="18" stroke="1.7" class="shrink-0" />
+      <span class="min-w-48 flex-1">
+        {{ outsideCount === 1 ? '1 entry is' : `${outsideCount} entries are` }}
+        outside this goal’s dates ({{
+          formatGoalRange(goal.startAt, goal.finishAt)
+        }}) and {{ outsideCount === 1 ? 'doesn’t' : 'don’t' }} count. Edit
+        {{ outsideCount === 1 ? 'its date' : 'their dates' }} or the goal’s
+        dates.
+      </span>
+    </div>
+
     <p v-if="!sortedEntries.length" class="text-ink-muted py-2 text-sm">
       No entries yet. Use “Log” above to add your first one.
     </p>
@@ -68,8 +80,17 @@
               <span class="form-label">
                 {{ goal.type === 'books' ? 'Finished on' : 'Read on' }}
               </span>
-              <span class="form-inner">
-                <input v-model="form.date" type="date" class="form-input" />
+              <span
+                class="form-inner"
+                :class="{ error: !isInGoalWindow(goal, form.date) }"
+              >
+                <input
+                  v-model="form.date"
+                  type="date"
+                  class="form-input"
+                  :min="toSimpleDate(goal.startAt)"
+                  :max="toSimpleDate(goal.finishAt)"
+                />
               </span>
             </label>
           </div>
@@ -95,7 +116,16 @@
               {{ bookFor(entry)?.authorName }}
             </span>
           </span>
-          <span class="entry-date">{{ formatGoalDate(entry.createdAt) }}</span>
+          <span class="entry-date">
+            <span
+              v-if="!isInGoalWindow(goal, entry.createdAt)"
+              class="outside-tag"
+              title="Entries outside the goal dates don’t count toward it"
+            >
+              Outside goal dates
+            </span>
+            {{ formatGoalDate(entry.createdAt) }}
+          </span>
           <span
             v-if="isAuto(entry)"
             class="auto-tag"
@@ -134,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconBooks, IconEdit, IconTrash } from '@tabler/icons-vue'
+import { IconBooks, IconCalendar, IconEdit, IconTrash } from '@tabler/icons-vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { ViewBook } from '~/types/book'
 import type { Goal } from '~/types/goal'
@@ -164,8 +194,18 @@ const sortedEntries = computed(() =>
 
 const unlogged = computed(() => getUnloggedGoalBooks(props.goal, props.books))
 
-const formValid = computed(() =>
-  props.goal.type === 'books' ? !!form.book : +form.amount > 0,
+const formValid = computed(
+  () =>
+    !!form.date &&
+    isInGoalWindow(props.goal, form.date) &&
+    (props.goal.type === 'books' ? !!form.book : +form.amount > 0),
+)
+
+const outsideCount = computed(
+  () =>
+    props.goal.entries.filter(
+      (entry) => !isInGoalWindow(props.goal, entry.createdAt),
+    ).length,
 )
 
 function isAuto(entry: Entry) {
@@ -256,7 +296,13 @@ function logUnlogged() {
   @apply border-stroke bg-surface-canvas flex flex-col gap-3 rounded-xl border p-4;
 }
 .entry-date {
-  @apply text-ink-secondary text-sm font-medium whitespace-nowrap;
+  @apply text-ink-secondary flex items-center gap-2 text-sm font-medium whitespace-nowrap;
+}
+.outside-tag {
+  @apply bg-secondary-50 text-secondary-600 border-secondary-200 rounded-full border px-2 py-0.5 text-[0.6875rem] font-bold tracking-widest uppercase;
+}
+.banner.warning {
+  @apply border-secondary-200 bg-secondary-50 text-secondary-600;
 }
 .entry-tools {
   @apply flex gap-0.5 opacity-55;
