@@ -1,6 +1,6 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <DialogRoot :open="open">
+  <DialogRoot :open="open" @update:open="(value) => !value && _onCancel()">
     <DialogTrigger v-if="$slots['trigger']" @click="open = true">
       <slot name="trigger" />
     </DialogTrigger>

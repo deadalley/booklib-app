@@ -10,6 +10,8 @@ export type BookGoalEntry = {
   id: string
   book: Book['id']
   createdAt: string
+  // Virtual entry counted from the library; never persisted
+  auto?: boolean
 }
 
 export type PageGoalEntry = {
@@ -51,4 +53,16 @@ export type Goal = (BookGoal | PageGoal | HourGoal) & {
   status: GoalStatus
   author: string | null
   genres: string[]
+  // Book goals only: count books marked as read within the goal window
+  auto?: boolean
+}
+
+export type GoalDisplayStatus = GoalStatus | 'completed' | 'expired'
+
+export type GoalPeriodUnit = 'day' | 'week' | 'month' | 'year'
+
+export type GoalPeriod = {
+  start: string
+  end: string
+  value: number
 }

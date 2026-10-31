@@ -4,7 +4,7 @@ import type {
   BookProgressStatus,
   BookPropertyStatus,
 } from '~/types/book'
-import type { GoalInterval, GoalType } from '~/types/goal'
+import type { GoalInterval, GoalPeriodUnit, GoalType } from '~/types/goal'
 
 export const FAVORITE_COLLECTION_ID = 'favorite'
 export const TBR_COLLECTION_ID = 'tbr'
@@ -193,22 +193,26 @@ export const GOAL_INTERVAL = ['daily', 'weekly', 'monthly', 'yearly', 'total']
 
 export const GOAL_INTERVAL_MAP: Record<
   GoalInterval,
-  { id: GoalInterval; description: string }
+  { id: GoalInterval; description: string; unit?: GoalPeriodUnit }
 > = {
   daily: {
     id: 'daily',
+    unit: 'day',
     description: 'per day',
   },
   weekly: {
     id: 'weekly',
+    unit: 'week',
     description: 'per week',
   },
   monthly: {
     id: 'monthly',
+    unit: 'month',
     description: 'per month',
   },
   yearly: {
     id: 'yearly',
+    unit: 'year',
     description: 'per year',
   },
   total: {
