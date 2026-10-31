@@ -28,22 +28,13 @@
       </button>
 
       <div class="flex flex-wrap items-center gap-1.5">
-        <bl-button
-          v-if="info.status !== 'expired'"
-          size="sm"
-          @click="$emit('log')"
-        >
+        <bl-button v-if="info.status !== 'expired'" @click="$emit('log')">
           <template #prependIcon="iconProps">
             <IconPlus v-bind="iconProps" />
           </template>
           {{ logLabel }}
         </bl-button>
-        <bl-button
-          v-if="!isDone"
-          variant="secondary"
-          size="sm"
-          @click="togglePause"
-        >
+        <bl-button v-if="!isDone" variant="secondary" @click="togglePause">
           <template #prependIcon="iconProps">
             <component
               :is="
@@ -54,12 +45,7 @@
           </template>
           {{ goal.status === 'tracking' ? 'Pause' : 'Resume' }}
         </bl-button>
-        <bl-button
-          v-if="isDone"
-          variant="secondary"
-          size="sm"
-          @click="$emit('repeat')"
-        >
+        <bl-button v-if="isDone" variant="secondary" @click="$emit('repeat')">
           <template #prependIcon="iconProps">
             <IconRepeat v-bind="iconProps" />
           </template>
