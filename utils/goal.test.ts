@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Book } from '~/types/book'
 import type { Goal } from '~/types/goal'
 import {
+  getFeaturedGoal,
   getGoalInfo,
   getGoalPaceUnit,
   getGoalPeriods,
@@ -286,5 +287,23 @@ describe('getGoalRangePreset', () => {
       '2026-10-29',
       '2027-04-28',
     ])
+  })
+})
+
+describe('getFeaturedGoal', () => {
+  it('picks the longest active total book goal running today', () => {
+    const year = bookGoal({ id: 'year' })
+    const summer = bookGoal({
+      id: 'summer',
+      startAt: '2026-06-01',
+      finishAt: '2026-08-31',
+    })
+    const pages = pageGoal({ id: 'pages', interval: 'total' })
+    const paused = bookGoal({ id: 'paused', status: 'not-tracking' })
+
+    expect(
+      getFeaturedGoal([summer, pages, paused, year], '2026-07-01')?.id,
+    ).toBe('year')
+    expect(getFeaturedGoal([summer, pages], '2026-10-01')).toBeNull()
   })
 })

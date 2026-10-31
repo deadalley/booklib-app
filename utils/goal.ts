@@ -256,6 +256,31 @@ export function getGoalInfo(goal: Goal, today = todayKey()): GoalInfo {
   }
 }
 
+/**
+ * The active book goal counted in total whose window contains today; the
+ * longest one wins when several qualify.
+ */
+export function getFeaturedGoal(
+  goals: Goal[],
+  today = todayKey(),
+): Goal | null {
+  const span = (goal: Goal) =>
+    daysBetween(dayKey(goal.startAt), dayKey(goal.finishAt))
+
+  return (
+    goals
+      .filter(
+        (goal) =>
+          goal.type === 'books' &&
+          goal.interval === 'total' &&
+          getGoalStatus(goal, today) === 'tracking' &&
+          dayKey(goal.startAt) <= today &&
+          dayKey(goal.finishAt) >= today,
+      )
+      .sort((a, b) => span(b) - span(a))[0] ?? null
+  )
+}
+
 export function getGoalPaceUnit(goal: Goal): 'day' | 'week' | 'month' {
   const span = daysBetween(dayKey(goal.startAt), dayKey(goal.finishAt))
   if (span > 120) return 'month'
