@@ -42,13 +42,9 @@ import type { BookNote } from '~/types/book'
 const props = defineProps<{ note: BookNote; latest?: boolean }>()
 const emit = defineEmits<{ (e: 'edit' | 'delete'): void }>()
 
-const formattedDate = computed(() =>
-  new Date(props.note.createdAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }),
-)
+// Log dates are calendar days stored at UTC midnight; format them in UTC so
+// they don't shift to the previous day west of UTC.
+const formattedDate = computed(() => toFullDateCompact(props.note.createdAt))
 </script>
 
 <style scoped>

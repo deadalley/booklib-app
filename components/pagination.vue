@@ -22,7 +22,7 @@
       <template v-for="(page, index) in items">
         <PaginationListItem
           v-if="page.type === 'page'"
-          :key="index"
+          :key="`page-${page.value}`"
           class="pagination-page-item"
           :value="page.value"
         >
@@ -30,7 +30,7 @@
         </PaginationListItem>
         <PaginationEllipsis
           v-else
-          :key="page.type"
+          :key="`ellipsis-${index}`"
           :index="index"
           class="pagination-ellipsis"
         >

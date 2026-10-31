@@ -37,7 +37,7 @@
 
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
-      :books="!interactive || editing ? sortedBooksForTable : selectedBooks"
+      :books="tableBooks"
       :selected-table-columns="selectedTableColumns"
       :with-check="editing"
       :row-clickable="!editing"
@@ -60,7 +60,7 @@
 import type { Book, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
-defineProps<{
+const props = defineProps<{
   view: View
   interactive?: boolean
   editing?: boolean
@@ -97,8 +97,15 @@ const emit = defineEmits<{
   (e: 'update:page', val: number): void
 }>()
 
+// Outside the interactive (collection) mode the parent has already filtered,
+// sorted and paginated `books`; re-sorting here would scramble that order.
+const tableBooks = computed(() => {
+  if (!props.interactive) return books.value
+  return props.editing ? sortedBooksForTable.value : selectedBooks.value
+})
+
 function onSelectRows(selection: Record<string, boolean>) {
-  sortedBooksForTable.value.forEach((book) => {
+  tableBooks.value.forEach((book) => {
     const selected = !!selection[String(book.id)]
 
     if (!!book.selected !== selected) {

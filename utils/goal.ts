@@ -105,7 +105,16 @@ export function getGoalStatus(
   const progress = getGoalProgress(goal)
 
   if (today > dayKey(goal.finishAt)) {
-    return progress >= goal.amount ? 'completed' : 'expired'
+    if (goal.interval === 'total') {
+      return progress >= goal.amount ? 'completed' : 'expired'
+    }
+    // Periodic goals ("30 pages a day") are met when every period hit the
+    // target, not when the all-time total reaches a single period's amount.
+    const periods = getGoalPeriods(goal)
+    return periods.length > 0 &&
+      periods.every((period) => period.value >= goal.amount)
+      ? 'completed'
+      : 'expired'
   }
 
   if (goal.interval === 'total' && progress >= goal.amount) {
@@ -148,8 +157,10 @@ export function getGoalPeriods(goal: Goal): GoalPeriod[] {
   const end = dayKey(goal.finishAt)
   const periods: GoalPeriod[] = []
 
+  // Guard against malformed dates only; a daily goal can span many years
+  const maxPeriods = Math.max(0, daysBetween(start, end)) + 2
   let current = start
-  while (current <= end && periods.length < 400) {
+  while (current <= end && periods.length < maxPeriods) {
     let next: dayjs.Dayjs
     if (unit === 'day') next = day(current).add(1, 'day')
     else if (unit === 'week') next = day(current).add(7, 'day')
@@ -402,8 +413,11 @@ export function getGoalRangePreset(
       const next = t.add(1, 'month')
       return [format(next.startOf('month')), format(next.endOf('month'))]
     }
-    case 'week':
-      return [format(t.startOf('week')), format(t.endOf('week'))]
+    case 'week': {
+      // Monday–Sunday, matching the week strip
+      const monday = t.subtract((t.day() + 6) % 7, 'day')
+      return [format(monday), format(monday.add(6, 'day'))]
+    }
   }
 }
 
@@ -424,11 +438,26 @@ export function getRepeatedGoal(goal: Goal, today = todayKey()): Goal {
   let nextEnd: string
   let title = goal.title
 
+  const fullMonths =
+    start.slice(8) === '01' &&
+    day(end).endOf('month').format('YYYY-MM-DD') === end
+
   if (fullYear) {
     const year = Math.max(day(today).year(), day(end).year() + 1)
     nextStart = `${year}-01-01`
     nextEnd = `${year}-12-31`
     title = title.replace(/\d{4}/, String(year))
+  } else if (fullMonths) {
+    // Whole calendar months repeat as the same number of months
+    const months = day(end).diff(day(start), 'month') + 1
+    let next = day(start).add(months, 'month')
+    while (
+      next.add(months, 'month').subtract(1, 'day').format('YYYY-MM-DD') < today
+    ) {
+      next = next.add(months, 'month')
+    }
+    nextStart = next.format('YYYY-MM-DD')
+    nextEnd = next.add(months, 'month').subtract(1, 'day').format('YYYY-MM-DD')
   } else {
     const span = daysBetween(start, end)
     nextStart = addDays(end, 1)

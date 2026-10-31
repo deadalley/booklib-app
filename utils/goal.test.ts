@@ -14,6 +14,7 @@ import {
   resolveGoal,
   stripAutoEntries,
 } from './goal'
+import { toSimpleDate } from './date'
 
 function bookGoal(overrides: Partial<Goal> = {}): Goal {
   return {
@@ -263,13 +264,48 @@ describe('getRepeatedGoal', () => {
 
   it('moves other spans forward until they end after today', () => {
     const repeated = getRepeatedGoal(
-      pageGoal({ startAt: '2026-06-01', finishAt: '2026-06-30' }),
+      pageGoal({ startAt: '2026-06-03', finishAt: '2026-07-02' }),
       '2026-08-15',
     )
     expect([repeated.startAt, repeated.finishAt]).toEqual([
-      '2026-07-31',
-      '2026-08-29',
+      '2026-08-02',
+      '2026-08-31',
     ])
+  })
+
+  it('repeats whole calendar months as calendar months', () => {
+    // January (31 days) must repeat as February, not as Feb 1 – Mar 3
+    expect(
+      getRepeatedGoal(
+        pageGoal({ startAt: '2026-01-01', finishAt: '2026-01-31' }),
+        '2026-02-01',
+      ),
+    ).toMatchObject({ startAt: '2026-02-01', finishAt: '2026-02-28' })
+
+    // Skips ahead to the first window that is still running today
+    expect(
+      getRepeatedGoal(
+        pageGoal({ startAt: '2026-06-01', finishAt: '2026-06-30' }),
+        '2026-08-15',
+      ),
+    ).toMatchObject({ startAt: '2026-08-01', finishAt: '2026-08-31' })
+
+    // Quarters stay quarters
+    expect(
+      getRepeatedGoal(
+        pageGoal({ startAt: '2026-01-01', finishAt: '2026-03-31' }),
+        '2026-04-01',
+      ),
+    ).toMatchObject({ startAt: '2026-04-01', finishAt: '2026-06-30' })
+  })
+
+  it('keeps stored ISO dates on the same calendar day in every time zone', () => {
+    const repeated = getRepeatedGoal(
+      bookGoal({ title: 'Read 24 books in 2026' }),
+      '2027-01-05',
+    )
+    expect(toSimpleDate(repeated.startAt)).toBe('2027-01-01')
+    expect(toSimpleDate(repeated.finishAt)).toBe('2027-12-31')
   })
 })
 
@@ -287,6 +323,62 @@ describe('getGoalRangePreset', () => {
       '2026-10-29',
       '2027-04-28',
     ])
+  })
+
+  it('uses Monday–Sunday weeks', () => {
+    // 2026-10-29 is a Thursday, 2026-11-01 a Sunday, 2026-11-02 a Monday
+    expect(getGoalRangePreset('week', '2026-10-29')).toEqual([
+      '2026-10-26',
+      '2026-11-01',
+    ])
+    expect(getGoalRangePreset('week', '2026-11-01')).toEqual([
+      '2026-10-26',
+      '2026-11-01',
+    ])
+    expect(getGoalRangePreset('week', '2026-11-02')).toEqual([
+      '2026-11-02',
+      '2026-11-08',
+    ])
+  })
+})
+
+describe('periodic goal status', () => {
+  const daily = (values: number[]) =>
+    pageGoal({
+      startAt: '2026-10-01',
+      finishAt: `2026-10-0${values.length}`,
+      entries: values.map((pages, index) => ({
+        id: `e${index}`,
+        pages,
+        createdAt: `2026-10-0${index + 1}T00:00:00.000Z`,
+      })),
+    } as Partial<Goal>)
+
+  it('is not completed when only the all-time total reaches the amount', () => {
+    // 3 days of "30 pages a day", target met once
+    expect(getGoalStatus(daily([30, 0, 0]), '2026-11-01')).toBe('expired')
+    expect(getGoalStatus(daily([90, 0, 0]), '2026-11-01')).toBe('expired')
+  })
+
+  it('is completed when every period met the target', () => {
+    expect(getGoalStatus(daily([30, 45, 31]), '2026-11-01')).toBe('completed')
+  })
+
+  it('still reports progress for running goals', () => {
+    expect(getGoalStatus(daily([30, 0, 0]), '2026-10-02')).toBe('tracking')
+  })
+})
+
+describe('getGoalPeriods (long goals)', () => {
+  it('covers daily goals longer than 400 days', () => {
+    const periods = getGoalPeriods(
+      pageGoal({ startAt: '2026-01-01', finishAt: '2027-12-31' }),
+    )
+    expect(periods).toHaveLength(730)
+    expect(periods.at(-1)).toMatchObject({
+      start: '2027-12-31',
+      end: '2027-12-31',
+    })
   })
 })
 

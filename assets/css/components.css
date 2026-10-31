@@ -134,7 +134,7 @@
 
   /* Collection tile */
   .collection-tile {
-    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full flex-col overflow-hidden border shadow-sm transition-shadow duration-200;
+    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full w-full flex-col text-left overflow-hidden border shadow-sm transition-shadow duration-200;
     @apply hover:border-primary hover:shadow-primary/50;
   }
   .collection-tile-selected {

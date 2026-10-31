@@ -66,9 +66,8 @@ import {
 } from '~/utils/constants'
 import { toMonthYearCompact } from '~/utils/date'
 import {
-  getGoalProgress,
+  getGoalInfo,
   getGoalProgressColor,
-  getGoalProgressPercentage,
   getGoalStatus,
   getGoalStatusLabel,
   getGoalUnit,
@@ -88,17 +87,21 @@ const authorsById = computed(() =>
   props.authors ? indexBy(({ id }) => String(id), props.authors) : {},
 )
 
-const progress = computed(() => getGoalProgress(props.goal))
+const info = computed(() => getGoalInfo(props.goal))
 
-const progressPercentage = computed(() => {
-  if (!props.goal.amount) return 0
-
-  return Math.max(0, Math.min(100, getGoalProgressPercentage(props.goal)))
-})
+// For periodic goals ("30 pages a day") the bar shows the current period,
+// not the all-time total against a single period's target.
+const progressPercentage = computed(() =>
+  Math.max(0, Math.min(100, info.value.pct)),
+)
 
 const progressSummary = computed(() => {
-  const currentProgress = progress.value
-  return `${currentProgress} logged of ${props.goal.amount} ${getGoalUnit(props.goal, props.goal.amount)}`
+  const unit = getGoalUnit(props.goal, props.goal.amount)
+  if (props.goal.interval === 'total') {
+    return `${info.value.progress} logged of ${props.goal.amount} ${unit}`
+  }
+  const current = info.value.current?.value ?? 0
+  return `${current} of ${props.goal.amount} ${unit} this period · ${info.value.hit}/${info.value.counted} met`
 })
 
 const windowSummary = computed(

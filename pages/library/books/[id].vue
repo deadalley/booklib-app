@@ -131,8 +131,8 @@
 </template>
 
 <script setup lang="ts">
-import { faker } from '@faker-js/faker'
 import { IconEdit, IconTrash } from '@tabler/icons-vue'
+import { v4 as uuidv4 } from 'uuid'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
@@ -149,6 +149,7 @@ const {
   createBook,
   updateBook,
   getGoals,
+  getBooks,
 } = useBookLibrary()
 
 const route = useRoute()
@@ -159,17 +160,20 @@ const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const book = ref<Book>()
 const loading = ref(false)
-const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
+const tempCoverSrc = ref(`temp-${uuidv4()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
 const goals = ref<Goal[]>([])
+const libraryBooks = ref<Book[]>([])
 
 const loadData = async () => {
   collections.value = await getCollections()
   authors.value = await getAuthors()
   goals.value = await getGoals()
+  // Needed to resolve auto-counted goal entries (finished books)
+  libraryBooks.value = await getBooks()
 }
 
 const collectionsDisplayed = computed(() => {
@@ -181,15 +185,21 @@ const collectionsDisplayed = computed(() => {
 const bookGoals = computed(() => {
   if (!book.value) return []
 
-  return goals.value.filter((goal) => {
-    if (goal.type === 'books') {
-      return goal.entries.some(
-        (entry) => String(entry.book) === String(book.value?.id),
-      )
-    }
+  // Use the stored book, but with this page's latest progress, so finishing
+  // the book here immediately shows the goals it now counts towards.
+  const books = libraryBooks.value.map((b) =>
+    b.id === book.value?.id ? book.value : b,
+  )
 
-    return false
-  })
+  return goals.value
+    .map((goal) => resolveGoal(goal, books))
+    .filter(
+      (goal) =>
+        goal.type === 'books' &&
+        goal.entries.some(
+          (entry) => String(entry.book) === String(book.value?.id),
+        ),
+    )
 })
 
 const selectedDefaultCollections = ref<Record<string, boolean>>(
@@ -419,7 +429,7 @@ async function onLogEntry(
   book.value.progress.currentPage = page ?? book.value.progress.currentPage
   book.value.progress.notes = [
     ...(book.value.progress.notes ?? []),
-    { createdAt: date, content: note, page },
+    { id: uuidv4(), createdAt: date, content: note, page },
   ]
 
   await onSubmit(book.value)

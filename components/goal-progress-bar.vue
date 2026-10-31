@@ -2,7 +2,7 @@
   <bl-tooltip class="w-full">
     <div class="flex flex-col gap-2">
       <bl-progress-bar
-        v-model:progress-value="progress"
+        :progress-value="progress"
         size="sm"
         :color="getGoalProgressColor(goal, 'bg')"
       />
@@ -26,5 +26,9 @@ import { getGoalProgressPercentage } from '~/utils'
 
 const props = defineProps<{ goal: Goal }>()
 
-const progress = ref(getGoalProgressPercentage(props.goal))
+const progress = computed(() =>
+  props.goal.amount
+    ? Math.min(100, Math.max(0, getGoalProgressPercentage(props.goal)))
+    : 0,
+)
 </script>
