@@ -13,13 +13,20 @@
           <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
           <!-- Sidebar trigger button -->
           <div class="flex flex-1 justify-end sm:hidden">
-            <IconChevronDown
-              :size="ICON_SIZE_MEDIUM"
-              stroke="1.5"
-              class="text-ink-secondary hover:text-primary cursor-pointer transition-all duration-300"
-              :class="{ 'rotate-180': actionsOpen }"
+            <button
+              type="button"
+              class="text-ink-secondary hover:text-primary cursor-pointer"
+              :aria-expanded="actionsOpen"
+              :aria-label="actionsOpen ? 'Hide actions' : 'Show actions'"
               @click="actionsOpen = !actionsOpen"
-            />
+            >
+              <IconChevronDown
+                :size="ICON_SIZE_MEDIUM"
+                stroke="1.5"
+                class="transition-all duration-300"
+                :class="{ 'rotate-180': actionsOpen }"
+              />
+            </button>
           </div>
         </div>
         <slot v-if="!isMobile" name="headerActions" />

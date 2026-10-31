@@ -18,8 +18,8 @@
     "lint": "pnpm lint:js && pnpm lint:ts && pnpm lint:prettier",
     "lint:fix": "prettier . --write --list-different && pnpm lint:js --fix",
     "test": "vitest",
-    "test:start-app": "nuxt dev --port 3002 --dotenv .env.test",
-    "test:e2e": "pnpm playwright test --project=chromium",
+    "test:start-app": "cross-env ELECTRON_ENABLED=false nuxt dev --host 127.0.0.1 --port 3001",
+    "test:e2e": "playwright test --project=chromium --project=responsive",
     "test:e2e:ui": "pnpm playwright test --ui",
     "test:e2e:codegen": "concurrently 'pnpm test:start-app' 'playwright codegen'",
     "test:e2e:report": "playwright show-report",
@@ -28,7 +28,10 @@
     "electron:build": "electron-builder",
     "electron:build:win": "electron-builder --win",
     "electron:build:win:docker": "./scripts/build-windows.sh",
-    "electron:build:linux": "electron-builder --linux"
+    "electron:build:linux": "electron-builder --linux",
+    "test:e2e:mobile": "playwright test --project=mobile-chrome",
+    "test:e2e:all": "playwright test",
+    "test:tz": "cross-env TZ=America/Los_Angeles vitest run utils services && cross-env TZ=Pacific/Auckland vitest run utils services"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.9",
