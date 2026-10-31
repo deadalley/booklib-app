@@ -2,7 +2,7 @@
   <bl-stats-empty v-if="!books.length" label="Nothing in progress" />
   <ul v-else class="flex flex-col">
     <li v-for="book in rows" :key="book.id" class="row">
-      <NuxtLink :to="`/library/books/${book.id}`" class="link">
+      <NuxtLink :to="`/library/books/${book.id}`" class="row-link">
         <span class="flex justify-between gap-3">
           <span class="title">{{ book.title }}</span>
           <span class="text-primary text-sm font-bold">
@@ -66,13 +66,13 @@ const rows = computed(() =>
 .row + .row {
   @apply border-stroke-subtle border-t;
 }
-.link {
+.row-link {
   @apply flex w-full flex-col gap-1.5 py-3;
 }
 .title {
   @apply text-ink-primary truncate font-semibold;
 }
-.link:hover .title {
+.row-link:hover .title {
   @apply text-primary;
 }
 </style>

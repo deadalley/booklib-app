@@ -13,8 +13,7 @@
         class="column"
         :class="{
           zero: !item.value,
-          highlighted: highlight?.(item),
-          link: !!item.to,
+          clickable: !!item.to,
         }"
         :title="`${item.label}: ${format(item.value)}`"
       >
@@ -48,7 +47,6 @@ const props = withDefaults(
   defineProps<{
     items: StatsColumnItem[]
     format?: (value: number) => string
-    highlight?: (item: StatsColumnItem) => boolean
     emptyLabel?: string
   }>(),
   { format: (value: number) => String(value), emptyLabel: 'No data' },
@@ -78,13 +76,12 @@ const max = computed(() =>
   @apply text-ink-secondary text-xs font-bold whitespace-nowrap;
 }
 .bar {
-  @apply bg-primary-300 block min-h-0.5 w-full max-w-10 rounded-t-[5px] transition-colors duration-150;
+  @apply bg-primary block min-h-0.5 w-full max-w-10 rounded-t-[5px] transition-colors duration-150;
 }
-.column.highlighted .bar,
-.column.link:hover .bar {
-  @apply bg-primary;
+.column.clickable:hover .bar {
+  @apply bg-primary-800;
 }
-.column.link:hover .value {
+.column.clickable:hover .value {
   @apply text-primary;
 }
 .column.zero .bar {

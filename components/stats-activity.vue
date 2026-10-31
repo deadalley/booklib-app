@@ -4,7 +4,11 @@
     label="No books finished in this period"
   />
   <div v-else class="flex flex-col gap-4">
-    <div class="plot" :style="{ '--n': buckets.length }">
+    <div
+      class="plot"
+      :class="{ 'has-selection': !!selected }"
+      :style="{ '--n': buckets.length }"
+    >
       <button
         v-for="bucket in buckets"
         :key="bucket.key"
@@ -95,13 +99,13 @@ const current = computed(() =>
   @apply grid h-full min-w-0 cursor-pointer grid-rows-[auto_1fr_auto] justify-items-center gap-1 p-0;
 }
 .bar {
-  @apply bg-primary-200 block min-h-[3px] w-full max-w-11 self-end rounded-t-md rounded-b-[2px] transition-colors duration-150;
+  @apply bg-primary block min-h-[3px] w-full max-w-11 self-end rounded-t-md rounded-b-[2px] transition duration-150;
 }
 .column:hover .bar {
-  @apply bg-primary-400;
+  @apply bg-primary-800;
 }
-.column.selected .bar {
-  @apply bg-primary;
+.plot.has-selection .column:not(.selected) .bar {
+  @apply opacity-35;
 }
 .column.zero .bar {
   @apply bg-surface-container;

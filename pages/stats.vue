@@ -70,7 +70,7 @@
           <bl-stats-current :books="currentlyReading" />
         </bl-stats-tile>
 
-        <p class="goal-section-label mt-4">
+        <p class="section-label mt-4">
           Across your library · {{ books.length }}
           {{ books.length === 1 ? 'book' : 'books' }}
         </p>
@@ -100,7 +100,6 @@
           </template>
           <bl-stats-columns
             :items="distributionItems"
-            :highlight="distribution === 'rating' ? isMostCommon : undefined"
             :empty-label="
               distribution === 'rating' ? 'No rated books yet' : 'No data'
             "
@@ -177,7 +176,13 @@ import type { StatsDonutItem } from '~/components/stats-donut.vue'
 
 type Range = 'year' | '12m' | 'all'
 type Share = 'status' | 'format' | 'ownership' | 'language' | 'originalLanguage'
-type Distribution = 'rating' | 'pages' | 'decade'
+type Distribution =
+  | 'rating'
+  | 'pages'
+  | 'year'
+  | 'decade'
+  | 'language'
+  | 'originalLanguage'
 type RankBy = 'rating' | 'year' | 'pages'
 type GroupBy =
   | 'author'
@@ -201,7 +206,10 @@ const SHARE_OPTIONS: { value: Share; label: string }[] = [
 const DISTRIBUTION_OPTIONS: { value: Distribution; label: string }[] = [
   { value: 'rating', label: 'Rating' },
   { value: 'pages', label: 'Length' },
+  { value: 'year', label: 'Publication year' },
   { value: 'decade', label: 'Publication decade' },
+  { value: 'language', label: 'Language' },
+  { value: 'originalLanguage', label: 'Original language' },
 ]
 const RANK_OPTIONS: { value: RankBy; label: string }[] = [
   { value: 'rating', label: 'Rating' },
@@ -512,6 +520,30 @@ const distributionItems = computed<StatsColumnItem[]>(() => {
     }))
   }
 
+  if (distribution.value === 'year') {
+    const years = [
+      ...new Set(
+        books.value
+          .map(({ year }) => year)
+          .filter((value): value is number => !!value),
+      ),
+    ].sort((a, b) => a - b)
+    // Thin the axis labels when there are many years
+    const every = years.length > 16 ? Math.ceil(years.length / 10) : 1
+    return years.map((year, index) => ({
+      label: String(year),
+      short: index % every === 0 ? String(year) : '',
+      value: books.value.filter((book) => book.year === year).length,
+    }))
+  }
+
+  if (
+    distribution.value === 'language' ||
+    distribution.value === 'originalLanguage'
+  ) {
+    return languageCounts.value.slice(0, 10)
+  }
+
   const decades = books.value
     .filter(({ year }) => !!year)
     .map(({ year }) => Math.floor(year! / 10) * 10)
@@ -528,13 +560,17 @@ const distributionItems = computed<StatsColumnItem[]>(() => {
   })
 })
 
-const maxDistribution = computed(() =>
-  Math.max(0, ...distributionItems.value.map(({ value }) => value)),
-)
-
-function isMostCommon(item: StatsColumnItem) {
-  return !!item.value && item.value === maxDistribution.value
-}
+const languageCounts = computed<StatsColumnItem[]>(() => {
+  const key = distribution.value as 'language' | 'originalLanguage'
+  const counts = new Map<string, number>()
+  books.value.forEach((book) => {
+    const code = book[key]
+    if (code) counts.set(code, (counts.get(code) ?? 0) + 1)
+  })
+  return [...counts.entries()]
+    .map(([code, value]) => ({ label: languageLabel(code), value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+})
 
 const distributionSummary = computed(() => {
   if (distribution.value === 'rating') {
@@ -554,6 +590,18 @@ const distributionSummary = computed(() => {
     const median = pages[Math.floor(pages.length / 2)]!
     const total = pages.reduce((a, b) => a + b, 0)
     return `Median ${formatCount(median)} pages · ${formatCount(total)} pages in total`
+  }
+
+  if (
+    distribution.value === 'language' ||
+    distribution.value === 'originalLanguage'
+  ) {
+    const languages = languageCounts.value
+    if (!languages.length) return null
+    const total = languages.reduce((sum, { value }) => sum + value, 0)
+    return `${languages.length} ${languages.length === 1 ? 'language' : 'languages'} · ${total} of ${books.value.length} with one set${
+      languages.length > 10 ? ' · top 10 shown' : ''
+    }`
   }
 
   const years = books.value
