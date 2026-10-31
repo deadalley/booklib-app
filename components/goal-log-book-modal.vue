@@ -16,8 +16,23 @@
             @input="onSearch"
           />
         </div>
-        <bl-switch v-if="!query.trim() && finished.length" v-model="scope">
-          <bl-switch-option value="period" :selected-value="scope">
+        <bl-switch
+          v-if="!query.trim() && (finished.length || byAuthor.length)"
+          v-model="scope"
+        >
+          <bl-switch-option
+            v-if="byAuthor.length"
+            value="author"
+            :selected-value="scope"
+          >
+            <template #label>{{ authorName }} ({{ byAuthor.length }})</template>
+            <template #tooltip>Books by this goal’s author</template>
+          </bl-switch-option>
+          <bl-switch-option
+            v-if="finished.length"
+            value="period"
+            :selected-value="scope"
+          >
             <template #label>
               Finished in period ({{ finished.length }})
             </template>
@@ -130,7 +145,17 @@ const pool = computed(() =>
 const finished = computed(() => getGoalFinishedBooks(props.goal, pool.value))
 
 const query = ref('')
-const scope = ref<'period' | 'all'>('all')
+const byAuthor = computed(() =>
+  props.goal.author
+    ? pool.value.filter((book) => book.author === props.goal.author)
+    : [],
+)
+
+const authorName = computed(
+  () => byAuthor.value[0]?.authorName ?? 'Goal author',
+)
+
+const scope = ref<'period' | 'author' | 'all'>('all')
 const view = ref<View>('cards')
 const selectedId = ref<string | null>(null)
 const date = ref(toSimpleDate(now()))
@@ -140,7 +165,11 @@ watch(
   (isOpen) => {
     if (!isOpen) return
     query.value = ''
-    scope.value = finished.value.length ? 'period' : 'all'
+    scope.value = byAuthor.value.length
+      ? 'author'
+      : finished.value.length
+        ? 'period'
+        : 'all'
     selectedId.value = null
     date.value = toSimpleDate(now())
   },
@@ -157,7 +186,9 @@ const shown = computed(() => {
       )
     : scope.value === 'period'
       ? finished.value
-      : pool.value
+      : scope.value === 'author'
+        ? byAuthor.value
+        : pool.value
 
   return base.map((book) => ({
     ...book,
