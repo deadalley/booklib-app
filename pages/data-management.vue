@@ -1,31 +1,51 @@
 <template>
   <NuxtLayout name="dashboard" title="Data Management">
-    <!-- Import preview table (shown after file is parsed) -->
+    <!-- Import preview (shown after a file is parsed) -->
     <div
-      v-if="importedBooks?.length"
-      class="flex h-full flex-col gap-6 overflow-y-auto"
+      v-if="preview"
+      class="mx-auto flex w-full max-w-[90rem] flex-col gap-6"
+      data-testid="import-preview"
     >
-      <div class="flex justify-between">
-        <div>
-          <h5 v-if="selectedBooksForUpload.length">
-            <span class="text-primary">
-              {{ selectedBooksForUpload.length }}
-            </span>
-            books selected for import
-          </h5>
-          <h5 v-else>No books selected for import</h5>
-          <p class="text-ink-muted">
-            {{
-              selectedBooksForUpload.length
-                ? 'The following books will be imported:'
-                : 'Please select at least one book to be imported.'
-            }}
+      <div
+        class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div class="flex flex-col gap-1">
+          <span class="section-label text-primary">Import preview</span>
+          <h4 v-if="selectedRows.length">
+            <span class="text-primary">{{ selectedRows.length }}</span>
+            of {{ preview.rows.length }} books selected
+          </h4>
+          <h4 v-else>No books selected</h4>
+          <p class="text-ink-secondary text-sm">
+            {{ fileName }}
+            <template v-if="preview.plan.newAuthors.length">
+              · {{ preview.plan.newAuthors.length }} new
+              {{ preview.plan.newAuthors.length === 1 ? 'author' : 'authors' }}
+            </template>
+            <template v-if="duplicateCount">
+              · {{ duplicateCount }} possible
+              {{ duplicateCount === 1 ? 'duplicate' : 'duplicates' }} (not
+              selected)
+            </template>
           </p>
         </div>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-wrap gap-2">
           <bl-button variant="secondary" @click="onCancel">Cancel</bl-button>
           <bl-button
-            :disabled="!selectedBooksForUpload.length"
+            v-if="preview.backup"
+            variant="secondary"
+            :loading="importLoading"
+            @click="onRestoreBackup"
+          >
+            <template #prependIcon="prependIcon">
+              <IconDatabaseImport v-bind="prependIcon" />
+            </template>
+            Restore full backup
+          </bl-button>
+          <bl-button
+            :disabled="!selectedRows.length"
+            :loading="importLoading"
+            data-testid="import-submit"
             @click="onSubmit"
           >
             <template #prependIcon="prependIcon">
@@ -35,28 +55,82 @@
           </bl-button>
         </div>
       </div>
+
+      <bl-warning-badge v-if="preview.backup">
+        <template #icon="iconProps">
+          <IconInfoCircle v-bind="iconProps" />
+        </template>
+        <template #content>
+          This file is a full BookLib backup.
+          <b>Import selected books</b>
+          adds only the books (without collections).
+          <b>Restore full backup</b>
+          also brings in collections, authors and goals.
+        </template>
+      </bl-warning-badge>
+
+      <div
+        v-if="preview.issues.length"
+        class="paper-flat flex flex-col gap-2 px-5 py-4"
+        data-testid="import-issues"
+      >
+        <button
+          type="button"
+          class="flex items-center gap-2 text-left text-sm font-semibold"
+          @click="showIssues = !showIssues"
+        >
+          <IconAlertTriangle :size="18" stroke="1.5" class="text-primary" />
+          {{ issueSummary }}
+          <IconChevronDown
+            :size="16"
+            class="ml-auto transition-transform"
+            :class="{ 'rotate-180': showIssues }"
+          />
+        </button>
+        <ul
+          v-if="showIssues"
+          class="text-ink-secondary flex max-h-64 flex-col gap-1 overflow-y-auto text-sm"
+        >
+          <li
+            v-for="(issue, index) in preview.issues"
+            :key="index"
+            class="flex gap-2"
+          >
+            <span
+              class="shrink-0 font-semibold"
+              :class="
+                issue.severity === 'error' ? 'text-primary' : 'text-ink-muted'
+              "
+            >
+              {{ issue.row ? `Row ${issue.row}` : 'File' }}
+            </span>
+            <span>{{ issue.message }}</span>
+          </li>
+        </ul>
+      </div>
+
       <bl-books-table
-        :books="importedBooks"
-        :selected-table-columns="selectedTableColumns"
+        :books="preview.rows"
+        :selected-table-columns="previewColumns"
         with-check
-        default-selected
-        @select:rows="onSelectBook"
+        @select:rows="onSelectRows"
       />
     </div>
 
     <!-- Main data management view -->
-    <div v-else class="flex flex-col gap-8">
-      <div>
+    <div v-else class="mx-auto flex w-full max-w-[90rem] flex-col gap-8">
+      <div class="flex flex-col gap-1">
+        <span class="section-label text-primary">Library</span>
         <h3>Data Management</h3>
         <p class="text-ink-secondary">
-          Migrate your literary collection or backup your existing database with
-          ease.
+          Import books from a spreadsheet or another app, export your library,
+          or keep a full backup.
         </p>
       </div>
 
       <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <!-- Import Library card -->
-        <div class="paper data-management-card">
+        <!-- Import card -->
+        <section class="paper-flat data-management-card">
           <div class="data-management-card-header">
             <div class="flex items-center gap-2">
               <IconBookUpload
@@ -64,61 +138,48 @@
                 :size="ICON_SIZE_MEDIUM"
                 stroke="1.5"
               />
-              <h5>Import Library</h5>
+              <h5>Import books</h5>
             </div>
             <p class="text-ink-secondary text-sm">
-              Upload your data from Goodreads, Libib, or custom files.
+              CSV or JSON files: BookLib exports and backups, the templates
+              below, or spreadsheets with matching column names.
             </p>
           </div>
 
-          <!-- Source platform -->
           <div class="flex flex-col gap-2">
-            <h6>Source Platform</h6>
+            <span class="section-label">Templates</span>
             <div class="grid grid-cols-2 gap-2">
               <button
-                v-for="platform in sourcePlatforms"
-                :key="platform.label"
+                v-for="template in templates"
+                :key="template.value"
                 type="button"
                 class="platform-btn"
-                :class="{
-                  'platform-btn-active': importType === platform.value,
-                }"
-                @click="importType = platform.value"
+                @click="downloadTemplate(template.value)"
               >
                 <component
-                  :is="platform.icon"
+                  :is="template.icon"
                   :size="16"
                   stroke="1.5"
                   class="shrink-0"
                 />
-                {{ platform.label }}
+                {{ template.label }}
+                <IconDownload :size="14" class="text-ink-muted ml-auto" />
               </button>
             </div>
           </div>
 
-          <div class="flex flex-col gap-2">
-            <h6>Template File</h6>
-            <bl-button
-              variant="secondary"
-              :disabled="!importType"
-              :loading="importLoading"
-              @click="downloadImportTemplate"
-            >
-              <template #prependIcon="prependIcon">
-                <IconDownload v-bind="prependIcon" />
-              </template>
-              Download Template
-            </bl-button>
-          </div>
-
-          <!-- File drop zone -->
           <div
             class="file-drop-zone"
             :class="{ 'file-drop-zone-over': isDragging }"
+            role="button"
+            tabindex="0"
+            data-testid="import-drop-zone"
             @dragover.prevent="isDragging = true"
             @dragleave.prevent="isDragging = false"
             @drop.prevent="onDrop"
             @click="onUploadClick"
+            @keydown.enter.prevent="onUploadClick"
+            @keydown.space.prevent="onUploadClick"
           >
             <IconCloudUpload
               :size="44"
@@ -128,44 +189,39 @@
             <p class="text-ink-primary font-medium">
               Drag and drop your file here
             </p>
-            <p class="text-ink-muted text-sm">
-              Supports .csv, .json, .xlsx (Max 10MB)
-            </p>
-            <span class="text-primary text-sm underline">Browse Files</span>
+            <p class="text-ink-muted text-sm">Supports .csv and .json</p>
+            <span class="text-primary text-sm underline">Browse files</span>
           </div>
           <input
             ref="fileInput"
             type="file"
+            accept=".csv,.json,text/csv,application/json"
             class="hidden"
+            data-testid="import-file-input"
             @change="onFileChange"
           />
 
-          <!-- Error / hint -->
-          <bl-warning-badge v-if="importError">
+          <bl-warning-badge v-if="importError" data-testid="import-error">
             <template #icon="iconProps">
               <IconAlertTriangle v-bind="iconProps" />
             </template>
             <template #content>
-              <b>Error importing file:</b>
+              <b>Could not import {{ fileName }}:</b>
               {{ importError }}
             </template>
           </bl-warning-badge>
 
-          <bl-button
-            :disabled="!importType"
-            :loading="importLoading"
-            class="w-full justify-center"
-            @click="onUploadClick"
+          <p
+            v-if="importSuccess"
+            class="text-ink-secondary text-sm"
+            data-testid="import-success"
           >
-            Import Library
-            <template #appendIcon="appendIcon">
-              <IconUpload v-bind="appendIcon" />
-            </template>
-          </bl-button>
-        </div>
+            {{ importSuccess }}
+          </p>
+        </section>
 
-        <!-- Export Library card -->
-        <div class="paper data-management-card">
+        <!-- Export card -->
+        <section class="paper-flat data-management-card">
           <div class="data-management-card-header">
             <div class="flex items-center gap-2">
               <IconBookDownload
@@ -173,65 +229,56 @@
                 :size="ICON_SIZE_MEDIUM"
                 stroke="1.5"
               />
-              <h5>Export Library</h5>
+              <h5>Export</h5>
             </div>
             <p class="text-ink-secondary text-sm">
-              Download your entire collection for backup or sharing.
+              Download your books, or a full backup that can be restored later.
             </p>
           </div>
 
-          <!-- Select Export Format -->
-          <div class="flex flex-col gap-2">
-            <h6>Select Export Format</h6>
-            <div class="flex flex-col gap-2">
-              <button
-                v-for="format in exportFormats"
-                :key="format.value ?? format.label"
-                type="button"
-                class="export-format-option"
+          <div class="flex flex-col gap-2" role="radiogroup">
+            <span class="section-label">Format</span>
+            <button
+              v-for="format in exportFormats"
+              :key="format.value"
+              type="button"
+              role="radio"
+              :aria-checked="exportType === format.value"
+              class="export-format-option"
+              :class="{
+                'export-format-option-active': exportType === format.value,
+              }"
+              @click="exportType = format.value"
+            >
+              <div
+                class="export-format-radio"
                 :class="{
-                  'export-format-option-active':
-                    exportType === format.value && !format.disabled,
-                  'export-format-option-disabled': format.disabled,
+                  'export-format-radio-checked': exportType === format.value,
                 }"
-                :disabled="format.disabled"
-                @click="
-                  !format.disabled &&
-                  format.value &&
-                  (exportType = format.value)
-                "
               >
                 <div
-                  class="export-format-radio"
-                  :class="{
-                    'export-format-radio-checked': exportType === format.value,
-                  }"
-                >
-                  <div
-                    v-if="exportType === format.value && !format.disabled"
-                    class="export-format-radio-dot"
-                  />
-                </div>
-                <div class="flex-1 text-left">
-                  <p class="text-sm font-medium">{{ format.label }}</p>
-                  <p class="text-ink-muted text-xs">{{ format.description }}</p>
-                </div>
-                <component
-                  :is="format.icon"
-                  :size="18"
-                  stroke="1.5"
-                  class="text-ink-muted shrink-0"
+                  v-if="exportType === format.value"
+                  class="export-format-radio-dot"
                 />
-              </button>
-            </div>
+              </div>
+              <div class="flex-1 text-left">
+                <p class="text-sm font-medium">{{ format.label }}</p>
+                <p class="text-ink-muted text-xs">{{ format.description }}</p>
+              </div>
+              <component
+                :is="format.icon"
+                :size="18"
+                stroke="1.5"
+                class="text-ink-muted shrink-0"
+              />
+            </button>
           </div>
 
-          <!-- Footer -->
           <div
-            class="border-stroke mt-auto flex items-center justify-between border-t pt-4"
+            class="border-stroke mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4"
           >
             <p class="text-ink-secondary text-sm">
-              Total Books:
+              Total books:
               <span class="text-ink-primary font-semibold">
                 {{ totalBooks }}
               </span>
@@ -239,15 +286,16 @@
             <bl-button
               :disabled="!exportType"
               :loading="exportLoading"
-              @click="downloadExportFile"
+              data-testid="export-submit"
+              @click="onExport"
             >
               <template #prependIcon="prependIcon">
                 <IconDownload v-bind="prependIcon" />
               </template>
-              Generate Export
+              Download
             </bl-button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   </NuxtLayout>
@@ -258,262 +306,299 @@ import {
   IconAlertTriangle,
   IconBookDownload,
   IconBookUpload,
+  IconBraces,
+  IconChevronDown,
   IconCloudUpload,
+  IconDatabaseExport,
+  IconDatabaseImport,
   IconDownload,
   IconFileTypeCsv,
-  IconBraces,
+  IconInfoCircle,
   IconUpload,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
-import { indexBy, pick, prop, uniq } from 'ramda'
-import { v4 as uuidv4 } from 'uuid'
+import type { RowSelectionState } from '@tanstack/vue-table'
 import { useBookLibrary } from '~/composables/use-book-library'
-import type { Book } from '~/types/book'
-import type { LibraryData } from '~/types/library'
-import { parseCsvFile, parseJsonFile } from '~/utils/import'
+import type { Database } from '~/types/api'
+import type { Book, ViewBook } from '~/types/book'
+import {
+  bookToRecord,
+  formatFromFileName,
+  parseBookFile,
+  planImport,
+  recordToBook,
+  serializeBooks,
+  type ImportPlan,
+  type TransferFormat,
+  type TransferIssue,
+} from '~/services/transfer'
 
-// ─── Shared types ────────────────────────────────────────────────────────────
+const { getBooks, getAuthors, importBooks, importLibrary, exportLibrary } =
+  useBookLibrary()
 
-type ImportType = '.csv' | '.json'
-type ExportType = '.csv' | '.json'
-type ExportCollectionType = keyof LibraryData | 'all'
+// ─── Import ──────────────────────────────────────────────────────────────────
 
-// ─── Import ───────────────────────────────────────────────────────────────────
-
-const sourcePlatforms = [
-  { label: 'CSV', value: '.csv' as ImportType, icon: IconFileTypeCsv },
-  { label: 'JSON', value: '.json' as ImportType, icon: IconBraces },
+const templates: {
+  label: string
+  value: TransferFormat
+  icon: typeof IconFileTypeCsv
+}[] = [
+  { label: 'CSV template', value: 'csv', icon: IconFileTypeCsv },
+  { label: 'JSON template', value: 'json', icon: IconBraces },
 ]
 
-const selectedTableColumns = {
+const previewColumns = {
   coverSrc: { label: 'Cover', checked: false },
-  author: { label: 'Author', checked: true },
-  publisher: { label: 'Publisher', checked: true },
-  language: { label: 'Language', checked: true },
-  year: { label: 'Year', checked: true },
-  pages: { label: 'Pages', checked: true },
-  rating: { label: 'Rating', checked: true },
-  originalTitle: { label: 'Original Title', checked: true },
-  originalLanguage: { label: 'Original Language', checked: true },
-  isbn: { label: 'ISBN', checked: true },
-  progress: { label: 'Progress Status', checked: true },
 }
 
-const fileInput = ref()
-const importType = ref<ImportType>()
-const importedBooks = ref<Book[] | undefined>()
-const selectedBooks = ref<Record<Book['id'], boolean>>({})
-const fileName = ref<string>('')
+type Preview = {
+  plan: ImportPlan
+  rows: ViewBook[]
+  issues: TransferIssue[]
+  /** Raw backup contents when the file is a full BookLib backup. */
+  backup: Database | null
+}
+
+const fileInput = ref<HTMLInputElement>()
+const fileName = ref('')
+const preview = ref<Preview | null>(null)
+const selection = ref<RowSelectionState>({})
 const importLoading = ref(false)
 const importError = ref<string | null>(null)
+const importSuccess = ref<string | null>(null)
 const isDragging = ref(false)
+const showIssues = ref(false)
 
-const selectedBooksForUpload = computed(() =>
-  (importedBooks?.value ?? []).filter(({ id }) => selectedBooks.value[id]),
+const selectedRows = computed(() =>
+  (preview.value?.rows ?? []).filter(({ id }) => selection.value[id]),
 )
 
-function downloadImportTemplate() {
-  if (importType.value) {
-    const link = document.createElement('a')
-    link.href = `/templates/template${importType.value}`
-    link.download = `template${importType.value}`
-    link.target = '_blank'
-    link.click()
-  }
+const duplicateCount = computed(
+  () => preview.value?.plan.items.filter((i) => i.duplicateOf).length ?? 0,
+)
+
+const issueSummary = computed(() => {
+  const issues = preview.value?.issues ?? []
+  const errors = issues.filter((i) => i.severity === 'error').length
+  const warnings = issues.length - errors
+  return [
+    errors && `${errors} ${errors === 1 ? 'row skipped' : 'rows skipped'}`,
+    warnings && `${warnings} ${warnings === 1 ? 'warning' : 'warnings'}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+})
+
+function downloadTemplate(format: TransferFormat) {
+  const link = document.createElement('a')
+  link.href = `/templates/template.${format}`
+  link.download = `booklib-template.${format}`
+  link.click()
 }
 
 function onUploadClick() {
-  fileInput.value.click()
+  fileInput.value?.click()
 }
 
-async function parseFile(file: File) {
-  switch (importType.value) {
-    case '.csv':
-      return parseCsvFile(file)
-    case '.json':
-      return parseJsonFile(file)
-    default:
-      throw Error('Unknown file type')
+function asBackup(text: string): Database | null {
+  try {
+    const parsed = JSON.parse(text)
+    return parsed &&
+      Array.isArray(parsed.books) &&
+      Array.isArray(parsed.authors) &&
+      Array.isArray(parsed.collections)
+      ? (parsed as Database)
+      : null
+  } catch {
+    return null
   }
 }
 
 async function processImportFile(file: File) {
   fileName.value = file.name
+  importError.value = null
+  importSuccess.value = null
+
+  const format = formatFromFileName(file.name)
+  if (!format) {
+    importError.value = 'Unsupported file type. Use a .csv or .json file.'
+    return
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    importError.value = 'The file is larger than 10 MB.'
+    return
+  }
+
   importLoading.value = true
   try {
-    const books = await parseFile(file)
-    const booksWithIds = books.map((book, index) => ({
-      ...book,
-      id: String(index + 1),
+    const text = await file.text()
+    const { records, issues, rows } = parseBookFile(text, format)
+
+    if (!records.length) {
+      importError.value =
+        issues.find((issue) => issue.severity === 'error')?.message ??
+        'No books found in the file.'
+      return
+    }
+
+    const [books, authors] = await Promise.all([getBooks(), getAuthors()])
+    const plan = planImport(records, { books, authors })
+
+    const previewRows: ViewBook[] = plan.items.map((item, index) => ({
+      ...recordToBook(item.record, `row-${rows[index]}`),
+      authorName: item.record.author ?? undefined,
+      selected: !item.duplicateOf,
     }))
-    selectedBooks.value = booksWithIds.reduce(
-      (acc, { id }) => ({ ...acc, [id]: true }),
-      {},
+
+    selection.value = Object.fromEntries(
+      previewRows.map(({ id, selected }) => [id, !!selected]),
     )
-    importedBooks.value = booksWithIds
-  } catch (e) {
+    showIssues.value = issues.some((issue) => issue.severity === 'error')
+    preview.value = {
+      plan,
+      rows: previewRows,
+      issues,
+      backup: format === 'json' ? asBackup(text) : null,
+    }
+  } catch (error) {
     importError.value =
-      typeof e === 'string' ? e : 'An error occurred while parsing the file.'
-    importedBooks.value = []
+      error instanceof Error ? error.message : 'The file could not be read.'
+  } finally {
+    importLoading.value = false
+    if (fileInput.value) fileInput.value.value = ''
+  }
+}
+
+async function onFileChange(event: Event) {
+  const file = (event.target as HTMLInputElement)?.files?.[0]
+  if (file) await processImportFile(file)
+}
+
+async function onDrop(event: DragEvent) {
+  isDragging.value = false
+  const file = event.dataTransfer?.files?.[0]
+  if (file) await processImportFile(file)
+}
+
+function onSelectRows(value: RowSelectionState) {
+  selection.value = value
+}
+
+async function onSubmit() {
+  if (!preview.value || !selectedRows.value.length) return
+  importLoading.value = true
+  try {
+    const books: Book[] = selectedRows.value.map(
+      ({ authorName: _authorName, selected: _selected, ...book }) => book,
+    )
+    await importBooks(books)
+    preview.value = null
+    await navigateTo('/library/books')
+  } catch (error) {
+    importError.value =
+      error instanceof Error ? error.message : 'The books could not be saved.'
   } finally {
     importLoading.value = false
   }
 }
 
-async function onFileChange(e: Event) {
-  const file = (e.target as HTMLInputElement)?.files?.[0] as File
-  await processImportFile(file)
-}
-
-async function onDrop(e: DragEvent) {
-  isDragging.value = false
-  const file = e.dataTransfer?.files?.[0]
-  if (file) {
-    await processImportFile(file)
-  }
-}
-
-const { importLibrary, exportLibrary, getBooks } = useBookLibrary()
-
-async function onSubmit() {
-  if (importedBooks.value?.length) {
-    const uniqueAuthors = uniq(
-      selectedBooksForUpload.value.map((book) => book.author),
-    )
-    const authors = Array.from(uniqueAuthors).map((name) => ({
-      name: name!,
-      id: uuidv4(),
-      created_at: now(),
-    }))
-    const authorNameToId = indexBy(prop('name'), authors)
-    const databaseData = {
-      authors,
-      books: selectedBooksForUpload.value.map((book) => {
-        const { progress, ...bookRest } = book
-        return {
-          ...bookRest,
-          created_at: book.createdAt,
-          author_id: book.author
-            ? (authorNameToId[book.author as string]?.id ?? null)
-            : null,
-          progress_status: progress.status,
-          property_status: book.propertyStatus,
-          cover_src: book.coverSrc,
-          original_title: book.originalTitle,
-          original_language: book.originalLanguage,
-          started_at: progress.startedAt,
-          finished_at: progress.finishedAt,
-          notes: progress.notes,
-        }
-      }),
-      collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
-        ...c,
-        created_at: now(),
-      })),
-      'collection-book': [],
-      goals: [],
-    }
-    await importLibrary(databaseData)
-    navigateTo('/library')
+async function onRestoreBackup() {
+  if (!preview.value?.backup) return
+  importLoading.value = true
+  try {
+    await importLibrary(preview.value.backup)
+    preview.value = null
+    await navigateTo('/library/books')
+  } catch (error) {
+    importError.value =
+      error instanceof Error
+        ? error.message
+        : 'The backup could not be restored.'
+  } finally {
+    importLoading.value = false
   }
 }
 
 function onCancel() {
-  importedBooks.value = undefined
-  selectedBooks.value = {}
+  preview.value = null
+  selection.value = {}
 }
 
-function onSelectBook(value: Record<string, boolean>) {
-  selectedBooks.value = value
-}
+// ─── Export ──────────────────────────────────────────────────────────────────
 
-// ─── Export ───────────────────────────────────────────────────────────────────
+type ExportType = 'csv' | 'json' | 'backup'
 
-const exportFormats = [
+const exportFormats: {
+  label: string
+  description: string
+  value: ExportType
+  icon: typeof IconFileTypeCsv
+}[] = [
   {
-    label: 'Standard CSV',
-    description: 'Best for Excel, Numbers, and Google Sheets.',
-    value: '.csv' as ExportType,
+    label: 'Books (CSV)',
+    description: 'For Excel, Numbers and Google Sheets. Re-importable.',
+    value: 'csv',
     icon: IconFileTypeCsv,
-    disabled: false,
   },
   {
-    label: 'Structured JSON',
-    description: 'Ideal for developers and data integration.',
-    value: '.json' as ExportType,
+    label: 'Books (JSON)',
+    description: 'Every book field, for other apps. Re-importable.',
+    value: 'json',
     icon: IconBraces,
-    disabled: false,
+  },
+  {
+    label: 'Full backup (JSON)',
+    description: 'Books, authors, collections and goals. Restorable.',
+    value: 'backup',
+    icon: IconDatabaseExport,
   },
 ]
 
 const exportType = ref<ExportType>()
-const exportCollection = ref<ExportCollectionType>('all')
 const exportLoading = ref(false)
 const totalBooks = ref(0)
 
 onMounted(async () => {
-  const books = await getBooks()
-  totalBooks.value = books.length
+  totalBooks.value = (await getBooks()).length
 })
 
-async function fetchLibraryData(): Promise<LibraryData> {
-  const data = await exportLibrary()
-  return data as LibraryData
-}
-
-async function downloadExportFile() {
-  if (exportType.value && exportCollection.value) {
-    exportLoading.value = true
-    switch (exportType.value) {
-      case '.json':
-        return downloadAsJson(exportCollection.value)
-      case '.csv':
-        return downloadAsCsv(exportCollection.value as keyof LibraryData)
-      default:
-        return
+async function onExport() {
+  if (!exportType.value) return
+  exportLoading.value = true
+  try {
+    const date = dayjs().format('YYYY-MM-DD')
+    if (exportType.value === 'backup') {
+      const data = await exportLibrary()
+      download(
+        `${date}_booklib_backup.json`,
+        JSON.stringify(data, null, 2),
+        'application/json',
+      )
+      return
     }
+
+    const [books, authors] = await Promise.all([getBooks(), getAuthors()])
+    const authorsById = new Map(authors.map((author) => [author.id, author]))
+    const records = books.map((book) => bookToRecord(book, authorsById))
+    const format = exportType.value
+    download(
+      `${date}_booklib_books.${format}`,
+      serializeBooks(records, format),
+      format === 'csv' ? 'text/csv' : 'application/json',
+    )
+  } finally {
+    exportLoading.value = false
   }
 }
 
-async function downloadAsJson(collectionType: ExportCollectionType) {
-  const libraryData = await fetchLibraryData()
-  const exportData =
-    collectionType === 'all' ? libraryData : pick([collectionType], libraryData)
-  const data = JSON.stringify(exportData)
-  createDownloadLink(collectionType, '.json', data)
-}
-
-async function downloadAsCsv(collectionType: keyof LibraryData) {
-  const libraryData = await fetchLibraryData()
-  const exportData = libraryData[collectionType]
-  // @ts-expect-error wrong typing
-  const data = createCsvFile(exportData)
-  createDownloadLink(collectionType, '.csv', data)
-}
-
-function createDownloadLink(
-  collectionType: ExportCollectionType,
-  type: ExportType,
-  data: string,
-) {
-  const blob = new Blob([data], { type: 'text/plain' })
+function download(name: string, contents: string, type: string) {
+  const url = URL.createObjectURL(new Blob([contents], { type }))
   const link = document.createElement('a')
-  link.href = window.URL.createObjectURL(blob)
-  link.download = `${dayjs().format('YYYY-MM-DD')}_booklib_${collectionType}_export${type}`
-  link.dataset.downloadurl = ['text/json', link.download, link.href].join(':')
-  link.target = '_blank'
+  link.href = url
+  link.download = name
   link.click()
-  exportLoading.value = false
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
-
-watch(exportType, (value) => {
-  if (value === '.csv' && exportCollection.value === 'all') {
-    exportCollection.value = 'books'
-  }
-  if (value === '.json') {
-    exportCollection.value = 'all'
-  }
-})
 
 useHead({
   title: 'BookLib | Data Management',

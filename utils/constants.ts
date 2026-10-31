@@ -119,14 +119,6 @@ export const PROPERTY_STATUS_MAP: Record<
   },
 }
 
-export const BOOK_FORMAT = [
-  'hardcover',
-  'paperback',
-  'ebook',
-  'audiobook',
-  'other',
-]
-
 export const BOOK_FORMAT_MAP: Record<
   BookFormat,
   {
@@ -162,8 +154,6 @@ export const BOOK_FORMAT_MAP: Record<
   },
 }
 
-export const GOAL_TYPE = ['books', 'pages', 'hours']
-
 export const GOAL_TYPE_MAP: Record<
   GoalType,
   {
@@ -188,8 +178,6 @@ export const GOAL_TYPE_MAP: Record<
     icon: 'IconClockHour4',
   },
 }
-
-export const GOAL_INTERVAL = ['daily', 'weekly', 'monthly', 'yearly', 'total']
 
 export const GOAL_INTERVAL_MAP: Record<
   GoalInterval,
@@ -220,5 +208,3 @@ export const GOAL_INTERVAL_MAP: Record<
     description: 'in total',
   },
 }
-
-export const GOAL_STATUS = ['tracking', 'not-tracking']

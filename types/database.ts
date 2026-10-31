@@ -17,6 +17,7 @@ export type BookDB = {
   cover_src: string | null
   created_at: string
   finished_at: string | null
+  current_page?: number | null
   genres: string[] | null
   notes: BookNote[]
   isbn: string | null

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-useHead({
-  title: 'BookLib',
-})
-
-await navigateTo('/home')
+// Entry route: works in both history (web) and hash (Electron) router modes
+definePageMeta({ redirect: '/home' })
 </script>
+
+<template>
+  <div />
+</template>

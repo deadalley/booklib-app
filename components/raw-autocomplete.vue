@@ -43,13 +43,13 @@
       </ComboboxAnchor>
 
       <div v-if="multiple" class="mt-2 flex flex-wrap gap-1">
-        <bl-removable-tag
+        <bl-genre-tag
           v-for="(item, index) in selectValue"
           :key="item"
-          :value="item"
-          :index="index"
+          :genre="item"
+          size="sm"
           removable
-          @remove="onRemoveItem"
+          @remove="onRemoveItem(index)"
         />
       </div>
 

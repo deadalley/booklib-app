@@ -6,7 +6,7 @@
 /**
  * Extracts a readable error message from an unknown error value
  */
-export function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message
   }
@@ -22,7 +22,7 @@ export function getErrorMessage(error: unknown): string {
 /**
  * Creates a contextual error message with operation and context details
  */
-export function createContextualError(
+function createContextualError(
   operation: string,
   error: unknown,
   context?: Record<string, unknown>,
@@ -34,33 +34,6 @@ export function createContextualError(
         .join(', ')})`
     : ''
   return new Error(`${operation}${contextStr}: ${errorMessage}`)
-}
-
-/**
- * Wraps an async function with consistent error handling
- * Logs errors and optionally re-throws with contextual information
- */
-export async function withErrorHandling<T>(
-  operation: string,
-  fn: () => Promise<T>,
-  options?: {
-    context?: Record<string, unknown>
-    logError?: boolean
-    rethrow?: boolean
-  },
-): Promise<T> {
-  const { context, logError = true, rethrow = true } = options || {}
-  try {
-    return await fn()
-  } catch (error) {
-    if (logError) {
-      console.error(`${operation} error:`, error)
-    }
-    if (rethrow) {
-      throw createContextualError(operation, error, context)
-    }
-    throw error
-  }
 }
 
 /**
@@ -82,40 +55,4 @@ export function handleFileError(
   return createContextualError(operationMessage, error, {
     filePath,
   })
-}
-
-/**
- * Handles database operation errors with consistent formatting
- */
-export function handleDatabaseError(
-  operation: string,
-  error: unknown,
-  context?: Record<string, unknown>,
-): Error {
-  return createContextualError(`Database ${operation} failed`, error, context)
-}
-
-/**
- * Safely executes a function and returns the result or null on error
- * Useful for operations where errors should be silently handled
- */
-export async function safeExecute<T>(
-  fn: () => Promise<T>,
-  onError?: (error: unknown) => void,
-): Promise<T | null> {
-  try {
-    return await fn()
-  } catch (error) {
-    if (onError) {
-      onError(error)
-    }
-    return null
-  }
-}
-
-/**
- * Validates that an error is an instance of Error
- */
-export function isError(error: unknown): error is Error {
-  return error instanceof Error
 }

@@ -1,6 +1,6 @@
 @layer components {
   .bl-table-wrapper {
-    @apply rounded-scholarly border-stroke-subtle bg-surface-elevated w-full overflow-x-auto border shadow-sm;
+    @apply paper-flat w-full overflow-x-auto;
   }
 
   .bl-table {

@@ -1,4 +1,3 @@
-import { flatten, intersection, prop, uniqBy } from 'ramda'
 import type { Book } from '~/types/book'
 
 export function getUniqueElements<
@@ -33,35 +32,61 @@ export function getUniqueElements<
     )
 }
 
+/**
+ * Normalises text for matching: trims, collapses whitespace, lower-cases and
+ * removes diacritics, so "  García " matches "garcia".
+ */
+export function normalizeForMatch(value: unknown): string {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export function filterElementsBySearchParam<
   T extends object,
   K extends keyof T,
 >(elements: T[], searchParam?: string, keys?: K[]): T[] {
-  return elements.filter((element) => {
-    if (!searchParam) {
-      return elements
-    }
+  const query = normalizeForMatch(searchParam)
+  if (!query) {
+    return elements
+  }
 
-    const lowerCaseSearchParam = searchParam?.toLowerCase()
-    return Object.entries(element).some(([key, value]) => {
+  return elements.filter((element) =>
+    Object.entries(element).some(([key, value]) => {
       if (value && (!keys || (keys as string[]).includes(key))) {
-        return `${value}`.toLowerCase().includes(lowerCaseSearchParam)
+        return normalizeForMatch(value).includes(query)
       }
       return false
-    })
-  })
+    }),
+  )
 }
 
+/**
+ * Keeps elements whose `key` value (or any of its values, for arrays) matches
+ * one of the selected values. Matching ignores case, whitespace and accents.
+ * An empty selection keeps every element.
+ */
 export function filterElementsBySelectedArray<
   T extends Partial<Record<K, unknown>>,
   K extends keyof T,
->(key: K, elements: T[], selectedArray: T[K][]): T[] {
+>(key: K, elements: T[], selected: readonly unknown[]): T[] {
+  if (!selected.length) {
+    return elements
+  }
+
+  const wanted = new Set(selected.map(normalizeForMatch))
   return elements.filter((element) => {
     const value = element[key]
-    if (Array.isArray(value) && Array.isArray(selectedArray[0])) {
-      return !!intersection(value, selectedArray[0] as typeof value).length
-    }
-    return value && selectedArray.includes(value)
+    const values = Array.isArray(value) ? value : [value]
+    return values.some(
+      (item) =>
+        item !== null &&
+        item !== undefined &&
+        wanted.has(normalizeForMatch(item)),
+    )
   })
 }
 
@@ -82,15 +107,8 @@ export function filterElementsByRange<T extends object, K extends keyof T>(
   })
 }
 
-export function mergeAndFilter<T extends object, K extends keyof T>(
-  key: K,
-  ...elements: T[][]
-) {
-  return uniqBy(prop(key), flatten(elements))
-}
-
 function standardizeValue<K>(value: K) {
-  return typeof value === 'string' ? (value.trim().toLowerCase() as K) : value
+  return typeof value === 'string' ? (normalizeForMatch(value) as K) : value
 }
 
 export function isBookInDefaultCollection(

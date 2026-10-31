@@ -46,7 +46,7 @@ defineEmits<{ (e: 'day', day: string): void }>()
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-const today = toSimpleDate(now())
+const today = todaySimpleDate()
 
 const wide = computed(() => props.info.periods.length <= 62)
 

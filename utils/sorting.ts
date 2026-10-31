@@ -1,14 +1,7 @@
-import { indexBy, prop } from 'ramda'
-import type { Author } from '~/types/author'
-import type { Book, BookProgressStatus, ViewBook } from '~/types/book'
+import type { ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
 import type { Goal } from '~/types/goal'
 import { DEFAULT_COLLECTIONS } from '~/utils/constants'
-import {
-  getBooksByAuthor,
-  getAverageRating,
-  getBooksByStatus,
-} from '~/utils/mappers'
 
 export function sortBooksByOrder(booksToBeSorted: ViewBook[]) {
   return booksToBeSorted.concat().sort((book1, book2) => {
@@ -17,46 +10,6 @@ export function sortBooksByOrder(booksToBeSorted: ViewBook[]) {
     }
     return book1.title.localeCompare(book2.title, undefined, { numeric: true })
   })
-}
-
-export function sortBooksBy<B extends Book>(
-  books: B[],
-  bookProperty: keyof B,
-  direction: 'asc' | 'desc' = 'asc',
-  count?: number,
-) {
-  const sortedBooks = books.concat().sort((book1, book2) => {
-    if (book1[bookProperty] === null) {
-      return 1
-    }
-
-    if (book2[bookProperty] === null) {
-      return -1
-    }
-
-    if (
-      typeof book1[bookProperty] === 'string' &&
-      typeof book2[bookProperty] === 'string'
-    ) {
-      return direction === 'desc'
-        ? book2[bookProperty].localeCompare(book1[bookProperty], undefined, {
-            numeric: true,
-          })
-        : book1[bookProperty].localeCompare(book2[bookProperty], undefined, {
-            numeric: true,
-          })
-    }
-
-    const val1 = book1[bookProperty]
-    const val2 = book2[bookProperty]
-    if (typeof val1 === 'number' && typeof val2 === 'number') {
-      return direction === 'desc' ? val2 - val1 : val1 - val2
-    }
-
-    return 0
-  })
-
-  return count ? sortedBooks.slice(0, count) : sortedBooks
 }
 
 export function sortBooksByAuthor(books: ViewBook[]) {
@@ -127,104 +80,4 @@ export function sortGoals(goals: Goal[]) {
     }
     return goalSortingOrder[status1] - goalSortingOrder[status2]
   })
-}
-
-export function sortAuthorsByBookCount(
-  books: ViewBook[],
-  authors: Author[],
-): { author: Author; count: number }[] {
-  const authorsById = indexBy(prop('id'), authors)
-  const booksByAuthor = getBooksByAuthor(books, authors)
-  const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => {
-      const author = authorsById[authorId]
-      const authorBooks = booksByAuthor[authorId]
-      return {
-        author,
-        count: authorBooks?.length ?? 0,
-      }
-    })
-    .filter(
-      (item): item is { author: Author; count: number } =>
-        item.author !== undefined && item.count > 0,
-    )
-
-  return authorCounts.sort((a, b) => {
-    if (a.count === b.count) {
-      return a.author.name.localeCompare(b.author.name)
-    }
-    return b.count - a.count
-  })
-}
-
-export function sortAuthorsByBookRatings(
-  books: ViewBook[],
-  authors: Author[],
-  minAverage: number = 0.5,
-): { author: Author; count: number; average: number }[] {
-  const authorsById = indexBy(prop('id'), authors)
-  const booksByAuthor = getBooksByAuthor(books, authors)
-  const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => {
-      const author = authorsById[authorId]
-      const authorBooks = booksByAuthor[authorId]
-      return {
-        author,
-        count: authorBooks?.length ?? 0,
-        average: authorBooks ? getAverageRating(authorBooks) : undefined,
-      }
-    })
-    .filter(
-      (a): a is { author: Author; count: number; average: number } =>
-        a.author !== undefined &&
-        a.average !== undefined &&
-        a.average >= minAverage,
-    )
-
-  return authorCounts.sort((a, b) => {
-    if (a.average === b.average) {
-      if (a.count === b.count) {
-        return a.author.name.localeCompare(b.author.name)
-      }
-      return b.count - a.count
-    }
-
-    return b.average - a.average
-  })
-}
-
-export function sortAuthorByStatusesCount(
-  books: ViewBook[],
-  authors: Author[],
-): {
-  author: Author
-  count: number
-  countByStatus?: Record<BookProgressStatus, number>
-}[] {
-  const authorsById = indexBy(prop('id'), authors)
-  const booksByAuthor = getBooksByAuthor(books, authors)
-  const authorCounts = Object.keys(booksByAuthor)
-    .map((authorId) => {
-      const author = authorsById[authorId]
-      const authorBooks = booksByAuthor[authorId]
-      if (!author || !authorBooks) {
-        return null
-      }
-      return {
-        author,
-        count: authorBooks.length,
-        countByStatus: getBooksByStatus(authorBooks),
-      }
-    })
-    .filter(
-      (item): item is NonNullable<typeof item> =>
-        item !== null && item.count > 0,
-    )
-    .map((item) => ({
-      author: item.author,
-      count: item.count,
-      countByStatus: item.countByStatus,
-    }))
-
-  return authorCounts
 }

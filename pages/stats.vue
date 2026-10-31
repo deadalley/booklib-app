@@ -313,7 +313,7 @@ const RANGE_TITLES = computed<Record<Range, string>>(() => ({
 const formatCount = (value: number) =>
   value.toLocaleString('en-US', { maximumFractionDigits: 0 })
 
-const today = dayjs.utc(toSimpleDate(now()))
+const today = dayjs.utc(todaySimpleDate())
 
 const rangeStart = computed(() => {
   if (range.value === 'year') return today.startOf('year')

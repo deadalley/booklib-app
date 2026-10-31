@@ -118,7 +118,13 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/library': { redirect: '/library/books' },
+    // Former standalone pages, now part of Data Management
+    '/import': { redirect: '/data-management' },
+    '/export': { redirect: '/data-management' },
   },
+
+  // The styleguide is a development tool; keep it out of production builds
+  ignore: process.env.NODE_ENV === 'production' ? ['pages/styleguide.vue'] : [],
 
   compatibilityDate: '2024-12-15',
 })

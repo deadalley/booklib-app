@@ -40,28 +40,28 @@
   }
 
   /* Switches */
+  /* Segmented control: an inset paper-dark track with a raised selection */
   .switch {
-    @apply inline-flex h-min items-center;
+    @apply paper-dark border-stroke-subtle inline-flex h-min items-center gap-0.5 border p-0.5;
   }
   .switch-option {
-    @apply border-stroke bg-surface-elevated text-ink-secondary hover:bg-stroke/40 active:bg-stroke-subtle;
-    @apply first:rounded-l-scholarly last:rounded-r-scholarly flex w-full cursor-pointer items-center justify-center border transition-all ring-inset;
+    @apply text-ink-secondary hover:text-ink-primary flex w-full cursor-pointer items-center justify-center rounded-[6px] border border-transparent transition-all;
+    @apply focus-visible:ring-primary/25 focus-visible:ring-2 focus-visible:outline-none;
   }
   .switch-option-inner {
-    @apply flex cursor-pointer items-center gap-2 rounded-[inherit] px-3 py-2 lg:w-full;
+    @apply flex cursor-pointer items-center gap-2 rounded-[inherit] px-3 py-1.5 lg:w-full;
   }
   .switch-option-label {
-    @apply text-base font-semibold whitespace-nowrap;
+    @apply text-sm font-semibold whitespace-nowrap;
   }
   .switch-option.selected {
-    @apply border-stroke bg-surface hover:bg-stroke/40;
-    @apply w-full;
+    @apply bg-surface-elevated border-stroke-subtle text-ink-primary w-full shadow-sm;
   }
 
   /* Book tile */
   .book-tile {
-    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full flex-col overflow-hidden border shadow-sm transition-shadow duration-200;
-    @apply hover:shadow-primary/50 hover:border-primary;
+    @apply paper-flat flex h-full flex-col overflow-hidden transition-shadow duration-200;
+    @apply hover:shadow-primary/50 hover:border-primary hover:shadow-sm;
   }
   .book-tile-drag-handle {
     @apply bg-primary text-ink-inverse flex items-center justify-between px-3 py-1 text-sm;
@@ -73,7 +73,7 @@
     @apply relative block;
   }
   .book-tile-cover {
-    @apply h-56 w-full object-cover object-top;
+    @apply aspect-[2/3] h-auto w-full object-cover object-top;
   }
   .book-tile-floating-icon {
     @apply bg-surface-elevated text-ink-secondary border-stroke absolute top-3 left-3 inline-flex items-center justify-center rounded-full border px-2 py-1;
@@ -134,7 +134,7 @@
 
   /* Collection tile */
   .collection-tile {
-    @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex h-full flex-col overflow-hidden border shadow-sm transition-shadow duration-200;
+    @apply paper-flat flex h-full w-full flex-col overflow-hidden text-left transition-shadow duration-200;
     @apply hover:border-primary hover:shadow-primary/50;
   }
   .collection-tile-selected {
@@ -216,7 +216,7 @@
     @apply transition-transform duration-300 ease-in;
   }
   .menu-content {
-    @apply border-stroke-subtle bg-surface-elevated rounded-scholarly border;
+    @apply paper-sm;
     @apply flex flex-col items-start gap-1 p-2 text-base;
     @apply bottom-2 z-50 mt-1 max-h-96 w-full overflow-x-hidden overflow-y-auto;
     @apply transition-all duration-100 ease-in;
@@ -255,12 +255,12 @@
 
   /* Tooltip */
   .tooltip-content {
-    @apply rounded-scholarly bg-surface-elevated text-ink-primary px-3 py-2 text-sm shadow-sm;
+    @apply paper-sm text-ink-primary z-[110] max-w-xs px-2.5 py-1.5 text-[0.8125rem] font-medium;
   }
 
   /* Pagination */
   .pagination-root {
-    @apply bg-surface-elevated rounded-scholarly border-stroke-subtle mt-2 flex w-full items-center justify-between gap-3 border p-2;
+    @apply paper-flat mt-2 flex w-full flex-col-reverse items-center justify-between gap-2 border p-2 sm:flex-row sm:gap-3;
   }
   .pagination-summary {
     @apply text-ink-secondary text-sm font-medium;
@@ -400,15 +400,20 @@
   .nav-sidebar-button-active {
     @apply border-primary/40 bg-primary/10 text-primary;
     @apply hover:border-primary/50 hover:bg-primary/12 hover:text-primary;
-    @apply shadow-[inset_0_0_0_1px_rgba(152,88,88,0.08)];
+    @apply ring-primary/10 ring-1 ring-inset;
   }
   .nav-sidebar-button-icon-only {
     @apply h-11 w-11 justify-center gap-0 p-0;
   }
 
   /* Sidebar */
+  /* A sheet fixed to the viewport, so it is visible however far the page is
+     scrolled; full width on phones */
   .sidebar {
-    @apply border-l-stroke text-ink-primary bg-surface-subtle absolute inset-x-0 top-0 z-50 flex h-full flex-col gap-8 overflow-auto border-l px-8 pt-8 pb-16 shadow-md md:left-[unset] md:w-[355px];
+    @apply border-l-stroke text-ink-primary bg-surface-subtle fixed inset-y-0 right-0 z-50 flex w-full flex-col gap-8 overflow-y-auto border-l px-6 pt-6 pb-16 shadow-md sm:w-[24rem] sm:px-8 sm:pt-8;
+  }
+  .sidebar-backdrop {
+    @apply fixed inset-0 z-40 bg-black/20;
   }
   .sidebar-title {
     @apply tracking-widest uppercase;
@@ -534,7 +539,7 @@
 
 /* Progress card */
 .progress-card {
-  @apply bg-surface-elevated border-stroke-subtle flex flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
+  @apply paper-flat flex flex-col gap-4 px-6 py-5;
 }
 .progress-percentage {
   @apply font-display text-primary flex items-baseline text-[3.25rem] leading-[0.9] font-semibold tracking-[-0.02em];
@@ -555,11 +560,9 @@
   @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
 }
 
-/* Card */
+/* Card: the standard padded content card, built on paper-flat */
 .card {
-  @apply bg-surface-elevated rounded-scholarly;
-  @apply border-stroke-subtle border;
-  @apply flex min-w-0 flex-col gap-4 rounded-xl px-6 py-5;
+  @apply paper-flat flex min-w-0 flex-col gap-4 px-6 py-5;
 }
 .section-label {
   @apply text-ink-muted border-stroke-subtle flex w-full items-center gap-2 border-b pb-2 text-left text-xs font-bold tracking-[0.18em] uppercase;

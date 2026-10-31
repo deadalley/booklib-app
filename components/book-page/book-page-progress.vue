@@ -300,7 +300,7 @@
           <ol class="log-list">
             <bl-book-page-note
               v-for="(note, index) in sortedNotes"
-              :key="note.createdAt"
+              :key="note.id ?? `${note.createdAt}-${index}`"
               :note="note"
               :latest="index === 0"
               @edit="openLogModalForEdit(note)"
@@ -331,6 +331,7 @@ import {
   toFullDateCompact,
   toSimpleDate,
   fromSimpleDate,
+  todaySimpleDate,
   now,
 } from '~/utils/date'
 import {
@@ -448,9 +449,13 @@ const progressSubtitle = computed(() => {
   return `${pagesRead.value} of ${pages} pages`
 })
 
-const pagesRead = computed(() =>
-  Math.round(((props.book.pages ?? 0) * progress.value) / 100),
-)
+// Use the logged page directly; deriving it from the rounded percentage
+// loses precision (page 120 of 471 would show as 118).
+const pagesRead = computed(() => {
+  const pages = props.book.pages ?? 0
+  if (currentStatus.value === 'read') return pages
+  return Math.min(pages, props.book.progress.currentPage ?? 0)
+})
 
 const stats = computed(() => {
   const pages = props.book.pages ?? 0
@@ -504,7 +509,7 @@ const actions = computed<
     case 'read':
       return [
         {
-          id: PROGRESS_STATUS_MAP['not-finished'].id,
+          id: 'stop',
           icon: 'IconNotesOff',
           label: 'Mark as unread',
           variant: 'secondary',
@@ -581,7 +586,7 @@ function openLogModal() {
     ? String(props.book.progress.currentPage)
     : undefined
   logNote.value = ''
-  logDate.value = toSimpleDate(now())
+  logDate.value = todaySimpleDate()
   showLogModal.value = true
 }
 
@@ -593,22 +598,30 @@ function openLogModalForEdit(note: BookNote) {
   showLogModal.value = true
 }
 
+/** The chosen log date, falling back to today if the field was cleared. */
+function selectedLogDate() {
+  return fromSimpleDate(logDate.value || todaySimpleDate())
+}
+
 function onSaveLogEntry() {
+  const content = logNote.value.trim()
+
   if (editingNote.value) {
     const index = (props.book.progress.notes ?? []).indexOf(editingNote.value)
     emit('update-note', {
       index,
-      content: logNote.value,
+      content,
       page: logPageNumber.value || undefined,
-      createdAt: fromSimpleDate(logDate.value),
+      createdAt: selectedLogDate(),
     })
     editingNote.value = null
-  } else if (logPageNumber.value) {
+  } else if (logPageNumber.value || content) {
+    // A note on its own (without a page) is a valid log entry too
     emit(
       'log-entry',
-      logPageNumber.value,
-      logNote.value,
-      fromSimpleDate(logDate.value),
+      logPageNumber.value || undefined,
+      content,
+      selectedLogDate(),
     )
   }
 }
@@ -616,7 +629,7 @@ function onSaveLogEntry() {
 function openStartDateModal() {
   pendingStartDate.value = props.book.progress.startedAt
     ? toSimpleDate(props.book.progress.startedAt)
-    : toSimpleDate(now())
+    : todaySimpleDate()
   showStartDateModal.value = true
 }
 
@@ -679,7 +692,7 @@ function onConfirmStartDate() {
   emit(
     'status-select',
     PROGRESS_STATUS_MAP.reading.id,
-    fromSimpleDate(pendingStartDate.value),
+    fromSimpleDate(pendingStartDate.value || todaySimpleDate()),
   )
 }
 

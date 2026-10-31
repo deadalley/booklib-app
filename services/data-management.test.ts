@@ -40,6 +40,7 @@ vi.mock('../utils', () => ({
   logger: {
     error: vi.fn(),
   },
+  DEFAULT_COLLECTIONS: ['1', '2', '3'],
   DEFAULT_COLLECTIONS_INIT: [
     { id: '1', name: 'Read' },
     { id: '2', name: 'Currently Reading' },
