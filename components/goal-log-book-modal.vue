@@ -72,27 +72,17 @@
         </p>
         <label class="form-wrapper w-44 flex-none">
           <span class="form-label">Finished on</span>
-          <span class="form-inner" :class="{ error: !dateValid }">
-            <input
-              v-model="date"
-              type="date"
-              class="form-input"
-              :min="windowStart"
-              :max="windowEnd"
-            />
+          <span class="form-inner">
+            <input v-model="date" type="date" class="form-input" />
           </span>
         </label>
         <bl-button variant="secondary" @click="open = false">Cancel</bl-button>
-        <bl-button :disabled="!selectedId || !dateValid" @click="save">
+        <bl-button :disabled="!selectedId" @click="save">
           <template #prependIcon="iconProps">
             <IconPlus v-bind="iconProps" />
           </template>
           Log book
         </bl-button>
-        <p v-if="!dateValid" class="form-error w-full">
-          Pick a date between {{ formatGoalDate(windowStart) }} and
-          {{ formatGoalDate(windowEnd) }}.
-        </p>
       </div>
     </div>
   </bl-modal>
@@ -143,12 +133,7 @@ const query = ref('')
 const scope = ref<'period' | 'all'>('all')
 const view = ref<View>('cards')
 const selectedId = ref<string | null>(null)
-const windowStart = computed(() => toSimpleDate(props.goal.startAt))
-const windowEnd = computed(() => toSimpleDate(props.goal.finishAt))
-const date = ref(getGoalDefaultLogDate(props.goal))
-const dateValid = computed(
-  () => !!date.value && isInGoalWindow(props.goal, date.value),
-)
+const date = ref(toSimpleDate(now()))
 
 watch(
   open,
@@ -157,7 +142,7 @@ watch(
     query.value = ''
     scope.value = finished.value.length ? 'period' : 'all'
     selectedId.value = null
-    date.value = getGoalDefaultLogDate(props.goal)
+    date.value = toSimpleDate(now())
   },
   { immediate: true },
 )
@@ -193,11 +178,7 @@ function pick(id: string) {
 
   const finishedAt = props.books.find((book) => book.id === id)?.progress
     .finishedAt
-  if (
-    selectedId.value &&
-    finishedAt &&
-    isInGoalWindow(props.goal, finishedAt)
-  ) {
+  if (selectedId.value && finishedAt) {
     date.value = toSimpleDate(finishedAt)
   }
 }
@@ -210,7 +191,7 @@ function onSelectRows(selection: Record<string, boolean>) {
 }
 
 function save() {
-  if (!selectedId.value || !dateValid.value) return
+  if (!selectedId.value) return
   emit('save', { id: uuidv4(), book: selectedId.value, createdAt: date.value })
   open.value = false
 }

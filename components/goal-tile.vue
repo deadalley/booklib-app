@@ -279,8 +279,6 @@ const note = computed(() => {
     return `${paceText(value.paceOffset)} · ${value.daysLeft} days left`
   }
 
-  if (!value.started) return `Starts ${formatGoalDate(props.goal.startAt)}`
-
   const unit = getGoalPeriodUnit(props.goal) ?? 'day'
   return [
     value.current ? `${value.hit} of ${value.counted} ${unit}s on target` : '',
