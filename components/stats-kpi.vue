@@ -1,5 +1,5 @@
 <template>
-  <div class="goal-card kpi">
+  <div class="card kpi">
     <span
       class="bg-primary-50 text-primary rounded-scholarly mb-2 grid size-9 place-items-center"
     >

@@ -555,15 +555,17 @@
   @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
 }
 
-/* Tracking */
-.goal-card {
+/* Card */
+.card {
   @apply bg-surface-elevated rounded-scholarly;
   @apply border-stroke-subtle border;
   @apply flex min-w-0 flex-col gap-4 rounded-xl px-6 py-5;
 }
-.goal-section-label {
+.section-label {
   @apply text-ink-muted border-stroke-subtle flex w-full items-center gap-2 border-b pb-2 text-left text-xs font-bold tracking-[0.18em] uppercase;
 }
+
+/* Tracking */
 .goal-tag {
   @apply inline-flex rounded-full px-2.5 py-0.5 text-[0.6875rem] font-bold tracking-widest whitespace-nowrap uppercase;
 }

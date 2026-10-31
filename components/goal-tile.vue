@@ -1,7 +1,7 @@
 <template>
   <article
     :id="`goal-${goal.id}`"
-    class="goal-card tile"
+    class="card tile"
     :class="{ open, muted: info.status !== 'tracking' }"
   >
     <header class="flex flex-wrap items-start justify-between gap-4">

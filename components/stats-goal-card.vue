@@ -1,5 +1,5 @@
 <template>
-  <section v-if="!goal" class="goal-card goal">
+  <section v-if="!goal" class="card goal">
     <span class="icon-well">
       <IconTarget :size="22" stroke="1.6" />
     </span>
@@ -17,7 +17,7 @@
     </div>
   </section>
 
-  <section v-else class="goal-card goal">
+  <section v-else class="card goal">
     <svg viewBox="0 0 120 120" class="w-34 flex-none" aria-hidden="true">
       <circle cx="60" cy="60" :r="R" class="ring-track" />
       <circle

@@ -1,5 +1,5 @@
 <template>
-  <section class="goal-card gap-3">
+  <section class="card gap-3">
     <div>
       <p class="book-page-section-title">Today</p>
       <p

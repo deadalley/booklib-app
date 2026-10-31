@@ -1,5 +1,5 @@
 <template>
-  <section class="goal-card min-w-0">
+  <section class="card min-w-0">
     <header class="flex flex-wrap items-start justify-between gap-3">
       <div class="min-w-0">
         <h5 class="stats-title">{{ title }}</h5>

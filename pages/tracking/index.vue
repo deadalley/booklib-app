@@ -34,7 +34,7 @@
         />
 
         <section v-if="groups.active.length" class="group">
-          <p class="goal-section-label">Active · {{ groups.active.length }}</p>
+          <p class="section-label">Active · {{ groups.active.length }}</p>
           <bl-goal-tile
             v-for="goal in groups.active"
             :key="goal.id"
@@ -44,7 +44,7 @@
         </section>
 
         <section v-if="groups.paused.length" class="group">
-          <p class="goal-section-label">Paused · {{ groups.paused.length }}</p>
+          <p class="section-label">Paused · {{ groups.paused.length }}</p>
           <bl-goal-tile
             v-for="goal in groups.paused"
             :key="goal.id"
@@ -56,7 +56,7 @@
         <section v-if="groups.done.length" class="group">
           <button
             type="button"
-            class="goal-section-label hover:text-primary cursor-pointer"
+            class="section-label hover:text-primary cursor-pointer"
             :aria-expanded="showDone"
             @click="showDone = !showDone"
           >
