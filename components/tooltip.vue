@@ -5,7 +5,12 @@
   </div>
   <TooltipProvider v-else>
     <TooltipRoot :delay-duration="150">
-      <TooltipTrigger v-bind="$attrs" class="cursor-default">
+      <!-- A span, not a button: the content is often a button itself -->
+      <TooltipTrigger
+        v-bind="$attrs"
+        as="span"
+        class="inline-flex cursor-default"
+      >
         <slot />
       </TooltipTrigger>
       <TooltipPortal>

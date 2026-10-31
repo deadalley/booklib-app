@@ -8,14 +8,16 @@
     "
   >
     <template #headerActions>
-      <NuxtLink to="/library/collections/new">
-        <bl-button variant="primary" :expand="isMobile">
-          <template #appendIcon="iconProps">
-            <IconPlus v-bind="iconProps" />
-            Add collection
-          </template>
-        </bl-button>
-      </NuxtLink>
+      <bl-button
+        to="/library/collections/new"
+        variant="primary"
+        :expand="isMobile"
+      >
+        <template #appendIcon="iconProps">
+          <IconPlus v-bind="iconProps" />
+          Add collection
+        </template>
+      </bl-button>
     </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
@@ -41,9 +43,7 @@
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
       <template #label>There are no collections in your library</template>
       <template #action>
-        <NuxtLink to="/library/collections/new">
-          <bl-button>Create a collection</bl-button>
-        </NuxtLink>
+        <bl-button to="/library/collections/new">Create a collection</bl-button>
       </template>
     </bl-empty>
     <bl-empty

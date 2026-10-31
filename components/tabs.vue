@@ -1,11 +1,11 @@
 <template>
   <TabsRoot class="flex w-full flex-col" :default-value="defaultValue">
     <TabsList
-      class="border-stroke relative flex shrink-0 border-b"
-      aria-label="Manage your account"
+      class="border-stroke-subtle relative flex shrink-0 border-b"
+      :aria-label="label"
     >
       <TabsIndicator
-        class="absolute bottom-0 left-0 h-[2px] w-[--radix-tabs-indicator-size] translate-x-[--radix-tabs-indicator-position] translate-y-px rounded-full transition-[width,transform] duration-300"
+        class="absolute bottom-0 left-0 h-[2px] w-(--radix-tabs-indicator-size) translate-x-(--radix-tabs-indicator-position) translate-y-px rounded-full transition-[width,transform] duration-300"
       >
         <div class="bg-primary size-full" />
       </TabsIndicator>
@@ -21,6 +21,8 @@ import { TabsIndicator, TabsList, TabsRoot } from 'radix-vue'
 withDefaults(
   defineProps<{
     defaultValue?: string
+    /** Accessible name for the tab list */
+    label?: string
     orientation?: 'horizontal' | 'vertical'
     full?: boolean
   }>(),

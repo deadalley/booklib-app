@@ -82,10 +82,6 @@ export function getGoalProgress(goal: Goal): number {
   return sum(goal.entries.map((entry) => getGoalEntryValue(goal, entry)))
 }
 
-export function getGoalProgressPercentage(goal: Goal): number {
-  return Math.round((getGoalProgress(goal) / goal.amount) * 100)
-}
-
 export function getGoalStatus(
   goal: Goal,
   today = todayKey(),

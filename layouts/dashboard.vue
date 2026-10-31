@@ -45,23 +45,17 @@
           <!-- Navigation items -->
           <ul
             v-if="!!navigationItems?.length"
-            class="hidden items-center justify-center gap-5 lg:flex"
+            class="hidden items-center justify-center gap-1 lg:flex"
           >
-            <li
-              v-for="item of navigationItems"
-              :key="item.label"
-              class="hover:text-primary"
-              :class="{
-                'text-primary': item.active,
-              }"
-            >
+            <li v-for="item of navigationItems" :key="item.label">
+              <!-- v2 underline tabs -->
               <NuxtLink
                 :to="item.to"
                 :aria-current="item.active ? 'page' : undefined"
+                class="section-tab"
+                :class="{ 'section-tab-active': item.active }"
               >
-                <h6>
-                  {{ item.label }}
-                </h6>
+                {{ item.label }}
               </NuxtLink>
             </li>
           </ul>
@@ -140,3 +134,15 @@ const navigationItems = computed(() => {
 
 const sidebarOpen = ref(false)
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+.section-tab {
+  @apply text-ink-muted hover:text-ink-primary relative block px-3 py-2 text-xs font-bold tracking-[0.18em] uppercase transition-colors;
+  @apply focus-visible:ring-primary/25 rounded-scholarly focus-visible:ring-2 focus-visible:outline-none;
+}
+.section-tab-active {
+  @apply text-primary after:bg-primary after:absolute after:inset-x-3 after:-bottom-[0.8rem] after:h-0.5 after:rounded-full after:content-[''];
+}
+</style>

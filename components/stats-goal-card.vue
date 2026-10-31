@@ -6,14 +6,12 @@
     <div class="flex min-w-0 flex-1 flex-col items-start gap-1.5">
       <h5 class="stats-title">No active reading goal</h5>
       <p class="stats-sub">Set a target and track your pace here.</p>
-      <NuxtLink to="/tracking/new">
-        <bl-button size="sm">
-          <template #prependIcon="iconProps">
-            <IconPlus v-bind="iconProps" />
-          </template>
-          Set a goal
-        </bl-button>
-      </NuxtLink>
+      <bl-button to="/tracking/new" size="sm">
+        <template #prependIcon="iconProps">
+          <IconPlus v-bind="iconProps" />
+        </template>
+        Set a goal
+      </bl-button>
     </div>
   </section>
 
@@ -44,14 +42,16 @@
         · {{ pace }}
       </p>
       <p class="stats-sub">{{ summary }}</p>
-      <NuxtLink :to="`/tracking#goal-${goal.id}`" class="mt-1 flex justify-end">
-        <bl-button variant="tertiary">
-          <template #prependIcon="iconProps">
-            <IconCircleArrowRight v-bind="iconProps" />
-          </template>
-          Open in Tracking
-        </bl-button>
-      </NuxtLink>
+      <bl-button
+        :to="`/tracking#goal-${goal.id}`"
+        class="mt-1 self-end"
+        variant="tertiary"
+      >
+        <template #prependIcon="iconProps">
+          <IconCircleArrowRight v-bind="iconProps" />
+        </template>
+        Open in Tracking
+      </bl-button>
     </div>
   </section>
 </template>

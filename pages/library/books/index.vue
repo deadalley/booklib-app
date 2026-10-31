@@ -10,14 +10,12 @@
     :loading="loading"
   >
     <template #headerActions>
-      <NuxtLink to="/library/books/new">
-        <bl-button variant="primary" :expand="isMobile">
-          <template #prependIcon="iconProps">
-            <IconPlus v-bind="iconProps" />
-          </template>
-          Add book
-        </bl-button>
-      </NuxtLink>
+      <bl-button to="/library/books/new" variant="primary" :expand="isMobile">
+        <template #prependIcon="iconProps">
+          <IconPlus v-bind="iconProps" />
+        </template>
+        Add book
+      </bl-button>
     </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
@@ -72,9 +70,7 @@
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
-        <NuxtLink to="/library/books/new">
-          <bl-button>Create a book</bl-button>
-        </NuxtLink>
+        <bl-button to="/library/books/new">Create a book</bl-button>
       </template>
     </bl-empty>
     <bl-books-views

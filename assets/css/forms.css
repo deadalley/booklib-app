@@ -19,7 +19,13 @@
   }
 
   .form-inner:focus-within {
-    @apply border-primary;
+    @apply border-primary ring-primary/20 ring-2;
+  }
+  .form-inner-error {
+    @apply border-primary-500 bg-primary-50/40;
+  }
+  .form-inner:has(:disabled) {
+    @apply bg-surface-subtle text-ink-muted cursor-not-allowed;
   }
   .form-error {
     @apply text-primary-600 text-[0.8125rem] font-semibold;
@@ -31,9 +37,5 @@
   input.form-input,
   textarea.form-input {
     @apply w-full;
-  }
-  input:focus.form-input,
-  textarea:focus.form-input {
-    @apply border-stroke-strong;
   }
 }

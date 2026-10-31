@@ -190,7 +190,7 @@ const progressBarColor = computed(() => getGoalProgressColor(props.goal, 'bg'))
 @reference '../assets/css/main.css';
 
 .goal-link-tile {
-  @apply bg-surface-elevated border-stroke-subtle rounded-scholarly flex min-h-40 flex-col overflow-hidden border shadow-sm transition-shadow duration-200 md:min-h-0 md:flex-row;
+  @apply paper-flat flex min-h-40 flex-col overflow-hidden transition-shadow duration-200 md:min-h-0 md:flex-row;
   @apply hover:border-primary hover:shadow-primary/50;
 }
 

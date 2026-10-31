@@ -1,7 +1,7 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <DialogRoot :open="open" @update:open="(value) => !value && _onCancel()">
-    <DialogTrigger v-if="$slots['trigger']" @click="open = true">
+    <DialogTrigger v-if="$slots['trigger']" as-child @click="open = true">
       <slot name="trigger" />
     </DialogTrigger>
     <DialogPortal>

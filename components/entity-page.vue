@@ -10,14 +10,12 @@
       />
 
       <div class="flex items-center gap-2">
-        <NuxtLink :to="editHref">
-          <bl-button variant="secondary">
-            <template #prependIcon>
-              <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-            </template>
-            Edit
-          </bl-button>
-        </NuxtLink>
+        <bl-button :to="editHref" variant="secondary">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Edit
+        </bl-button>
         <bl-delete-collection-modal
           v-if="canDelete"
           :name="entity.name"
@@ -136,14 +134,12 @@
                   : 'There are no books by this author.'
               }}
             </p>
-            <NuxtLink :to="editHref">
-              <bl-button variant="secondary">
-                <template #prependIcon="iconProps">
-                  <IconPlus v-bind="iconProps" />
-                </template>
-                Add books
-              </bl-button>
-            </NuxtLink>
+            <bl-button :to="editHref" variant="secondary">
+              <template #prependIcon="iconProps">
+                <IconPlus v-bind="iconProps" />
+              </template>
+              Add books
+            </bl-button>
           </div>
         </section>
       </div>
