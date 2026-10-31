@@ -9,9 +9,9 @@
         class="data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 rounded-xl p-7 focus:outline-none"
+        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl p-5 focus:outline-none sm:p-7"
         :class="{
-          'w-[90vw]': size !== undefined,
+          'w-[calc(100vw-2rem)]': size !== undefined,
           'max-w-screen-sm': size === 'sm',
           'max-w-screen-md': size === 'md',
           'max-w-screen-lg': size === 'lg',
@@ -34,8 +34,12 @@
             />
             <slot name="title" />
           </h4>
-          <DialogClose v-if="withCloseButton">
-            <bl-icon-button variant="secondary" @click="_onCancel">
+          <DialogClose v-if="withCloseButton" as-child>
+            <bl-icon-button
+              variant="secondary"
+              aria-label="Close"
+              @click="_onCancel"
+            >
               <template #default="iconProps">
                 <IconX v-bind="iconProps" />
               </template>
@@ -45,26 +49,26 @@
         <div class="relative">
           <slot />
         </div>
+        <!-- Footer: stacked full-width buttons on phones, a row otherwise -->
         <div
-          class="flex items-baseline justify-end gap-2"
-          :class="{
-            'mt-4': $slots['cancel-label'] || $slots['action-label'],
-          }"
+          v-if="$slots['cancel-label'] || $slots['action-label']"
+          class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-baseline sm:justify-end"
         >
-          <DialogClose>
-            <bl-button
-              v-if="$slots['cancel-label']"
-              variant="secondary"
-              @click="_onCancel"
-            >
-              <slot name="cancel-label" />
-            </bl-button>
-          </DialogClose>
-          <DialogClose>
-            <bl-button v-if="$slots['action-label']" @click="_onConfirm">
-              <slot name="action-label" />
-            </bl-button>
-          </DialogClose>
+          <bl-button
+            v-if="$slots['cancel-label']"
+            variant="secondary"
+            class="justify-center"
+            @click="_onCancel"
+          >
+            <slot name="cancel-label" />
+          </bl-button>
+          <bl-button
+            v-if="$slots['action-label']"
+            class="justify-center"
+            @click="_onConfirm"
+          >
+            <slot name="action-label" />
+          </bl-button>
         </div>
       </DialogContent>
     </DialogPortal>

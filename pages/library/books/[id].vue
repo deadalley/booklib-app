@@ -97,7 +97,7 @@
         <section v-if="bookGoals.length" class="book-page-section">
           <p class="book-page-section-title">Goals</p>
           <div
-            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 sm:grid-cols-[repeat(auto-fill,minmax(min(30rem,100%),1fr))]"
           >
             <bl-goal-link-tile
               v-for="goal in bookGoals"

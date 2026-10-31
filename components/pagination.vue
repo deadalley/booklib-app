@@ -2,7 +2,7 @@
   <PaginationRoot
     v-model:page="currentPage"
     :total="totalItemCount"
-    :sibling-count="1"
+    :sibling-count="isMobile ? 0 : 1"
     :default-page="1"
     :items-per-page="itemsPerPage"
     class="pagination-root"
@@ -13,7 +13,7 @@
     </p>
 
     <PaginationList v-slot="{ items }" class="pagination-list">
-      <PaginationFirst class="pagination-arrow">
+      <PaginationFirst class="pagination-arrow max-sm:hidden">
         <IconChevronsLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationFirst>
       <PaginationPrev class="pagination-arrow">
@@ -40,7 +40,7 @@
       <PaginationNext class="pagination-arrow pagination-arrow-next">
         <IconChevronRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationNext>
-      <PaginationLast class="pagination-arrow">
+      <PaginationLast class="pagination-arrow max-sm:hidden">
         <IconChevronsRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationLast>
     </PaginationList>
@@ -64,6 +64,9 @@ import {
   PaginationPrev,
   PaginationRoot,
 } from 'radix-vue'
+
+// Fewer page buttons on phones so the control fits the screen
+const { isMobile } = useBreakpoints()
 
 const props = defineProps<{ totalItemCount: number; itemsPerPage: number }>()
 

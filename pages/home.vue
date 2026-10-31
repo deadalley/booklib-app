@@ -97,12 +97,12 @@
         </bl-tile>
       </div>
       <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 flex flex-col lg:col-span-4">
+        <div class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4">
           <bl-book-stats-tile :books="books ?? []" />
         </div>
         <div
           v-if="books.length || authors.length"
-          class="col-span-12 flex flex-col lg:col-span-4"
+          class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4"
         >
           <bl-book-suggestions-tile
             :books="books"
@@ -110,7 +110,7 @@
             :reload-books="refresh"
           />
         </div>
-        <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
+        <div class="col-span-12 flex flex-col gap-4 2xl:col-span-4">
           <bl-goal-suggestion-tile />
         </div>
       </div>

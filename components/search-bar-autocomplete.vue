@@ -2,7 +2,7 @@
   <bl-raw-autocomplete
     v-model="selectedValue"
     v-model:search-term="searchTerm"
-    class="min-w-48 sm:max-w-sm sm:min-w-80"
+    class="min-w-48 sm:max-w-sm sm:min-w-56 xl:min-w-80"
     :options="visibleFlatOptions"
     :groups="visibleGroups"
     :placeholder="placeholder"

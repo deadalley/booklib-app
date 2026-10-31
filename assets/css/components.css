@@ -73,7 +73,7 @@
     @apply relative block;
   }
   .book-tile-cover {
-    @apply h-56 w-full object-cover object-top;
+    @apply aspect-[2/3] h-auto w-full object-cover object-top;
   }
   .book-tile-floating-icon {
     @apply bg-surface-elevated text-ink-secondary border-stroke absolute top-3 left-3 inline-flex items-center justify-center rounded-full border px-2 py-1;
@@ -260,7 +260,7 @@
 
   /* Pagination */
   .pagination-root {
-    @apply bg-surface-elevated rounded-scholarly border-stroke-subtle mt-2 flex w-full items-center justify-between gap-3 border p-2;
+    @apply bg-surface-elevated rounded-scholarly border-stroke-subtle mt-2 flex w-full flex-col-reverse items-center justify-between gap-2 border p-2 sm:flex-row sm:gap-3;
   }
   .pagination-summary {
     @apply text-ink-secondary text-sm font-medium;
@@ -407,8 +407,13 @@
   }
 
   /* Sidebar */
+  /* A sheet fixed to the viewport, so it is visible however far the page is
+     scrolled; full width on phones */
   .sidebar {
-    @apply border-l-stroke text-ink-primary bg-surface-subtle absolute inset-x-0 top-0 z-50 flex h-full flex-col gap-8 overflow-auto border-l px-8 pt-8 pb-16 shadow-md md:left-[unset] md:w-[355px];
+    @apply border-l-stroke text-ink-primary bg-surface-subtle fixed inset-y-0 right-0 z-50 flex w-full flex-col gap-8 overflow-y-auto border-l px-6 pt-6 pb-16 shadow-md sm:w-[24rem] sm:px-8 sm:pt-8;
+  }
+  .sidebar-backdrop {
+    @apply fixed inset-0 z-40 bg-black/20;
   }
   .sidebar-title {
     @apply tracking-widest uppercase;

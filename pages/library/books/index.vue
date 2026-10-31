@@ -11,7 +11,7 @@
   >
     <template #headerActions>
       <NuxtLink to="/library/books/new">
-        <bl-button variant="primary" :expand="isMobile()">
+        <bl-button variant="primary" :expand="isMobile">
           <template #prependIcon="iconProps">
             <IconPlus v-bind="iconProps" />
           </template>
@@ -152,6 +152,8 @@ import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 import type { Collection } from '~/types/collection'
+
+const { isMobile } = useBreakpoints()
 
 const { getBooks, getAuthors, getCollections, updateBook, deleteBooks } =
   useBookLibrary()

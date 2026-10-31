@@ -24,6 +24,8 @@
                 : `${Math.max(3, (period.value / max) * 100)}%`,
           }"
           :title="`${periodLabel(period)}: ${formatGoalNumber(period.value)} ${getGoalUnit(goal, period.value)}`"
+          role="img"
+          :aria-label="`${periodLabel(period)}: ${formatGoalNumber(period.value)} ${getGoalUnit(goal, period.value)}`"
         />
       </div>
       <div class="axis">

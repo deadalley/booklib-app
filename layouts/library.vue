@@ -22,29 +22,29 @@
             />
           </div>
         </div>
-        <slot v-if="!isMobile()" name="headerActions" />
+        <slot v-if="!isMobile" name="headerActions" />
       </div>
       <!-- Actions -->
       <div
         class="z-10 flex w-full flex-col gap-3 transition-all duration-300 ease-in-out"
         :class="{
-          'max-h-96 opacity-100': actionsOpen,
-          'max-h-0 opacity-0': !actionsOpen,
-          'mt-4': !isMobile(),
+          'max-h-[40rem] opacity-100': actionsOpen,
+          // Collapsed actions must not stay clickable underneath the title
+          'pointer-events-none invisible max-h-0 overflow-hidden opacity-0':
+            !actionsOpen,
+          'mt-4': !isMobile,
         }"
+        :aria-hidden="!actionsOpen"
       >
         <div
-          class="flex w-full flex-1 flex-col justify-start gap-3 overflow-x-auto overflow-y-visible p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
-          :class="[
-            { 'md:mr-[355px]': !!sidebarContent },
-            actionsOpen ? 'translate-y-0' : '-translate-y-full',
-          ]"
+          class="flex w-full flex-1 flex-col justify-start gap-3 p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          :class="actionsOpen ? 'translate-y-0' : '-translate-y-full'"
         >
-          <div class="flex w-fit justify-end gap-2 overflow-visible">
+          <div class="flex w-full flex-wrap items-center gap-2">
             <slot name="navbar" />
           </div>
         </div>
-        <slot v-if="isMobile()" name="headerActions" />
+        <slot v-if="isMobile" name="headerActions" />
       </div>
     </div>
     <!-- Content -->
@@ -63,11 +63,17 @@ defineProps<{
   loading?: boolean
 }>()
 
+const { isMobile } = useBreakpoints()
+
+// Actions start collapsed on phones and expanded elsewhere; follow the
+// breakpoint when the window is resized
 const actionsOpen = ref(true)
 
-onMounted(() => {
-  if (isMobile()) {
-    actionsOpen.value = false
-  }
-})
+watch(
+  isMobile,
+  (mobile) => {
+    actionsOpen.value = !mobile
+  },
+  { immediate: true },
+)
 </script>

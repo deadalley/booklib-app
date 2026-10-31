@@ -9,7 +9,7 @@
   >
     <template #headerActions>
       <NuxtLink to="/library/collections/new">
-        <bl-button variant="primary" :expand="isMobile()">
+        <bl-button variant="primary" :expand="isMobile">
           <template #appendIcon="iconProps">
             <IconPlus v-bind="iconProps" />
             Add collection
@@ -101,6 +101,8 @@ import type { Collection } from '~/types/collection'
 import { IconMaximize, IconMinimize, IconPlus } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
+
+const { isMobile } = useBreakpoints()
 
 const {
   getCollections,
