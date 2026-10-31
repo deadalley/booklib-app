@@ -44,15 +44,20 @@
         · {{ pace }}
       </p>
       <p class="stats-sub">{{ summary }}</p>
-      <NuxtLink :to="`/tracking#goal-${goal.id}`" class="stats-link">
-        Open in Tracking
+      <NuxtLink :to="`/tracking#goal-${goal.id}`" class="mt-1 flex justify-end">
+        <bl-button variant="tertiary">
+          <template #prependIcon="iconProps">
+            <IconCircleArrowRight v-bind="iconProps" />
+          </template>
+          Open in Tracking
+        </bl-button>
       </NuxtLink>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { IconPlus, IconTarget } from '@tabler/icons-vue'
+import { IconCircleArrowRight, IconPlus, IconTarget } from '@tabler/icons-vue'
 import type { Goal } from '~/types/goal'
 
 const props = defineProps<{ goal: Goal | null }>()

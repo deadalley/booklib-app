@@ -1,4 +1,8 @@
 @layer components {
+  /* Links */
+  .link {
+    @apply text-primary cursor-pointer self-start p-0 text-left text-[0.8125rem] font-bold tracking-widest whitespace-nowrap uppercase underline-offset-[3px] hover:underline;
+  }
   /* Buttons */
   .button {
     @apply rounded-scholarly flex h-min w-fit items-center justify-center gap-2 border text-base font-semibold whitespace-nowrap lg:inline-flex lg:grow-0;
@@ -553,7 +557,9 @@
 
 /* Tracking */
 .goal-card {
-  @apply bg-surface-elevated border-stroke-subtle flex min-w-0 flex-col gap-4 rounded-xl border px-6 py-5 shadow-sm;
+  @apply bg-surface-elevated rounded-scholarly;
+  @apply border-stroke-subtle border;
+  @apply flex min-w-0 flex-col gap-4 rounded-xl px-6 py-5;
 }
 .goal-section-label {
   @apply text-ink-muted border-stroke-subtle flex w-full items-center gap-2 border-b pb-2 text-left text-xs font-bold tracking-[0.18em] uppercase;
@@ -589,7 +595,4 @@
 }
 .stats-sub {
   @apply text-ink-muted text-[0.8125rem] font-medium;
-}
-.stats-link {
-  @apply text-primary cursor-pointer self-start p-0 text-left text-[0.8125rem] font-bold tracking-widest whitespace-nowrap uppercase underline-offset-[3px] hover:underline;
 }

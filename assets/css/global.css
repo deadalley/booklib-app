@@ -22,7 +22,7 @@
   }
   .paper-flat {
     @apply bg-surface-elevated rounded-scholarly;
-    /* @apply border-stroke-subtle border; */
+    @apply border-stroke-subtle border;
   }
   .paper-dark {
     @apply bg-surface rounded-scholarly;
