@@ -243,7 +243,8 @@ export const FIELDS: readonly FieldDefinition[] = [
     label: 'Progress status',
     type: 'enum',
     values: PROGRESS_STATUS_VALUES,
-    aliases: ['status', 'readstatus'],
+    // v1 files used a combined PROGRESS / PROGRESS_STATUS column
+    aliases: ['progress', 'status', 'readstatus'],
   },
   {
     key: 'startedAt',

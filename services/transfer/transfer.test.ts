@@ -32,7 +32,7 @@ function makeBook(overrides: Partial<Book> = {}): Book {
     originalLanguage: 'en',
     pages: 272,
     publisher: 'Bloomsbury',
-    rating: 4,
+    rating: 4.5,
     summary: 'A house of endless halls, with "quotes", commas, and\nnewlines.',
     year: 2020,
     genres: ['Fantasy', 'Mystery'],
@@ -76,6 +76,7 @@ describe('field registry', () => {
     ['My Rating', 'rating'],
     ['ISBN13', 'isbn'],
     ['cover_src', 'coverSrc'],
+    ['PROGRESS', 'progressStatus'],
   ])('resolves column "%s" to %s', (column, key) => {
     expect(resolveFieldKey(column)).toBe(key)
   })
@@ -333,6 +334,110 @@ describe('round trip', () => {
     const record = bookToRecord(makeBook(), { a1: authors[0]! })
     expect(record.author).toBe('Susanna Clarke')
     expect(record).not.toHaveProperty('collections')
+  })
+})
+
+describe('numbers with decimal commas', () => {
+  it.each([
+    ['2,5', 2.5],
+    ['2.5', 2.5],
+    ['4,0', 4],
+    ['5', 5],
+    [3.5, 3.5],
+  ])('reads rating %s as %s', (rating, expected) => {
+    const { records, issues } = normalizeRows([{ title: 'x', rating }])
+    expect(issues).toEqual([])
+    expect(records[0]?.rating).toBe(expected)
+  })
+
+  it.each(['2,3', '2.3', '5,5', '-1', 'great'])(
+    'rejects rating %s (only 0–5 in steps of 0.5)',
+    (rating) => {
+      const { records, issues } = normalizeRows([{ title: 'x', rating }])
+      expect(records[0]?.rating).toBeNull()
+      expect(issues).toEqual([
+        expect.objectContaining({
+          field: 'rating',
+          severity: 'warning',
+          message: expect.stringContaining('steps of 0.5'),
+        }),
+      ])
+    },
+  )
+
+  it('reads thousands separators in whole numbers', () => {
+    const { records } = normalizeRows([
+      { title: 'x', pages: '1,200', year: '1 999' },
+    ])
+    expect(records[0]).toMatchObject({ pages: 1200, year: 1999 })
+  })
+
+  it('reads decimal commas in CSV files', () => {
+    const { records, issues } = parseBookFile(
+      'TITLE,RATING\nDune,"2,5"\n',
+      'csv',
+    )
+    expect(issues).toEqual([])
+    expect(records[0]?.rating).toBe(2.5)
+  })
+})
+
+describe('legacy combined progress/ownership status (v1)', () => {
+  it('maps owned / not-owned in a PROGRESS column to ownership', () => {
+    const { records, issues } = parseBookFile(
+      'TITLE,PROGRESS\nA,reading\nB,owned\nC,NOT_OWNED\nD,read\n',
+      'csv',
+    )
+    expect(issues).toEqual([])
+    expect(
+      records.map((r) => [r.title, r.progress.status, r.propertyStatus]),
+    ).toEqual([
+      ['A', 'reading', null],
+      ['B', null, 'owned'],
+      ['C', null, 'not-owned'],
+      ['D', 'read', null],
+    ])
+  })
+
+  it('also reads PROGRESS_STATUS', () => {
+    const { records } = parseBookFile(
+      'TITLE,PROGRESS_STATUS\nA,not-owned\n',
+      'csv',
+    )
+    expect(records[0]?.propertyStatus).toBe('not-owned')
+  })
+
+  it('lets an explicit ownership column win, in any column order', () => {
+    for (const csv of [
+      'TITLE,PROGRESS_STATUS,PROPERTY_STATUS\nA,owned,not-owned\n',
+      'TITLE,PROPERTY_STATUS,PROGRESS_STATUS\nA,not-owned,owned\n',
+    ]) {
+      expect(parseBookFile(csv, 'csv').records[0]?.propertyStatus).toBe(
+        'not-owned',
+      )
+    }
+  })
+
+  it('reads v1 JSON files and database backups', () => {
+    const legacyJson = parseBookFile(
+      JSON.stringify({ books: [{ title: 'A', progressStatus: 'owned' }] }),
+      'json',
+    )
+    expect(legacyJson.records[0]).toMatchObject({
+      propertyStatus: 'owned',
+      progress: { status: null },
+    })
+
+    const backup = parseBookFile(
+      JSON.stringify({
+        authors: [],
+        collections: [],
+        books: [{ id: 'b1', title: 'B', progress_status: 'not-owned' }],
+      }),
+      'json',
+    )
+    expect(backup.issues).toEqual([])
+    expect(backup.records[0]?.propertyStatus).toBe('not-owned')
   })
 })
 

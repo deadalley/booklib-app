@@ -87,6 +87,38 @@ test.describe('import', () => {
     ).toContainText('1 of 1 books selected')
   })
 
+  test('reads v1 files: combined PROGRESS column and decimal commas', async ({
+    page,
+  }) => {
+    await page.getByTestId('import-file-input').setInputFiles({
+      name: 'booklib-v1.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(
+        'TITLE,PROGRESS,RATING\nOwned book,owned,"2,5"\nWanted book,not-owned,\nRead book,read,4\n',
+      ),
+    })
+    await expect(page.getByTestId('import-issues')).toHaveCount(0)
+    await page.getByTestId('import-submit').click()
+    await expect(page).toHaveURL(/\/library\/books$/)
+
+    const books = Object.fromEntries(
+      (await readLibrary(page)).books.map((b) => [b.title, b]),
+    )
+    expect(books['Owned book']).toMatchObject({
+      property_status: 'owned',
+      progress_status: null,
+      rating: 2.5,
+    })
+    expect(books['Wanted book']).toMatchObject({
+      property_status: 'not-owned',
+      progress_status: null,
+    })
+    expect(books['Read book']).toMatchObject({
+      progress_status: 'read',
+      rating: 4,
+    })
+  })
+
   test('rejects unsupported files', async ({ page }) => {
     await page.getByTestId('import-file-input').setInputFiles({
       name: 'books.xlsx',

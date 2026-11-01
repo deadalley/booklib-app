@@ -91,7 +91,21 @@ function isBlank(value: unknown): boolean {
   )
 }
 
+/**
+ * BookLib v1 stored ownership in the progress status ("owned"/"not-owned"
+ * meant "not started"). These values map to ownership instead of progress.
+ */
+const LEGACY_PROGRESS_OWNERSHIP: Record<string, BookRecord['propertyStatus']> =
+  {
+    owned: 'owned',
+    'not-owned': 'not-owned',
+    wishlist: 'not-owned',
+  }
+
 class RowContext {
+  /** Ownership found in a legacy combined progress status column. */
+  legacyPropertyStatus: BookRecord['propertyStatus'] = null
+
   constructor(
     readonly row: number,
     readonly issues: TransferIssue[],
@@ -115,14 +129,32 @@ function toText(value: unknown): string | null {
   return null
 }
 
+/**
+ * Parses numbers written in common spreadsheet styles: `2.5`, `2,5` (decimal
+ * comma) and `1,200` (thousands separator). Returns null when not a number.
+ */
+export function parseNumber(value: unknown): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value !== 'string') return null
+  let text = value.trim().replace(/\s+/g, '')
+  if (!text) return null
+  if (/^-?\d{1,3}(,\d{3})+$/.test(text)) {
+    text = text.replace(/,/g, '')
+  } else if (/^-?\d*,\d+$/.test(text)) {
+    text = text.replace(',', '.')
+  }
+  const num = Number(text)
+  return Number.isFinite(num) ? num : null
+}
+
 function coerceInteger(
   value: unknown,
   field: FieldDefinition,
   ctx: RowContext,
 ): number | null {
   if (isBlank(value)) return null
-  const num = typeof value === 'number' ? value : Number(String(value).trim())
-  if (!Number.isFinite(num)) {
+  const num = parseNumber(value)
+  if (num === null) {
     ctx.warn(field.key, `${field.label} "${String(value)}" is not a number`)
     return null
   }
@@ -144,13 +176,17 @@ function coerceInteger(
 
 function coerceRating(value: unknown, ctx: RowContext): number | null {
   if (isBlank(value)) return null
-  const num = typeof value === 'number' ? value : Number(String(value).trim())
-  if (!Number.isFinite(num) || num < 0 || num > 5) {
-    ctx.warn('rating', `Rating "${String(value)}" must be between 0 and 5`)
+  const num = parseNumber(value)
+  // Ratings are half stars: 0–5 in steps of 0.5 (2,5 is fine, 2,3 is not)
+  if (num === null || num < 0 || num > 5 || !Number.isInteger(num * 2)) {
+    ctx.warn(
+      'rating',
+      `Rating "${String(value)}" must be between 0 and 5 in steps of 0.5`,
+    )
     return null
   }
   // 0 means "not rated" in most exports
-  return num === 0 ? null : Math.round(num)
+  return num === 0 ? null : num
 }
 
 /** Parses a date into the stored ISO format; calendar days stay on their day. */
@@ -378,13 +414,22 @@ function applyField(
         ctx,
       ) as BookRecord['propertyStatus']
       return
-    case 'progressStatus':
+    case 'progressStatus': {
+      const key = toText(value)
+        ?.toLowerCase()
+        .replace(/[\s_]+/g, '-')
+      if (key && key in LEGACY_PROGRESS_OWNERSHIP) {
+        ctx.legacyPropertyStatus = LEGACY_PROGRESS_OWNERSHIP[key] ?? null
+        record.progress.status = null
+        return
+      }
       record.progress.status = coerceEnum(
         value,
         field,
         ctx,
       ) as BookRecord['progress']['status']
       return
+    }
     case 'createdAt':
       record.createdAt = coerceDateField(value, field, ctx)
       return
@@ -451,6 +496,11 @@ export function normalizeRows(rows: RawRow[]): NormalizeResult {
     if (!record.title) {
       ctx.error('title', 'Missing title, row skipped')
       return
+    }
+
+    // An explicit ownership column wins over a legacy combined status
+    if (!record.propertyStatus && ctx.legacyPropertyStatus) {
+      record.propertyStatus = ctx.legacyPropertyStatus
     }
 
     checkConsistency(record, ctx)
