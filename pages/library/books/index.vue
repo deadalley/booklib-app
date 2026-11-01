@@ -10,14 +10,12 @@
     :loading="loading"
   >
     <template #headerActions>
-      <NuxtLink to="/library/books/new">
-        <bl-button variant="primary" :expand="isMobile()">
-          <template #prependIcon="iconProps">
-            <IconPlus v-bind="iconProps" />
-          </template>
-          Add book
-        </bl-button>
-      </NuxtLink>
+      <bl-button to="/library/books/new" variant="primary" :expand="isMobile">
+        <template #prependIcon="iconProps">
+          <IconPlus v-bind="iconProps" />
+        </template>
+        Add book
+      </bl-button>
     </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
@@ -35,10 +33,11 @@
         </template>
         Columns
         <template #item="{ item }">
-          <div @click.stop="toggleColumnChecked(item.value as string)">
+          <div @click.stop>
             <bl-checkbox
               :id="`col-${item.value}`"
-              v-model="columnCheckboxStates[item.value as string]"
+              :checked="columnCheckboxStates[item.value as string]"
+              @change="toggleColumnChecked(item.value as string)"
             >
               {{ item.label }}
             </bl-checkbox>
@@ -71,9 +70,7 @@
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
-        <NuxtLink to="/library/books/new">
-          <bl-button>Create a book</bl-button>
-        </NuxtLink>
+        <bl-button to="/library/books/new">Create a book</bl-button>
       </template>
     </bl-empty>
     <bl-books-views
@@ -151,6 +148,8 @@ import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
 import { indexBy } from 'ramda'
 import type { Collection } from '~/types/collection'
+
+const { isMobile } = useBreakpoints()
 
 const { getBooks, getAuthors, getCollections, updateBook, deleteBooks } =
   useBookLibrary()
@@ -253,9 +252,14 @@ function onPageChange(page: number) {
   currentPage.value = page
 }
 
-const selectedBookIds = computed(() =>
-  viewBooks.value.filter(({ selected }) => !!selected).map(({ id }) => id),
-)
+// Bulk actions only apply to selected books that are currently visible
+// (matching the active search and filters), never to hidden ones.
+const selectedBookIds = computed(() => {
+  const visible = new Set(sortedBooks.value.map(({ id }) => id))
+  return viewBooks.value
+    .filter(({ id, selected }) => !!selected && visible.has(id))
+    .map(({ id }) => id)
+})
 const selectedBooksCount = computed(() => selectedBookIds.value.length)
 const hasSelectedBooks = computed(() => selectedBooksCount.value > 0)
 
@@ -296,17 +300,16 @@ async function onMoveBooksToCollection(collectionId: string) {
   loading.value = true
 
   try {
-    await Promise.all(
-      selectedBookIds.value.map(async (bookId) => {
-        const currentBook = books.value.find((book) => book.id === bookId)
-        if (!currentBook) return
+    // Sequential writes: each update reads and writes the whole database
+    for (const bookId of selectedBookIds.value) {
+      const currentBook = books.value.find((book) => book.id === bookId)
+      if (!currentBook) continue
 
-        const nextCollections = Array.from(
-          new Set([...(currentBook.collections ?? []), collectionId]),
-        )
-        await updateBook(bookId, { collections: nextCollections })
-      }),
-    )
+      const nextCollections = Array.from(
+        new Set([...(currentBook.collections ?? []), collectionId]),
+      )
+      await updateBook(bookId, { collections: nextCollections })
+    }
 
     await refresh()
     clearSelectedBooks()
@@ -324,11 +327,9 @@ async function onEditBooksAuthor(authorId: string) {
   loading.value = true
 
   try {
-    await Promise.all(
-      selectedBookIds.value.map((bookId) =>
-        updateBook(bookId, { author: authorId }),
-      ),
-    )
+    for (const bookId of selectedBookIds.value) {
+      await updateBook(bookId, { author: authorId })
+    }
 
     await refresh()
     clearSelectedBooks()

@@ -1,21 +1,12 @@
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <bl-chip
+    <bl-genre-tag
       v-for="(genre, index) in genres"
       :key="genre"
-      rounded
-      class="gap-1.5 pr-1.5"
-    >
-      {{ genre }}
-      <button
-        type="button"
-        class="hover:bg-stroke inline-flex cursor-pointer rounded-full p-0.5"
-        :aria-label="`Remove ${genre}`"
-        @click="$emit('remove', index)"
-      >
-        <IconX :size="12" stroke="2" />
-      </button>
-    </bl-chip>
+      :genre="genre"
+      removable
+      @remove="$emit('remove', index)"
+    />
 
     <div
       class="form-inner text-ink-muted w-44! gap-1.5! rounded-full! px-3! py-1! text-sm!"
@@ -34,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconPlus, IconX } from '@tabler/icons-vue'
+import { IconPlus } from '@tabler/icons-vue'
 
 const props = defineProps<{
   genres: string[]

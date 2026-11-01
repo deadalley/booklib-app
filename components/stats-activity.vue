@@ -10,7 +10,7 @@
       :style="{ '--n': buckets.length }"
     >
       <button
-        v-for="bucket in buckets"
+        v-for="(bucket, index) in buckets"
         :key="bucket.key"
         type="button"
         class="column"
@@ -27,7 +27,12 @@
           class="bar"
           :style="{ height: `${(bucket.books.length / max) * 100}%` }"
         />
-        <span class="label">{{ bucket.short }}</span>
+        <span
+          class="label"
+          :class="{ 'label-thinned': index % labelEvery !== 0 }"
+        >
+          {{ bucket.short }}
+        </span>
       </button>
     </div>
 
@@ -79,6 +84,11 @@ const max = computed(() =>
 const current = computed(() =>
   props.buckets.find(({ key }) => key === selected.value),
 )
+
+// Show at most ~8 labels when space is tight
+const labelEvery = computed(() =>
+  Math.max(1, Math.ceil(props.buckets.length / 8)),
+)
 </script>
 
 <style scoped>
@@ -115,6 +125,12 @@ const current = computed(() =>
 }
 .label {
   @apply text-ink-muted text-xs font-semibold whitespace-nowrap;
+}
+/* On narrow screens only every n-th label is shown so they don't overlap */
+@media (max-width: 767.98px) {
+  .label-thinned {
+    @apply invisible;
+  }
 }
 .column.selected .label {
   @apply text-primary;

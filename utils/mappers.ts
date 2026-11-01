@@ -1,12 +1,7 @@
 import type { Author } from '~/types/author'
-import type {
-  BookProgressStatus,
-  BookPropertyStatus,
-  ViewBook,
-} from '~/types/book'
+import type { ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import languageOptions from '~/public/languages-2.json'
-import { sum, uniq } from 'ramda'
+import { sum } from 'ramda'
 
 export function getBooksByAuthor(books: ViewBook[], authors: Author[]) {
   return authors.reduce<Record<string, ViewBook[]>>(
@@ -38,76 +33,6 @@ export function getBooksByCollection(
   )
 }
 
-export function getBooksByLanguage(
-  books: ViewBook[],
-  property: 'language' | 'originalLanguage',
-) {
-  return Object.keys(languageOptions).reduce<Record<string, ViewBook[]>>(
-    (booksByLanguage, key) => {
-      const booksForLanguage = books.filter((book) => book[property] === key)
-
-      if (booksForLanguage.length) {
-        return {
-          ...booksByLanguage,
-          [key]: booksForLanguage,
-        }
-      }
-
-      return booksByLanguage
-    },
-    {},
-  )
-}
-
-export function getBooksByPublisher(books: ViewBook[]) {
-  return books.reduce<Record<string, ViewBook[]>>(
-    (publisherBooks, book) => ({
-      ...publisherBooks,
-      ...(book.publisher
-        ? {
-            [book.publisher]: (publisherBooks[book.publisher] || []).concat(
-              book,
-            ),
-          }
-        : {}),
-    }),
-    {},
-  )
-}
-
-export function getBooksByGenre(books: ViewBook[]) {
-  const genres = uniq(
-    books.flatMap((book) => book.genres).filter((v): v is string => !!v),
-  )
-
-  return genres.reduce<Record<string, ViewBook[]>>((booksByGenre, genre) => {
-    const booksForGenre = books.filter((book) => book.genres?.includes(genre))
-
-    if (booksForGenre.length) {
-      return {
-        ...booksByGenre,
-        [genre]: booksForGenre,
-      }
-    }
-
-    return booksByGenre
-  }, {})
-}
-
-export function getBooksByFormat(books: ViewBook[]) {
-  return books.reduce<Record<string, ViewBook[]>>(
-    (formatBooks, book) => ({
-      ...formatBooks,
-      ...(book.format
-        ? {
-            [book.format]: (formatBooks[book.format] || []).concat(book),
-          }
-        : {}),
-    }),
-    {},
-  )
-}
-
 export function getAverageRating(books: ViewBook[]): number | undefined {
   const booksWithValidRatings = books
     .filter((book) => book.rating !== null)
@@ -119,39 +44,5 @@ export function getAverageRating(books: ViewBook[]): number | undefined {
 
   return roundToNearestHalf(
     sum(booksWithValidRatings) / booksWithValidRatings.length,
-  )
-}
-
-export function getBooksByStatus(
-  books: ViewBook[],
-): Record<BookProgressStatus, number> {
-  return PROGRESS_STATUS.reduce(
-    (acc, currentStatus) => {
-      return {
-        ...acc,
-        [currentStatus]: books.filter(
-          (book) => book.progress.status === currentStatus,
-        ).length,
-      }
-    },
-    {
-      reading: 0,
-      paused: 0,
-      read: 0,
-      'not-finished': 0,
-    },
-  )
-}
-
-export function getBooksByPropertyStatus(
-  books: ViewBook[],
-): Record<BookPropertyStatus, number> {
-  const statuses: BookPropertyStatus[] = ['owned', 'not-owned']
-  return statuses.reduce(
-    (acc, status) => ({
-      ...acc,
-      [status]: books.filter((book) => book.propertyStatus === status).length,
-    }),
-    { owned: 0, 'not-owned': 0 },
   )
 }

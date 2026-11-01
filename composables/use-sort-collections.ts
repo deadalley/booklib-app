@@ -15,7 +15,7 @@ export const useSortCollections = (collections: Ref<Collection[] | null>) => {
   watch(
     () => route.query.view,
     (v) => {
-      view.value = (v as View) ?? 'cards'
+      view.value = (v as View) ?? 'expanded-cards'
     },
   )
 

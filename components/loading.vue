@@ -1,8 +1,9 @@
 <template>
   <svg
     v-bind="$attrs"
-    aria-hidden="true"
-    class="fill-primary dark:text-ink-muted inline size-8 animate-spin"
+    role="status"
+    aria-label="Loading"
+    class="fill-primary text-stroke-subtle inline size-8 animate-spin"
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

@@ -1,24 +1,16 @@
 <template>
   <div
     v-bind="$attrs"
-    class="flex flex-col items-center justify-center gap-8 rounded-xl px-4 py-16"
-    :class="{
-      'bg-surface-elevated': variant === 'primary',
-      'bg-surface-subtle': variant === 'secondary',
-    }"
+    class="empty-state"
+    :class="{ 'empty-state-elevated': variant === 'primary' }"
   >
-    <component
-      :is="icons[icon]"
-      class="text-ink-muted"
-      :class="{
-        'text-ink-secondary': variant === 'primary',
-        'text-ink-muted': variant === 'secondary',
-      }"
-      size="58"
-      stroke="1"
-    />
-    <div class="flex flex-col items-center justify-center gap-4">
-      <slot name="label" />
+    <span class="empty-state-icon" aria-hidden="true">
+      <component :is="icons[icon]" :size="24" stroke="1.6" />
+    </span>
+    <div class="flex flex-col items-center justify-center gap-4 text-center">
+      <div v-if="$slots['label']" class="empty-state-label">
+        <slot name="label" />
+      </div>
       <slot name="action" />
     </div>
   </div>
@@ -35,3 +27,21 @@ withDefaults(
   { variant: 'secondary' },
 )
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+/* A dashed take on paper-flat, matching the v2 empty states */
+.empty-state {
+  @apply paper-flat bg-surface-subtle border-stroke flex flex-col items-center justify-center gap-4 border-dashed px-6 py-14;
+}
+.empty-state-elevated {
+  @apply bg-surface-elevated;
+}
+.empty-state-icon {
+  @apply bg-primary-50 text-primary grid size-12 place-items-center rounded-full;
+}
+.empty-state-label {
+  @apply font-display text-ink-primary text-xl;
+}
+</style>

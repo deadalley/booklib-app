@@ -5,6 +5,7 @@
     :initial-name="author.name"
     :books="books"
     :initial-selected-ids="initialSelectedIds"
+    :saving="saving"
     @cancel="navigateTo(detailHref)"
     @save="onSave"
   />
@@ -54,6 +55,8 @@ async function fetchData() {
   author.value = data
 }
 
+const saving = ref(false)
+
 async function onSave({
   name,
   selectedIds,
@@ -61,8 +64,14 @@ async function onSave({
   name: string
   selectedIds: Book['id'][]
 }) {
-  await updateAuthor(authorId.value, { name, bookIds: selectedIds })
-  navigateTo(detailHref.value)
+  if (saving.value) return
+  saving.value = true
+  try {
+    await updateAuthor(authorId.value, { name, bookIds: selectedIds })
+    await navigateTo(detailHref.value)
+  } finally {
+    saving.value = false
+  }
 }
 
 onMounted(fetchData)

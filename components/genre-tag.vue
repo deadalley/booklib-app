@@ -1,149 +1,66 @@
 <template>
-  <div
-    v-show="!newGenre || editing"
-    ref="target"
-    class="relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-1 text-base"
-    :class="{
-      'hover:bg-primary/90 cursor-pointer': !!attrs.onClick,
-      'bg-primary-800': !!selected,
-      'bg-surface-elevated text-primary ring-primary ring-1 ring-inset':
-        editing,
-      'bg-primary text-ink-inverse': !editing,
-    }"
-    @click="onClick"
-    @mouseenter="setHovered(true)"
-    @mouseleave="setHovered(false)"
-    @keydown.enter="_onCommit"
-    @keydown.escape="onCancel"
+  <bl-chip
+    rounded
+    class="genre-tag"
+    :class="{ 'genre-tag-removable': removable, 'genre-tag-sm': size === 'sm' }"
+    data-testid="genre-tag"
   >
-    <span v-if="!editing">{{ initialContent }}</span>
-    <input
-      ref="genre-input"
-      v-model="content"
-      class="text-ink-primary max-w-24"
-      :class="{
-        'w-0 opacity-0': !editing,
-      }"
+    <IconTag
+      v-if="withIcon"
+      :size="size === 'sm' ? 12 : 14"
+      stroke="1.75"
+      class="text-ink-muted shrink-0"
+      aria-hidden="true"
     />
-    <bl-loading
-      v-if="loading"
-      class="!fill-ink-inverse !text-primary !h-4 !w-4"
-    />
-    <IconCircleXFilled
-      v-if="!loading && removable && hovered"
-      :size="18"
-      stroke="1.5"
-      class="cursor-pointer opacity-0"
-      :class="{ 'opacity-100': hovered }"
-      @click="_onRemove"
-    />
-    <IconTagFilled
-      v-if="!removable || (!loading && !hovered)"
-      :size="18"
-      stroke="1.5"
-    />
-  </div>
-  <div
-    v-if="newGenre && !editing"
-    class="bg-primary text-ink-inverse hover:bg-primary/90 relative flex w-fit cursor-default items-center gap-2 rounded-xl px-4 py-2 text-base"
-    @click="onNew"
-  >
-    <IconPlus :size="16" stroke="2" />
-    Add genre
-  </div>
+    <span class="truncate">
+      <slot>{{ genre }}</slot>
+    </span>
+    <button
+      v-if="removable"
+      type="button"
+      class="genre-tag-remove"
+      :aria-label="`Remove ${genre}`"
+      @click.stop.prevent="$emit('remove')"
+    >
+      <IconX :size="12" stroke="2" />
+    </button>
+  </bl-chip>
 </template>
 
 <script setup lang="ts">
+import { IconTag, IconX } from '@tabler/icons-vue'
+
 /**
- * @deprecated Use `bl-removable-tag` instead.
+ * A genre (or any other free-text tag), optionally removable. Used on the
+ * book page, in the genre editor and for multi-value autocomplete fields.
  */
-import { useTemplateRef } from 'vue'
-import { IconCircleXFilled, IconPlus, IconTagFilled } from '@tabler/icons-vue'
-import { onClickOutside } from '@vueuse/core'
+withDefaults(
+  defineProps<{
+    genre: string
+    removable?: boolean
+    withIcon?: boolean
+    size?: 'sm' | 'md'
+  }>(),
+  { removable: false, withIcon: false, size: 'md' },
+)
 
-const attrs = useAttrs()
-
-const props = defineProps<{
-  value?: string
-  index: number
-  editable?: boolean
-  removable?: boolean
-  newGenre?: boolean
-  selected?: boolean
-  onCommit?: (value: string | undefined, index: number) => void
-  onRemove?: (index: number) => void
-}>()
-
-const loading = ref(false)
-const hovered = ref(false)
-const editing = ref(false)
-const target = ref(null)
-const initialContent = ref(props.value)
-const content = ref(props.value)
-
-const inputRef = useTemplateRef('genre-input')
-
-onClickOutside(target, () => {
-  if (props.editable) {
-    onCancel()
-  }
-})
-
-function onCancel() {
-  inputRef.value?.blur()
-  editing.value = false
-  content.value = initialContent.value
-}
-
-async function _onCommit() {
-  loading.value = true
-  inputRef.value?.blur()
-
-  await props.onCommit?.(content.value, props.index)
-
-  loading.value = false
-
-  if (props.newGenre) {
-    editing.value = false
-    initialContent.value = undefined
-    content.value = undefined
-  }
-}
-
-async function _onRemove(event: Event) {
-  event.preventDefault()
-  event.stopPropagation()
-
-  loading.value = true
-
-  if (props.newGenre && inputRef.value) {
-    onCancel()
-  } else {
-    await props.onRemove?.(props.index)
-  }
-
-  loading.value = false
-}
-
-function onNew() {
-  editing.value = true
-  content.value = 'New genre'
-  initialContent.value = 'New genre'
-  inputRef.value?.focus()
-}
-
-function onClick() {
-  if (typeof attrs.onClick === 'function') {
-    attrs.onClick()
-  }
-
-  if (props.editable) {
-    editing.value = true
-    inputRef.value?.focus()
-  }
-}
-
-function setHovered(value: boolean) {
-  hovered.value = value
-}
+defineEmits<{ (e: 'remove'): void }>()
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+.genre-tag {
+  @apply max-w-full gap-1.5;
+}
+.genre-tag-removable {
+  @apply pr-1.5;
+}
+.genre-tag-sm {
+  @apply px-2 py-0.5 text-xs;
+}
+.genre-tag-remove {
+  @apply text-ink-muted hover:bg-stroke hover:text-ink-primary inline-flex shrink-0 cursor-pointer rounded-full p-0.5 transition-colors;
+  @apply focus-visible:ring-primary/25 focus-visible:ring-2 focus-visible:outline-none;
+}
+</style>

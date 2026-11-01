@@ -1,30 +1,18 @@
-@layer components {
-  .book-section h3,
-  .book-section h4 {
-    @apply pb-4;
-  }
-  .book-section h5,
-  .book-section h6 {
-    @apply pb-2;
-  }
-  .book-section {
-    @apply pb-2;
-  }
-  .book-section:not(:first-child) {
-    @apply border-t-stroke border-t pt-12;
-  }
-
-  .paper {
-    @apply bg-surface-elevated rounded-xl shadow-md;
-  }
-  .paper-sm {
-    @apply bg-surface-elevated rounded-scholarly shadow-sm;
-  }
-  .paper-flat {
-    @apply bg-surface-elevated rounded-scholarly;
-    @apply border-stroke-subtle border;
-  }
-  .paper-dark {
-    @apply bg-surface rounded-scholarly;
-  }
+/*
+ * Surfaces. `paper-flat` is the base for every card and tile (flat, hairline
+ * border); `paper` / `paper-sm` add elevation for floating surfaces (menus,
+ * popovers, modals); `paper-dark` is for inset or secondary panels.
+ * Declared with @utility so component styles can `@apply` them.
+ */
+@utility paper {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border shadow-md;
+}
+@utility paper-sm {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border shadow-sm;
+}
+@utility paper-flat {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border;
+}
+@utility paper-dark {
+  @apply bg-surface rounded-scholarly;
 }

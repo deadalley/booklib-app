@@ -123,7 +123,7 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
       columnHelper.accessor('progress', {
         header: 'Status',
         cell: (info) => {
-          const status = info.getValue().status
+          const status = info.getValue()?.status
 
           if (status) {
             return h(BlProgressStatusIcon, {
@@ -133,6 +133,7 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
             return null
           }
         },
+        size: 14,
       }),
     ].filter((column) => {
       if (!column) {

@@ -3,7 +3,7 @@
   <AccordionRoot
     v-model="selectedValue"
     :default-value="defaultOpen ? 'tile' : undefined"
-    class="bg-surface-elevated paper rounded-xl px-8 py-6"
+    class="paper-flat px-5 py-5 sm:px-6"
     type="single"
     :collapsible="true"
     :disabled="!$slots['collapsible']"
@@ -23,7 +23,7 @@
           <AccordionTrigger
             class="flex w-full flex-1 cursor-pointer items-center justify-start"
           >
-            <h5 v-if="$slots['title']" class="truncate">
+            <h5 v-if="$slots['title']" class="stats-title truncate">
               <slot name="title" />
             </h5>
           </AccordionTrigger>

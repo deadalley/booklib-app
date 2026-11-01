@@ -135,7 +135,7 @@ function buildSearchGroups(
     subtitle: `${booksByAuthorId[author.id] ?? 0} ${
       (booksByAuthorId[author.id] ?? 0) === 1 ? 'book' : 'books'
     }`,
-    href: '/library/authors',
+    href: `/library/authors/${author.id}`,
     group: 'authors',
   }))
 

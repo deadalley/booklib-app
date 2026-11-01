@@ -1,12 +1,15 @@
 <template>
   <NuxtLayout name="dashboard" title="Home">
-    <div v-if="isEmpty" class="flex flex-col">
-      <h1 class="mb-8">Welcome to your new library!</h1>
+    <div v-if="isEmpty" class="mx-auto flex w-full max-w-[90rem] flex-col">
+      <div class="mb-8 flex flex-col gap-1">
+        <span class="section-label text-primary">Home</span>
+        <h3>Welcome to your new library</h3>
+      </div>
       <div class="flex flex-col items-center gap-4">
         <img
           :src="getAssetPath('/book-graphics.svg')"
           alt="Book"
-          class="h-96 object-cover object-center"
+          class="h-56 object-cover object-center sm:h-80"
         />
         <h4>Your library is empty.</h4>
         <p class="text-center text-lg">
@@ -14,33 +17,39 @@
           <br />
           Let's add your first book.
         </p>
-        <NuxtLink class="mt-4 flex md:inline-flex" to="/library/books/new">
-          <bl-button expand>
-            <template #prependIcon="prependIcon">
-              <IconPlus v-bind="prependIcon" />
-            </template>
-            Add first book to library
-          </bl-button>
-        </NuxtLink>
+        <bl-button to="/library/books/new" class="mt-4 w-full sm:w-72">
+          <template #prependIcon="prependIcon">
+            <IconPlus v-bind="prependIcon" />
+          </template>
+          Add first book to library
+        </bl-button>
         <div
-          class="[&_hr]:text-ink-muted flex w-1/2 items-center justify-center gap-6 py-3 [&_hr]:w-full"
+          class="[&_hr]:text-ink-muted flex w-full max-w-sm items-center justify-center gap-6 py-3 [&_hr]:w-full"
         >
           <hr />
           <h6>OR</h6>
           <hr />
         </div>
-        <NuxtLink to="/import">
-          <bl-button expand>
-            <template #prependIcon="prependIcon">
-              <IconUpload v-bind="prependIcon" />
-            </template>
-            Import books from file
-          </bl-button>
-        </NuxtLink>
+        <bl-button
+          to="/data-management"
+          variant="secondary"
+          class="w-full sm:w-72"
+        >
+          <template #prependIcon="prependIcon">
+            <IconUpload v-bind="prependIcon" />
+          </template>
+          Import books from file
+        </bl-button>
       </div>
     </div>
-    <div v-if="!isEmpty" class="flex flex-col gap-10">
-      <h1>Welcome to your library!</h1>
+    <div
+      v-if="!isEmpty"
+      class="mx-auto flex w-full max-w-[90rem] flex-col gap-8"
+    >
+      <div class="flex flex-col gap-1">
+        <span class="section-label text-primary">Home</span>
+        <h3>Welcome to your library</h3>
+      </div>
       <div class="flex w-full flex-col gap-4 md:flex-row">
         <bl-section-tile icon="IconBooks" href="/library/books">
           <template #label>Books</template>
@@ -48,13 +57,14 @@
             {{ books?.length }}
             {{ (books?.length ?? 0) > 1 ? 'books' : 'book' }}
           </template>
-          <NuxtLink
+          <bl-button
             v-if="!books?.length"
-            class="hidden sm:block"
             to="/library/books/new"
+            size="sm"
+            class="max-sm:hidden"
           >
-            <bl-button>Create a book</bl-button>
-          </NuxtLink>
+            Create a book
+          </bl-button>
         </bl-section-tile>
         <bl-section-tile icon="IconArchive" href="/library/collections">
           <template #label>Collections</template>
@@ -62,13 +72,14 @@
             {{ collections?.length }}
             {{ (collections?.length ?? 0) > 1 ? 'collections' : 'collection' }}
           </template>
-          <NuxtLink
+          <bl-button
             v-if="!collections?.length"
-            class="hidden sm:block"
             to="/library/collections/new"
+            size="sm"
+            class="max-sm:hidden"
           >
-            <bl-button>Create a collection</bl-button>
-          </NuxtLink>
+            Create a collection
+          </bl-button>
         </bl-section-tile>
         <bl-section-tile icon="IconFeather" href="/library/authors">
           <template #label>Authors</template>
@@ -97,12 +108,12 @@
         </bl-tile>
       </div>
       <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 flex flex-col lg:col-span-4">
+        <div class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4">
           <bl-book-stats-tile :books="books ?? []" />
         </div>
         <div
           v-if="books.length || authors.length"
-          class="col-span-12 flex flex-col lg:col-span-4"
+          class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4"
         >
           <bl-book-suggestions-tile
             :books="books"
@@ -110,7 +121,7 @@
             :reload-books="refresh"
           />
         </div>
-        <div class="col-span-12 flex flex-col gap-4 lg:col-span-4">
+        <div class="col-span-12 flex flex-col gap-4 2xl:col-span-4">
           <bl-goal-suggestion-tile />
         </div>
       </div>

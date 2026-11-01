@@ -1,11 +1,13 @@
 <template>
-  <NuxtLink
-    :to="selectable ? undefined : collectionHref"
+  <component
+    :is="selectable ? 'button' : NuxtLink"
+    v-bind="selectable ? { type: 'button' } : { to: collectionHref }"
     class="collection-tile"
     :class="[
       { 'collection-tile-selected': selectable && collection.selected },
       { 'collection-tile-detailed': isDetailedLayout },
     ]"
+    @click="onSelect"
   >
     <template v-if="isDetailedLayout">
       <div class="collection-tile-detailed-accent">
@@ -29,15 +31,11 @@
       </div>
 
       <div class="collection-tile-detailed-content">
-        <NuxtLink
-          class="collection-tile-detailed-title-link"
-          :to="selectable ? undefined : collectionHref"
-          @click="onSelect"
-        >
+        <div class="collection-tile-detailed-title-link">
           <h6 class="collection-tile-detailed-title">
             {{ collection.name }}
           </h6>
-        </NuxtLink>
+        </div>
 
         <div class="collection-tile-detailed-main">
           <p class="collection-tile-detailed-kicker">Books</p>
@@ -75,22 +73,17 @@
           <p v-else class="collection-tile-detailed-empty-copy">No books yet</p>
         </div>
 
-        <NuxtLink
+        <span
           v-if="hasMoreBooks && !selectable"
-          :to="collectionHref"
           class="collection-tile-detailed-more-button"
         >
           See {{ remainingBooksCount }} more
-        </NuxtLink>
+        </span>
       </div>
     </template>
 
     <template v-else>
-      <NuxtLink
-        :to="selectable ? undefined : collectionHref"
-        class="collection-tile-cover-wrap"
-        @click="onSelect"
-      >
+      <div class="collection-tile-cover-wrap">
         <div v-if="books?.length" class="collection-tile-cover-grid">
           <template v-for="(book, index) in books" :key="book.id">
             <div
@@ -130,14 +123,10 @@
             <template #emptyLabel>No books</template>
           </bl-empty-book-image>
         </div>
-      </NuxtLink>
+      </div>
 
       <div class="collection-tile-content">
-        <NuxtLink
-          class="collection-tile-title-row"
-          :to="selectable ? undefined : collectionHref"
-          @click="onSelect"
-        >
+        <div class="collection-tile-title-row">
           <component
             :is="icons[tileIcon]"
             v-if="tileIcon"
@@ -148,10 +137,10 @@
           <h6 class="collection-tile-title">
             {{ collection.name }}
           </h6>
-        </NuxtLink>
+        </div>
       </div>
     </template>
-  </NuxtLink>
+  </component>
 </template>
 
 <script
@@ -168,6 +157,7 @@
   "
 >
 import { icons } from '@tabler/icons-vue'
+import { NuxtLink } from '#components'
 import type { Book, ViewBook } from '~/types/book'
 
 const props = withDefaults(

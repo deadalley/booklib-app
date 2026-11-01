@@ -1,7 +1,9 @@
 <template>
-  <button
+  <component
+    :is="to ? NuxtLink : 'button'"
     v-bind="$attrs"
-    type="button"
+    :to="to"
+    :type="to ? undefined : 'button'"
     class="button"
     :class="{
       'button-primary': variant === 'primary',
@@ -23,19 +25,24 @@
         ($slots['prependIcon'] || $slots['appendIcon'])
       ),
     }"
-    :disabled="disabled"
+    :disabled="to ? undefined : disabled"
+    :aria-disabled="to && (disabled || loading) ? true : undefined"
     :aria-pressed="pressed"
   >
     <slot name="prependIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
     <slot />
     <slot name="appendIcon" :size="ICON_SIZE_SMALL" stroke="1.5" />
     <bl-loading v-if="loading" class="size-4!" />
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+import { NuxtLink } from '#components'
 withDefaults(
   defineProps<{
+    /** Renders the button as a link (avoids wrapping a button in a link). */
+    to?: RouteLocationRaw
     expand?: boolean
     disabled?: boolean
     loading?: boolean

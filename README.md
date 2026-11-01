@@ -189,16 +189,36 @@ See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
 
 ## Testing
 
-- **Unit tests** with Vitest
-- **End-to-end tests** with Playwright
+- **Unit tests** with Vitest, colocated as `*.test.ts` (utilities, the data
+  service, the import/export module in `services/transfer`, composables and
+  components)
+- **End-to-end tests** with Playwright in `tests/`. Each test seeds its own
+  library into the browser's storage through `tests/fixtures.ts`, so tests are
+  isolated and can run in parallel.
 
 Run tests:
 
 ```bash
-pnpm test           # Unit tests
-pnpm test:e2e       # E2E tests
-pnpm lint:ts        # Type checking
+pnpm test             # Unit tests
+pnpm test:tz          # Date-sensitive unit tests in other time zones
+pnpm test:e2e         # E2E tests (desktop + responsive viewport sweep)
+pnpm test:e2e:mobile  # E2E tests on a phone viewport
+pnpm test:e2e:all     # Every Playwright project, including Firefox and WebKit
+pnpm lint:ts          # Type checking
 ```
+
+The e2e tests start the app on port 3001. To run them against an app that is
+already running, set `BASE_URL` (for example `BASE_URL=http://127.0.0.1:3000`).
+To use an existing Chromium instead of Playwright's download, set
+`PW_CHROMIUM_PATH` to its executable.
+
+### Import and export format
+
+Imports and exports share one format, defined by the field registry in
+`services/transfer/schema.ts`. CSV headers, JSON keys, the templates in
+`public/templates` and validation all derive from it. Every book field except
+collections can be imported; a full backup (Data Management → Full backup)
+also restores collections, authors and goals.
 
 ## Tools
 

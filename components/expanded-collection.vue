@@ -2,9 +2,12 @@
 <template>
   <AccordionRoot v-model="openValue" type="single" :collapsible="true">
     <AccordionItem value="items" class="border-stroke border-b">
-      <AccordionHeader as="div" class="flex w-full">
+      <!-- Only the chevron toggles; links and actions are siblings so no
+           interactive element is nested inside the trigger button -->
+      <AccordionHeader as="div" class="flex w-full items-center gap-3 py-3">
         <AccordionTrigger
-          class="group flex w-full cursor-pointer items-center gap-3 py-3 text-start"
+          class="group flex shrink-0 cursor-pointer items-center gap-3"
+          :aria-label="`${open ? 'Collapse' : 'Expand'} ${collection.name}`"
         >
           <IconChevronDown
             class="text-ink-muted group-hover:text-primary shrink-0 transition-transform duration-300 ease-in group-data-[state=open]:rotate-180"
@@ -18,53 +21,51 @@
             class="text-primary shrink-0"
             :size="18"
           />
-          <NuxtLink
-            :to="`/library/${collectionType}/${collection.id}`"
-            class="text-ink-primary group-hover:text-primary hover:text-primary font-semibold underline-offset-[3px] hover:underline"
-            @click="(event: Event) => event.stopPropagation()"
-          >
-            <h6>
-              {{ collection.name }}
-            </h6>
-          </NuxtLink>
-          <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
-          <div
-            class="ml-auto flex items-center gap-4"
-            @click="(event: Event) => event.stopPropagation()"
-          >
-            <NuxtLink
-              v-if="open"
-              :to="`/library/${collectionType}/${collection.id}`"
-              class="text-primary text-xs font-bold tracking-widest uppercase"
-            >
-              See All
-            </NuxtLink>
-            <button
-              v-else
-              type="button"
-              class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
-              @click="open = true"
-            >
-              Expand
-            </button>
-            <bl-delete-collection-modal
-              v-if="canDelete"
-              :name="collection.name"
-              @confirm="
-                (deleteBooks: boolean) =>
-                  $emit('delete', collection.id, deleteBooks)
-              "
-            >
-              <template #trigger>
-                <IconTrash
-                  class="text-ink-muted hover:text-primary cursor-pointer"
-                  :size="ICON_SIZE_SMALL"
-                  stroke="1.5"
-                />
-              </template>
-            </bl-delete-collection-modal>
-          </div>
         </AccordionTrigger>
+        <NuxtLink
+          :to="`/library/${collectionType}/${collection.id}`"
+          class="text-ink-primary hover:text-primary min-w-0 truncate font-semibold underline-offset-[3px] hover:underline"
+        >
+          <h6 class="truncate">
+            {{ collection.name }}
+          </h6>
+        </NuxtLink>
+        <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
+        <div class="ml-auto flex shrink-0 items-center gap-4">
+          <NuxtLink
+            v-if="open"
+            :to="`/library/${collectionType}/${collection.id}`"
+            class="text-primary text-xs font-bold tracking-widest uppercase"
+          >
+            See All
+          </NuxtLink>
+          <button
+            v-else
+            type="button"
+            class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
+            @click="open = true"
+          >
+            Expand
+          </button>
+          <bl-delete-collection-modal
+            v-if="canDelete"
+            :name="collection.name"
+            @confirm="
+              (deleteBooks: boolean) =>
+                $emit('delete', collection.id, deleteBooks)
+            "
+          >
+            <template #trigger>
+              <button
+                type="button"
+                class="text-ink-muted hover:text-primary cursor-pointer"
+                :aria-label="`Delete ${collection.name}`"
+              >
+                <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+              </button>
+            </template>
+          </bl-delete-collection-modal>
+        </div>
       </AccordionHeader>
       <AccordionContent class="accordion-content">
         <div

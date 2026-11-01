@@ -31,7 +31,7 @@
         />
         <bl-empty-book-image
           v-else
-          class="book-tile-cover h-56! rounded-b-none! p-5!"
+          class="book-tile-cover h-auto! rounded-b-none! p-3! sm:p-5!"
         >
           {{ book.title }}
         </bl-empty-book-image>

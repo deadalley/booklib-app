@@ -29,10 +29,12 @@ const route = useRoute()
 
 const { isLibraryEmpty } = useBookLibrary()
 
-const isEmpty = ref<boolean>(false)
-
+// An empty library has nothing to browse: send the user to the home page,
+// which explains how to add or import books (creation pages stay reachable).
 onMounted(async () => {
-  isEmpty.value = await isLibraryEmpty()
+  if ((await isLibraryEmpty()) && !route.path.includes('/new')) {
+    await navigateTo('/home')
+  }
 })
 
 const navItems = [
@@ -49,10 +51,6 @@ const navItems = [
     label: 'Authors',
   },
 ]
-
-if (isEmpty.value && !route.path.includes('/new')) {
-  navigateTo('/home')
-}
 
 useHead({
   title: 'BookLib | Library',

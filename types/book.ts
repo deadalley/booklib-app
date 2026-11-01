@@ -13,6 +13,7 @@ export type BookFormat =
   | 'other'
 
 export type BookNote = {
+  id?: string
   createdAt: string
   page?: number
   content: string

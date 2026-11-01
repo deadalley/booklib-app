@@ -1,4 +1,9 @@
-import { fromSimpleDate, toISOString, getIntervalUnit } from './date'
+import {
+  fromSimpleDate,
+  toISOString,
+  getIntervalUnit,
+  todaySimpleDate,
+} from './date'
 
 describe('date', () => {
   describe('fromSimpleDate', () => {
@@ -7,6 +12,41 @@ describe('date', () => {
       const isoDate = fromSimpleDate(date)
 
       expect(isoDate).toBe('2020-10-01T00:00:00.000Z')
+    })
+
+    it('is idempotent for ISO timestamps (no day shift on re-save)', () => {
+      const stored = '2020-10-01T00:00:00.000Z'
+      expect(fromSimpleDate(stored)).toBe(stored)
+      expect(fromSimpleDate(fromSimpleDate(fromSimpleDate(stored)))).toBe(
+        stored,
+      )
+    })
+
+    it('throws a RangeError for empty or invalid input', () => {
+      expect(() => fromSimpleDate('')).toThrow(RangeError)
+      expect(() => fromSimpleDate('not a date')).toThrow(RangeError)
+    })
+  })
+
+  describe('toSimpleDate (time zones)', () => {
+    it('returns bare calendar days unchanged', () => {
+      expect(toSimpleDate('2027-01-01')).toBe('2027-01-01')
+    })
+
+    it('round-trips with fromSimpleDate', () => {
+      expect(toSimpleDate(fromSimpleDate('2024-02-29'))).toBe('2024-02-29')
+    })
+  })
+
+  describe('todaySimpleDate', () => {
+    it('uses the local calendar day', () => {
+      const now = new Date()
+      const local = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+      ].join('-')
+      expect(todaySimpleDate()).toBe(local)
     })
   })
 

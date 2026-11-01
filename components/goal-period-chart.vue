@@ -24,6 +24,8 @@
                 : `${Math.max(3, (period.value / max) * 100)}%`,
           }"
           :title="`${periodLabel(period)}: ${formatGoalNumber(period.value)} ${getGoalUnit(goal, period.value)}`"
+          role="img"
+          :aria-label="`${periodLabel(period)}: ${formatGoalNumber(period.value)} ${getGoalUnit(goal, period.value)}`"
         />
       </div>
       <div class="axis">
@@ -52,7 +54,7 @@ import type { GoalInfo } from '~/utils/goal'
 
 const props = defineProps<{ goal: Goal; info: GoalInfo }>()
 
-const today = toSimpleDate(now())
+const today = todaySimpleDate()
 
 const periods = computed(() => props.info.periods)
 const unit = computed(() => getGoalPeriodUnit(props.goal))

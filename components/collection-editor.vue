@@ -6,6 +6,7 @@
     :initial-name="collection?.name ?? ''"
     :books="books"
     :initial-selected-ids="initialSelectedIds"
+    :saving="saving"
     @cancel="onCancel"
     @save="onSave"
   />
@@ -27,6 +28,7 @@ const {
 } = useBookLibrary()
 
 const loaded = ref(false)
+const saving = ref(false)
 const collection = ref<Collection | null>(null)
 const books = ref<ViewBook[]>([])
 
@@ -73,22 +75,28 @@ async function onSave({
   name: string
   selectedIds: Book['id'][]
 }) {
+  if (saving.value) return
+  saving.value = true
   const booksInCollection = selectedIds.map((id, order) => ({ id, order }))
 
-  if (props.collectionId) {
-    await updateCollection(props.collectionId, {
-      name,
-      books: booksInCollection,
-    })
-    navigateTo(detailHref.value)
-  } else {
-    const created = await createCollection({
-      name,
-      books: booksInCollection,
-    } as Collection)
-    navigateTo(
-      created ? `/library/collections/${created.id}` : '/library/collections',
-    )
+  try {
+    if (props.collectionId) {
+      await updateCollection(props.collectionId, {
+        name,
+        books: booksInCollection,
+      })
+      await navigateTo(detailHref.value)
+    } else {
+      const created = await createCollection({
+        name,
+        books: booksInCollection,
+      } as Collection)
+      await navigateTo(
+        created ? `/library/collections/${created.id}` : '/library/collections',
+      )
+    }
+  } finally {
+    saving.value = false
   }
 }
 

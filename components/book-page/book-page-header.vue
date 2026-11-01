@@ -48,9 +48,12 @@
       </div>
 
       <div v-if="(book.genres ?? []).length" class="flex flex-wrap gap-2">
-        <bl-chip v-for="genre in book.genres" :key="genre" rounded>
-          {{ genre }}
-        </bl-chip>
+        <bl-genre-tag
+          v-for="genre in book.genres"
+          :key="genre"
+          :genre="genre"
+          with-icon
+        />
       </div>
 
       <bl-book-page-default-collections

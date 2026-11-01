@@ -68,88 +68,8 @@ export type ThemeTokens = {
   }
 }
 
-export const legacyTheme: ThemeTokens = {
-  colors: {
-    primary: {
-      DEFAULT: '#CA3D3D',
-      50: '#fff1f1',
-      100: '#ffe0e0',
-      200: '#ffc6c6',
-      300: '#f6a1a1',
-      400: '#e87272',
-      500: '#CA3D3D',
-      600: '#b12d2d',
-      700: '#962020',
-      800: '#791616',
-      900: '#5f1111',
-    },
-    secondary: {
-      DEFAULT: '#c47f2b',
-      50: '#fef3dc',
-      100: '#fce4b8',
-      200: '#f7d28a',
-      300: '#f0c060',
-      400: '#dca044',
-      500: '#c47f2b',
-      600: '#b06f1e',
-      700: '#a06010',
-      800: '#804d0e',
-      900: '#5c380a',
-    },
-    surface: {
-      DEFAULT: '#F6F6F6',
-      canvas: '#FFFFFF',
-      container: '#FFFFFF',
-      subtle: '#F6F6F6',
-      elevated: '#FFFFFF',
-      dark: '#202020',
-      inverse: '#202020',
-    },
-    ink: {
-      primary: '#202020',
-      secondary: '#454545',
-      subtle: '#DEDEDE',
-      muted: '#C9C9C9',
-      inverse: '#FFFFFF',
-    },
-    stroke: {
-      DEFAULT: '#E3E3E3',
-      subtle: '#F6F6F6',
-      strong: '#C9C9C9',
-      inverse: '#202020',
-    },
-  },
-  fontFamily: {
-    body: ['Sarala', 'sans-serif'],
-    display: ['Reem Kufi', 'Sarala', 'sans-serif'],
-    mono: [
-      'ui-monospace',
-      'SFMono-Regular',
-      'Menlo',
-      'Monaco',
-      'Consolas',
-      'Liberation Mono',
-      'Courier New',
-      'monospace',
-    ],
-  },
-  letterSpacing: {
-    caps: '0.18em',
-  },
-  borderRadius: {
-    scholarly: '2.4rem',
-  },
-  boxShadow: {
-    atelier:
-      '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04)',
-    elevated:
-      '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03)',
-    inner: 'inset 0 2px 8px 0 rgb(0 0 0 / 0.3)',
-    subtle: '0px 0px 5px 2px rgba(0,0,0,0.82)',
-  },
-}
-
-export const newTheme: ThemeTokens = {
+/** BookLib v2 design tokens (the v1 "legacy" theme was retired). */
+export const activeTheme: ThemeTokens = {
   colors: {
     primary: {
       DEFAULT: '#b22227',
@@ -229,15 +149,6 @@ export const newTheme: ThemeTokens = {
     subtle: '0px 0px 1px 1px rgba(0,0,0,0.06)',
   },
 }
-
-export const activeThemeName = 'new'
-
-export const themes = {
-  legacy: legacyTheme,
-  new: newTheme,
-} as const
-
-export const activeTheme = themes[activeThemeName]
 
 export function toTailwindTheme(theme: ThemeTokens) {
   return {

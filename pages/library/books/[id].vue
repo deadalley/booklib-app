@@ -97,7 +97,7 @@
         <section v-if="bookGoals.length" class="book-page-section">
           <p class="book-page-section-title">Goals</p>
           <div
-            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 md:grid-cols-[repeat(auto-fill,minmax(30rem,1fr))]"
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 sm:grid-cols-[repeat(auto-fill,minmax(min(30rem,100%),1fr))]"
           >
             <bl-goal-link-tile
               v-for="goal in bookGoals"
@@ -131,8 +131,8 @@
 </template>
 
 <script setup lang="ts">
-import { faker } from '@faker-js/faker'
 import { IconEdit, IconTrash } from '@tabler/icons-vue'
+import { v4 as uuidv4 } from 'uuid'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
@@ -149,6 +149,7 @@ const {
   createBook,
   updateBook,
   getGoals,
+  getBooks,
 } = useBookLibrary()
 
 const route = useRoute()
@@ -159,17 +160,20 @@ const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
 const book = ref<Book>()
 const loading = ref(false)
-const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
+const tempCoverSrc = ref(`temp-${uuidv4()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
 const goals = ref<Goal[]>([])
+const libraryBooks = ref<Book[]>([])
 
 const loadData = async () => {
   collections.value = await getCollections()
   authors.value = await getAuthors()
   goals.value = await getGoals()
+  // Needed to resolve auto-counted goal entries (finished books)
+  libraryBooks.value = await getBooks()
 }
 
 const collectionsDisplayed = computed(() => {
@@ -181,15 +185,21 @@ const collectionsDisplayed = computed(() => {
 const bookGoals = computed(() => {
   if (!book.value) return []
 
-  return goals.value.filter((goal) => {
-    if (goal.type === 'books') {
-      return goal.entries.some(
-        (entry) => String(entry.book) === String(book.value?.id),
-      )
-    }
+  // Use the stored book, but with this page's latest progress, so finishing
+  // the book here immediately shows the goals it now counts towards.
+  const books = libraryBooks.value.map((b) =>
+    b.id === book.value?.id ? book.value : b,
+  )
 
-    return false
-  })
+  return goals.value
+    .map((goal) => resolveGoal(goal, books))
+    .filter(
+      (goal) =>
+        goal.type === 'books' &&
+        goal.entries.some(
+          (entry) => String(entry.book) === String(book.value?.id),
+        ),
+    )
 })
 
 const selectedDefaultCollections = ref<Record<string, boolean>>(
@@ -419,7 +429,7 @@ async function onLogEntry(
   book.value.progress.currentPage = page ?? book.value.progress.currentPage
   book.value.progress.notes = [
     ...(book.value.progress.notes ?? []),
-    { createdAt: date, content: note, page },
+    { id: uuidv4(), createdAt: date, content: note, page },
   ]
 
   await onSubmit(book.value)
@@ -440,10 +450,26 @@ async function onSelectProgress(
   startedAt?: string,
 ) {
   if (book.value) {
-    book.value.progress.status = progressStatus
+    const progress = book.value.progress
+    progress.status = progressStatus
 
     if (startedAt) {
-      book.value.progress.startedAt = startedAt
+      progress.startedAt = startedAt
+    }
+
+    if (progressStatus === 'read' || progressStatus === 'not-finished') {
+      // Record when the book was finished/abandoned so goals and stats count it
+      progress.finishedAt = progress.finishedAt ?? now()
+    } else {
+      // Back to reading (or reset): a previous finish date no longer applies
+      progress.finishedAt = null
+    }
+
+    if (progressStatus === null) {
+      progress.startedAt = null
+      progress.currentPage = null
+    } else if (progressStatus === 'reading' && !startedAt) {
+      progress.startedAt = progress.startedAt ?? now()
     }
 
     if (!isNew.value) {

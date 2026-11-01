@@ -16,7 +16,7 @@
       outer: outerClass,
       wrapper: 'form-wrapper',
       label: 'form-label',
-      inner: `form-inner ${error ? 'border-primary-500' : focused ? 'border-primary' : 'border-stroke'}`,
+      inner: `form-inner ${error ? 'form-inner-error' : focused ? 'border-primary' : 'border-stroke'}`,
       input: 'form-input',
       help: 'form-error',
     }"

@@ -11,14 +11,14 @@
     @mouseleave="setHovered(false)"
   >
     <bl-icon-button
-      v-if="selectable && hovered"
+      v-if="selectable && showSelectControl"
       class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       :class="{
         'opacity-0': !selected,
-        'opacity-100': selected || hovered,
+        'opacity-100': selected || showSelectControl,
       }"
     >
-      <template v-if="hovered" #default="iconProps">
+      <template v-if="showSelectControl" #default="iconProps">
         <IconX v-if="selected" v-bind="iconProps" />
         <IconPlus v-if="!selected" v-bind="iconProps" />
       </template>
@@ -27,8 +27,8 @@
       v-if="selectable"
       class="rounded-scholarly bg-surface-inverse absolute inset-0 z-10 size-full cursor-pointer transition-opacity duration-300"
       :class="{
-        'opacity-0': !selected || !hovered,
-        'opacity-60': hovered,
+        'opacity-0': !selected || !showSelectControl,
+        'opacity-60': showSelectControl,
       }"
     />
 
@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import type { icons } from '@tabler/icons-vue'
 import { IconX, IconPlus } from '@tabler/icons-vue'
+import { useMediaQuery } from '@vueuse/core'
 
 defineProps<{
   href?: string
@@ -81,6 +82,9 @@ defineProps<{
 defineEmits(['click'])
 
 const hovered = ref(false)
+// Touch screens have no hover, so the selection control is always shown there
+const noHover = useMediaQuery('(hover: none)')
+const showSelectControl = computed(() => hovered.value || noHover.value)
 
 function setHovered(value: boolean) {
   hovered.value = value

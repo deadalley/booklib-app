@@ -7,8 +7,13 @@
     }"
   >
     <DropdownMenuRoot>
-      <DropdownMenuTrigger class="menu-trigger">
-        <bl-button v-bind="$props" expand variant="secondary">
+      <DropdownMenuTrigger as-child>
+        <bl-button
+          v-bind="$props"
+          class="menu-trigger"
+          expand
+          variant="secondary"
+        >
           <template #prependIcon="iconProps">
             <slot name="prependIcon" v-bind="iconProps" />
           </template>

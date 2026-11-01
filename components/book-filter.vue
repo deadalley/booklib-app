@@ -42,7 +42,12 @@
     <bl-book-filter-section
       v-model="selectedCollections"
       title="Collections"
-      :elements="sortCollections(collections).map(({ name }) => name)"
+      :elements="
+        sortCollections(collections).map(({ id, name }) => ({
+          value: id,
+          label: name,
+        }))
+      "
     />
 
     <bl-book-filter-section

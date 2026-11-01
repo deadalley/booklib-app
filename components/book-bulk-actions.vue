@@ -2,7 +2,7 @@
   <Transition name="bulk-actions-float">
     <div
       v-if="open"
-      class="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4"
+      class="pointer-events-none fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 flex justify-center px-4 sm:bottom-6"
     >
       <div
         class="bulk-actions-bar pointer-events-auto"

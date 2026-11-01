@@ -13,7 +13,11 @@
         <bl-button variant="secondary" @click="$emit('cancel')">
           {{ isNew ? 'Cancel' : 'Discard changes' }}
         </bl-button>
-        <bl-button :disabled="!dirty" @click="onSave">
+        <bl-button
+          :disabled="!dirty || saving"
+          :loading="saving"
+          @click="onSave"
+        >
           <template #prependIcon="iconProps">
             <IconDeviceFloppy v-bind="iconProps" />
           </template>
@@ -125,7 +129,11 @@
           <bl-button variant="secondary" @click="$emit('cancel')">
             {{ isNew ? 'Cancel' : 'Discard changes' }}
           </bl-button>
-          <bl-button :disabled="!dirty" @click="onSave">
+          <bl-button
+            :disabled="!dirty || saving"
+            :loading="saving"
+            @click="onSave"
+          >
             <template #prependIcon="iconProps">
               <IconDeviceFloppy v-bind="iconProps" />
             </template>
@@ -147,6 +155,8 @@ const props = defineProps<{
   initialName: string
   books: ViewBook[]
   initialSelectedIds: Book['id'][]
+  /** True while the parent is saving; blocks repeated submits. */
+  saving?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -248,7 +258,7 @@ function onSearch(event: Event) {
 function onSave() {
   submitAttempted.value = true
 
-  if (!dirty.value || nameError.value) return
+  if (props.saving || !dirty.value || nameError.value) return
 
   emit('save', { name: name.value.trim(), selectedIds: selected.value })
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="w-full" :style="{ height: `${height}px` }">
-    <VChart renderer="svg" :option="option" />
+    <VChart renderer="svg" :option="option" autoresize />
   </div>
 </template>
 
@@ -55,7 +55,7 @@ const option = computed<EChartsOption>(() => ({
           label: {
             fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
-            fontSize: 18,
+            fontSize: 14,
             color: tailwind.colors.ink.secondary,
             verticalAlign: 'middle',
             padding: [0, 6, 0, 0],
@@ -63,7 +63,7 @@ const option = computed<EChartsOption>(() => ({
           value: {
             fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
-            fontSize: 16,
+            fontSize: 14,
             color: tailwind.colors.ink.inverse,
             backgroundColor: tailwind.colors.primary.DEFAULT,
             verticalAlign: 'middle',
