@@ -133,6 +133,7 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
             return null
           }
         },
+        size: 14,
       }),
     ].filter((column) => {
       if (!column) {
