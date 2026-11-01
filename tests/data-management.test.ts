@@ -94,7 +94,7 @@ test.describe('import', () => {
       name: 'booklib-v1.csv',
       mimeType: 'text/csv',
       buffer: Buffer.from(
-        'TITLE,PROGRESS,RATING\nOwned book,owned,"2,5"\nWanted book,not-owned,\nRead book,read,4\n',
+        'TITLE,PROGRESS,RATING,ORIGINAL_LANGUAGE\nOwned book,owned,"2,5",Norwegian\nWanted book,not-owned,,\nRead book,read,4,\n',
       ),
     })
     await expect(page.getByTestId('import-issues')).toHaveCount(0)
@@ -108,6 +108,7 @@ test.describe('import', () => {
       property_status: 'owned',
       progress_status: null,
       rating: 2.5,
+      original_language: 'nb',
     })
     expect(books['Wanted book']).toMatchObject({
       property_status: 'not-owned',

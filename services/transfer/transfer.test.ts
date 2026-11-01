@@ -337,6 +337,45 @@ describe('round trip', () => {
   })
 })
 
+describe('language names', () => {
+  it.each([
+    ['Norwegian', 'nb'],
+    ['norwegian', 'nb'],
+    ['NORWEGIAN', 'nb'],
+    ['Norsk', 'nb'],
+    ['Norwegian Bokmål', 'nb'],
+    ['Norwegian (Bokmal)', 'nb'],
+    ['Bokmål', 'nb'],
+    ['no', 'nb'],
+    ['Nynorsk', 'nn-NO'],
+    ['Español', 'es'],
+    ['Spanish', 'es'],
+    ['Portuguese (Brazil)', 'pt-BR'],
+    ['pt_br', 'pt-BR'],
+    ['Azeri', 'az'],
+    ['  english  ', 'en'],
+  ])('reads %s as %s in both language columns', (name, code) => {
+    const { records, issues } = normalizeRows([
+      { title: 'x', LANGUAGE: name, ORIGINAL_LANGUAGE: name },
+    ])
+    expect(issues).toEqual([])
+    expect(records[0]).toMatchObject({ language: code, originalLanguage: code })
+  })
+
+  it('keeps unknown languages and warns', () => {
+    const { records, issues } = normalizeRows([
+      { title: 'x', ORIGINAL_LANGUAGE: 'Klingon' },
+    ])
+    expect(records[0]?.originalLanguage).toBe('Klingon')
+    expect(issues).toEqual([
+      expect.objectContaining({
+        field: 'originalLanguage',
+        severity: 'warning',
+      }),
+    ])
+  })
+})
+
 describe('numbers with decimal commas', () => {
   it.each([
     ['2,5', 2.5],

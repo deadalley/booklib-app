@@ -32,12 +32,67 @@ const IGNORED_COLUMNS = new Set(
 )
 
 const LANGUAGES = languageOptions as Record<string, string>
-const LANGUAGE_BY_NAME = new Map(
-  Object.entries(LANGUAGES).map(([code, name]) => [name.toLowerCase(), code]),
-)
-const LANGUAGE_BY_CODE = new Map(
-  Object.keys(LANGUAGES).map((code) => [code.toLowerCase(), code]),
-)
+/** Lower-cased, accent-free, single-spaced form used for language matching. */
+function languageKey(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/_/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Names and codes the language list cannot express on its own. */
+const LANGUAGE_ALIASES: Record<string, string> = {
+  // "Norwegian" (macrolanguage `no`) is stored as Bokmål, the common written form
+  no: 'nb',
+  nor: 'nb',
+  nob: 'nb',
+  norsk: 'nb',
+  bokmal: 'nb',
+  nno: 'nn-NO',
+  nynorsk: 'nn-NO',
+}
+
+function intlLanguageName(locale: string, code: string): string | undefined {
+  try {
+    return new Intl.DisplayNames([locale], { type: 'language' }).of(code)
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Maps every accepted spelling of a language to its code in the language
+ * list: codes, list names, names without qualifiers ("Norwegian" for
+ * "Norwegian (Bokmal)"), English and native names ("Norsk bokmål", "Español")
+ * and a few aliases. Earlier sources win when two claim the same key.
+ */
+const LANGUAGE_LOOKUP: Map<string, string> = (() => {
+  const lookup = new Map<string, string>()
+  const add = (name: string | undefined, code: string) => {
+    if (!name) return
+    const key = languageKey(name)
+    if (key && !lookup.has(key)) lookup.set(key, code)
+  }
+  // Codes without a region first, so base names prefer `nb` over `nn-NO`
+  const entries = Object.entries(LANGUAGES).sort(
+    ([a], [b]) => Number(a.includes('-')) - Number(b.includes('-')),
+  )
+
+  for (const [code] of entries) add(code, code)
+  for (const [code, name] of entries) add(name, code)
+  for (const [code, name] of entries) {
+    add(name.replace(/\s*\([^)]*\)/g, ''), code)
+  }
+  for (const [code] of entries) add(intlLanguageName('en', code), code)
+  for (const [code] of entries) add(intlLanguageName(code, code), code)
+  for (const [alias, code] of Object.entries(LANGUAGE_ALIASES)) {
+    add(alias, code)
+  }
+  return lookup
+})()
 
 const ENUM_SYNONYMS: Partial<Record<FieldKey, Record<string, string | null>>> =
   {
@@ -233,10 +288,8 @@ function coerceLanguage(
 ): string | null {
   const text = toText(value)
   if (!text) return null
-  const byCode = LANGUAGE_BY_CODE.get(text.toLowerCase())
-  if (byCode) return byCode
-  const byName = LANGUAGE_BY_NAME.get(text.toLowerCase())
-  if (byName) return byName
+  const code = LANGUAGE_LOOKUP.get(languageKey(text))
+  if (code) return code
   ctx.warn(
     field.key,
     `Unknown ${field.label.toLowerCase()} "${text}" kept as-is`,
