@@ -45,7 +45,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/icon.png",
+    "icon": "build/icons",
     "category": "Office",
     "maintainer": "deadalley <deadalley31@gmail.com>",
     "vendor": "deadalley",
@@ -72,7 +72,11 @@
     "synopsis": "Manage your personal book library",
     "maintainer": "deadalley <deadalley31@gmail.com>",
     "vendor": "deadalley",
-    "artifactName": "booklib_${version}_${arch}.${ext}"
+    "artifactName": "booklib_${version}_${arch}.${ext}",
+    "appArmorProfile": "build/apparmor-profile.tpl",
+    "fpm": [
+      "build/booklib.metainfo.xml=/usr/share/metainfo/com.booklib.app.metainfo.xml"
+    ]
   },
   "publish": {
     "provider": "github",

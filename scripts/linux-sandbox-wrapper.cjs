@@ -8,10 +8,11 @@
 //
 // electron-builder only adds `--no-sandbox` to the AppImage's embedded
 // .desktop entry, not when the AppImage is run directly. So the real binary is
-// renamed to `<name>.bin` and replaced by a small launcher that adds
-// `--no-sandbox` only when neither sandbox mode can work. The .deb keeps the
-// full sandbox: its post-install script makes chrome-sandbox setuid root when
-// user namespaces are unavailable.
+// renamed to `<name>.bin` and replaced by a small launcher that, only when
+// running from an AppImage, adds `--no-sandbox` if user namespaces can't be
+// used. The .deb keeps the full sandbox: it installs an AppArmor profile for
+// `<name>.bin` (build/apparmor-profile.tpl) and makes chrome-sandbox setuid
+// root where user namespaces are unavailable.
 const fs = require('node:fs/promises')
 const path = require('node:path')
 
@@ -20,24 +21,28 @@ const launcher = (binName) => `#!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
 BIN="$HERE/${binName}"
 
-sandbox_works() {
-  # Test hook to simulate a system without user namespaces
+# Can Chromium's user namespace sandbox work for an unconfined process?
+userns_sandbox_works() {
+  # Test hook to simulate a system without usable user namespaces
   [ -n "$BOOKLIB_FORCE_NO_USERNS" ] && return 1
-  # Chromium's user namespace sandbox
-  if [ -L /proc/self/ns/user ] && command -v unshare >/dev/null 2>&1 &&
-    unshare --user true >/dev/null 2>&1; then
-    return 0
-  fi
-  # setuid helper, as set up by the .deb post-install script
-  SANDBOX="$HERE/chrome-sandbox"
-  [ -u "$SANDBOX" ] && [ "$(stat -c %u "$SANDBOX" 2>/dev/null)" = "0" ]
+  # Ubuntu 24.04+: AppArmor strips capabilities in new user namespaces of
+  # programs without their own profile, which AppImages can't have
+  [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ] && return 1
+  # Debian and older kernels can switch them off entirely
+  [ "$(cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null)" = "0" ] && return 1
+  # Otherwise try it: create a namespace and map our user to root in it
+  command -v unshare >/dev/null 2>&1 || return 1
+  unshare --user --map-root-user true >/dev/null 2>&1
 }
 
-if sandbox_works; then
-  exec "$BIN" "$@"
-else
+# Inside an AppImage the setuid chrome-sandbox helper can never be root-owned,
+# so without user namespaces Chromium would abort on start. Installed
+# packages (.deb) keep the full sandbox: they ship an AppArmor profile or a
+# setuid helper.
+if [ -n "$APPIMAGE" ] && ! userns_sandbox_works; then
   exec "$BIN" --no-sandbox "$@"
 fi
+exec "$BIN" "$@"
 `
 
 exports.default = async function afterPack(context) {

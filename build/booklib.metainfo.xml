@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AppStream metadata: gives software centres such as KDE Discover and GNOME
+     Software the app's name, icon and description. Installed by the .deb. -->
+<component type="desktop-application">
+  <id>com.booklib.app</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>BookLib</name>
+  <summary>Manage your personal book library</summary>
+  <developer id="io.github.deadalley">
+    <name>deadalley</name>
+  </developer>
+  <description>
+    <p>
+      BookLib keeps your book collection on your own computer. Add books by
+      hand or find them on Google Books, organise them into collections and
+      track your reading goals.
+    </p>
+    <ul>
+      <li>Manage your books, authors and collections</li>
+      <li>Track reading goals by books, pages or hours</li>
+      <li>See statistics about your reading</li>
+      <li>Import and export your library as CSV or JSON</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">booklib.desktop</launchable>
+  <icon type="stock">booklib</icon>
+  <categories>
+    <category>Office</category>
+  </categories>
+  <url type="homepage">https://github.com/deadalley/booklib-app</url>
+  <url type="bugtracker">https://github.com/deadalley/booklib-app/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/deadalley/booklib-app/main/screenshots/BookLib-2.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+</component>

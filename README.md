@@ -155,8 +155,13 @@ On Linux, the app is started through a small launcher
 Some distributions, such as Ubuntu 24.04, block the user namespaces that
 Chromium's sandbox needs, and an AppImage can't use the setuid fallback. On
 those systems the launcher starts the AppImage with `--no-sandbox` instead of
-letting it crash. The `.deb` keeps the full sandbox, so prefer it on
-Debian/Ubuntu.
+letting it crash. The `.deb` keeps the full sandbox: it installs an AppArmor
+profile (`build/apparmor-profile.tpl`) and AppStream metadata
+(`build/booklib.metainfo.xml`) so software centres such as KDE Discover show the
+app's name and icon. Prefer it on Debian/Ubuntu.
+
+All packages are `devDependencies`: the app is fully bundled, and keeping
+`dependencies` empty stops electron-builder from scanning `node_modules`.
 
 #### Android App (Capacitor)
 
