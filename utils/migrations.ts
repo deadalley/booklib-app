@@ -44,3 +44,31 @@ export function migrateWishlistToCollection(data: Database): boolean {
 
   return changed
 }
+
+// Ordered list of schema migrations. Each one moves the data to `version`.
+// Append new entries here and never change or reorder old ones.
+const MIGRATIONS: { version: number; migrate: (data: Database) => void }[] = [
+  { version: 1, migrate: migrateWishlistToCollection },
+]
+
+export const CURRENT_DB_VERSION = MIGRATIONS.at(-1)!.version
+
+// Brings `data` up to CURRENT_DB_VERSION in place. Files without a version
+// predate versioning and run every migration (they are all idempotent).
+// Returns whether anything changed, so the caller knows to write.
+export function runMigrations(data: Database): boolean {
+  const fromVersion = data.version ?? 0
+
+  if (fromVersion > CURRENT_DB_VERSION) {
+    throw new Error(
+      `The library file was saved by a newer version of BookLib (schema v${fromVersion}, this app supports v${CURRENT_DB_VERSION}). Please update BookLib.`,
+    )
+  }
+  if (fromVersion === CURRENT_DB_VERSION) return false
+
+  MIGRATIONS.filter(({ version }) => version > fromVersion).forEach(
+    ({ migrate }) => migrate(data),
+  )
+  data.version = CURRENT_DB_VERSION
+  return true
+}

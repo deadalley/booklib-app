@@ -35,6 +35,8 @@ export type GetOrderedBooksQuerySearchParams = {
 }
 
 export type Database = {
+  // Schema version, see utils/migrations.ts. Missing in files saved before versioning.
+  version?: number
   authors: AuthorDB[]
   books: BookDB[]
   collections: CollectionDB[]

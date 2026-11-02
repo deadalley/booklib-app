@@ -71,11 +71,10 @@ const props = defineProps<{
 }>()
 
 const loading = ref(false)
-const coverSrc = ref<string | null>(
-  props.book.coverSrc && `${props.book.coverSrc}#${randomInt(1000, 1_000_000)}`,
-)
+// Local covers come back with a ?v=<timestamp> query, so a replaced image
+// gets a new URL and is not served from the cache.
+const coverSrc = ref<string | null>(props.book.coverSrc ?? null)
 
-const { handleFileInput } = useFileStorage()
 const { updateBookCover, deleteBookCover } = useBookLibrary()
 
 const isWebEnvironment = ref<boolean>(
@@ -91,26 +90,28 @@ function onUploadClick() {
 async function onFileChange(e: Event) {
   if (isWebEnvironment.value) return
 
-  await handleFileInput(e)
-
-  const file = (e.target as HTMLInputElement)?.files?.[0]
+  const input = e.target as HTMLInputElement
+  const file = input?.files?.[0]
   if (!file) return
 
   loading.value = true
-
-  const newCoverSrc = await updateBookCover(coverId.value, file)
-
-  if (newCoverSrc) {
-    coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
+  try {
+    const newCoverSrc = await updateBookCover(coverId.value, file)
+    if (newCoverSrc) coverSrc.value = newCoverSrc
+  } finally {
+    loading.value = false
+    // Allow picking the same file again
+    input.value = ''
   }
-  loading.value = false
 }
 
 async function onRemoveClick() {
   loading.value = true
-
-  await deleteBookCover(coverId.value)
-  coverSrc.value = null
-  loading.value = false
+  try {
+    await deleteBookCover(coverId.value)
+    coverSrc.value = null
+  } finally {
+    loading.value = false
+  }
 }
 </script>
