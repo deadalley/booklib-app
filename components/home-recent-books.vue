@@ -57,7 +57,7 @@ const tiles = computed(() =>
     box-shadow 0.15s;
 }
 .tile:hover .cover {
-  @apply -translate-y-0.5 shadow-[0_6px_14px_rgba(0,0,0,0.1)];
+  @apply -translate-y-0.5 shadow-[0_2px_6px_rgba(0,0,0,0.08)];
 }
 .title {
   @apply text-ink-primary line-clamp-2 text-[0.9375rem] leading-[1.25] font-semibold;
