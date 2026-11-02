@@ -22,9 +22,11 @@ import {
   DEFAULT_COLLECTIONS,
   DEFAULT_COLLECTIONS_INIT,
   goalToDbGoal,
+  CURRENT_DB_VERSION,
   logger,
   migrateWishlistToCollection,
   now,
+  runMigrations,
 } from '../utils'
 import type { DatabaseClient } from './database-client'
 import { createDatabaseClient } from './database-client'
@@ -66,6 +68,7 @@ export class BookLibDataManagementService {
     collectionBooks?: Database['collection-book']
   }): Database {
     return {
+      version: CURRENT_DB_VERSION,
       authors: [...authors],
       books: [...books],
       collections: DEFAULT_COLLECTIONS_INIT.map((c) => ({
@@ -98,7 +101,7 @@ export class BookLibDataManagementService {
       this.client = await createDatabaseClient(this.dbPath, this.getDbSeed({}))
 
       await this.client.read()
-      if (migrateWishlistToCollection(this.client.data)) {
+      if (runMigrations(this.client.data)) {
         await this.client.write()
       }
 
@@ -150,20 +153,10 @@ export class BookLibDataManagementService {
     }))
   }
 
-  private isBookCover(id: BookDB['id']) {
-    return (fileName: string) => fileName.split('.')[0] === id
-  }
-
-  private async getBookCoverFileName(
-    _id: BookDB['id'],
-  ): Promise<string | undefined> {
-    // Implementation depends on how book covers are stored in client-side
-    // This would need to be adapted based on your file storage strategy
-    return undefined
-  }
-
-  private getBookCoverUrl(id: BookDB['id']): string {
-    return `/book-covers/${id}`
+  private get electronAPI() {
+    return typeof window !== 'undefined' && 'electronAPI' in window
+      ? window.electronAPI
+      : null
   }
 
   // Authors
@@ -224,13 +217,10 @@ export class BookLibDataManagementService {
       goal.author_id === id ? { ...goal, author_id: null } : goal,
     )
 
+    const removedBookIds: BookDB['id'][] = []
     if (params.deleteBooks) {
-      const removedBookIds: BookDB['id'][] = []
       this.client.data.books = this.client.data.books.filter((book) => {
-        if (book.author_id === id) {
-          removedBookIds.push(book.id)
-          this.deleteBookCover(book.id)
-        }
+        if (book.author_id === id) removedBookIds.push(book.id)
         return book.author_id !== id
       })
       this.client.data['collection-book'] = this.client.data[
@@ -244,6 +234,9 @@ export class BookLibDataManagementService {
     }
 
     await this.client.write()
+    await Promise.all(
+      removedBookIds.map((bookId) => this.deleteBookCoverFile(bookId)),
+    )
     return id
   }
 
@@ -309,7 +302,9 @@ export class BookLibDataManagementService {
     })
   }
 
-  async createBook(book: Book): Promise<Book | null> {
+  async createBook(
+    book: Book & { tempCoverSrc?: string },
+  ): Promise<Book | null> {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
@@ -322,6 +317,13 @@ export class BookLibDataManagementService {
       id: book.id ?? uuidv4(),
       author_id: authorId,
       created_at: book.createdAt || now(),
+    }
+
+    // A cover uploaded before the book existed is stored under its temp id
+    if (book.tempCoverSrc && this.electronAPI) {
+      bookDb.cover_src =
+        (await this.electronAPI.renameCover(book.tempCoverSrc, bookDb.id)) ??
+        bookDb.cover_src
     }
 
     const collections = book.collections
@@ -383,6 +385,9 @@ export class BookLibDataManagementService {
       ...bookToDbBook(merged),
       id,
       author_id: authorId,
+      // The cover is owned by updateBookCover/deleteBookCover. The edit form
+      // can submit a stale coverSrc from before an upload, so never take it here.
+      cover_src: existingBook.cover_src,
       created_at: existingBook.created_at,
     }
 
@@ -428,10 +433,8 @@ export class BookLibDataManagementService {
 
     this.removeGoalBookReferences([id])
 
-    // Delete book cover
-    await this.deleteBookCover(id)
-
     await this.client.write()
+    await this.deleteBookCoverFile(id)
     return id
   }
 
@@ -445,11 +448,7 @@ export class BookLibDataManagementService {
 
     ids.forEach((id) => {
       const bookExists = this.client!.data.books.some((book) => book.id === id)
-      if (bookExists) {
-        deletedIds.push(id)
-        // Delete book cover
-        this.deleteBookCover(id)
-      }
+      if (bookExists) deletedIds.push(id)
     })
 
     // Remove books
@@ -465,6 +464,7 @@ export class BookLibDataManagementService {
     this.removeGoalBookReferences(deletedIds)
 
     await this.client.write()
+    await Promise.all(deletedIds.map((id) => this.deleteBookCoverFile(id)))
     return deletedIds
   }
 
@@ -539,23 +539,64 @@ export class BookLibDataManagementService {
   }
 
   // Book Covers
-  async getBookCover(_id: BookDB['id']): Promise<string | null> {
-    // This would need to be implemented based on your client-side file storage strategy
-    // For now, return null
-    return null
+  // Cover images are only stored in the Electron app: the main process keeps
+  // them in <userData>/covers and serves them through booklib-cover:// URLs,
+  // which are saved in `cover_src`. `id` is a book id, or the temporary
+  // `temp-<uuid>` id of a book that has not been created yet.
+  async getBookCover(id: BookDB['id']): Promise<string | null> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    await this.client.read()
+    return (
+      this.client.data.books.find((book) => book.id === id)?.cover_src ?? null
+    )
   }
 
-  async updateBookCover(
-    _id: BookDB['id'],
-    _file: File,
-  ): Promise<string | null> {
-    // This would need to be implemented based on your client-side file storage strategy
-    // For now, return null
-    return null
+  async updateBookCover(id: BookDB['id'], file: File): Promise<string | null> {
+    const electronAPI = this.electronAPI
+    if (!electronAPI) {
+      throw new Error('Book covers are only supported in the desktop app')
+    }
+
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const coverSrc = await electronAPI.saveCover(id, bytes, file.type)
+
+    await this.client.read()
+    const book = this.client.data.books.find((book) => book.id === id)
+    if (book) {
+      book.cover_src = coverSrc
+      await this.client.write()
+    }
+
+    return coverSrc
   }
 
-  async deleteBookCover(_id: BookDB['id']): Promise<void> {
-    // This would need to be implemented based on your client-side file storage strategy
+  // Removes the image file only; callers that keep the book update `cover_src`.
+  private async deleteBookCoverFile(id: BookDB['id']): Promise<void> {
+    try {
+      await this.electronAPI?.deleteCover(id)
+    } catch (error) {
+      // A leftover image must not block deleting the book itself
+      logger.error({ error, id }, 'Failed to delete book cover')
+    }
+  }
+
+  async deleteBookCover(id: BookDB['id']): Promise<void> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    await this.electronAPI?.deleteCover(id)
+
+    await this.client.read()
+    const book = this.client.data.books.find((book) => book.id === id)
+    if (book?.cover_src) {
+      book.cover_src = null
+      await this.client.write()
+    }
   }
 
   // Collections

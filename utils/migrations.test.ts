@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { Database } from '~/types/api'
 import type { BookDB } from '~/types/database'
-import { migrateWishlistToCollection } from './migrations'
+import {
+  CURRENT_DB_VERSION,
+  migrateWishlistToCollection,
+  runMigrations,
+} from './migrations'
 
 function createDatabase(): Database {
   return {
@@ -48,5 +52,30 @@ describe('migrateWishlistToCollection', () => {
 
     expect(migrateWishlistToCollection(data)).toBe(false)
     expect(JSON.stringify(data)).toBe(snapshot)
+  })
+})
+
+describe('runMigrations', () => {
+  it('migrates files saved before versioning and stamps the version', () => {
+    const data = createDatabase()
+
+    expect(runMigrations(data)).toBe(true)
+
+    expect(data.version).toBe(CURRENT_DB_VERSION)
+    expect(data.books[0]?.property_status).toBe('not-owned')
+  })
+
+  it('does nothing for data at the current version', () => {
+    const data = { ...createDatabase(), version: CURRENT_DB_VERSION }
+    const snapshot = JSON.stringify(data)
+
+    expect(runMigrations(data)).toBe(false)
+    expect(JSON.stringify(data)).toBe(snapshot)
+  })
+
+  it('refuses data from a newer app version', () => {
+    const data = { ...createDatabase(), version: CURRENT_DB_VERSION + 1 }
+
+    expect(() => runMigrations(data)).toThrow('newer version of BookLib')
   })
 })

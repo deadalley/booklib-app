@@ -6,6 +6,14 @@ export interface ElectronAPI {
   fileExists: (filePath: string) => Promise<boolean>
   getDbPath: () => Promise<string>
   ensureDir: (dirPath: string) => Promise<void>
+  // Book covers (see electron/covers.ts). Return booklib-cover:// URLs.
+  saveCover: (
+    id: string,
+    bytes: Uint8Array,
+    mimeType: string,
+  ) => Promise<string>
+  deleteCover: (id: string) => Promise<void>
+  renameCover: (fromId: string, toId: string) => Promise<string | null>
 }
 
 declare global {
