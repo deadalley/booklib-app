@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
 
+// `BUILD_TARGET=capacitor` builds the static app that is bundled into the
+// Android app (see capacitor.config.ts).
+const isCapacitorBuild = process.env.BUILD_TARGET === 'capacitor'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -10,6 +14,9 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
+    // Capacitor loads `index.html` from the web directory, so render the
+    // entry route instead of only the `200.html` SPA fallback.
+    ...(isCapacitorBuild ? { prerender: { routes: ['/'] } } : {}),
   },
 
   vite: {

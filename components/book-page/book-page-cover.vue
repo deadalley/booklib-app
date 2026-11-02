@@ -28,17 +28,22 @@
       @change="onFileChange"
     />
 
-    <bl-tooltip :disabled="!isWebEnvironment">
+    <bl-tooltip :disabled="!coversUnavailable">
       <template #tooltip-content>
-        You are running a
-        <b class="contents">demo</b>
-        version of BookLib. Uploading custom book covers is not available in
-        this version.
+        <template v-if="isAndroid">
+          Uploading custom book covers is not available on Android yet.
+        </template>
+        <template v-else>
+          You are running a
+          <b class="contents">demo</b>
+          version of BookLib. Uploading custom book covers is not available in
+          this version.
+        </template>
       </template>
       <div class="flex flex-wrap gap-2">
         <bl-button
           variant="secondary"
-          :disabled="isWebEnvironment || loading"
+          :disabled="coversUnavailable || loading"
           @click="onUploadClick"
         >
           <template #prependIcon="iconProps">
@@ -62,6 +67,7 @@
 <script setup lang="ts">
 import { IconUpload } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
+import { getAppPlatform, supportsCoverUploads } from '~/utils/platform'
 
 const fileInput = ref<HTMLInputElement>()
 
@@ -77,9 +83,10 @@ const coverSrc = ref<string | null>(props.book.coverSrc ?? null)
 
 const { updateBookCover, deleteBookCover } = useBookLibrary()
 
-const isWebEnvironment = ref<boolean>(
-  typeof window !== 'undefined' && !('electronAPI' in window),
-)
+// Cover files are stored by the desktop app; the web demo and Android
+// app can't upload them yet.
+const coversUnavailable = ref<boolean>(!supportsCoverUploads())
+const isAndroid = getAppPlatform() === 'android'
 
 const coverId = computed(() => props.book.id ?? props.tempCoverSrc ?? '')
 
@@ -88,7 +95,7 @@ function onUploadClick() {
 }
 
 async function onFileChange(e: Event) {
-  if (isWebEnvironment.value) return
+  if (coversUnavailable.value) return
 
   const input = e.target as HTMLInputElement
   const file = input?.files?.[0]
