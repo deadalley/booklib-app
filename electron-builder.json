@@ -47,8 +47,8 @@
     ],
     "icon": "public/icon.png",
     "category": "Office",
-    "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
-    "vendor": "Jessica Aissa",
+    "maintainer": "deadalley <deadalley31@gmail.com>",
+    "vendor": "deadalley",
     "description": "BookLib is an application for managing your book collection.",
     "synopsis": "Manage your personal book library",
     "desktop": {
@@ -70,8 +70,8 @@
     "priority": "optional",
     "description": "BookLib is an application for managing your book collection.",
     "synopsis": "Manage your personal book library",
-    "maintainer": "Jessica Aissa <deadalley31@gmail.com>",
-    "vendor": "Jessica Aissa",
+    "maintainer": "deadalley <deadalley31@gmail.com>",
+    "vendor": "deadalley",
     "artifactName": "booklib_${version}_${arch}.${ext}"
   },
   "publish": {
@@ -80,5 +80,5 @@
     "repo": "booklib-app"
   },
   "npmRebuild": false,
-  "copyright": "Copyright © 2025 Jessica Aissa"
+  "copyright": "Copyright © 2025 deadalley"
 }

@@ -4,7 +4,7 @@
   "main": "dist-electron/main.js",
   "version": "0.1.0",
   "description": "BookLib is an application for managing your book collection.",
-  "author": "Jessica Aissa <deadalley31@gmail.com>",
+  "author": "deadalley <deadalley31@gmail.com>",
   "scripts": {
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
     "dev:electron": "cross-env ELECTRON_ENABLED=true nuxt dev --dotenv .env.local",
