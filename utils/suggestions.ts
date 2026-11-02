@@ -37,10 +37,7 @@ export function getBookPagesRead(book: Book): number {
 /** Reading progress as a whole percentage (0 without a page count). */
 export function getBookPercentage(book: Book): number {
   if (!book.pages) return 0
-  return Math.min(
-    100,
-    Math.round((getBookPagesRead(book) / book.pages) * 100),
-  )
+  return Math.min(100, Math.round((getBookPagesRead(book) / book.pages) * 100))
 }
 
 /** The local calendar day (`YYYY-MM-DD`) of a timestamp. */
@@ -68,7 +65,8 @@ export function formatRelativeDay(
 
   let span: string
   if (days < 30) span = plural(days, 'day')
-  else if (days < 365) span = plural(Math.max(1, Math.round(days / 30)), 'month')
+  else if (days < 365)
+    span = plural(Math.max(1, Math.round(days / 30)), 'month')
   else span = plural(Math.max(1, Math.round(days / 365)), 'year')
 
   return suffix ? `${span} ago` : span
@@ -89,17 +87,19 @@ function almostFinished(books: Book[]): Suggestion[] {
     .filter(({ progress }) => progress >= 60 && progress < 100)
     .sort((a, b) => b.progress - a.progress)
     .slice(0, 2)
-    .map(({ book, progress }): Suggestion => ({
-      id: `almost-${book.id}`,
-      kind: 'almost',
-      eyebrow: 'Almost there',
-      title: `You’re almost finishing ${book.title}!`,
-      body: `${Math.max(0, (book.pages ?? 0) - getBookPagesRead(book))} pages left. You’re ${progress}% of the way through.`,
-      cta: 'Continue reading',
-      book,
-      progress,
-      action: { type: 'open', bookId: book.id },
-    }))
+    .map(
+      ({ book, progress }): Suggestion => ({
+        id: `almost-${book.id}`,
+        kind: 'almost',
+        eyebrow: 'Almost there',
+        title: `You’re almost finishing ${book.title}!`,
+        body: `${Math.max(0, (book.pages ?? 0) - getBookPagesRead(book))} pages left. You’re ${progress}% of the way through.`,
+        cta: 'Continue reading',
+        book,
+        progress,
+        action: { type: 'open', bookId: book.id },
+      }),
+    )
 }
 
 function unloggedGoalBooks(
@@ -151,8 +151,7 @@ function favouriteAuthor(books: Book[], authors: Author[]): Suggestion[] {
         .filter(({ progress }) => !progress.status)
         .sort(byCreatedAt)
       const average = rated.length
-        ? rated.reduce((total, { rating }) => total + rating!, 0) /
-          rated.length
+        ? rated.reduce((total, { rating }) => total + rating!, 0) / rated.length
         : null
       return { authorId, read, unread, average }
     })

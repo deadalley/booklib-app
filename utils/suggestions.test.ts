@@ -63,7 +63,11 @@ const reading = (id: string, currentPage: number, extra: Partial<Book> = {}) =>
     },
   })
 
-const read = (id: string, extra: Partial<Book> = {}, finishedAt = '2026-10-30') =>
+const read = (
+  id: string,
+  extra: Partial<Book> = {},
+  finishedAt = '2026-10-30',
+) =>
   book(id, {
     ...extra,
     progress: {
@@ -284,8 +288,8 @@ describe('dismissals', () => {
     const now = Date.UTC(2026, 10, 2)
     const dismissed = { a: snoozeUntil(now), b: now - 1 }
     expect(Object.keys(activeDismissals(dismissed, now))).toEqual(['a'])
-    expect(
-      activeDismissals(dismissed, now + 14 * 24 * 60 * 60 * 1000),
-    ).toEqual({})
+    expect(activeDismissals(dismissed, now + 14 * 24 * 60 * 60 * 1000)).toEqual(
+      {},
+    )
   })
 })
