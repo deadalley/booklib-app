@@ -12,25 +12,40 @@ overrides:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@capacitor/android':
         specifier: ~8.5.3
         version: 8.5.3(@capacitor/core@8.5.3)
+      '@capacitor/cli':
+        specifier: ~8.5.3
+        version: 8.5.3
       '@capacitor/core':
         specifier: ~8.5.3
         version: 8.5.3
       '@capacitor/filesystem':
         specifier: 8.1.5
         version: 8.1.5(@capacitor/core@8.5.3)
+      '@faker-js/faker':
+        specifier: ^10.1.0
+        version: 10.1.0
       '@formkit/nuxt':
         specifier: ^1.6.9
         version: 1.6.9(esbuild@0.27.1)(magicast@0.5.1)(rollup@4.53.4)(tailwindcss@4.2.2)(vite@7.3.0(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
       '@nuxt/eslint':
         specifier: ^1.12.1
         version: 1.12.1(@typescript-eslint/utils@8.49.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.25)(eslint@9.39.2(jiti@2.6.1))(magicast@0.5.1)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))
+      '@nuxt/eslint-config':
+        specifier: ^1.12.1
+        version: 1.12.1(@typescript-eslint/utils@8.49.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.25)(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       '@nuxt/image':
         specifier: ^2.0.0
         version: 2.0.0(@netlify/blobs@9.1.2)(db0@0.3.4)(ioredis@5.8.2)(magicast@0.5.1)
+      '@nuxt/test-utils':
+        specifier: ^3.21.0
+        version: 3.21.0(@playwright/test@1.57.0)(@vue/test-utils@2.4.6)(happy-dom@20.0.11)(jsdom@20.0.3)(magicast@0.5.1)(playwright-core@1.57.0)(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@25.0.2)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@20.0.3)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))
+      '@playwright/test':
+        specifier: ^1.57.0
+        version: 1.57.0
       '@sentry/electron':
         specifier: ^7.5.0
         version: 7.5.0
@@ -40,79 +55,12 @@ importers:
       '@tabler/icons-vue':
         specifier: ^3.36.0
         version: 3.36.0(vue@3.5.25(typescript@5.9.3))
-      '@tanstack/vue-table':
-        specifier: ^8.21.3
-        version: 8.21.3(vue@3.5.25(typescript@5.9.3))
-      '@vueuse/core':
-        specifier: ^14.1.0
-        version: 14.1.0(vue@3.5.25(typescript@5.9.3))
-      color:
-        specifier: ^5.0.3
-        version: 5.0.3
-      dayjs:
-        specifier: ^1.11.19
-        version: 1.11.19
-      echarts:
-        specifier: ^6.0.0
-        version: 6.0.0
-      import-in-the-middle:
-        specifier: ^2.0.0
-        version: 2.0.0
-      lowdb:
-        specifier: ^7.0.1
-        version: 7.0.1
-      nuxt:
-        specifier: ^4.2.2
-        version: 4.2.2(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@25.0.2)(@vue/compiler-sfc@3.5.25)(cac@6.7.14)(db0@0.3.4)(encoding@0.1.13)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.32.0)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.4)(terser@5.43.1)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))(vue-tsc@3.1.8(typescript@5.9.3))(xml2js@0.6.2)(yaml@2.8.2)
-      nuxt-echarts:
-        specifier: 1.0.1
-        version: 1.0.1(echarts@6.0.0)(magicast@0.5.1)(vue-echarts@8.0.1(echarts@6.0.0)(vue@3.5.25(typescript@5.9.3)))
-      nuxt-file-storage:
-        specifier: ^0.3.0
-        version: 0.3.0(magicast@0.5.1)
-      papaparse:
-        specifier: 5.5.3
-        version: 5.5.3
-      radix-vue:
-        specifier: ^1.9.17
-        version: 1.9.17(vue@3.5.25(typescript@5.9.3))
-      ramda:
-        specifier: ^0.32.0
-        version: 0.32.0
-      uuid:
-        specifier: ^13.0.0
-        version: 13.0.0
-      vue:
-        specifier: ^3.5.25
-        version: 3.5.25(typescript@5.9.3)
-      vue-echarts:
-        specifier: ^8.0.1
-        version: 8.0.1(echarts@6.0.0)(vue@3.5.25(typescript@5.9.3))
-      vue-router:
-        specifier: ^4.6.4
-        version: 4.6.4(vue@3.5.25(typescript@5.9.3))
-      vuedraggable:
-        specifier: ^4.1.0
-        version: 4.1.0(vue@3.5.25(typescript@5.9.3))
-    devDependencies:
-      '@capacitor/cli':
-        specifier: ~8.5.3
-        version: 8.5.3
-      '@faker-js/faker':
-        specifier: ^10.1.0
-        version: 10.1.0
-      '@nuxt/eslint-config':
-        specifier: ^1.12.1
-        version: 1.12.1(@typescript-eslint/utils@8.49.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.25)(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      '@nuxt/test-utils':
-        specifier: ^3.21.0
-        version: 3.21.0(@playwright/test@1.57.0)(@vue/test-utils@2.4.6)(happy-dom@20.0.11)(jsdom@20.0.3)(magicast@0.5.1)(playwright-core@1.57.0)(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@25.0.2)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@20.0.3)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))
-      '@playwright/test':
-        specifier: ^1.57.0
-        version: 1.57.0
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.2.2(vite@7.3.0(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))
+      '@tanstack/vue-table':
+        specifier: ^8.21.3
+        version: 8.21.3(vue@3.5.25(typescript@5.9.3))
       '@types/color':
         specifier: ^4.2.0
         version: 4.2.0
@@ -134,12 +82,24 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
+      '@vueuse/core':
+        specifier: ^14.1.0
+        version: 14.1.0(vue@3.5.25(typescript@5.9.3))
+      color:
+        specifier: ^5.0.3
+        version: 5.0.3
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
+      dayjs:
+        specifier: ^1.11.19
+        version: 1.11.19
+      echarts:
+        specifier: ^6.0.0
+        version: 6.0.0
       electron:
         specifier: ^39.2.7
         version: 39.2.7
@@ -152,9 +112,27 @@ importers:
       happy-dom:
         specifier: ^20.0.11
         version: 20.0.11
+      import-in-the-middle:
+        specifier: ^2.0.0
+        version: 2.0.0
+      lowdb:
+        specifier: ^7.0.1
+        version: 7.0.1
+      nuxt:
+        specifier: ^4.2.2
+        version: 4.2.2(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@25.0.2)(@vue/compiler-sfc@3.5.25)(cac@6.7.14)(db0@0.3.4)(encoding@0.1.13)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.32.0)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.4)(terser@5.43.1)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2))(vue-tsc@3.1.8(typescript@5.9.3))(xml2js@0.6.2)(yaml@2.8.2)
+      nuxt-echarts:
+        specifier: 1.0.1
+        version: 1.0.1(echarts@6.0.0)(magicast@0.5.1)(vue-echarts@8.0.1(echarts@6.0.0)(vue@3.5.25(typescript@5.9.3)))
       nuxt-electron:
         specifier: ^0.7.0
         version: 0.7.0(vite-plugin-electron-renderer@0.14.6)(vite-plugin-electron@0.29.0(vite-plugin-electron-renderer@0.14.6))
+      nuxt-file-storage:
+        specifier: ^0.3.0
+        version: 0.3.0(magicast@0.5.1)
+      papaparse:
+        specifier: 5.5.3
+        version: 5.5.3
       pino:
         specifier: ^10.1.0
         version: 10.1.0
@@ -170,6 +148,12 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.7.2
         version: 0.7.2(prettier@3.7.4)
+      radix-vue:
+        specifier: ^1.9.17
+        version: 1.9.17(vue@3.5.25(typescript@5.9.3))
+      ramda:
+        specifier: ^0.32.0
+        version: 0.32.0
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
@@ -182,6 +166,9 @@ importers:
       unplugin-vue-components:
         specifier: ^30.0.0
         version: 30.0.0(@babel/parser@7.28.5)(@nuxt/kit@4.2.2(magicast@0.5.1))(vue@3.5.25(typescript@5.9.3))
+      uuid:
+        specifier: ^13.0.0
+        version: 13.0.0
       vite-plugin-electron:
         specifier: ^0.29.0
         version: 0.29.0(vite-plugin-electron-renderer@0.14.6)
@@ -191,9 +178,21 @@ importers:
       vitest:
         specifier: ^4.0.15
         version: 4.0.15(@opentelemetry/api@1.9.0)(@types/node@25.0.2)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@20.0.3)(lightningcss@1.32.0)(terser@5.43.1)(yaml@2.8.2)
+      vue:
+        specifier: ^3.5.25
+        version: 3.5.25(typescript@5.9.3)
+      vue-echarts:
+        specifier: ^8.0.1
+        version: 8.0.1(echarts@6.0.0)(vue@3.5.25(typescript@5.9.3))
+      vue-router:
+        specifier: ^4.6.4
+        version: 4.6.4(vue@3.5.25(typescript@5.9.3))
       vue-tsc:
         specifier: ^3
         version: 3.1.8(typescript@5.9.3)
+      vuedraggable:
+        specifier: ^4.1.0
+        version: 4.1.0(vue@3.5.25(typescript@5.9.3))
 
 packages:
 
