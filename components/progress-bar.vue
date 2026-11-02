@@ -1,8 +1,9 @@
 <template>
   <ProgressRoot
     v-model="progressValue"
-    class="relative w-full overflow-hidden rounded-full bg-accent"
+    class="bg-surface relative w-full overflow-hidden rounded-full"
     :class="{
+      'h-1': size === 'xs',
       'h-2': size === 'sm',
       'h-3': size === 'md',
       'h-4': size === 'lg',
@@ -12,7 +13,7 @@
     @mouseleave="hovered = false"
   >
     <ProgressIndicator
-      class="size-full rounded-full transition-transform duration-[660ms] ease-in"
+      class="size-full rounded-full transition-transform duration-660 ease-in"
       :class="{
         [color]: true,
       }"
@@ -26,10 +27,10 @@ import { ProgressIndicator, ProgressRoot } from 'radix-vue'
 
 withDefaults(
   defineProps<{
-    size?: 'sm' | 'md' | 'lg'
+    size?: 'xs' | 'sm' | 'md' | 'lg'
     color?: string
   }>(),
-  { size: 'md', color: 'bg-main' },
+  { size: 'md', color: 'bg-primary' },
 )
 
 const hovered = ref(false)

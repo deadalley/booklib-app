@@ -6,14 +6,11 @@
     <NuxtLink
       v-bind="$attrs"
       :to="disabled ? undefined : to"
-      class="flex items-center rounded-xl py-3 text-lg"
+      class="nav-sidebar-button"
       :class="{
-        'cursor-pointer transition-all hover:bg-accent/30 active:bg-accent-dark/20':
-          !disabled,
-        'cursor-default text-accent': disabled,
-        'bg-main text-white hover:bg-main/80': active,
-        'gap-3 px-5': !iconOnly,
-        'px-3': !!iconOnly,
+        'nav-sidebar-button-disabled': disabled,
+        'nav-sidebar-button-active': active,
+        'nav-sidebar-button-icon-only': !!iconOnly,
       }"
       :disabled="disabled"
     >

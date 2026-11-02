@@ -19,6 +19,8 @@ The StorageService has been updated to support multiple storage backends: Electr
 ### 3. Electron IPC Handlers (`electron/main.ts`)
 
 - File operations: `file:read`, `file:write`, `file:exists`
+- `file:write` is atomic (`electron/fs-utils.ts`): it writes `<file>.tmp`, flushes it to disk and renames it over the target, so a crash mid-save leaves the previous file intact
+- Book covers: `cover:save`, `cover:delete`, `cover:rename` (see [Book Covers](#book-covers))
 - Directory operations: `dir:ensure`
 - Database path: `db:getPath` (returns path in user data directory)
 
@@ -54,6 +56,16 @@ The StorageService has been updated to support multiple storage backends: Electr
 
 - Browser LocalStorage
 
+## Book Covers
+
+Covers are only supported in the Electron app; the web build keeps the upload button disabled.
+
+- Image files live in `<userData>/covers/<bookId>.<ext>` (jpg, png, webp or gif, up to 10 MB), managed by `CoverStore` in `electron/covers.ts`.
+- The main process serves them through the `booklib-cover://` protocol. `cover_src` stores a URL such as `booklib-cover://<bookId>.png?v=<timestamp>`; the `?v=` changes on every upload so a replaced image is not served from the cache. Covers with an `http(s)` URL (for example from an import) are shown as they are.
+- A cover uploaded while creating a book is saved under the form's `temp-<uuid>` id and moved to the real book id by `createBook`. Temp covers from forms that were never saved are removed after 24 hours, on app start.
+- `updateBookCover` / `deleteBookCover` own `cover_src`; `updateBook` never changes it. Deleting a book deletes its cover file.
+- Library export/import (`services/transfer`) keeps `coverSrc` URLs but does not include the image files, so local covers do not move to another machine.
+
 ## Usage
 
 The StorageService automatically detects the environment and uses the appropriate storage method:
@@ -72,6 +84,10 @@ The service detects the environment in this order:
 
 1. **Electron**: Checks for `window.electronAPI`
 2. **Browser**: Falls back to LocalStorage
+
+## Schema Versioning
+
+The database has a `version` field. On startup `runMigrations` (`utils/migrations.ts`) runs every migration newer than the stored version, then saves. Files saved before versioning have no `version` and run all migrations, which are idempotent. A file with a version newer than the app supports is refused instead of being rewritten. To change the data shape, append a migration to `MIGRATIONS`.
 
 ## Migration
 

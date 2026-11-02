@@ -1,18 +1,14 @@
 <template>
   <button
-    class="inline-flex size-8 items-center justify-center gap-2 rounded-3xl text-base font-medium"
+    type="button"
+    class="button p-2"
     :class="{
-      'bg-main text-white': variant === 'primary',
-      'hover:bg-main/90 active:bg-main-dark':
-        variant === 'primary' && !disabled,
-      'bg-accent-light text-black': variant === 'secondary',
-      'hover:bg-white hover:ring-1 hover:ring-inset hover:ring-accent-dark active:bg-accent-light':
-        variant === 'secondary' && !disabled,
-      'border border-accent p-2 text-black': variant === 'tertiary',
-      'hover:bg-accent-light active:bg-accent':
-        variant === 'tertiary' && !disabled,
-      '!bg-accent-light !text-accent-dark': !!disabled && !keepStyle,
+      'button-primary': variant === 'primary',
+      'button-secondary': variant === 'secondary',
+      'button-tertiary': variant === 'tertiary',
+      'button-disabled': !!disabled && !keepStyle,
       'cursor-pointer': !disabled,
+      ...(typeof $attrs.class === 'string' ? { [$attrs.class]: true } : {}),
     }"
     :disabled="disabled"
   >

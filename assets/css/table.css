@@ -1,33 +1,49 @@
-.bl-table {
-  @apply relative w-full overflow-x-auto md:w-full;
-  table-layout: fixed;
-}
+@layer components {
+  .bl-table-wrapper {
+    @apply paper-flat w-full overflow-x-auto;
+  }
 
-.bl-table th {
-  @apply px-8 py-4 text-base;
-}
+  .bl-table {
+    @apply relative w-full min-w-190 border-separate border-spacing-0;
+    table-layout: fixed;
+  }
 
-.bl-table td {
-  @apply px-8 py-3 text-base;
-}
+  .bl-table th {
+    @apply px-5 py-3 text-sm;
+  }
 
-.bl-table thead th {
-  @apply bg-accent-light text-left font-semibold;
-  position: sticky;
-}
+  .bl-table td {
+    @apply px-5 py-3.5 text-sm;
+  }
 
-.bl-table thead th > span {
-  @apply flex items-center gap-3;
-}
+  .bl-table thead th {
+    @apply bg-surface-subtle text-ink-secondary border-stroke-subtle border-b text-left text-xs font-semibold tracking-wide uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
 
-.bl-table th:first-child {
-  @apply rounded-l-lg;
-}
+  .bl-table thead th > span {
+    @apply flex items-center gap-2;
+  }
 
-.bl-table th:last-child {
-  @apply rounded-r-lg;
-}
+  .bl-table thead th:first-child {
+    @apply rounded-tl-scholarly;
+  }
 
-.bl-table td {
-  @apply border-b border-accent-light text-base;
+  .bl-table thead th:last-child {
+    @apply rounded-tr-scholarly;
+  }
+
+  .bl-table td {
+    @apply border-stroke-subtle border-b align-middle;
+  }
+
+  .bl-table tbody tr {
+    @apply transition-colors;
+  }
+
+  .bl-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
 }

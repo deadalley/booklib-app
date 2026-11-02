@@ -8,6 +8,7 @@
       <template #icon="iconProps">
         <IconLayoutGrid v-bind="iconProps" />
       </template>
+      <template v-if="showLabels" #label>Grid</template>
       <template #tooltip>Grid view</template>
     </bl-switch-option>
     <bl-switch-option
@@ -18,7 +19,8 @@
       <template #icon="iconProps">
         <IconMist v-bind="iconProps" />
       </template>
-      <template #tooltip>Expanded cars view</template>
+      <template v-if="showLabels" #label>Rows</template>
+      <template #tooltip>Expanded cards view</template>
     </bl-switch-option>
     <bl-switch-option
       v-if="views.includes('table')"
@@ -28,6 +30,7 @@
       <template #icon="iconProps">
         <IconList v-bind="iconProps" />
       </template>
+      <template v-if="showLabels" #label>Table</template>
       <template #tooltip>Table view</template>
     </bl-switch-option>
   </bl-switch>
@@ -40,8 +43,9 @@ import type { View } from '~/types/ui'
 withDefaults(
   defineProps<{
     views?: View[]
+    showLabels?: boolean
   }>(),
-  { views: () => ['cards', 'table'] },
+  { views: () => ['cards', 'table'], showLabels: false },
 )
 
 const view = defineModel<View>('view')

@@ -1,14 +1,14 @@
 <template>
   <div
-    class="size-full rounded-xl bg-accent-light p-10 text-lg"
+    class="rounded-scholarly bg-surface-subtle size-full p-10 text-lg"
     v-bind="$attrs"
   >
     <div
-      class="flex size-full w-full flex-col items-center justify-center gap-3 rounded-[inherit] border-2 border-dashed border-accent-dark p-2 text-accent-dark"
+      class="border-stroke-strong text-ink-muted flex size-full w-full flex-col items-center justify-center gap-3 rounded-[inherit] border-2 border-dashed p-2"
     >
       <component :is="icons[icon]" stroke="1.5" :size="iconSize" />
       <span
-        class="w-full truncate text-center font-normal leading-tight text-black"
+        class="text-ink-primary w-full truncate text-center leading-tight font-normal"
       >
         <slot />
         <template v-if="!$slots['default']">

@@ -8,7 +8,7 @@
       @drag="(args) => $emit('book-drag', args)"
       @select="(args) => $emit('book-select', args)"
     />
-    <hr v-if="editing" class="my-8 text-main" />
+    <hr v-if="editing" class="text-primary my-8" />
     <div v-if="editing" class="flex items-center justify-between">
       <h4>All books</h4>
       <bl-search-bar
@@ -37,37 +37,30 @@
 
   <div v-if="view === 'table'" class="overflow-x-auto">
     <bl-books-table
-      :books="!interactive || editing ? sortedBooksForTable : selectedBooks"
+      :books="tableBooks"
       :selected-table-columns="selectedTableColumns"
       :with-check="editing"
       :row-clickable="!editing"
       interactive
-      @select:row="
-        (args) =>
-          $emit('book-select', { bookId: args.id, selected: args.selected })
-      "
+      @select:rows="onSelectRows"
       @click:row="(args: Book) => navigateTo(`/library/books/${args.id}`)"
     />
   </div>
 
-  <div
+  <bl-pagination
     v-if="totalBookCount && totalBookCount > BOOKS_PAGE_SIZE"
-    class="flex justify-center py-2"
-  >
-    <bl-pagination
-      v-model="currentPage"
-      :total-item-count="totalBookCount"
-      :items-per-page="BOOKS_PAGE_SIZE"
-      @update:page="(args) => $emit('update:page', args)"
-    />
-  </div>
+    v-model="currentPage"
+    :total-item-count="totalBookCount"
+    :items-per-page="BOOKS_PAGE_SIZE"
+    @update:page="(args) => $emit('update:page', args)"
+  />
 </template>
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 
-defineProps<{
+const props = defineProps<{
   view: View
   interactive?: boolean
   editing?: boolean
@@ -95,7 +88,7 @@ const { sortedBooks, onSearch } = useSortBooks(notSelectedBooks)
 const { sortedBooks: sortedBooksForTable, onSearch: onSearchTable } =
   useSortBooks(books)
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'book-select', val: { bookId: Book['id']; selected: boolean }): void
   (
     e: 'book-drag',
@@ -103,4 +96,21 @@ defineEmits<{
   ): void
   (e: 'update:page', val: number): void
 }>()
+
+// Outside the interactive (collection) mode the parent has already filtered,
+// sorted and paginated `books`; re-sorting here would scramble that order.
+const tableBooks = computed(() => {
+  if (!props.interactive) return books.value
+  return props.editing ? sortedBooksForTable.value : selectedBooks.value
+})
+
+function onSelectRows(selection: Record<string, boolean>) {
+  tableBooks.value.forEach((book) => {
+    const selected = !!selection[String(book.id)]
+
+    if (!!book.selected !== selected) {
+      emit('book-select', { bookId: book.id, selected })
+    }
+  })
+}
 </script>

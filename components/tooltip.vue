@@ -1,17 +1,22 @@
 <template>
-  <TooltipProvider>
+  <!-- A disabled trigger would render a disabled button that swallows clicks -->
+  <div v-if="disabled" v-bind="$attrs">
+    <slot />
+  </div>
+  <TooltipProvider v-else>
     <TooltipRoot :delay-duration="150">
-      <TooltipTrigger v-bind="$attrs" class="cursor-default">
+      <!-- A span, not a button: the content is often a button itself -->
+      <TooltipTrigger
+        v-bind="$attrs"
+        as="span"
+        class="inline-flex cursor-default"
+      >
         <slot />
       </TooltipTrigger>
       <TooltipPortal>
-        <TooltipContent
-          class="z-50 rounded-lg bg-white px-3 py-2 drop-shadow-md"
-          :side-offset="5"
-          :side="side"
-        >
+        <TooltipContent class="tooltip-content" :side-offset="5" :side="side">
           <slot name="tooltip-content" />
-          <TooltipArrow class="fill-white" :width="8" />
+          <TooltipArrow class="fill-surface-elevated" :width="8" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>
@@ -28,5 +33,10 @@ import {
   TooltipTrigger,
 } from 'radix-vue'
 
-defineProps<{ side?: 'top' | 'right' | 'bottom' | 'left' }>()
+defineProps<{
+  side?: 'top' | 'right' | 'bottom' | 'left'
+  disabled?: boolean
+}>()
+
+defineOptions({ inheritAttrs: false })
 </script>

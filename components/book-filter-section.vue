@@ -1,25 +1,27 @@
 <template>
-  <div v-if="!!elements.length">
-    <h6 class="mb-4">{{ title }}</h6>
-    <div class="flex w-full flex-wrap gap-3">
-      <bl-pill
-        v-for="element in elements"
-        v-if="!genre"
-        :key="element"
-        :selected="selectedElements.includes(element)"
-        @click="onSelect(element)"
+  <div v-if="!!elements.length" class="filter-section">
+    <div class="filter-section-header">
+      <label class="filter-section-label">{{ title }}</label>
+      <button
+        v-if="selectedElements?.length"
+        class="filter-section-reset"
+        @click="onReset"
       >
-        {{ getDisplayValue(element) }}
-      </bl-pill>
-      <bl-genre-tag
-        v-for="(element, index) in elements"
-        v-if="!!genre"
-        :key="element"
-        :value="element"
-        :index="index"
-        :selected="selectedElements.includes(element)"
-        @click="onSelect(element)"
-      />
+        Reset
+      </button>
+    </div>
+    <div class="columns-2 gap-6">
+      <bl-checkbox
+        v-for="option in options"
+        :id="`filter-${idPrefix}-${option.value}`"
+        :key="option.value"
+        :checked="selectedElements?.includes(option.value)"
+        align="left"
+        class="mb-1"
+        @change="onSelect(option.value)"
+      >
+        {{ option.label }}
+      </bl-checkbox>
     </div>
   </div>
 </template>
@@ -27,11 +29,25 @@
 <script setup lang="ts">
 import languageOptions from '~/public/languages-2.json'
 
-defineProps<{
+type FilterOption = { value: string; label: string }
+
+const props = defineProps<{
   title: string
-  elements: string[]
-  genre?: boolean
+  /** Plain values (language codes are shown as names) or value/label pairs. */
+  elements: (string | FilterOption)[]
 }>()
+
+const idPrefix = computed(() =>
+  props.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+)
+
+const options = computed<FilterOption[]>(() =>
+  props.elements.map((element) =>
+    typeof element === 'string'
+      ? { value: element, label: getDisplayValue(element) }
+      : element,
+  ),
+)
 
 const selectedElements = defineModel({
   type: Array<string>,
@@ -43,11 +59,12 @@ function getDisplayValue(element: string) {
 }
 
 function onSelect(element: string) {
-  if (selectedElements.value.includes(element)) {
-    const index = selectedElements.value.findIndex((el) => el === element)
-    selectedElements.value.splice(index, 1)
-  } else {
-    selectedElements.value.push(element)
-  }
+  selectedElements.value = selectedElements.value.includes(element)
+    ? selectedElements.value.filter((el) => el !== element)
+    : [...selectedElements.value, element]
+}
+
+function onReset() {
+  selectedElements.value = []
 }
 </script>

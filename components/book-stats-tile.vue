@@ -20,11 +20,11 @@ defineProps<{
 }>()
 
 const options: (SelectOption & {
-  value: 'rating' | 'progressStatus'
+  value: 'rating' | 'progress'
   unit?: string
 })[] = [
   { label: 'Books by rating', value: 'rating', unit: '★' },
-  { label: 'Books by progress status', value: 'progressStatus' },
+  { label: 'Books by progress status', value: 'progress' },
 ]
 
 const { index } = useAutoIncrementIndex(options.length, 14)

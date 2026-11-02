@@ -1,31 +1,21 @@
 import { createGlobalState } from '@vueuse/core'
-import { computed, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useGlobalState = createGlobalState(() => {
-  // state
-  const state = shallowRef({
-    sidebarCollapsed: false,
+  const { isMobile, isWide } = useBreakpoints()
+
+  // `null` means "automatic": collapsed on phones and below `xl`, expanded on
+  // wide screens. Toggling stores the user's explicit choice.
+  const sidebarPreference = ref<boolean | null>(null)
+
+  const isSidebarCollapsed = computed(() => {
+    if (isMobile.value) return true
+    return sidebarPreference.value ?? !isWide.value
   })
 
-  // getters
-  const isSidebarCollapsed = computed(() => state.value.sidebarCollapsed)
-
-  // actions
   function toggleSidebar() {
-    state.value = {
-      ...state.value,
-      sidebarCollapsed: !state.value.sidebarCollapsed,
-    }
+    sidebarPreference.value = !isSidebarCollapsed.value
   }
-
-  onMounted(() => {
-    if (isMobile()) {
-      state.value = {
-        ...state.value,
-        sidebarCollapsed: true,
-      }
-    }
-  })
 
   return { isSidebarCollapsed, toggleSidebar }
 })

@@ -2,7 +2,7 @@
   <draggable
     :list="books"
     :item-key="(book: ViewBook) => book.id"
-    class="grid size-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 sm:h-min md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+    class="books-grid grid size-full grid-cols-2 gap-x-4 gap-y-6 overflow-x-visible overflow-y-auto sm:h-min sm:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] sm:gap-x-6 sm:gap-y-8"
     :animation="200"
     :disabled="!props.draggable"
     @change="
@@ -18,10 +18,9 @@
     "
   >
     <template #item="{ element: book }">
-      <bl-book-card
+      <bl-book-tile
         :key="book.id"
         :book="book"
-        class="md:!w-36"
         :selectable="selectable"
         :draggable="props.draggable"
         :floating-icon="getIcon(book)"
@@ -38,6 +37,10 @@
 import draggable from 'vuedraggable'
 import type { ViewBook } from '~/types/book'
 import type { icons } from '@tabler/icons-vue'
+import {
+  DEFAULT_COLLECTION_ICONS,
+  FAVORITE_COLLECTION_ID,
+} from '~/utils/constants'
 
 const props = defineProps<{
   small?: boolean

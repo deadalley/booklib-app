@@ -1,1 +1,4 @@
-TITLE,AUTHOR,PUBLISHER,LANGUAGE,YEAR,PAGES,ORIGINAL_TITLE,ORIGINAL_LANGUAGE,PROGRESS_STATUS,BOOK_FORMAT,RATING,STARTED_AT,FINISHED_AT,ISBN
+TITLE,AUTHOR,ORIGINAL_TITLE,PUBLISHER,LANGUAGE,ORIGINAL_LANGUAGE,YEAR,PAGES,ISBN,RATING,SUMMARY,GENRES,FORMAT,PROPERTY_STATUS,COVER,ADDED_AT,PROGRESS_STATUS,STARTED_AT,FINISHED_AT,CURRENT_PAGE,NOTES
+The Left Hand of Darkness,Ursula K. Le Guin,,Ace Books,en,en,1969,304,9780441478125,5,A human envoy visits the planet Gethen.,Science Fiction; Classics,paperback,owned,,2024-01-15,read,2024-02-01,2024-02-20,304,"[{""createdAt"": ""2024-02-10"", ""page"": 150, ""content"": ""Halfway through the ice.""}]"
+Cien años de soledad,Gabriel García Márquez,,Editorial Sudamericana,es,es,1967,471,,,,Magical Realism,hardcover,owned,,2024-03-01,reading,2024-03-05,,120,
+Piranesi,Susanna Clarke,,Bloomsbury,en,en,2020,272,9781635575637,,,Fantasy,ebook,not-owned,,,,,,,

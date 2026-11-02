@@ -1,0 +1,55 @@
+<template>
+  <div class="flex flex-wrap gap-2">
+    <bl-button
+      v-for="item in DEFAULT_COLLECTIONS"
+      :key="item"
+      variant="secondary"
+      :pressed="!!selected[item]"
+      @click="$emit('default-collection-change', item)"
+    >
+      <template #prependIcon>
+        <component
+          :is="
+            icons[
+              ((selected[item]
+                ? DEFAULT_COLLECTION_ICONS_FILLED
+                : DEFAULT_COLLECTION_ICONS)[item] ??
+                'IconHeart') as keyof typeof icons
+            ]
+          "
+          :size="18"
+          stroke="1.6"
+        />
+      </template>
+      {{
+        selected[item]
+          ? DEFAULT_COLLECTION_TOGGLE_LABELS[item]?.on
+          : DEFAULT_COLLECTION_TOGGLE_LABELS[item]?.off
+      }}
+    </bl-button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { icons } from '@tabler/icons-vue'
+
+defineProps<{
+  selected: Record<string, boolean>
+}>()
+
+defineEmits<{
+  (e: 'default-collection-change', collectionId: string): void
+}>()
+
+const DEFAULT_COLLECTION_ICONS: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeart',
+  [TBR_COLLECTION_ID]: 'IconBook',
+  [WISHLIST_COLLECTION_ID]: 'IconGift',
+}
+
+const DEFAULT_COLLECTION_ICONS_FILLED: Record<string, keyof typeof icons> = {
+  [FAVORITE_COLLECTION_ID]: 'IconHeartFilled',
+  [TBR_COLLECTION_ID]: 'IconBookFilled',
+  [WISHLIST_COLLECTION_ID]: 'IconGiftFilled',
+}
+</script>

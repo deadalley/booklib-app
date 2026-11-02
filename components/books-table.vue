@@ -55,10 +55,12 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
             href: `/library/books/${book.id}`,
             alt: book.title,
             coverSrc: book.coverSrc,
+            compact: true,
+            class: 'w-fit border-0',
           })
         },
         enableSorting: false,
-        size: 12,
+        size: 8,
       }),
       columnHelper.accessor('title', {
         header: 'Title',
@@ -118,10 +120,10 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
         header: 'ISBN',
         cell,
       }),
-      columnHelper.accessor('progressStatus', {
+      columnHelper.accessor('progress', {
         header: 'Status',
         cell: (info) => {
-          const status = info.getValue()
+          const status = info.getValue()?.status
 
           if (status) {
             return h(BlProgressStatusIcon, {
@@ -131,6 +133,7 @@ const columns = computed<ColumnDef<DataType, unknown>[]>(
             return null
           }
         },
+        size: 14,
       }),
     ].filter((column) => {
       if (!column) {

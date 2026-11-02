@@ -1,89 +1,88 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
-  <AccordionRoot
-    :default-value="books.length ? 'items' : undefined"
-    type="single"
-    :collapsible="true"
-    class="!w-[calc(100% - 255px)]"
-  >
-    <AccordionItem value="items">
-      <AccordionHeader as="div" class="flex w-full">
+  <AccordionRoot v-model="openValue" type="single" :collapsible="true">
+    <AccordionItem value="items" class="border-stroke border-b">
+      <!-- Only the chevron toggles; links and actions are siblings so no
+           interactive element is nested inside the trigger button -->
+      <AccordionHeader as="div" class="flex w-full items-center gap-3 py-3">
         <AccordionTrigger
-          class="accordion-trigger mb-2 flex w-full items-center justify-between rounded-2xl border border-accent px-8 py-2 text-start hover:bg-accent-light"
+          class="group flex shrink-0 cursor-pointer items-center gap-3"
+          :aria-label="`${open ? 'Collapse' : 'Expand'} ${collection.name}`"
         >
-          <div class="flex flex-1 items-center gap-3">
-            <NuxtLink
-              class="flex items-center gap-3"
-              :to="`/library/${collectionType}/${collection.id}`"
-              @click="(event: Event) => event.stopPropagation()"
-            >
-              <component
-                :is="icons[icon]"
-                v-if="icon"
-                stroke="1.5"
-                class="text-main"
-              />
-              <h5 class="hover:text-main">
-                {{ collection.name }}
-              </h5>
-            </NuxtLink>
-            <bl-total-tag>{{
-              books.length
-                ? `${books.length} ${books.length > 1 ? 'books' : 'book'}`
-                : 'Empty'
-            }}</bl-total-tag>
-          </div>
-          <bl-modal
-            v-if="canDelete"
-            size="sm"
-            @confirm="$emit('delete', collection.id, deleteBooks)"
-          >
-            <template #trigger>
-              <IconTrash
-                class="mr-4 cursor-pointer text-accent-dark hover:text-main"
-                :size="ICON_SIZE_SMALL"
-                stroke="1.5"
-                @click="deleteModalOpen = true"
-              />
-            </template>
-            <template #title>
-              Are you sure you want to delete
-              <strong class="contents">{{ collection.name }}</strong>
-              ?
-            </template>
-            <bl-checkbox v-model="deleteBooks" align="left">
-              <template v-if="!deleteBooks">
-                Your books will <strong>not</strong> be deleted.
-              </template>
-              <template v-if="deleteBooks">
-                Your books <strong>will</strong> be deleted.
-              </template>
-              This action cannot be undone.
-            </bl-checkbox>
-            <template #cancel-label> Cancel </template>
-            <template #action-label> Delete </template>
-          </bl-modal>
           <IconChevronDown
-            class="accordion-chevron transition-transform duration-300 ease-in"
-            :size="20"
+            class="text-ink-muted group-hover:text-primary shrink-0 transition-transform duration-300 ease-in group-data-[state=open]:rotate-180"
+            :size="16"
+            stroke="2"
+          />
+          <component
+            :is="icons[icon]"
+            v-if="icon"
+            stroke="1.5"
+            class="text-primary shrink-0"
+            :size="18"
           />
         </AccordionTrigger>
+        <NuxtLink
+          :to="`/library/${collectionType}/${collection.id}`"
+          class="text-ink-primary hover:text-primary min-w-0 truncate font-semibold underline-offset-[3px] hover:underline"
+        >
+          <h6 class="truncate">
+            {{ collection.name }}
+          </h6>
+        </NuxtLink>
+        <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
+        <div class="ml-auto flex shrink-0 items-center gap-4">
+          <NuxtLink
+            v-if="open"
+            :to="`/library/${collectionType}/${collection.id}`"
+            class="text-primary text-xs font-bold tracking-widest uppercase"
+          >
+            See All
+          </NuxtLink>
+          <button
+            v-else
+            type="button"
+            class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
+            @click="open = true"
+          >
+            Expand
+          </button>
+          <bl-delete-collection-modal
+            v-if="canDelete"
+            :name="collection.name"
+            @confirm="
+              (deleteBooks: boolean) =>
+                $emit('delete', collection.id, deleteBooks)
+            "
+          >
+            <template #trigger>
+              <button
+                type="button"
+                class="text-ink-muted hover:text-primary cursor-pointer"
+                :aria-label="`Delete ${collection.name}`"
+              >
+                <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
+              </button>
+            </template>
+          </bl-delete-collection-modal>
+        </div>
       </AccordionHeader>
-      <AccordionContent class="relative mb-10 overflow-x-auto">
+      <AccordionContent class="accordion-content">
         <div
           v-if="books.length"
-          class="accordion-content relative flex size-max gap-x-6 p-4 transition duration-100 ease-out"
+          class="flex size-max gap-x-6 py-4 pl-7 transition duration-100 ease-out"
         >
-          <bl-book-card
+          <div
             v-for="book in sortBooksByOrder(books)"
             :key="book.title"
-            :book="book"
-            class="!w-36"
-          />
+            class="w-40 shrink-0 [&>div]:h-full"
+          >
+            <bl-book-tile :book="book" />
+          </div>
         </div>
         <div
           v-if="!books.length"
-          class="flex w-full items-center justify-center px-4 py-8"
+          class="text-ink-muted flex w-full items-center justify-center px-4 py-8 text-sm"
         >
           There are no books in this collection.
         </div>
@@ -114,7 +113,7 @@ import {
 } from 'radix-vue'
 import type { Book } from '~/types/book'
 
-defineProps<{
+const props = defineProps<{
   collectionType: 'authors' | 'collections'
   collection: T
   books: Book[]
@@ -124,28 +123,33 @@ defineProps<{
 
 defineEmits<{ (e: 'delete', id: T['id'], deleteBooks: boolean): void }>()
 
-const deleteModalOpen = ref(false)
-const deleteBooks = ref(false)
+const open = defineModel<boolean>('open', { default: true })
+
+const openValue = computed({
+  get: () => (open.value ? 'items' : undefined),
+  set: (val) => {
+    open.value = val === 'items'
+  },
+})
+
+const bookCountLabel = computed(() =>
+  props.books.length
+    ? `${props.books.length} ${props.books.length > 1 ? 'books' : 'book'}`
+    : 'Empty',
+)
 </script>
 
 <style scoped>
-.accordion-content {
-  overflow: hidden;
-}
+@reference '../assets/css/main.css';
 
+.accordion-content {
+  @apply overflow-x-auto;
+}
 .accordion-content[data-state='open'] {
   animation: slideDown 300ms ease-out;
 }
-
 .accordion-content[data-state='closed'] {
   animation: slideUp 300ms ease-out;
-}
-
-.accordion-chevron {
-  transition: transform 300ms;
-}
-.accordion-trigger[data-state='open'] > .accordion-chevron {
-  transform: rotate(180deg);
 }
 
 @keyframes slideDown {

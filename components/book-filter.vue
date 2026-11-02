@@ -1,99 +1,84 @@
 <template>
-  <div class="flex flex-col gap-10">
-    <div>
-      <h6 class="mb-4">Author</h6>
+  <div class="filter-sidebar">
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Author</label>
+      </div>
       <bl-raw-autocomplete
         v-model="selectedAuthor"
         with-wrapper
         clearable
-        placeholder="Select author"
+        placeholder="Filter by author..."
         :options="
           authors.map(({ id, name }) => ({ label: name, value: String(id) }))
         "
       />
     </div>
-    <div>
-      <h6 class="mb-4">Collections</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in DEFAULT_COLLECTIONS"
-          :key="item"
-          :value="item"
-          :selected="!!selectedCollections?.includes(item)"
-          @select="onSelectCollection"
-        >
-          <template #icon="iconProps">
-            <component
-              :is="
-                icons[
-                  (selectedCollections?.includes(item)
-                    ? DEFAULT_COLLECTION_ICONS_FILLED
-                    : DEFAULT_COLLECTION_ICONS)[item]!
-                ]
-              "
-              v-bind="iconProps"
-            />
-          </template>
-        </bl-multiselect-option>
-      </bl-multiselect>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Ownership</label>
+      </div>
+      <bl-raw-select
+        v-model="selectedPropertyStatus"
+        with-wrapper
+        placeholder="Any Ownership"
+        :options="propertyStatusOptions"
+      />
     </div>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Reading Status</label>
+      </div>
+      <bl-raw-select
+        v-model="selectedStatus"
+        with-wrapper
+        placeholder="Any Status"
+        :options="statusOptions"
+      />
+    </div>
+
+    <bl-book-filter-section
+      v-model="selectedCollections"
+      title="Collections"
+      :elements="
+        sortCollections(collections).map(({ id, name }) => ({
+          value: id,
+          label: name,
+        }))
+      "
+    />
+
     <bl-book-filter-section
       v-model="selectedPublishers"
       title="Publisher"
       :elements="publishers"
     />
+
     <bl-book-filter-section
       v-model="selectedLanguages"
       title="Language"
       :elements="languages"
     />
+
     <bl-book-filter-section
       v-model="selectedOriginalLanguages"
       title="Original Language"
       :elements="originalLanguages"
     />
+
     <bl-book-filter-section
       v-model="selectedGenres"
-      title="Genres"
+      title="Genre"
       :elements="genres"
-      :genre="true"
     />
-    <div>
-      <h6 class="mb-4">Progress Status</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in Object.values(PROGRESS_STATUS_MAP)"
-          :key="item.id"
-          :value="item.id"
-          :selected="!!selectedStatuses?.includes(item.id)"
-          @select="onSelectStatus"
-        >
-          <template #icon="iconProps">
-            <component :is="icons[item.icon]" v-bind="iconProps" />
-          </template>
-          <template #tooltip>{{ item.description }}</template>
-        </bl-multiselect-option>
-      </bl-multiselect>
-    </div>
-    <div>
-      <h6 class="mb-4">Book Format</h6>
-      <bl-multiselect class="w-full">
-        <bl-multiselect-option
-          v-for="item in Object.values(BOOK_FORMAT_MAP)"
-          :key="item.id"
-          :value="item.id"
-          :selected="!!selectedFormats?.includes(item.id)"
-          @select="onSelectFormat"
-        >
-          <template #icon="iconProps">
-            <component :is="icons[item.icon]" v-bind="iconProps" />
-          </template>
-          <template #tooltip>{{ item.description }}</template>
-        </bl-multiselect-option>
-      </bl-multiselect>
-    </div>
-    <div>
-      <h6>Year</h6>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Year</label>
+        <span class="filter-section-reset">{{ yearLabel }}</span>
+      </div>
       <bl-slider
         v-if="selectedYearRange"
         v-model:values="selectedYearRange"
@@ -102,8 +87,12 @@
         :step="1"
       />
     </div>
-    <div>
-      <h6>Page</h6>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Pages</label>
+        <span class="filter-section-reset">{{ pageLabel }}</span>
+      </div>
       <bl-slider
         v-if="selectedPageRange"
         v-model:values="selectedPageRange"
@@ -112,23 +101,45 @@
         :step="50"
       />
     </div>
-    <div class="flex flex-col gap-2">
-      <bl-button expand variant="secondary" @click="$emit('reset')">
-        Reset filters
-      </bl-button>
-      <bl-button expand @click="$emit('apply')">Apply filters</bl-button>
+
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <label class="filter-section-label">Format</label>
+      </div>
+      <div class="format-grid">
+        <button
+          v-for="item in Object.values(BOOK_FORMAT_MAP)"
+          :key="item.id"
+          type="button"
+          class="format-option"
+          :class="{ selected: !!selectedFormats?.includes(item.id) }"
+          @click="onSelectFormat(item.id)"
+        >
+          <component :is="icons[item.icon]" :size="14" stroke="1.8" />
+          <span>{{ item.description }}</span>
+        </button>
+      </div>
     </div>
+
+    <bl-button expand @click="$emit('apply')">Apply Filters</bl-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
-import type { Book, BookFormat, BookProgressStatus } from '~/types/book'
+import type {
+  Book,
+  BookFormat,
+  BookProgressStatus,
+  BookPropertyStatus,
+} from '~/types/book'
+import type { Collection } from '~/types/collection'
 
 defineProps<{
   authors: Author[]
   books: Book[]
+  collections: Collection[]
 
   publishers: string[]
   languages: string[]
@@ -151,25 +162,62 @@ const selectedOriginalLanguages = defineModel<string[]>(
 )
 const selectedGenres = defineModel<string[]>('selectedGenres')
 const selectedStatuses = defineModel<BookProgressStatus[]>('selectedStatuses')
+const selectedPropertyStatuses = defineModel<BookPropertyStatus[]>(
+  'selectedPropertyStatuses',
+)
 const selectedFormats = defineModel<BookFormat[]>('selectedFormats')
 const selectedYearRange = defineModel<[number, number]>('selectedYearRange')
 const selectedPageRange = defineModel<[number, number]>('selectedPageRange')
 
 defineEmits(['reset', 'apply'])
 
-function onSelectStatus(value: BookProgressStatus) {
-  if (selectedStatuses.value) {
-    const newValues = selectedStatuses.value.filter(
-      (status) => status !== value,
-    )
+const statusOptions = computed(() =>
+  Object.values(PROGRESS_STATUS_MAP).map((status) => ({
+    label: status.description,
+    value: status.id,
+  })),
+)
 
-    if (newValues.length === selectedStatuses.value.length) {
-      selectedStatuses.value = selectedStatuses.value.concat(value)
-    } else {
-      selectedStatuses.value = newValues
-    }
+const selectedStatus = computed<string | undefined>({
+  get() {
+    return selectedStatuses.value?.[0]
+  },
+  set(value) {
+    selectedStatuses.value = value ? [value as BookProgressStatus] : []
+  },
+})
+
+const propertyStatusOptions = computed(() =>
+  Object.values(PROPERTY_STATUS_MAP).map((status) => ({
+    label: status.description,
+    value: status.id,
+  })),
+)
+
+const selectedPropertyStatus = computed<string | undefined>({
+  get() {
+    return selectedPropertyStatuses.value?.[0]
+  },
+  set(value) {
+    selectedPropertyStatuses.value = value ? [value as BookPropertyStatus] : []
+  },
+})
+
+const yearLabel = computed(() => {
+  if (!selectedYearRange.value) {
+    return ''
   }
-}
+
+  return `${selectedYearRange.value[0]} - ${selectedYearRange.value[1]}`
+})
+
+const pageLabel = computed(() => {
+  if (!selectedPageRange.value) {
+    return ''
+  }
+
+  return `${selectedPageRange.value[0]} - ${selectedPageRange.value[1]}`
+})
 
 function onSelectFormat(value: BookFormat) {
   if (selectedFormats.value) {
@@ -179,17 +227,6 @@ function onSelectFormat(value: BookFormat) {
       selectedFormats.value = selectedFormats.value.concat(value)
     } else {
       selectedFormats.value = newValues
-    }
-  }
-}
-
-function onSelectCollection(value: string) {
-  if (selectedCollections.value) {
-    const index = selectedCollections.value.findIndex((v) => v === value)
-    if (index === -1) {
-      selectedCollections.value.push(value)
-    } else {
-      selectedCollections.value.splice(index, 1)
     }
   }
 }

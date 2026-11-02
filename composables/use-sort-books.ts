@@ -1,5 +1,42 @@
-import type { BookFormat, BookProgressStatus, ViewBook } from '~/types/book'
+import type {
+  BookFormat,
+  BookProgressStatus,
+  BookPropertyStatus,
+  ViewBook,
+} from '~/types/book'
 import type { View } from '~/types/ui'
+
+export type BookSortValue =
+  | 'custom'
+  | 'title-asc'
+  | 'title-desc'
+  | 'author-asc'
+  | 'year-desc'
+  | 'rating-desc'
+
+const BOOK_SORT_VALUES: BookSortValue[] = [
+  'custom',
+  'title-asc',
+  'title-desc',
+  'author-asc',
+  'year-desc',
+  'rating-desc',
+]
+
+function compareNullableNumberDesc(
+  val1: number | null | undefined,
+  val2: number | null | undefined,
+) {
+  if (val1 === null || val1 === undefined) {
+    return val2 === null || val2 === undefined ? 0 : 1
+  }
+
+  if (val2 === null || val2 === undefined) {
+    return -1
+  }
+
+  return val2 - val1
+}
 
 export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const router = useRouter()
@@ -21,6 +58,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   )
 
   const currentPage = ref<number>(1)
+  const sortBy = ref<BookSortValue>('custom')
 
   const defaultTableColumns = {
     coverSrc: { label: 'Cover', checked: false },
@@ -32,7 +70,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     originalTitle: { label: 'Original Title', checked: false },
     originalLanguage: { label: 'Original Language', checked: false },
     isbn: { label: 'ISBN', checked: false },
-    progressStatus: { label: 'Progress Status', checked: false },
+    progress: { label: 'Progress Status', checked: false },
   }
 
   const pages = computed(() => getUniqueElements(books.value ?? [], 'pages'))
@@ -56,7 +94,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const maxPages = computed(() => Math.max(...pages.value, 300))
 
   const minYear = computed(() => Math.min(...years.value, 0))
-  const maxYear = computed(() => getCurrentYear())
+  const maxYear = computed(() => Math.max(...years.value, getCurrentYear()))
 
   const selectedCollections = ref<string[]>([])
   const selectedAuthor = ref<string | undefined>()
@@ -65,6 +103,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   const selectedOriginalLanguages = ref<string[]>([])
   const selectedGenres = ref<string[]>([])
   const selectedStatuses = ref<BookProgressStatus[]>([])
+  const selectedPropertyStatuses = ref<BookPropertyStatus[]>([])
   const selectedFormats = ref<BookFormat[]>([])
   const selectedYearRange = ref<[number, number]>([
     minYear.value,
@@ -74,9 +113,10 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     minPages.value,
     maxPages.value,
   ])
+  // Column visibility is a view preference, so it survives filter resets
   const selectedTableColumns = ref<{
     [key in keyof ViewBook]?: { label: string; checked: boolean }
-  }>(defaultTableColumns)
+  }>(structuredClone(defaultTableColumns))
 
   const filterCount = computed(() => {
     let count = 0
@@ -93,65 +133,83 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     if (selectedGenres.value.length) {
       count++
     }
-    if (
-      selectedYearRange.value[0] !== minYear.value ||
-      selectedYearRange.value[1] !== maxYear.value
-    ) {
+    if (selectedCollections.value.length) {
       count++
     }
-    if (
-      selectedPageRange.value[0] !== minPages.value ||
-      selectedPageRange.value[1] !== maxPages.value
-    ) {
+    if (selectedAuthor.value) {
+      count++
+    }
+    if (selectedStatuses.value.length) {
+      count++
+    }
+    if (selectedPropertyStatuses.value.length) {
+      count++
+    }
+    if (selectedFormats.value.length) {
+      count++
+    }
+    if (isYearRangeActive.value) {
+      count++
+    }
+    if (isPageRangeActive.value) {
       count++
     }
 
     return count
   })
 
+  const isYearRangeActive = computed(
+    () =>
+      selectedYearRange.value[0] > minYear.value ||
+      selectedYearRange.value[1] < maxYear.value,
+  )
+  const isPageRangeActive = computed(
+    () =>
+      selectedPageRange.value[0] > minPages.value ||
+      selectedPageRange.value[1] < maxPages.value,
+  )
+
+  // When the bounds change (books added/removed) an untouched range follows
+  // them, so new books outside the old bounds are not silently hidden.
+  watch([minYear, maxYear], ([min, max], [oldMin, oldMax]) => {
+    const [from, to] = selectedYearRange.value
+    selectedYearRange.value = [
+      from <= oldMin ? min : from,
+      to >= oldMax ? max : to,
+    ]
+  })
+  watch([minPages, maxPages], ([min, max], [oldMin, oldMax]) => {
+    const [from, to] = selectedPageRange.value
+    selectedPageRange.value = [
+      from <= oldMin ? min : from,
+      to >= oldMax ? max : to,
+    ]
+  })
+
   const sortedBooks = computed<ViewBook[]>(() => {
-    const hasFilter = !!(
-      selectedPublishers.value.length ||
-      selectedLanguages.value.length ||
-      selectedOriginalLanguages.value.length ||
-      selectedGenres.value.length
+    const allBooks: ViewBook[] = books.value ?? []
+
+    // Categories combine with AND; values within a category combine with OR
+    let combinedFilters = filterElementsBySelectedArray(
+      'publisher',
+      allBooks,
+      selectedPublishers.value,
     )
-
-    let combinedFilters: ViewBook[] = books.value ?? []
-
-    if (hasFilter) {
-      const filterByPublisher = filterElementsBySelectedArray(
-        'publisher',
-        books.value ?? [],
-        selectedPublishers.value,
-      )
-
-      const filterByLanguage = filterElementsBySelectedArray(
-        'language',
-        books.value ?? [],
-        selectedLanguages.value,
-      )
-
-      const filterByOriginalLanguage = filterElementsBySelectedArray(
-        'originalLanguage',
-        books.value ?? [],
-        selectedOriginalLanguages.value,
-      )
-
-      const filterByGenres = filterElementsBySelectedArray(
-        'genres',
-        books.value ?? [],
-        [selectedGenres.value],
-      )
-
-      combinedFilters = mergeAndFilter(
-        'id',
-        filterByPublisher,
-        filterByLanguage,
-        filterByOriginalLanguage,
-        filterByGenres,
-      )
-    }
+    combinedFilters = filterElementsBySelectedArray(
+      'language',
+      combinedFilters,
+      selectedLanguages.value,
+    )
+    combinedFilters = filterElementsBySelectedArray(
+      'originalLanguage',
+      combinedFilters,
+      selectedOriginalLanguages.value,
+    )
+    combinedFilters = filterElementsBySelectedArray(
+      'genres',
+      combinedFilters,
+      selectedGenres.value,
+    )
 
     const filterByTextSearch = filterElementsBySearchParam(
       combinedFilters,
@@ -159,26 +217,36 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
       ['title', 'authorName'],
     )
 
-    const filterByYear = filterElementsByRange(
-      'year',
-      filterByTextSearch,
-      selectedYearRange.value,
-    )
+    const filterByYear = isYearRangeActive.value
+      ? filterElementsByRange(
+          'year',
+          filterByTextSearch,
+          selectedYearRange.value,
+        )
+      : filterByTextSearch
 
-    const filterByPages = filterElementsByRange(
-      'pages',
-      filterByYear,
-      selectedPageRange.value,
-    )
+    const filterByPages = isPageRangeActive.value
+      ? filterElementsByRange('pages', filterByYear, selectedPageRange.value)
+      : filterByYear
 
-    const filterByStatus = filterByPages.filter(({ progressStatus }) => {
+    const filterByStatus = filterByPages.filter(({ progress }) => {
       return (
         !selectedStatuses.value.length ||
-        (progressStatus && selectedStatuses.value.includes(progressStatus))
+        (progress.status && selectedStatuses.value.includes(progress.status))
       )
     })
 
-    const filterByFormat = filterByStatus.filter(({ format }) => {
+    const filterByPropertyStatus = filterByStatus.filter(
+      ({ propertyStatus }) => {
+        return (
+          !selectedPropertyStatuses.value.length ||
+          (propertyStatus &&
+            selectedPropertyStatuses.value.includes(propertyStatus))
+        )
+      },
+    )
+
+    const filterByFormat = filterByPropertyStatus.filter(({ format }) => {
       return (
         !selectedFormats.value.length ||
         (format && selectedFormats.value.includes(format))
@@ -199,20 +267,99 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
         )
       : filterByAuthor
 
-    const sorted = sortBooksByOrder(filterByCollections).map((book) => ({
+    const booksWithCollections = filterByCollections.map((book) => ({
       ...book,
       isFavorite: isBookInDefaultCollection(book, FAVORITE_COLLECTION_ID),
-      isWishlist: isBookInDefaultCollection(book, WISHLIST_COLLECTION_ID),
     }))
 
-    return sorted
-  })
-
-  const filteredBooksByPage = computed(() => {
-    if ((currentPage.value - 1) * BOOKS_PAGE_SIZE >= sortedBooks.value.length) {
-      currentPage.value = 1
+    if (sortBy.value === 'custom') {
+      return sortBooksByOrder(booksWithCollections)
     }
 
+    if (sortBy.value === 'title-asc') {
+      return booksWithCollections.concat().sort((book1, book2) =>
+        book1.title.localeCompare(book2.title, undefined, {
+          numeric: true,
+        }),
+      )
+    }
+
+    if (sortBy.value === 'title-desc') {
+      return booksWithCollections.concat().sort((book1, book2) =>
+        book2.title.localeCompare(book1.title, undefined, {
+          numeric: true,
+        }),
+      )
+    }
+
+    if (sortBy.value === 'author-asc') {
+      return sortBooksByAuthor(booksWithCollections)
+    }
+
+    if (sortBy.value === 'year-desc') {
+      return booksWithCollections.concat().sort((book1, book2) => {
+        const yearCompare = compareNullableNumberDesc(book1.year, book2.year)
+
+        if (!yearCompare) {
+          return book1.title.localeCompare(book2.title, undefined, {
+            numeric: true,
+          })
+        }
+
+        return yearCompare
+      })
+    }
+
+    return booksWithCollections.concat().sort((book1, book2) => {
+      const ratingCompare = compareNullableNumberDesc(
+        book1.rating,
+        book2.rating,
+      )
+
+      if (!ratingCompare) {
+        return book1.title.localeCompare(book2.title, undefined, {
+          numeric: true,
+        })
+      }
+
+      return ratingCompare
+    })
+  })
+
+  const pageCount = computed(() =>
+    Math.max(1, Math.ceil(sortedBooks.value.length / BOOKS_PAGE_SIZE)),
+  )
+
+  // Keep the current page in range when books are removed or filtered out
+  watch(pageCount, (count) => {
+    if (currentPage.value > count) {
+      currentPage.value = count
+    }
+  })
+
+  // A new filter or search starts from the first page
+  watch(
+    [
+      textSearch,
+      selectedCollections,
+      selectedAuthor,
+      selectedPublishers,
+      selectedLanguages,
+      selectedOriginalLanguages,
+      selectedGenres,
+      selectedStatuses,
+      selectedPropertyStatuses,
+      selectedFormats,
+      selectedYearRange,
+      selectedPageRange,
+    ],
+    () => {
+      currentPage.value = 1
+    },
+    { deep: true },
+  )
+
+  const filteredBooksByPage = computed(() => {
     const filteredByCurrentPage = sortedBooks.value.slice(
       (currentPage.value - 1) * BOOKS_PAGE_SIZE,
       currentPage.value * BOOKS_PAGE_SIZE,
@@ -238,26 +385,38 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
   }
 
   function onResetFilter() {
+    selectedCollections.value = []
+    selectedFormats.value = []
     selectedAuthor.value = undefined
     selectedPublishers.value = []
     selectedLanguages.value = []
     selectedOriginalLanguages.value = []
     selectedGenres.value = []
     selectedStatuses.value = []
+    selectedPropertyStatuses.value = []
 
     selectedYearRange.value = [minYear.value, maxYear.value]
     selectedPageRange.value = [minPages.value, maxPages.value]
 
-    selectedTableColumns.value = defaultTableColumns
-
     onCloseSidebar()
+  }
+
+  function onSortByChange(value: string) {
+    if (!BOOK_SORT_VALUES.includes(value as BookSortValue)) {
+      return
+    }
+
+    sortBy.value = value as BookSortValue
+    currentPage.value = 1
   }
 
   return {
     view,
     currentPage,
+    sortBy,
     sortedBooks,
     filteredBooksByPage,
+    pageCount,
     filterCount,
     sidebarContent,
     selectedTableColumns,
@@ -272,6 +431,7 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     selectedOriginalLanguages,
     selectedGenres,
     selectedStatuses,
+    selectedPropertyStatuses,
     selectedFormats,
     selectedYearRange,
     selectedPageRange,
@@ -287,5 +447,6 @@ export const useSortBooks = <T extends ViewBook>(books: Ref<T[] | null>) => {
     onTableSettingsOpen,
     onCloseSidebar,
     onResetFilter,
+    onSortByChange,
   }
 }

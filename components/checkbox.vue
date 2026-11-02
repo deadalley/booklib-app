@@ -1,26 +1,54 @@
 <template>
   <label
-    :for="$attrs.id as string"
-    class="flex size-full cursor-pointer items-center gap-3 text-black"
-    :class="{
-      'justify-center': !$slots['default'],
-      'flex-row-reverse': align === 'left',
-    }"
+    class="checkbox-label"
+    :class="[
+      { 'flex-row-reverse justify-end': align === 'left' },
+      $attrs.class,
+    ]"
   >
-    <span v-if="$slots['default']" class="size-full">
+    <span>
       <slot />
     </span>
     <input
-      v-bind="$attrs"
-      v-model="checked"
+      :id="inputId"
+      :checked="isChecked"
+      :disabled="disabled"
       type="checkbox"
-      class="relative aspect-square size-5 cursor-pointer appearance-none rounded-md border border-accent-dark transition-all checked:border-main checked:bg-main"
+      class="checkbox-input"
+      @change="onChange"
     />
   </label>
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{ align?: 'right' | 'left' }>(), { align: 'right' })
+defineOptions({ inheritAttrs: false })
 
-const checked = defineModel<boolean>()
+const attrs = useAttrs()
+const inputId = computed(() => attrs.id as string | undefined)
+
+const props = withDefaults(
+  defineProps<{
+    align?: 'right' | 'left'
+    /** One-way checked state, for when the parent owns the value. */
+    checked?: boolean
+    disabled?: boolean
+  }>(),
+  { align: 'left', checked: undefined, disabled: false },
+)
+
+const model = defineModel<boolean | undefined>({ default: undefined })
+
+const emit = defineEmits<{
+  (e: 'change', value: boolean): void
+}>()
+
+// A parent-controlled `checked` wins so external resets are always reflected
+const isChecked = computed(() => props.checked ?? model.value ?? false)
+
+function onChange(event: Event) {
+  const value = (event.target as HTMLInputElement).checked
+  model.value = value
+  // Emitted exactly once per user interaction
+  emit('change', value)
+}
 </script>

@@ -1,40 +1,60 @@
 <template>
   <div
-    class="relative flex size-full flex-col gap-4 overflow-x-visible sm:gap-8"
+    class="relative flex size-full flex-col overflow-x-visible"
     v-bind="$attrs"
   >
-    <div class="flex flex-col items-baseline justify-between lg:flex-row">
-      <div class="flex w-full items-center gap-3">
-        <h3>{{ title }}</h3>
-        <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
-        <div class="flex flex-1 justify-end sm:hidden">
-          <IconChevronDown
-            :size="ICON_SIZE_MEDIUM"
-            stroke="1.5"
-            class="cursor-pointer text-accent-darker transition-all duration-300 hover:text-main"
-            :class="{ 'rotate-180': actionsOpen }"
-            @click="actionsOpen = !actionsOpen"
-          />
+    <div class="mb-6 flex flex-col">
+      <div class="flex items-baseline justify-between">
+        <!-- Header -->
+        <div class="flex w-full items-center gap-3">
+          <!-- Title -->
+          <h3>{{ title }}</h3>
+          <!-- Total -->
+          <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
+          <!-- Sidebar trigger button -->
+          <div class="flex flex-1 justify-end sm:hidden">
+            <button
+              type="button"
+              class="text-ink-secondary hover:text-primary cursor-pointer"
+              :aria-expanded="actionsOpen"
+              :aria-label="actionsOpen ? 'Hide actions' : 'Show actions'"
+              @click="actionsOpen = !actionsOpen"
+            >
+              <IconChevronDown
+                :size="ICON_SIZE_MEDIUM"
+                stroke="1.5"
+                class="transition-all duration-300"
+                :class="{ 'rotate-180': actionsOpen }"
+              />
+            </button>
+          </div>
         </div>
+        <slot v-if="!isMobile" name="headerActions" />
       </div>
+      <!-- Actions -->
       <div
-        class="z-10 w-full transition-all duration-300 ease-in-out"
+        class="z-10 flex w-full flex-col gap-3 transition-all duration-300 ease-in-out"
         :class="{
-          'max-h-96 opacity-100': actionsOpen,
-          'max-h-0 opacity-0': !actionsOpen,
+          'max-h-[40rem] opacity-100': actionsOpen,
+          // Collapsed actions must not stay clickable underneath the title
+          'pointer-events-none invisible max-h-0 overflow-hidden opacity-0':
+            !actionsOpen,
+          'mt-4': !isMobile,
         }"
+        :aria-hidden="!actionsOpen"
       >
         <div
-          class="mt-5 flex w-full flex-1 flex-col justify-end gap-3 px-1 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
-          :class="[
-            { 'md:mr-[355px]': !!sidebarContent },
-            actionsOpen ? 'translate-y-0' : '-translate-y-full',
-          ]"
+          class="flex w-full flex-1 flex-col justify-start gap-3 p-0.5 transition-transform duration-300 ease-in-out lg:mt-0 lg:flex-row"
+          :class="actionsOpen ? 'translate-y-0' : '-translate-y-full'"
         >
-          <slot name="navbar" />
+          <div class="flex w-full flex-wrap items-center gap-2">
+            <slot name="navbar" />
+          </div>
         </div>
+        <slot v-if="isMobile" name="headerActions" />
       </div>
     </div>
+    <!-- Content -->
     <slot />
   </div>
   <bl-loading-overlay v-if="loading" />
@@ -50,11 +70,17 @@ defineProps<{
   loading?: boolean
 }>()
 
+const { isMobile } = useBreakpoints()
+
+// Actions start collapsed on phones and expanded elsewhere; follow the
+// breakpoint when the window is resized
 const actionsOpen = ref(true)
 
-onMounted(() => {
-  if (isMobile()) {
-    actionsOpen.value = false
-  }
-})
+watch(
+  isMobile,
+  (mobile) => {
+    actionsOpen.value = !mobile
+  },
+  { immediate: true },
+)
 </script>

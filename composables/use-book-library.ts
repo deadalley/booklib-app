@@ -8,6 +8,7 @@ import type {
   GetOrderedBooksQuerySearchParams,
   LibraryIntegrityResult,
   Database,
+  UpdateAuthorParams,
 } from '~/types/api'
 
 export function useBookLibrary() {
@@ -19,6 +20,13 @@ export function useBookLibrary() {
 
   const getAuthors = async (): Promise<Author[]> => {
     return await service.getAuthors()
+  }
+
+  const updateAuthor = async (
+    id: string,
+    params: UpdateAuthorParams,
+  ): Promise<Author | null> => {
+    return await service.updateAuthor(id, params)
   }
 
   const deleteAuthor = async (
@@ -148,6 +156,10 @@ export function useBookLibrary() {
     return await service.importLibrary(data)
   }
 
+  const importBooks = async (books: Book[]): Promise<number> => {
+    return await service.importBooks(books)
+  }
+
   const exportLibrary = async (): Promise<Database> => {
     return await service.exportLibrary()
   }
@@ -159,6 +171,7 @@ export function useBookLibrary() {
   return {
     // Authors
     getAuthors,
+    updateAuthor,
     deleteAuthor,
     // Books
     getBook,
@@ -190,6 +203,7 @@ export function useBookLibrary() {
     resetLibrary,
     checkLibraryIntegrity,
     importLibrary,
+    importBooks,
     exportLibrary,
     // External API
     searchGoogleBooks,

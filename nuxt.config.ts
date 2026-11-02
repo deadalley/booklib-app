@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -10,15 +12,13 @@ export default defineNuxtConfig({
     },
   },
 
-  css: [
-    '@/assets/css/main.css',
-    '@/assets/css/components.css',
-    '@/assets/css/forms.css',
-    '@/assets/css/table.css',
-  ],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
+  css: ['@/assets/css/main.css'],
 
   modules: [
-    '@nuxtjs/tailwindcss',
     '@formkit/nuxt',
     '@nuxt/image',
     '@nuxt/eslint',
@@ -43,6 +43,7 @@ export default defineNuxtConfig({
       {
         path: '~/components',
         prefix: 'bl',
+        pathPrefix: false,
       },
     ],
   },
@@ -100,10 +101,6 @@ export default defineNuxtConfig({
     mount: 'usr',
   },
 
-  tailwindcss: {
-    exposeConfig: true,
-  },
-
   typescript: {
     strict: true,
   },
@@ -121,7 +118,13 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/library': { redirect: '/library/books' },
+    // Former standalone pages, now part of Data Management
+    '/import': { redirect: '/data-management' },
+    '/export': { redirect: '/data-management' },
   },
+
+  // The styleguide is a development tool; keep it out of production builds
+  ignore: process.env.NODE_ENV === 'production' ? ['pages/styleguide.vue'] : [],
 
   compatibilityDate: '2024-12-15',
 })

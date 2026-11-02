@@ -2,13 +2,21 @@ import type { Book } from '~/types/book'
 import type { AuthorDB, BookDB, CollectionDB, GoalDB } from '~/types/database'
 import type { Collection } from '~/types/collection'
 import { toISOString, fromSimpleDate, now } from './date'
-import type { GoogleBook } from '~/types/google'
 import type { Author } from '~/types/author'
 import type { Goal } from '~/types/goal'
 import { v4 as uuidv4 } from 'uuid'
 
 export function nullify<T>(value: T) {
   return value === undefined || value === null || value === '' ? null : value
+}
+
+/**
+ * Goal entries are stored as ISO timestamps. Entries coming from forms carry a
+ * calendar day (`YYYY-MM-DD`), while entries loaded from the database already
+ * carry an ISO timestamp; `fromSimpleDate` handles both without shifting days.
+ */
+function toEntryDate(createdAt: string | undefined | null) {
+  return createdAt ? fromSimpleDate(createdAt) : now()
 }
 
 export function dbAuthorToAuthor(dbAuthor: AuthorDB): Author {
@@ -38,10 +46,15 @@ export function dbBookToBook(
     summary: dbBook.summary,
     year: dbBook.year,
     genres: dbBook.genres ?? [],
-    progressStatus: dbBook.progress_status,
     format: dbBook.format,
-    startedAt: dbBook.started_at ? dbBook.started_at : null,
-    finishedAt: dbBook.finished_at ? dbBook.finished_at : null,
+    progress: {
+      status: dbBook.progress_status,
+      startedAt: dbBook.started_at ?? null,
+      finishedAt: dbBook.finished_at ?? null,
+      notes: dbBook.notes ?? [],
+      currentPage: dbBook.current_page ?? null,
+    },
+    propertyStatus: dbBook.property_status,
     collections,
     author: dbBook.author_id,
   }
@@ -65,10 +78,13 @@ export function bookToDbBook(
     title: book.title || '',
     year: nullify(book.year),
     genres: book.genres || null,
-    progress_status: book.progressStatus || 'not-owned',
+    notes: book.progress?.notes ?? [],
+    progress_status: book.progress?.status || null,
+    property_status: book.propertyStatus || null,
     format: book.format || null,
-    started_at: nullify(book.startedAt),
-    finished_at: nullify(book.finishedAt),
+    started_at: nullify(book.progress?.startedAt),
+    finished_at: nullify(book.progress?.finishedAt),
+    current_page: nullify(book.progress?.currentPage),
     collections: book.collections ?? [],
   }
 }
@@ -84,15 +100,6 @@ export function dbCollectionToCollection(
     books: books
       .map(({ book_id, order }) => ({ id: book_id, order }))
       .sort(({ order: order1 }, { order: order2 }) => order1 - order2),
-  }
-}
-
-export function collectionToDbCollection(
-  collection: Collection,
-): Omit<CollectionDB, 'created_at' | 'id'> {
-  return {
-    ...(collection.id ? { id: collection.id } : {}),
-    name: collection.name,
   }
 }
 
@@ -157,6 +164,7 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     author: dbGoal.author_id,
     genres: dbGoal.genres,
     completedAt: dbGoal.completed_at,
+    auto: !!dbGoal.auto,
     ...typeAndEntries,
   } as Goal
 }
@@ -165,11 +173,13 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
   if (goal.type === 'books') {
     return {
       type: 'books',
-      entries: (goal.entries || []).map((entry) => ({
-        id: entry.id ?? uuidv4(),
-        book_id: entry.book,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
-      })),
+      entries: (goal.entries || [])
+        .filter((entry) => !entry.auto)
+        .map((entry) => ({
+          id: entry.id ?? uuidv4(),
+          book_id: entry.book,
+          created_at: toEntryDate(entry.createdAt),
+        })),
     }
   } else if (goal.type === 'pages') {
     return {
@@ -177,7 +187,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         pages: entry.pages,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+        created_at: toEntryDate(entry.createdAt),
       })),
     }
   } else if (goal.type === 'hours') {
@@ -186,7 +196,7 @@ function getGoalTypeAndEntriesDb(goal: Goal): Pick<GoalDB, 'type' | 'entries'> {
       entries: (goal.entries || []).map((entry) => ({
         id: entry.id ?? uuidv4(),
         hours: entry.hours,
-        created_at: entry.createdAt ? fromSimpleDate(entry.createdAt) : now(),
+        created_at: toEntryDate(entry.createdAt),
       })),
     }
   }
@@ -207,35 +217,7 @@ export function goalToDbGoal(goal: Goal): GoalDB {
     author_id: goal.author,
     genres: goal.genres || [],
     completed_at: goal.completedAt || null,
+    auto: goal.type === 'books' && !!goal.auto,
     ...getGoalTypeAndEntriesDb(goal),
-  }
-}
-
-export function googleBookToBook(googleBook: GoogleBook): Book {
-  return {
-    id: '0',
-    title: googleBook.volumeInfo.title,
-    coverSrc: googleBook.volumeInfo.imageLinks?.thumbnail || null,
-    createdAt: '',
-    isbn: null,
-    language: googleBook.volumeInfo.language,
-    originalTitle: null,
-    originalLanguage: null,
-    pages: googleBook.volumeInfo.pageCount,
-    publisher: googleBook.volumeInfo.publisher,
-    rating: 0,
-    summary: googleBook.volumeInfo.description,
-    year: (() => {
-      if (!googleBook.volumeInfo.publishedDate) return null
-      const date = new Date(googleBook.volumeInfo.publishedDate)
-      return isNaN(date.getTime()) ? null : date.getFullYear()
-    })(),
-    genres: googleBook.volumeInfo.categories || [],
-    collections: [],
-    progressStatus: null,
-    format: null,
-    startedAt: null,
-    finishedAt: null,
-    author: null,
   }
 }

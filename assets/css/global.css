@@ -1,0 +1,18 @@
+/*
+ * Surfaces. `paper-flat` is the base for every card and tile (flat, hairline
+ * border); `paper` / `paper-sm` add elevation for floating surfaces (menus,
+ * popovers, modals); `paper-dark` is for inset or secondary panels.
+ * Declared with @utility so component styles can `@apply` them.
+ */
+@utility paper {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border shadow-md;
+}
+@utility paper-sm {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border shadow-sm;
+}
+@utility paper-flat {
+  @apply bg-surface-elevated rounded-scholarly border-stroke-subtle border;
+}
+@utility paper-dark {
+  @apply bg-surface rounded-scholarly;
+}

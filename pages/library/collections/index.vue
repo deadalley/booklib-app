@@ -7,45 +7,56 @@
       `${sortedCollections.length} ${sortedCollections.length === 1 ? 'collection' : 'collections'}`
     "
   >
+    <template #headerActions>
+      <bl-button
+        to="/library/collections/new"
+        variant="primary"
+        :expand="isMobile"
+      >
+        <template #appendIcon="iconProps">
+          <IconPlus v-bind="iconProps" />
+          Add collection
+        </template>
+      </bl-button>
+    </template>
     <template #navbar>
       <bl-search-bar @input="onSearch" />
-      <NuxtLink
-        class="flex md:inline-flex lg:order-6"
-        to="/library/collections/new"
+      <bl-view-switch
+        v-model:view="view"
+        :views="['cards', 'expanded-cards']"
+        show-labels
+      />
+      <bl-button
+        v-if="view === 'expanded-cards'"
+        variant="secondary"
+        @click="toggleAll"
       >
-        <bl-button expand>
-          <template #prependIcon="prependIcon">
-            <IconPlus v-bind="prependIcon" />
-          </template>
-          Collection
-        </bl-button>
-      </NuxtLink>
-      <div class="flex justify-end gap-3">
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
+        <template #prependIcon="iconProps">
+          <component
+            :is="allExpanded ? IconMinimize : IconMaximize"
+            v-bind="iconProps"
+          />
+        </template>
+        {{ allExpanded ? 'Collapse' : 'Expand' }}
+      </bl-button>
     </template>
     <bl-empty v-if="collections?.length === 0" icon="IconArchive">
-      <template #label> There are no collections in your library </template>
+      <template #label>There are no collections in your library</template>
       <template #action>
-        <NuxtLink to="/library/collections/new">
-          <bl-button>Create a collection</bl-button>
-        </NuxtLink>
+        <bl-button to="/library/collections/new">Create a collection</bl-button>
       </template>
     </bl-empty>
     <bl-empty
       v-if="collections?.length >= 0 && sortedCollections?.length === 0"
       icon="IconArchive"
     >
-      <template #label> No collections found </template>
+      <template #label>No collections found</template>
     </bl-empty>
     <div
       v-if="view === 'cards'"
-      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-visible overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
-      <bl-collection-card
+      <bl-collection-tile
         v-for="collection in filteredCollectionsByPage"
         :key="collection.id"
         collection-type="collections"
@@ -58,11 +69,13 @@
         <bl-expanded-collection
           v-for="collection in filteredCollectionsByPage"
           :key="collection.id"
+          :open="isOpen(collection.id)"
           collection-type="collections"
           :collection="collection"
           :books="booksByCollectionId[collection.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
           :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
+          @update:open="(value) => (openOverrides[collection.id] = value)"
           @delete="deleteCollection"
         />
       </div>
@@ -85,9 +98,11 @@
 <script setup lang="ts">
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Collection } from '~/types/collection'
-import { IconPlus } from '@tabler/icons-vue'
+import { IconMaximize, IconMinimize, IconPlus } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
+
+const { isMobile } = useBreakpoints()
 
 const {
   getCollections,
@@ -118,6 +133,18 @@ const {
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+const allExpanded = ref(true)
+const openOverrides = ref<Record<string, boolean>>({})
+
+function isOpen(id: Collection['id']) {
+  return openOverrides.value[id] ?? allExpanded.value
+}
+
+function toggleAll() {
+  allExpanded.value = !allExpanded.value
+  openOverrides.value = {}
 }
 
 async function refresh() {

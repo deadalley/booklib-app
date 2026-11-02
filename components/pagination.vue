@@ -1,50 +1,46 @@
 <template>
   <PaginationRoot
     v-model:page="currentPage"
-    show-edges
     :total="totalItemCount"
-    :sibling-count="1"
+    :sibling-count="isMobile ? 0 : 1"
     :default-page="1"
     :items-per-page="itemsPerPage"
+    class="pagination-root"
     @update:page="(args) => $emit('update:page', args)"
   >
-    <PaginationList v-slot="{ items }" class="flex items-center gap-3">
-      <PaginationFirst
-        class="flex size-9 items-center justify-center rounded-full text-accent-darker enabled:hover:text-main disabled:opacity-50"
-      >
+    <p class="pagination-summary">
+      Page {{ currentPageDisplay }} of {{ totalPages }}
+    </p>
+
+    <PaginationList v-slot="{ items }" class="pagination-list">
+      <PaginationFirst class="pagination-arrow max-sm:hidden">
         <IconChevronsLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationFirst>
-      <PaginationPrev
-        class="mr-4 flex size-9 items-center justify-center rounded-full text-accent-darker enabled:hover:text-main disabled:opacity-50"
-      >
+      <PaginationPrev class="pagination-arrow">
         <IconChevronLeft :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationPrev>
       <template v-for="(page, index) in items">
         <PaginationListItem
           v-if="page.type === 'page'"
-          :key="index"
-          class="size-10 rounded-full border border-accent bg-white text-lg text-accent-darker transition-all first:rounded-l-xl last:rounded-r-xl hover:bg-accent-light data-[selected]:border-main data-[selected]:bg-main data-[selected]:text-white"
+          :key="`page-${page.value}`"
+          class="pagination-page-item"
           :value="page.value"
         >
           {{ page.value }}
         </PaginationListItem>
         <PaginationEllipsis
           v-else
-          :key="page.type"
+          :key="`ellipsis-${index}`"
           :index="index"
-          class="flex size-9 items-center justify-center text-accent-darker enabled:hover:text-main"
+          class="pagination-ellipsis"
         >
           &#8230;
         </PaginationEllipsis>
       </template>
-      <PaginationNext
-        class="ml-4 flex size-9 items-center justify-center rounded-full text-accent-darker enabled:hover:text-main disabled:opacity-50"
-      >
+      <PaginationNext class="pagination-arrow pagination-arrow-next">
         <IconChevronRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationNext>
-      <PaginationLast
-        class="flex size-9 items-center justify-center rounded-full text-accent-darker enabled:hover:text-main disabled:opacity-50"
-      >
+      <PaginationLast class="pagination-arrow max-sm:hidden">
         <IconChevronsRight :size="ICON_SIZE_MEDIUM" stroke="1.5" />
       </PaginationLast>
     </PaginationList>
@@ -69,11 +65,23 @@ import {
   PaginationRoot,
 } from 'radix-vue'
 
-defineProps<{ totalItemCount: number; itemsPerPage: number }>()
+// Fewer page buttons on phones so the control fits the screen
+const { isMobile } = useBreakpoints()
+
+const props = defineProps<{ totalItemCount: number; itemsPerPage: number }>()
 
 defineEmits<{
   (e: 'update:page', val: number): void
 }>()
 
 const currentPage = defineModel<number>()
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(props.totalItemCount / props.itemsPerPage)),
+)
+
+const currentPageDisplay = computed(() => {
+  const page = currentPage.value ?? 1
+  return Math.min(page, totalPages.value)
+})
 </script>

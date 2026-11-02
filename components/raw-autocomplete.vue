@@ -1,10 +1,9 @@
 <!-- eslint-disable tailwindcss/no-custom-classname -->
 <template>
   <div
-    class="relative w-full"
+    class="menu-popper-root"
     :class="{
-      'popper-with-wrapper': withWrapper,
-      popper: !withWrapper,
+      'with-wrapper': withWrapper,
       [side]: true,
     }"
   >
@@ -20,15 +19,16 @@
       :reset-search-term-on-blur="false"
     >
       <ComboboxAnchor
+        class="flex items-center gap-2"
         :class="{
-          'flex size-full items-center gap-3': !withWrapper,
           'form-inner': withWrapper,
-          '!border-main': focused,
+          'border-primary!': focused,
         }"
       >
+        <slot name="prepend" />
         <ComboboxInput
           v-bind="$attrs"
-          class="w-full"
+          class="min-w-0 flex-1"
           :class="{ hidden: !(editing && !hidden) }"
           :placeholder="placeholder"
           @focus="onFocus"
@@ -36,20 +36,20 @@
         />
         <IconX
           v-if="clearable && selectValue"
-          class="cursor-pointer"
+          class="shrink-0 cursor-pointer"
           :size="14"
           @click="onClear"
         />
       </ComboboxAnchor>
 
       <div v-if="multiple" class="mt-2 flex flex-wrap gap-1">
-        <bl-removable-tag
+        <bl-genre-tag
           v-for="(item, index) in selectValue"
           :key="item"
-          :value="item"
-          :index="index"
+          :genre="item"
+          size="sm"
           removable
-          @remove="onRemoveItem"
+          @remove="onRemoveItem(index)"
         />
       </div>
 
@@ -58,12 +58,13 @@
         :side="side"
         :avoid-collisions="false"
         position="popper"
-        class="base-container bottom-2 z-50 mt-1 max-h-96 w-full flex-col overflow-y-auto overflow-x-hidden"
+        class="menu-content"
       >
         <ComboboxViewport class="w-full">
           <ComboboxEmpty as-child>
             <div
-              class="w-full rounded-lg px-4 py-[0.35rem] hover:cursor-pointer hover:bg-accent-light"
+              class="autocomplete-empty-item"
+              :class="{ disabled: !canCreateNew }"
               @click="onAddNew"
             >
               {{
@@ -74,19 +75,43 @@
             </div>
           </ComboboxEmpty>
 
+          <template v-if="groups?.length">
+            <template v-for="(group, groupIndex) in groups" :key="groupIndex">
+              <ComboboxLabel v-if="group.label" class="select-group-label">
+                {{ group.label }}
+              </ComboboxLabel>
+              <ComboboxGroup class="flex w-full flex-col gap-1">
+                <ComboboxItem
+                  v-for="(option, index) in group.options"
+                  :key="`${group.label}-${index}`"
+                  class="menu-item"
+                  :value="option.value"
+                >
+                  <slot name="item" :option="option">
+                    <ComboboxLabel>
+                      {{ option.label }}
+                    </ComboboxLabel>
+                  </slot>
+                </ComboboxItem>
+              </ComboboxGroup>
+            </template>
+          </template>
+
           <ComboboxGroup
-            v-if="extendedOptions"
+            v-else-if="extendedOptions"
             class="flex w-full flex-col gap-1"
           >
             <ComboboxItem
               v-for="(option, index) in extendedOptions"
               :key="index"
-              class="relative flex w-full cursor-pointer select-none items-center rounded-lg px-4 py-[0.35rem] text-base data-[disabled]:pointer-events-none data-[highlighted]:bg-accent-light data-[state=checked]:bg-main data-[disabled]:text-accent data-[state=checked]:text-white data-[highlighted]:outline-none"
+              class="menu-item"
               :value="option.value"
             >
-              <ComboboxLabel>
-                {{ option.label }}
-              </ComboboxLabel>
+              <slot name="item" :option="option">
+                <ComboboxLabel>
+                  {{ option.label }}
+                </ComboboxLabel>
+              </slot>
             </ComboboxItem>
           </ComboboxGroup>
         </ComboboxViewport>
@@ -114,6 +139,7 @@ import { IconX } from '@tabler/icons-vue'
 export type AutocompleteProps = {
   dataTestid?: string
   options: SelectOption[]
+  groups?: { label?: string; options: SelectOption[] }[]
   placeholder?: string
   withWrapper?: boolean
   align?: 'start' | 'center' | 'end'
@@ -142,8 +168,16 @@ const focused = defineModel<boolean>('focused')
 const open = ref<boolean>(false)
 const extendedOptions = ref([...props.options])
 
+const mergedOptions = computed<SelectOption[]>(() => {
+  if (props.groups?.length) {
+    return props.groups.flatMap((group) => group.options)
+  }
+
+  return props.options
+})
+
 watch(
-  () => props.options,
+  mergedOptions,
   (options) => {
     extendedOptions.value = [...options]
   },
@@ -197,6 +231,8 @@ function onClear() {
   } else {
     selectValue.value = undefined
   }
+
+  searchTerm.value = undefined
 }
 
 function onRemoveItem(index: number) {
@@ -214,33 +250,3 @@ function getDisplayValue(value: string) {
   return labelByValue.value[value] ?? value
 }
 </script>
-
-<style scoped>
-[data-radix-popper-content-wrapper] {
-  position: absolute !important;
-}
-
-.popper-with-wrapper [data-radix-popper-content-wrapper] {
-  width: 100%;
-}
-
-.popper [data-radix-popper-content-wrapper] {
-  width: calc(100% + 30px);
-}
-
-.popper.bottom [data-radix-popper-content-wrapper] {
-  margin-top: 8px !important;
-}
-
-.popper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 12px !important;
-}
-
-.popper-with-wrapper.top [data-radix-popper-content-wrapper] {
-  padding-bottom: 8px !important;
-}
-
-.select-trigger[data-state='open'] .select-chevron {
-  transform: rotate(180deg);
-}
-</style>

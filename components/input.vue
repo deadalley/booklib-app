@@ -1,30 +1,33 @@
 <template>
   <div v-if="!editing && !hidden" class="form-wrapper flex-1">
-    <label class="form-label">{{ $attrs.label }}</label>
-    <h5 v-if="inputModel && $attrs.type !== 'textarea'">{{ displayValue }}</h5>
-    <p v-if="inputModel && $attrs.type === 'textarea'" class="italic">
+    <label class="form-label">{{ attrs.label }}</label>
+    <h5 v-if="inputModel && attrs.type !== 'textarea'">{{ displayValue }}</h5>
+    <p v-if="inputModel && attrs.type === 'textarea'" class="italic">
       {{ displayValue }}
     </p>
-    <IconCircleOff v-if="!inputModel" :size="14" class="text-accent-dark" />
+    <IconCircleOff v-if="!inputModel" :size="14" class="text-ink-muted" />
   </div>
   <FormKit
+    ref="formkitRef"
     v-model="inputModel"
-    v-bind="$attrs"
+    v-bind="forwardedAttrs"
     :class="{ hidden: !(editing && !hidden) }"
     :classes="{
-      outer: `form-outer flex-1 ${editing ? '' : '!hidden'}`,
-      wrapper: 'form-wrapper flex-1',
-      label: 'form-label ml-4',
-      inner: `form-inner ${focused ? '!border-main' : 'border-accent'}`,
+      outer: outerClass,
+      wrapper: 'form-wrapper',
+      label: 'form-label',
+      inner: `form-inner ${error ? 'form-inner-error' : focused ? 'border-primary' : 'border-stroke'}`,
       input: 'form-input',
+      help: 'form-error',
     }"
+    :help="error || undefined"
     @focus="onFocus"
     @blur="onBlur"
   >
     <!-- @vue-skip -->
-    <template v-for="(_, name) in $slots" #[name]="slotData"
-      ><slot :name="name" v-bind="slotData"
-    /></template>
+    <template v-for="(_, name) in $slots" #[name]="slotData">
+      <slot :name="name" v-bind="slotData" />
+    </template>
     <!-- @vue-skip -->
     <template v-if="clearable && !$slots['suffixIcon']" #suffixIcon>
       <IconX class="cursor-pointer" :size="14" @click="onClear" />
@@ -34,21 +37,37 @@
 
 <script setup lang="ts">
 import { IconCircleOff, IconX } from '@tabler/icons-vue'
+import { normalizeClass } from 'vue'
 
 export type InputProps = {
   editing?: boolean
   hidden?: boolean
   clearable?: boolean
+  autofocus?: boolean
+  error?: string | false | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatter?: (value: any) => string | undefined
 }
 
 const inputModel = defineModel<string | undefined>()
 const focused = ref(false)
+const attrs = useAttrs()
+const formkitRef = ref<{ $el: HTMLElement } | null>(null)
+
+onMounted(() => {
+  if (props.autofocus) {
+    nextTick(() => {
+      formkitRef.value?.$el
+        ?.querySelector<HTMLElement>('input, textarea')
+        ?.focus()
+    })
+  }
+})
 
 const props = withDefaults(defineProps<InputProps>(), {
   editing: true,
   hidden: false,
+  autofocus: false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatter: (value: any) => value && `${value}`,
 })
@@ -56,6 +75,21 @@ const props = withDefaults(defineProps<InputProps>(), {
 const displayValue = computed(() => {
   return props.formatter(inputModel.value)
 })
+
+const forwardedAttrs = computed(() => {
+  // FormKit class sections control the rendered wrappers, so we merge class manually.
+
+  const { class: _class, ...rest } = attrs
+  return rest
+})
+
+const outerClass = computed(() =>
+  normalizeClass([
+    'flex flex-1 flex-col gap-1',
+    props.editing ? '' : '!hidden',
+    attrs.class,
+  ]),
+)
 
 function onFocus() {
   focused.value = true

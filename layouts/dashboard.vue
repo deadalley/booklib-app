@@ -1,66 +1,106 @@
 <template>
-  <div class="relative flex h-screen w-screen flex-col sm:flex-row">
+  <div class="relative flex h-dvh w-full flex-col sm:flex-row">
+    <!-- Fixed app navigation sidebar -->
     <bl-nav-sidebar />
+
+    <!-- Dynamic sidebar -->
     <bl-sidebar
       v-if="!!navItems?.length"
       :open="sidebarOpen"
       title=" "
       @close="sidebarOpen = false"
     >
-      <ul v-if="!!navItems?.length" class="flex flex-col gap-5">
+      <ul v-if="!!navigationItems?.length" class="flex flex-col gap-5">
         <li
-          v-for="item of navItems"
+          v-for="item of navigationItems"
           :key="item.label"
-          class="text-xl hover:text-main"
+          class="hover:text-primary font-display text-2xl"
         >
-          <NuxtLink :to="item.to" @click="sidebarOpen = false">{{
-            item.label
-          }}</NuxtLink>
+          <NuxtLink :to="item.to" @click="sidebarOpen = false">
+            {{ item.label }}
+          </NuxtLink>
         </li>
       </ul>
     </bl-sidebar>
     <main
-      class="relative flex h-0 w-full flex-1 flex-col sm:h-screen sm:flex-[unset]"
+      class="relative flex h-0 w-full min-w-0 flex-1 flex-col sm:h-dvh sm:flex-[unset]"
     >
-      <nav class="flex items-center gap-8 border-b border-b-accent px-8 py-4">
-        <NuxtLink class="flex-1" to="/library/books">
-          <h5>{{ title }}</h5>
-        </NuxtLink>
+      <!-- Header: title or section links centred, actions on the right. A
+           three-column grid keeps the centre from overlapping the search. -->
+      <nav
+        class="border-b-stroke grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b px-4 py-3 sm:px-8"
+      >
+        <span aria-hidden="true" />
 
-        <ul v-if="!!navItems?.length" class="hidden gap-5 sm:flex">
-          <li
-            v-for="item of navItems"
-            :key="item.label"
-            class="text-lg hover:text-main"
+        <div class="flex min-w-0 items-center justify-center">
+          <!-- Page title -->
+          <NuxtLink
+            v-if="!navigationItems?.length"
+            :to="route.path"
+            class="hover:text-primary truncate"
           >
-            <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
-          </li>
-        </ul>
+            <h6 class="truncate">{{ title }}</h6>
+          </NuxtLink>
 
-        <slot name="action-btn" />
+          <!-- Navigation items -->
+          <ul
+            v-if="!!navigationItems?.length"
+            class="hidden items-center justify-center gap-5 lg:flex"
+          >
+            <li
+              v-for="item of navigationItems"
+              :key="item.label"
+              class="hover:text-primary"
+              :class="{
+                'text-primary': item.active,
+              }"
+            >
+              <NuxtLink
+                :to="item.to"
+                :aria-current="item.active ? 'page' : undefined"
+              >
+                <h6>
+                  {{ item.label }}
+                </h6>
+              </NuxtLink>
+            </li>
+          </ul>
+        </div>
 
-        <IconMenu2
-          v-if="!!navItems?.length"
-          :size="ICON_SIZE_MEDIUM"
-          stroke="1.5"
-          class="cursor-pointer hover:text-main sm:hidden"
-          @click="sidebarOpen = !sidebarOpen"
-        />
+        <div class="flex min-w-0 items-center justify-end gap-4">
+          <!-- Global search bar -->
+          <bl-global-search />
+
+          <slot name="action-btn" />
+
+          <button
+            v-if="!!navigationItems?.length"
+            type="button"
+            class="hover:text-primary cursor-pointer lg:hidden"
+            aria-label="Open section menu"
+            @click="sidebarOpen = !sidebarOpen"
+          >
+            <IconMenu2 :size="ICON_SIZE_MEDIUM" stroke="1.5" />
+          </button>
+        </div>
       </nav>
       <div
-        class="relative flex w-full flex-1 flex-col overflow-y-auto p-8 pt-10 sm:p-16"
+        class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-8 pb-10 sm:px-8 sm:py-10 xl:px-12 xl:py-14 2xl:px-16 2xl:py-16"
       >
+        <!-- Demo alert -->
         <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
           <template #icon="iconProps">
             <IconAlertTriangle v-bind="iconProps" />
           </template>
           <template #content>
-            You are running a <b class="contents">demo</b> version of BookLib.
-            Your data is stored in the browser session and will not be available
-            elsewhere. To use BookLib fully, please download the app at
+            You are running a
+            <b class="contents">demo</b>
+            version of BookLib. Your data is stored in the browser session and
+            will not be available elsewhere. To use BookLib fully, please
+            download the app at
             <NuxtLink
               to="https://github.com/deadalley/booklib-app/releases/latest"
-              class="contents font-semibold underline hover:text-main"
+              class="hover:text-primary contents font-semibold underline"
               target="_blank"
             >
               @deadalley/booklib-app
@@ -68,8 +108,12 @@
             .
           </template>
         </bl-warning-badge>
+
+        <!-- Content -->
         <slot />
-        <NuxtLoadingIndicator color="#985858" />
+
+        <!-- Loading indicator -->
+        <NuxtLoadingIndicator :color="loadingColor" />
       </div>
     </main>
   </div>
@@ -77,11 +121,28 @@
 
 <script setup lang="ts">
 import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
+import { activeTheme } from '~/utils/theme'
 
-defineProps<{ title: string; navItems?: { to?: string; label: string }[] }>()
+const route = useRoute()
 
-const sidebarOpen = ref(false)
 const isWebEnvironment = ref<boolean>(
   typeof window !== 'undefined' && !('electronAPI' in window),
 )
+
+const loadingColor = activeTheme.colors.primary.DEFAULT
+
+const props = defineProps<{
+  title: string
+  navItems?: { to?: string; label: string }[]
+}>()
+
+const navigationItems = computed(() => {
+  const path = route.path.split('/').at(-1)
+  return props.navItems?.map((item) => ({
+    ...item,
+    active: route.path.includes(item.to ?? '') || item.to === path,
+  }))
+})
+
+const sidebarOpen = ref(false)
 </script>

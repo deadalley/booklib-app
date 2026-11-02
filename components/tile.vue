@@ -3,7 +3,7 @@
   <AccordionRoot
     v-model="selectedValue"
     :default-value="defaultOpen ? 'tile' : undefined"
-    class="flex flex-col gap-3 rounded-xl border border-accent bg-white px-8 py-6"
+    class="paper-flat px-5 py-5 sm:px-6"
     type="single"
     :collapsible="true"
     :disabled="!$slots['collapsible']"
@@ -12,7 +12,7 @@
       <AccordionHeader
         v-if="$slots['title'] || $slots['actions']"
         as="div"
-        class="accordion-header flex w-full flex-1 items-start justify-between gap-3 sm:items-center"
+        class="accordion-header mb-3 flex w-full flex-1 items-start justify-between gap-3 sm:items-center"
       >
         <div
           class="flex w-full flex-1 items-center justify-between"
@@ -23,7 +23,7 @@
           <AccordionTrigger
             class="flex w-full flex-1 cursor-pointer items-center justify-start"
           >
-            <h5 v-if="$slots['title']" class="truncate">
+            <h5 v-if="$slots['title']" class="stats-title truncate">
               <slot name="title" />
             </h5>
           </AccordionTrigger>
@@ -40,7 +40,7 @@
         </div>
         <AccordionTrigger v-if="$slots['collapsible']">
           <IconChevronDown
-            class="accordion-chevron mt-2 cursor-pointer text-accent-darker transition-transform duration-300 ease-in hover:text-main sm:mt-0"
+            class="accordion-chevron text-ink-secondary hover:text-primary mt-2 cursor-pointer transition-transform duration-300 ease-in sm:mt-0"
             :size="ICON_SIZE_SMALL"
           />
         </AccordionTrigger>

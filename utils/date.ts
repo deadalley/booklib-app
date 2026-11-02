@@ -23,12 +23,41 @@ export function toISOString(date: ConfigType) {
   return dayjs(date).utc().toISOString()
 }
 
-export function fromSimpleDate(date: string) {
-  return dayjs(date, 'YYYY-MM-DD').utc(true).toISOString()
+const SIMPLE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+export function isSimpleDate(value: unknown): value is string {
+  return typeof value === 'string' && SIMPLE_DATE_RE.test(value)
 }
 
+/**
+ * Converts a calendar day (`YYYY-MM-DD`) to the ISO timestamp of that day at
+ * UTC midnight, which is how calendar days are stored. Full ISO timestamps are
+ * passed through unchanged (normalised to UTC) so the function is idempotent.
+ */
+export function fromSimpleDate(date: string) {
+  const parsed = isSimpleDate(date) ? dayjs.utc(date) : dayjs(date).utc()
+  if (!date || !parsed.isValid()) {
+    throw new RangeError(`Invalid date: "${date}"`)
+  }
+  return parsed.toISOString()
+}
+
+/**
+ * Returns the calendar day (`YYYY-MM-DD`) of a stored date. Calendar days are
+ * stored as UTC midnight, so they are read back in UTC. Bare `YYYY-MM-DD`
+ * strings are returned as-is (they must not be shifted by the local offset).
+ */
 export function toSimpleDate(date: ConfigType) {
+  if (isSimpleDate(date)) return date
   return dayjs(date).utc().format('YYYY-MM-DD')
+}
+
+/**
+ * The user's current calendar day (`YYYY-MM-DD`) in their local time zone.
+ * Use this, not `todaySimpleDate()`, for "today" defaults.
+ */
+export function todaySimpleDate() {
+  return dayjs().format('YYYY-MM-DD')
 }
 
 export function toDefaultDate(date: ConfigType) {

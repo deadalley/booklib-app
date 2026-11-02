@@ -1,401 +1,145 @@
 <template>
-  <div
-    v-if="book"
-    class="flex flex-1 flex-col gap-10 2xl:w-9/12 2xl:overflow-auto"
+  <section
+    v-if="book && !editing && !isNew"
+    class="@container mx-auto flex w-full max-w-[90rem] flex-col gap-8"
   >
-    <header class="flex flex-col gap-6">
-      <button
-        class="hidden items-center gap-2 hover:text-main sm:flex"
-        @click="$router.back()"
-      >
-        <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
-        <h6>Back</h6>
-      </button>
-      <div class="flex flex-col items-start justify-between gap-3 md:flex-row">
-        <div class="flex flex-col">
-          <div class="flex w-full flex-1 items-center gap-5 sm:w-[unset]">
-            <h2 class="flex items-end leading-none">
-              {{ isNew ? 'New Book' : book.title }}
-            </h2>
-            <bl-rating
-              :editing="editing"
-              :rating="book.rating ?? 0"
-              :on-commit="onSelectRating"
-            />
-            <div class="flex gap-2">
-              <div v-if="editing" class="flex w-full justify-start gap-2">
-                <bl-button expand variant="secondary" @click="onCancel">
-                  {{ isNew ? 'Cancel' : 'Discard changes' }}
-                </bl-button>
-                <bl-button expand @click="onSaveChanges()">
-                  {{ isNew ? 'Create book' : 'Save changes' }}
-                </bl-button>
-              </div>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <bl-breadcrumbs
+        :items="[
+          { label: 'Library', to: '../../' },
+          { label: primaryCollectionName, to: '../' },
+          { label: book.title },
+        ]"
+      />
 
-              <bl-button
-                v-if="!editing"
-                variant="secondary"
-                @click="onEdit(true)"
-              >
-                <template #prependIcon>
-                  <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
-                </template>
-              </bl-button>
-              <bl-modal
-                v-if="!isNew && !editing"
-                size="sm"
-                @confirm="deleteBook"
-              >
-                <template #trigger>
-                  <bl-button variant="secondary">
-                    <template #prependIcon>
-                      <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
-                    </template>
-                  </bl-button>
-                </template>
-                <template #title>
-                  Are you sure you want to delete
-                  <strong class="contents">{{ book.title }}</strong>
-                  ?
-                </template>
-                This action cannot be undone.
-                <template #cancel-label> Cancel </template>
-                <template #action-label> Delete </template>
-              </bl-modal>
-            </div>
-          </div>
-          <h5 v-if="authorName">{{ authorName }}</h5>
-        </div>
-        <div
-          class="flex w-full flex-col-reverse items-start gap-3 sm:w-[unset] sm:flex-row"
-        >
-          <div v-if="!isNew" class="flex flex-col justify-end leading-tight">
-            <p>Added on</p>
-            <h6 class="w-max">{{ formattedDate }}</h6>
-          </div>
-        </div>
-      </div>
-    </header>
-    <div class="flex flex-1 flex-col gap-10 lg:flex-row lg:overflow-auto">
-      <div class="flex flex-col gap-2">
-        <div class="lg:w-80">
-          <bl-book-image editing :book="book!" :temp-cover-src="tempCoverSrc" />
-        </div>
-        <bl-multiselect class="w-full">
-          <bl-multiselect-option
-            v-for="item in DEFAULT_COLLECTIONS"
-            :key="item"
-            :value="item"
-            :selected="!!selectedDefaultCollections[item]"
-            @select="onDefaultCollectionChange"
-          >
-            <template #icon="iconProps">
-              <component
-                :is="
-                  icons[
-                    (selectedDefaultCollections[item]
-                      ? DEFAULT_COLLECTION_ICONS_FILLED
-                      : DEFAULT_COLLECTION_ICONS)[item]!!
-                  ]
-                "
-                class="text-main"
-                v-bind="iconProps"
-              />
-            </template>
-          </bl-multiselect-option>
-        </bl-multiselect>
-        <div class="mt-4 flex flex-col gap-2">
-          <bl-stepper
-            v-model="currentStep"
-            :interactive="true"
-            :steps="progressSteps"
-            @change="onProgressChange"
-          />
-          <bl-modal v-model="stepperModalOpen" :with-close-button="false">
-            <div class="flex flex-col gap-5">
-              <div class="flex flex-col gap-3">
-                <div class="flex justify-center gap-3">
-                  <div
-                    v-for="status in Object.values(PROGRESS_STATUS_MAP).filter(
-                      ({ step }) => step === currentStep,
-                    )"
-                    :key="status.id"
-                    class="flex size-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-accent p-2 hover:bg-accent-light"
-                    @click="onSelectProgress(status.id)"
-                  >
-                    <component
-                      :is="icons[status.icon]"
-                      :size="32"
-                      class="text-main"
-                    />
-                    {{ status.description }}
-                  </div>
-                </div>
-              </div>
-              <div class="flex flex-col">
-                <bl-checkbox
-                  v-if="currentStep === 2"
-                  v-model="startReadingBookToday"
-                  align="left"
-                >
-                  Update start reading date to today
-                </bl-checkbox>
-                <bl-checkbox
-                  v-if="currentStep === 3"
-                  v-model="finishReadingBookToday"
-                  align="left"
-                >
-                  Update finish reading date to today
-                </bl-checkbox>
-              </div>
-              <bl-button
-                variant="secondary"
-                expand
-                @click="stepperModalOpen = false"
-              >
-                Cancel
-              </bl-button>
-            </div>
-          </bl-modal>
-        </div>
-      </div>
-
-      <ClientOnly>
-        <div
-          class="flex flex-1 flex-col gap-16 overflow-visible overflow-y-auto"
-        >
-          <FormKit
-            v-model="book"
-            type="form"
-            :actions="false"
-            @submit="onSaveChanges"
-          >
-            <section class="book-section max-w-screen-md">
-              <div class="form-section">
-                <div class="form-row">
-                  <bl-input
-                    id="title"
-                    :editing="editing"
-                    name="title"
-                    label="Title"
-                    placeholder="Title"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input-autocomplete
-                    id="author"
-                    :editing="editing"
-                    name="author"
-                    label="Author"
-                    placeholder="Author"
-                    :options="authorSelectOptions"
-                    can-create-new
-                    clearable
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-select
-                    id="format"
-                    type="select"
-                    :editing="editing"
-                    name="format"
-                    label="Format"
-                    placeholder="Format"
-                    :options="
-                      Object.values(BOOK_FORMAT_MAP).map(
-                        ({ id, description, icon }) => ({
-                          label: description,
-                          value: id,
-                          icon,
-                        }),
-                      )
-                    "
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="publisher"
-                    :editing="editing"
-                    name="publisher"
-                    label="Publisher"
-                    placeholder="Publisher"
-                  />
-                  <bl-select
-                    id="language"
-                    type="select"
-                    :editing="editing"
-                    name="language"
-                    label="Language"
-                    placeholder="Language"
-                    :options="languageSelectOptions"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="year"
-                    :editing="editing"
-                    name="year"
-                    label="Year"
-                    placeholder="Year"
-                    type="number"
-                    :min="0"
-                  />
-                  <bl-input
-                    id="pages"
-                    :editing="editing"
-                    name="pages"
-                    label="Pages"
-                    placeholder="Pages"
-                    type="number"
-                    :min="0"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="originalTitle"
-                    :editing="editing"
-                    name="originalTitle"
-                    label="Original Title"
-                    placeholder="Original Title"
-                  />
-                  <bl-select
-                    id="originalLanguage"
-                    :editing="editing"
-                    name="originalLanguage"
-                    label="Original Language"
-                    placeholder="Original Language"
-                    :options="languageSelectOptions"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="isbn"
-                    :editing="editing"
-                    name="isbn"
-                    label="ISBN"
-                    placeholder="ISBN"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="summary"
-                    type="textarea"
-                    :editing="editing"
-                    name="summary"
-                    label="Summary"
-                    placeholder="Summary"
-                    :rows="4"
-                  />
-                </div>
-                <div class="form-row">
-                  <bl-input
-                    id="startedAt"
-                    type="date"
-                    :editing="editing"
-                    name="startedAt"
-                    label="Started reading on"
-                    placeholder="Start date"
-                    clearable
-                    :formatter="dateFormatter"
-                  />
-                  <bl-input
-                    id="finishedAt"
-                    :editing="editing"
-                    type="date"
-                    name="finishedAt"
-                    label="Finished reading on"
-                    placeholder="End date"
-                    clearable
-                    :formatter="dateFormatter"
-                  />
-                </div>
-              </div>
-              <div
-                v-if="!!(book.genres ?? []).length || editing"
-                class="mt-5 flex flex-wrap gap-3"
-              >
-                <bl-genre-tag
-                  v-for="(genre, index) in book.genres"
-                  :key="genre"
-                  :removable="editing"
-                  :editable="editing"
-                  :value="genre"
-                  :index="index"
-                  :on-commit="onSelectGenre"
-                  :on-remove="onRemoveGenre"
-                />
-                <bl-genre-tag
-                  v-if="editing"
-                  key="new"
-                  :removable="editing"
-                  :new-genre="true"
-                  :index="book.genres?.length ?? -1"
-                  :on-commit="onSelectGenre"
-                  :on-remove="onRemoveGenre"
-                />
-              </div>
-            </section>
-
-            <section
-              v-if="!!collectionsDisplayed.length"
-              class="book-section overflow-visible"
+      <div class="flex items-center gap-2">
+        <bl-button variant="secondary" @click="onEdit(true)">
+          <template #prependIcon>
+            <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Edit
+        </bl-button>
+        <bl-modal size="sm" @confirm="deleteBook">
+          <template #trigger>
+            <bl-button
+              variant="secondary"
+              aria-label="Delete book"
+              title="Delete book"
             >
-              <h4>Collections</h4>
-              <div
-                v-if="!collectionsDisplayed.length"
-                class="flex max-w-screen-md flex-col items-center gap-3"
-              >
-                <p>This book is not assigned any collections.</p>
-              </div>
-              <div
-                v-if="!!collectionsDisplayed.length"
-                class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-hidden p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
-              >
-                <bl-collection-card
-                  v-for="collection in collectionsDisplayed"
-                  :key="collection.id"
-                  :collection="collection"
-                  :selectable="managingCollections"
-                  collection-type="collections"
-                  :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
-                  @select="onSelectCollection"
-                />
-              </div>
-            </section>
-
-            <section v-if="!externalBooks.length && false" class="book-section">
-              <template v-if="!externalBooks.length && false">
-                <h4>Find books</h4>
-                <bl-button @click="fetchBooksFromGoogle">Fetch</bl-button>
+              <template #prependIcon>
+                <IconTrash :size="ICON_SIZE_SMALL" stroke="1.5" />
               </template>
-              <div
-                v-if="externalBooks.length"
-                class="relative flex size-max gap-x-6 p-3 transition duration-100 ease-out"
-              >
-                <bl-book-card
-                  v-for="b in externalBooks"
-                  :key="b.title"
-                  :book="b"
-                  class="!w-36"
-                />
-              </div>
-            </section>
-          </FormKit>
-        </div>
-      </ClientOnly>
+            </bl-button>
+          </template>
+          <template #title>
+            Are you sure you want to delete
+            <strong class="contents">{{ book.title }}</strong>
+            ?
+          </template>
+          This action cannot be undone.
+          <template #cancel-label>Cancel</template>
+          <template #action-label>Delete</template>
+        </bl-modal>
+      </div>
     </div>
-  </div>
+
+    <bl-book-page-header
+      :book="book"
+      :authors="authors"
+      :selected-default-collections="selectedDefaultCollections"
+      @default-collection-change="onDefaultCollectionChange"
+    />
+
+    <div class="book-page-body">
+      <div class="book-page-body-progress">
+        <bl-book-page-progress
+          :book="book"
+          @status-select="onSelectProgress"
+          @property-status-select="onPropertyStatusSelect"
+          @log-entry="onLogEntry"
+          @update-note="onUpdateNote"
+          @delete-note="onDeleteNote"
+        />
+      </div>
+
+      <div class="book-page-body-main">
+        <section class="book-page-section">
+          <p class="book-page-section-title">Summary</p>
+          <p class="summary" :class="{ empty: !book.summary }">
+            {{ book.summary || 'No summary yet.' }}
+          </p>
+        </section>
+
+        <section class="book-page-section">
+          <p class="book-page-section-title">Details</p>
+          <bl-book-page-fields :book="book" />
+        </section>
+
+        <section v-if="collectionsDisplayed.length" class="book-page-section">
+          <div class="flex items-center justify-between gap-3">
+            <p class="book-page-section-title">Collections</p>
+            <bl-total-tag>{{ collectionsDisplayed.length }}</bl-total-tag>
+          </div>
+          <div
+            class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4"
+          >
+            <bl-collection-tile
+              v-for="collection in collectionsDisplayed"
+              :key="collection.id"
+              :collection="collection"
+              collection-type="collections"
+              layout="compact"
+              :icon="DEFAULT_COLLECTION_ICONS_FILLED[collection.id]"
+            />
+          </div>
+        </section>
+
+        <section v-if="bookGoals.length" class="book-page-section">
+          <p class="book-page-section-title">Goals</p>
+          <div
+            class="grid h-min w-full grid-cols-1 gap-x-6 gap-y-8 overflow-x-hidden overflow-y-auto pb-1 sm:grid-cols-[repeat(auto-fill,minmax(min(30rem,100%),1fr))]"
+          >
+            <bl-goal-link-tile
+              v-for="goal in bookGoals"
+              :key="goal.id"
+              :goal="goal"
+              :authors="authors"
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <bl-book-page-edit
+    v-else-if="book"
+    v-model:book="book"
+    :is-new="isNew"
+    :temp-cover-src="tempCoverSrc"
+    :selected-default-collections="selectedDefaultCollections"
+    :author-select-options="authorSelectOptions"
+    :language-select-options="languageSelectOptions"
+    :collections-displayed="collectionsDisplayed"
+    :on-select-rating="onSelectRating"
+    :on-select-genre="onSelectGenre"
+    :on-remove-genre="onRemoveGenre"
+    @cancel="onCancel"
+    @save="onSaveChanges"
+    @default-collection-change="onDefaultCollectionChange"
+    @collection-select="onSelectCollection"
+  />
 </template>
 
 <script setup lang="ts">
-import { faker } from '@faker-js/faker'
-import { IconArrowLeft, IconEdit, icons, IconTrash } from '@tabler/icons-vue'
+import { IconEdit, IconTrash } from '@tabler/icons-vue'
+import { v4 as uuidv4 } from 'uuid'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
 import type { Author } from '~/types/author'
-import type { Book, BookProgressStatus } from '~/types/book'
+import type { Book, BookProgressStatus, BookPropertyStatus } from '~/types/book'
 import type { Collection } from '~/types/collection'
-import { toDefaultDate } from '../../../utils/date'
+import type { Goal } from '~/types/goal'
+import { ICON_SIZE_SMALL } from '~/utils/constants'
 
 const {
   getCollections,
@@ -404,33 +148,33 @@ const {
   deleteBook: _deleteBook,
   createBook,
   updateBook,
-  searchGoogleBooks,
+  getGoals,
+  getBooks,
 } = useBookLibrary()
 
 const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const externalBooks = ref<Book[]>([])
 const managingCollections = ref(isNew.value)
 const editing = ref(isNew.value)
-const stepperModalOpen = ref()
 const book = ref<Book>()
 const loading = ref(false)
-const tempCoverSrc = ref(`temp-${faker.string.uuid()}`)
+const tempCoverSrc = ref(`temp-${uuidv4()}`)
 const allCollections = ref<(Collection & { selected: boolean })[]>([])
-const startReadingBookToday = ref(false)
-const finishReadingBookToday = ref(false)
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
+const goals = ref<Goal[]>([])
+const libraryBooks = ref<Book[]>([])
 
 const loadData = async () => {
   collections.value = await getCollections()
   authors.value = await getAuthors()
+  goals.value = await getGoals()
+  // Needed to resolve auto-counted goal entries (finished books)
+  libraryBooks.value = await getBooks()
 }
-
-onMounted(loadData)
 
 const collectionsDisplayed = computed(() => {
   return managingCollections.value
@@ -438,19 +182,29 @@ const collectionsDisplayed = computed(() => {
     : allCollections.value.filter((collection) => collection.selected)
 })
 
-const formattedDate = computed(() => toFullDateCompact(book.value?.createdAt))
+const bookGoals = computed(() => {
+  if (!book.value) return []
 
-const currentStep = ref<number | undefined>(
-  book.value
-    ? PROGRESS_STATUS_MAP[book.value.progressStatus ?? 'not-owned'].step
-    : undefined,
-)
+  // Use the stored book, but with this page's latest progress, so finishing
+  // the book here immediately shows the goals it now counts towards.
+  const books = libraryBooks.value.map((b) =>
+    b.id === book.value?.id ? book.value : b,
+  )
 
-const selectedDefaultCollections = ref<Record<string, boolean>>({
-  [WISHLIST_COLLECTION_ID]: false,
-  [TBR_COLLECTION_ID]: false,
-  [FAVORITE_COLLECTION_ID]: false,
+  return goals.value
+    .map((goal) => resolveGoal(goal, books))
+    .filter(
+      (goal) =>
+        goal.type === 'books' &&
+        goal.entries.some(
+          (entry) => String(entry.book) === String(book.value?.id),
+        ),
+    )
 })
+
+const selectedDefaultCollections = ref<Record<string, boolean>>(
+  Object.fromEntries(DEFAULT_COLLECTIONS.map((id) => [id, false])),
+)
 
 const languageSelectOptions = computed(() =>
   Object.entries(languageOptions).map(([value, label]) => ({ label, value })),
@@ -465,21 +219,13 @@ const authorSelectOptions = computed(() =>
     .sort(({ label: l1 }, { label: l2 }) => l1.localeCompare(l2)),
 )
 
-const progressSteps = computed(() => [
-  book.value?.progressStatus === 'owned'
-    ? PROGRESS_STATUS_MAP.owned
-    : PROGRESS_STATUS_MAP['not-owned'],
-  book.value?.progressStatus === 'paused'
-    ? PROGRESS_STATUS_MAP.paused
-    : PROGRESS_STATUS_MAP.reading,
-  book.value?.progressStatus === 'not-finished'
-    ? PROGRESS_STATUS_MAP['not-finished']
-    : PROGRESS_STATUS_MAP.read,
-])
+const primaryCollectionName = computed(() => {
+  const firstCollection = allCollections.value.find(
+    ({ id, selected }) => selected && !DEFAULT_COLLECTIONS.includes(String(id)),
+  )
 
-const authorName = computed(
-  () => authors.value?.find(({ id }) => book.value?.author === id)?.name,
-)
+  return firstCollection?.name ?? 'Books'
+})
 
 watch(isNew, () => {
   managingCollections.value = isNew.value
@@ -487,11 +233,27 @@ watch(isNew, () => {
 
 async function fetchBook() {
   if (isNew.value) {
-    book.value = {} as Book
+    book.value = {
+      collections: [],
+      genres: [],
+      progress: { status: null, startedAt: null, finishedAt: null, notes: [] },
+    } as unknown as Book
   } else {
     loading.value = true
     const data = await getBook(route.params.id as string)
-    book.value = data || ({} as Book)
+    book.value = data
+      ? {
+          ...data,
+          progress: { ...data.progress, notes: data.progress?.notes ?? [] },
+        }
+      : ({
+          progress: {
+            status: null,
+            startedAt: null,
+            finishedAt: null,
+            notes: [],
+          },
+        } as unknown as Book)
     loading.value = false
   }
 
@@ -500,17 +262,10 @@ async function fetchBook() {
     selected: !!book.value?.collections?.includes(collection.id),
   }))
 
-  currentStep.value =
-    PROGRESS_STATUS_MAP[book.value?.progressStatus ?? 'not-owned'].step
-
-  selectedDefaultCollections.value[FAVORITE_COLLECTION_ID] =
-    !!book.value &&
-    isBookInDefaultCollection(book.value, FAVORITE_COLLECTION_ID)
-  selectedDefaultCollections.value[WISHLIST_COLLECTION_ID] =
-    !!book.value &&
-    isBookInDefaultCollection(book.value, WISHLIST_COLLECTION_ID)
-  selectedDefaultCollections.value[TBR_COLLECTION_ID] =
-    !!book.value && isBookInDefaultCollection(book.value, TBR_COLLECTION_ID)
+  DEFAULT_COLLECTIONS.forEach((id) => {
+    selectedDefaultCollections.value[id] =
+      !!book.value && isBookInDefaultCollection(book.value, id)
+  })
 }
 
 async function deleteBook() {
@@ -527,10 +282,11 @@ function onEdit(value: boolean) {
   }))
 }
 
-function onCancel() {
+async function onCancel() {
   if (isNew.value) {
     navigateTo('/library/books')
   } else {
+    await fetchBook()
     onEdit(false)
   }
 }
@@ -543,8 +299,12 @@ async function onSubmit(bookValues: Book) {
       .map(({ id }) => id),
     tempCoverSrc: isNew.value ? tempCoverSrc.value : undefined,
     genres: book.value?.genres ?? [],
+    progress: {
+      ...bookValues.progress,
+      notes: book.value?.progress.notes ?? bookValues.progress?.notes ?? [],
+      status: book.value?.progress.status ?? bookValues.progress?.status,
+    },
     rating: book.value?.rating,
-    progressStatus: book.value?.progressStatus,
   } as Book
 
   if (isNew.value) {
@@ -566,10 +326,50 @@ async function onSaveChanges() {
   }
 }
 
-async function onSelectRating(rating: number) {
+async function onSelectRating(rating: number | null) {
   if (book.value) {
     book.value.rating = rating
   }
+}
+
+async function onUpdateNote({
+  index,
+  content,
+  page,
+  createdAt,
+}: {
+  index: number
+  content: string
+  page?: number
+  createdAt?: string
+}) {
+  if (!book.value || isNew.value) return
+  if (index < 0 || index >= (book.value.progress.notes ?? []).length) return
+
+  const nextNotes = [...(book.value.progress.notes ?? [])]
+  const currentNote = nextNotes[index]
+  if (!currentNote) return
+
+  nextNotes[index] = {
+    ...currentNote,
+    content,
+    ...(createdAt ? { createdAt } : {}),
+    ...(page ? { page } : { page: undefined }),
+  }
+
+  book.value.progress.notes = nextNotes
+  await onSubmit(book.value)
+}
+
+async function onDeleteNote({ index }: { index: number }) {
+  if (!book.value || isNew.value) return
+
+  const nextNotes = [...(book.value.progress.notes ?? [])]
+  if (index < 0 || index >= nextNotes.length) return
+
+  nextNotes.splice(index, 1)
+  book.value.progress.notes = nextNotes
+  await onSubmit(book.value)
 }
 
 async function onSelectGenre(genre: string | undefined, index: number) {
@@ -610,7 +410,7 @@ async function onDefaultCollectionChange(collectionId: string) {
     selected: selectedDefaultCollections.value[collectionId],
   })
 
-  if (book.value) {
+  if (book.value && !editing.value) {
     book.value.collections = allCollections.value
       .filter(({ selected }) => !!selected)
       .map(({ id }) => id)
@@ -619,60 +419,68 @@ async function onDefaultCollectionChange(collectionId: string) {
   }
 }
 
-async function onSelectProgress(progressStatus: BookProgressStatus) {
-  if (book.value) {
-    book.value.progressStatus = progressStatus
+async function onLogEntry(
+  page: number | undefined,
+  note: string,
+  date: string,
+) {
+  if (!book.value || isNew.value) return
 
-    if (progressStatus === 'reading' && startReadingBookToday.value) {
-      book.value.startedAt = now()
-    } else if (progressStatus === 'read' && finishReadingBookToday.value) {
-      book.value.finishedAt = now()
+  book.value.progress.currentPage = page ?? book.value.progress.currentPage
+  book.value.progress.notes = [
+    ...(book.value.progress.notes ?? []),
+    { id: uuidv4(), createdAt: date, content: note, page },
+  ]
+
+  await onSubmit(book.value)
+}
+
+async function onPropertyStatusSelect(propertyStatus: BookPropertyStatus) {
+  if (book.value) {
+    book.value.propertyStatus = propertyStatus
+
+    if (!isNew.value) {
+      await onSubmit(book.value)
+    }
+  }
+}
+
+async function onSelectProgress(
+  progressStatus: BookProgressStatus | null,
+  startedAt?: string,
+) {
+  if (book.value) {
+    const progress = book.value.progress
+    progress.status = progressStatus
+
+    if (startedAt) {
+      progress.startedAt = startedAt
+    }
+
+    if (progressStatus === 'read' || progressStatus === 'not-finished') {
+      // Record when the book was finished/abandoned so goals and stats count it
+      progress.finishedAt = progress.finishedAt ?? now()
+    } else {
+      // Back to reading (or reset): a previous finish date no longer applies
+      progress.finishedAt = null
+    }
+
+    if (progressStatus === null) {
+      progress.startedAt = null
+      progress.currentPage = null
+    } else if (progressStatus === 'reading' && !startedAt) {
+      progress.startedAt = progress.startedAt ?? now()
     }
 
     if (!isNew.value) {
       await onSubmit(book.value)
     }
   }
-  stepperModalOpen.value = false
-  startReadingBookToday.value = false
-  finishReadingBookToday.value = false
 }
 
-function onProgressChange(progressStatusStep: number) {
-  const progressStatus = progressSteps.value.find(
-    ({ step }) => progressStatusStep === step,
-  )
-
-  if (progressStatus) {
-    if (
-      progressStatus.step === PROGRESS_STATUS_MAP.owned.step ||
-      progressStatus.step === PROGRESS_STATUS_MAP.reading.step ||
-      progressStatus.step === PROGRESS_STATUS_MAP.read.step
-    ) {
-      stepperModalOpen.value = true
-    } else if (book.value) {
-      book.value.progressStatus = progressStatus.id
-
-      if (!isNew.value) {
-        onSubmit(book.value)
-      }
-    }
-  }
-}
-
-function dateFormatter(date: Date | undefined): string | undefined {
-  return date && toDefaultDate(date)
-}
-
-async function fetchBooksFromGoogle() {
-  if (book.value) {
-    const books = await searchGoogleBooks(book.value.title || '')
-    externalBooks.value = books as Book[]
-  }
-}
-
-onMounted(() => {
-  fetchBook()
+onMounted(async () => {
+  await loadData()
+  await fetchBook()
 })
 
 useHead({
@@ -683,3 +491,16 @@ definePageMeta({
   alias: ['/new'],
 })
 </script>
+
+<style scoped>
+@reference '../../../assets/css/main.css';
+
+.summary {
+  @apply text-ink-secondary max-w-[68ch] text-[1.0625rem] leading-[1.65];
+  text-wrap: pretty;
+}
+
+.summary.empty {
+  @apply text-ink-muted;
+}
+</style>

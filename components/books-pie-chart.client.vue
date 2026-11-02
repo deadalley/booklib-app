@@ -8,7 +8,7 @@
   generic="
     T extends keyof Pick<
       Book,
-      'progressStatus' | 'language' | 'originalLanguage' | 'rating'
+      'progress' | 'language' | 'originalLanguage' | 'rating'
     >
   "
 >
@@ -28,9 +28,13 @@ const props = withDefaults(
 )
 
 const series = computed(() => {
+  const getValue = (book: Book) =>
+    props.bookProperty === 'progress'
+      ? book.progress.status
+      : book[props.bookProperty]
   const groupedBooks = groupBy(
-    (book) => String(book[props.bookProperty]),
-    props.books.filter((book) => !!book[props.bookProperty]),
+    (book) => String(getValue(book)),
+    props.books.filter((book) => !!getValue(book)),
   )
   return sortByBookProperty(
     Object.entries(groupedBooks).map(([label, items]) => ({
@@ -53,7 +57,7 @@ function getChartLabel(label: NonNullable<T>): string {
     return languageOptions[label as keyof typeof languageOptions]
   }
 
-  if (props.bookProperty === 'progressStatus') {
+  if (props.bookProperty === 'progress') {
     return PROGRESS_STATUS_MAP[label as keyof typeof PROGRESS_STATUS_MAP]
       .description
   }
@@ -69,7 +73,7 @@ function sortByBookProperty(
       { label: label1, originalLabel: originalLabel1 },
       { label: label2, originalLabel: originalLabel2 },
     ) => {
-      if (props.bookProperty === 'progressStatus') {
+      if (props.bookProperty === 'progress') {
         return (
           PROGRESS_STATUS_MAP[originalLabel1 as BookProgressStatus].step -
           PROGRESS_STATUS_MAP[originalLabel2 as BookProgressStatus].step

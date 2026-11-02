@@ -1,10 +1,12 @@
 import * as Sentry from '@sentry/electron/main'
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, net, protocol } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { handleFileError } from '../utils/error-handling'
 import { logger } from '../utils/logger'
+import { COVER_PROTOCOL, CoverStore } from './covers'
+import { atomicWriteFile } from './fs-utils'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
@@ -50,6 +52,17 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
   : RENDERER_DIST
 
 let win: BrowserWindow | null
+
+// Must run before the app is ready. `standard` + `secure` let <img> tags load
+// booklib-cover:// URLs like any https resource.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: COVER_PROTOCOL,
+    privileges: { standard: true, secure: true, supportFetchAPI: true },
+  },
+])
+
+let coverStore: CoverStore
 
 function createWindow() {
   win = new BrowserWindow({
@@ -137,7 +150,7 @@ function initIpc() {
 
   ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
     try {
-      await fs.writeFile(filePath, data, 'utf-8')
+      await atomicWriteFile(filePath, data)
     } catch (error) {
       logger.error({ error, filePath }, 'File write error')
       Sentry.captureException(error)
@@ -163,6 +176,60 @@ function initIpc() {
       throw handleFileError('ensure', dirPath, error)
     }
   })
+
+  // Book covers
+  ipcMain.handle(
+    'cover:save',
+    async (_, id: string, bytes: Uint8Array, mimeType: string) => {
+      try {
+        return await coverStore.save(id, bytes, mimeType)
+      } catch (error) {
+        logger.error({ error, id, mimeType }, 'Cover save error')
+        Sentry.captureException(error)
+        throw error
+      }
+    },
+  )
+
+  ipcMain.handle('cover:delete', async (_, id: string) => {
+    try {
+      await coverStore.delete(id)
+    } catch (error) {
+      logger.error({ error, id }, 'Cover delete error')
+      Sentry.captureException(error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('cover:rename', async (_, fromId: string, toId: string) => {
+    try {
+      return await coverStore.rename(fromId, toId)
+    } catch (error) {
+      logger.error({ error, fromId, toId }, 'Cover rename error')
+      Sentry.captureException(error)
+      throw error
+    }
+  })
+}
+
+function initCovers() {
+  coverStore = new CoverStore(path.join(app.getPath('userData'), 'covers'))
+
+  protocol.handle(COVER_PROTOCOL, async (request) => {
+    const filePath = coverStore.resolveUrl(request.url)
+    if (!filePath) return new Response(null, { status: 404 })
+
+    try {
+      await fs.access(filePath)
+    } catch {
+      return new Response(null, { status: 404 })
+    }
+    return net.fetch(pathToFileURL(filePath).toString())
+  })
+
+  coverStore.removeStaleTempCovers().catch((error) => {
+    logger.error({ error }, 'Failed to remove stale temp covers')
+  })
 }
 
 app.on('window-all-closed', () => {
@@ -179,6 +246,7 @@ app.on('activate', () => {
 })
 
 app.whenReady().then(() => {
+  initCovers()
   initIpc()
   createWindow()
 })

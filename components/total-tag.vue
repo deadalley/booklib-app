@@ -1,10 +1,9 @@
 <template>
   <div
-    class="relative mt-1 inline-flex items-center gap-2 rounded-xl px-3 py-1 text-sm font-medium"
+    class="total-tag"
     :class="{
-      'border border-accent bg-accent-light text-accent-darker':
-        variant === 'secondary',
-      'border border-main bg-main text-white': variant === 'primary',
+      'total-tag-primary': variant === 'primary',
+      'total-tag-secondary': variant === 'secondary',
     }"
   >
     <slot />

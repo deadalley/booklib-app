@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LowSync } from 'lowdb'
 import type { Database } from '~/types/api'
 import type { Book } from '~/types/book'
@@ -40,21 +40,28 @@ vi.mock('../utils', () => ({
   logger: {
     error: vi.fn(),
   },
+  DEFAULT_COLLECTIONS: ['1', '2', '3'],
   DEFAULT_COLLECTIONS_INIT: [
     { id: '1', name: 'Read' },
     { id: '2', name: 'Currently Reading' },
     { id: '3', name: 'Want to Read' },
   ],
   now: vi.fn(() => '2023-01-01T00:00:00.000Z'),
+  migrateWishlistToCollection: vi.fn(() => false),
+  runMigrations: vi.fn(() => false),
+  CURRENT_DB_VERSION: 1,
   dbBookToBook: vi.fn((book: BookDB, collections: string[]) => ({
     ...book,
     collections,
     author: book.author_id,
     createdAt: book.created_at,
     coverSrc: book.cover_src,
-    progressStatus: book.progress_status,
-    startedAt: book.started_at,
-    finishedAt: book.finished_at,
+    progress: {
+      status: book.progress_status,
+      startedAt: book.started_at,
+      finishedAt: book.finished_at,
+      notes: book.notes ?? [],
+    },
     originalTitle: book.original_title,
     originalLanguage: book.original_language,
   })),
@@ -63,9 +70,9 @@ vi.mock('../utils', () => ({
     author_id: book.author,
     created_at: book.createdAt,
     cover_src: book.coverSrc,
-    progress_status: book.progressStatus,
-    started_at: book.startedAt,
-    finished_at: book.finishedAt,
+    progress_status: book.progress.status,
+    started_at: book.progress.startedAt,
+    finished_at: book.progress.finishedAt,
     original_title: book.originalTitle,
     original_language: book.originalLanguage,
   })),
@@ -145,6 +152,36 @@ describe('StorageService', () => {
       const authors = await service.getAuthors()
       expect(authors).toHaveLength(2)
       expect(authors[0]?.name).toBe('John Doe')
+    })
+
+    it('should update an author name and reassign books', async () => {
+      service['client']!.data.books = [
+        { id: '1', title: 'Book 1', author_id: '1' } as BookDB,
+        { id: '2', title: 'Book 2', author_id: '2' } as BookDB,
+        { id: '3', title: 'Book 3', author_id: null } as BookDB,
+      ]
+
+      const author = await service.updateAuthor('1', {
+        name: 'Renamed',
+        bookIds: ['2', '3'],
+      })
+
+      expect(author?.name).toBe('Renamed')
+      expect(
+        service['client']!.data.books.map(({ id, author_id, title }) => [
+          id,
+          author_id,
+          title,
+        ]),
+      ).toEqual([
+        ['1', null, 'Book 1'],
+        ['2', '1', 'Book 2'],
+        ['3', '1', 'Book 3'],
+      ])
+    })
+
+    it('should return null when updating an unknown author', async () => {
+      expect(await service.updateAuthor('missing', { name: 'x' })).toBeNull()
     })
 
     it('should delete an author and optionally delete books', async () => {
@@ -247,10 +284,15 @@ describe('StorageService', () => {
         summary: null,
         year: null,
         genres: null,
-        progressStatus: 'not-owned',
         format: null,
-        startedAt: null,
-        finishedAt: null,
+        progress: {
+          status: null,
+          startedAt: null,
+          finishedAt: null,
+          notes: [],
+          currentPage: null,
+        },
+        propertyStatus: 'not-owned',
       }
 
       const createdBook = await service.createBook(newBook)
@@ -264,6 +306,110 @@ describe('StorageService', () => {
       expect(result).toBe('1')
       expect(service['client']!.data.books).toHaveLength(0)
       expect(service['client']!.data['collection-book']).toHaveLength(0)
+    })
+  })
+
+  describe('book covers', () => {
+    const electronAPI = {
+      saveCover: vi.fn(async (id: string) => `booklib-cover://${id}.png?v=1`),
+      deleteCover: vi.fn(async () => {}),
+      renameCover: vi.fn(
+        async (_from: string, to: string) => `booklib-cover://${to}.png?v=2`,
+      ),
+    }
+
+    beforeEach(async () => {
+      await service.initialize()
+      // Set after initialize so the localStorage-backed client is still used
+      Object.assign(window, { electronAPI })
+      service['client']!.data = {
+        authors: [],
+        books: [
+          { id: '1', title: 'Covered', cover_src: null } as BookDB,
+          { id: '2', title: 'Other', cover_src: 'old.png' } as BookDB,
+        ],
+        collections: [],
+        'collection-book': [],
+        goals: [],
+      }
+    })
+
+    afterEach(() => {
+      delete (window as Partial<Window>).electronAPI
+    })
+
+    const file = () =>
+      new File([new Uint8Array([1, 2])], 'c.png', { type: 'image/png' })
+
+    it('saves an uploaded cover and stores its URL on the book', async () => {
+      const url = await service.updateBookCover('1', file())
+
+      expect(url).toBe('booklib-cover://1.png?v=1')
+      expect(electronAPI.saveCover).toHaveBeenCalledWith(
+        '1',
+        new Uint8Array([1, 2]),
+        'image/png',
+      )
+      expect(service['client']!.data.books[0]?.cover_src).toBe(url)
+      expect(await service.getBookCover('1')).toBe(url)
+    })
+
+    it('saves a cover for an unsaved book without touching the data', async () => {
+      const url = await service.updateBookCover('temp-x', file())
+
+      expect(url).toBe('booklib-cover://temp-x.png?v=1')
+      expect(service['client']!.data.books.map((b) => b.cover_src)).toEqual([
+        null,
+        'old.png',
+      ])
+    })
+
+    it('moves the temp cover onto a newly created book', async () => {
+      const created = await service.createBook({
+        id: '3',
+        title: 'New',
+        collections: [],
+        progress: {},
+        tempCoverSrc: 'temp-x',
+      } as unknown as Book & { tempCoverSrc: string })
+
+      expect(electronAPI.renameCover).toHaveBeenCalledWith('temp-x', '3')
+      expect(created?.coverSrc).toBe('booklib-cover://3.png?v=2')
+    })
+
+    it('removes a cover and clears the URL', async () => {
+      await service.deleteBookCover('2')
+
+      expect(electronAPI.deleteCover).toHaveBeenCalledWith('2')
+      expect(service['client']!.data.books[1]?.cover_src).toBeNull()
+    })
+
+    it('keeps the stored cover when the edit form sends a stale one', async () => {
+      await service.updateBook('2', { title: 'Renamed', coverSrc: null })
+
+      expect(service['client']!.data.books[1]?.cover_src).toBe('old.png')
+    })
+
+    it('deletes cover files along with books', async () => {
+      await service.deleteBooks(['1', '2'])
+
+      expect(electronAPI.deleteCover).toHaveBeenCalledWith('1')
+      expect(electronAPI.deleteCover).toHaveBeenCalledWith('2')
+    })
+
+    it('still deletes the book when removing the cover file fails', async () => {
+      electronAPI.deleteCover.mockRejectedValueOnce(new Error('locked'))
+
+      expect(await service.deleteBook('2')).toBe('2')
+      expect(service['client']!.data.books).toHaveLength(1)
+    })
+
+    it('rejects uploads outside the desktop app', async () => {
+      delete (window as Partial<Window>).electronAPI
+
+      await expect(service.updateBookCover('1', file())).rejects.toThrow(
+        'desktop app',
+      )
     })
   })
 

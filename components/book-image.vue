@@ -4,11 +4,13 @@
     :disabled="!isWebEnvironment"
   >
     <template #tooltip-content>
-      You are running a <b class="contents">demo</b> version of BookLib.
-      Uploading custom book covers is not available in this version.
+      You are running a
+      <b class="contents">demo</b>
+      version of BookLib. Uploading custom book covers is not available in this
+      version.
     </template>
     <div
-      class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border border-accent lg:flex-1"
+      class="border-stroke relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border lg:flex-1"
       :class="{ 'justify-center': loading }"
       @mouseenter="setHovered(true)"
       @mouseleave="setHovered(false)"
@@ -21,7 +23,7 @@
       />
       <bl-icon-button
         v-if="editing"
-        class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
+        class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-100': hovered,
@@ -34,7 +36,7 @@
       </bl-icon-button>
       <bl-icon-button
         v-if="editing"
-        class="absolute right-0 top-0 z-20 -translate-x-1/2 translate-y-1/2 transition-opacity duration-300"
+        class="absolute top-0 right-0 z-20 -translate-x-1/2 translate-y-1/2 transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-100': hovered,
@@ -47,7 +49,7 @@
       </bl-icon-button>
       <div
         v-if="editing"
-        class="absolute inset-0 z-10 size-full rounded-xl bg-black transition-opacity duration-300"
+        class="bg-surface-inverse absolute inset-0 z-10 size-full rounded-xl transition-opacity duration-300"
         :class="{
           'opacity-0': !hovered,
           'opacity-60': hovered,
@@ -86,12 +88,11 @@ const props = defineProps<{
 }>()
 
 const loading = ref(false)
-const coverSrc = ref<string | null>(
-  props.book.coverSrc && `${props.book.coverSrc}#${randomInt(1000, 1_000_000)}`,
-)
+// Local covers come back with a ?v=<timestamp> query, so a replaced image
+// gets a new URL and is not served from the cache.
+const coverSrc = ref<string | null>(props.book.coverSrc ?? null)
 const hovered = ref(false)
 
-const { handleFileInput } = useFileStorage()
 const { updateBookCover, deleteBookCover } = useBookLibrary()
 
 const isWebEnvironment = ref<boolean>(
@@ -111,28 +112,31 @@ function onUploadClick() {
 async function onFileChange(e: Event) {
   if (isWebEnvironment.value) return
 
-  await handleFileInput(e)
-  loading.value = true
-
-  const file = (e.target as HTMLInputElement)?.files?.[0]
+  const input = e.target as HTMLInputElement
+  const file = input?.files?.[0]
   if (!file) return
 
-  const newCoverSrc = await updateBookCover(
-    props.book.id ?? props.tempCoverSrc!,
-    file,
-  )
-
-  if (newCoverSrc) {
-    coverSrc.value = `${newCoverSrc}#${randomInt(1000, 1_000_000)}`
+  loading.value = true
+  try {
+    const newCoverSrc = await updateBookCover(
+      props.book.id ?? props.tempCoverSrc!,
+      file,
+    )
+    if (newCoverSrc) coverSrc.value = newCoverSrc
+  } finally {
+    loading.value = false
+    // Allow picking the same file again
+    input.value = ''
   }
-  loading.value = false
 }
 
 async function onRemoveClick() {
   loading.value = true
-
-  await deleteBookCover(props.book.id ?? props.tempCoverSrc!)
-  coverSrc.value = null
-  loading.value = false
+  try {
+    await deleteBookCover(props.book.id ?? props.tempCoverSrc!)
+    coverSrc.value = null
+  } finally {
+    loading.value = false
+  }
 }
 </script>

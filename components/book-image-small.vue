@@ -1,39 +1,48 @@
 <template>
   <NuxtLink
     :to="selectable ? undefined : href"
-    class="relative w-full cursor-pointer rounded-xl border border-accent"
+    class="rounded-scholarly border-stroke relative w-full cursor-pointer border"
     :class="{
       'transition-all duration-300 ease-in-out': selectable,
-      'border-main': selectable && !!selected,
+      'border-primary': selectable && !!selected,
     }"
     @click="$emit('click')"
     @mouseenter="setHovered(true)"
     @mouseleave="setHovered(false)"
   >
     <bl-icon-button
-      v-if="selectable && hovered"
-      class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
+      v-if="selectable && showSelectControl"
+      class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
       :class="{
         'opacity-0': !selected,
-        'opacity-100': selected || hovered,
+        'opacity-100': selected || showSelectControl,
       }"
     >
-      <template v-if="hovered" #default="iconProps">
+      <template v-if="showSelectControl" #default="iconProps">
         <IconX v-if="selected" v-bind="iconProps" />
         <IconPlus v-if="!selected" v-bind="iconProps" />
       </template>
     </bl-icon-button>
     <div
       v-if="selectable"
-      class="absolute inset-0 z-10 size-full cursor-pointer rounded-xl bg-black transition-opacity duration-300"
+      class="rounded-scholarly bg-surface-inverse absolute inset-0 z-10 size-full cursor-pointer transition-opacity duration-300"
       :class="{
-        'opacity-0': !selected || !hovered,
-        'opacity-60': hovered,
+        'opacity-0': !selected || !showSelectControl,
+        'opacity-60': showSelectControl,
       }"
     />
 
-    <bl-empty-book-image v-if="!coverSrc" :icon="icon" class="!h-48 !p-5">
-      <template v-if="title" #default>
+    <bl-empty-book-image
+      v-if="!coverSrc"
+      :icon="icon"
+      :icon-size="compact ? 14 : undefined"
+      :class="
+        compact
+          ? '!h-12 !w-8 !p-0.5 [&_span]:hidden [&>div]:!p-0'
+          : '!h-48 !p-5'
+      "
+    >
+      <template v-if="title && !compact" #default>
         {{ title }}
       </template>
       <template v-if="$slots['emptyLabel']" #emptyLabel>
@@ -44,15 +53,20 @@
       v-if="coverSrc"
       :src="coverSrc ?? undefined"
       :alt="alt"
-      class="h-auto w-full rounded-xl object-cover object-top md:h-48"
-    >
-    </NuxtImg>
+      class="object-cover object-top"
+      :class="
+        compact
+          ? 'rounded-scholarly h-12 w-8'
+          : 'h-auto w-full rounded-xl md:h-48'
+      "
+    ></NuxtImg>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import type { icons } from '@tabler/icons-vue'
 import { IconX, IconPlus } from '@tabler/icons-vue'
+import { useMediaQuery } from '@vueuse/core'
 
 defineProps<{
   href?: string
@@ -62,11 +76,15 @@ defineProps<{
   selectable?: boolean
   selected?: boolean
   icon?: keyof typeof icons
+  compact?: boolean
 }>()
 
 defineEmits(['click'])
 
 const hovered = ref(false)
+// Touch screens have no hover, so the selection control is always shown there
+const noHover = useMediaQuery('(hover: none)')
+const showSelectControl = computed(() => hovered.value || noHover.value)
 
 function setHovered(value: boolean) {
   hovered.value = value

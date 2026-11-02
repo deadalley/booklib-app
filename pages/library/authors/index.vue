@@ -9,27 +9,39 @@
   >
     <template #navbar>
       <bl-search-bar @input="onSearch" />
-      <div class="flex justify-end gap-3">
-        <bl-view-switch
-          v-model:view="view"
-          :views="['cards', 'expanded-cards']"
-        />
-      </div>
+      <bl-view-switch
+        v-model:view="view"
+        :views="['cards', 'expanded-cards']"
+        show-labels
+      />
+      <bl-button
+        v-if="view === 'expanded-cards'"
+        variant="secondary"
+        @click="toggleAll"
+      >
+        <template #prependIcon="iconProps">
+          <component
+            :is="allExpanded ? IconMinimize : IconMaximize"
+            v-bind="iconProps"
+          />
+        </template>
+        {{ allExpanded ? 'Collapse' : 'Expand' }}
+      </bl-button>
     </template>
     <bl-empty v-if="authors?.length === 0" icon="IconFeather">
-      <template #label> There are no authors in your library </template>
+      <template #label>There are no authors in your library</template>
     </bl-empty>
     <bl-empty
       v-if="authors?.length >= 0 && sortedAuthors?.length === 0"
       icon="IconFeather"
     >
-      <template #label> No authors found </template>
+      <template #label>No authors found</template>
     </bl-empty>
     <div
       v-if="view === 'cards'"
-      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-y-auto overflow-x-visible p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
+      class="grid h-min w-full grid-cols-1 flex-wrap gap-x-6 gap-y-8 overflow-x-visible overflow-y-auto p-3 md:grid-cols-[repeat(auto-fill,minmax(9rem,1fr))]"
     >
-      <bl-collection-card
+      <bl-collection-tile
         v-for="author in filteredAuthorsByPage"
         :key="author.id"
         collection-type="authors"
@@ -42,11 +54,13 @@
         <bl-expanded-collection
           v-for="author in filteredAuthorsByPage"
           :key="author.id"
+          :open="isOpen(author.id)"
           collection-type="authors"
           :collection="author"
           :books="booksByAuthorId[author.id] ?? []"
           :icon="DEFAULT_COLLECTION_ICONS_FILLED[author.id]"
-          can-delete
+          :can-delete="false"
+          @update:open="(value) => (openOverrides[author.id] = value)"
           @delete="deleteAuthor"
         />
       </div>
@@ -67,6 +81,7 @@
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Book } from '~/types/book'
 import type { Author } from '~/types/author'
+import { IconMaximize, IconMinimize } from '@tabler/icons-vue'
 
 const { getBooks, getAuthors, deleteAuthor: _deleteAuthor } = useBookLibrary()
 
@@ -89,6 +104,18 @@ const { view, currentPage, sortedAuthors, filteredAuthorsByPage, onSearch } =
 
 function onPageChange(page: number) {
   currentPage.value = page
+}
+
+const allExpanded = ref(true)
+const openOverrides = ref<Record<string, boolean>>({})
+
+function isOpen(id: Author['id']) {
+  return openOverrides.value[id] ?? allExpanded.value
+}
+
+function toggleAll() {
+  allExpanded.value = !allExpanded.value
+  openOverrides.value = {}
 }
 
 async function refresh() {
