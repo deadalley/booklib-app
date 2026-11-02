@@ -120,10 +120,14 @@
 </template>
 
 <script setup lang="ts">
-import { IconMenu2 } from '@tabler/icons-vue'
+import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
 import { activeTheme } from '~/utils/theme'
 
 const route = useRoute()
+
+const isWebEnvironment = ref<boolean>(
+  typeof window !== 'undefined' && !('electronAPI' in window),
+)
 
 const loadingColor = activeTheme.colors.primary.DEFAULT
 
