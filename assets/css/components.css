@@ -601,3 +601,11 @@
 .stats-sub {
   @apply text-ink-muted text-[0.8125rem] font-medium;
 }
+
+/* Home */
+.home-card {
+  @apply bg-surface-elevated border-stroke-subtle flex min-w-0 flex-col gap-4 rounded-xl border px-6 py-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)];
+}
+.home-icon-well {
+  @apply bg-primary-50 text-primary rounded-scholarly grid size-9 flex-none place-items-center;
+}
