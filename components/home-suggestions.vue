@@ -183,7 +183,7 @@ watchEffect((onCleanup) => {
   @apply from-primary-50 bg-linear-to-r to-transparent to-70%;
 }
 .cover {
-  @apply relative aspect-[2/3] w-36 overflow-hidden rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.08)];
+  @apply relative aspect-[2/3] w-36 overflow-hidden rounded-lg;
 }
 .cover > :first-child {
   @apply rounded-none;
