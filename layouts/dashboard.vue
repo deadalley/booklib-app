@@ -88,14 +88,16 @@
         class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-8 pb-10 sm:px-8 sm:py-10 xl:px-12 xl:py-14 2xl:px-16 2xl:py-16"
       >
         <!-- Demo alert -->
-        <!-- <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
+        <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
           <template #icon="iconProps">
             <IconAlertTriangle v-bind="iconProps" />
           </template>
           <template #content>
-            You are running a <b class="contents">demo</b> version of BookLib.
-            Your data is stored in the browser session and will not be available
-            elsewhere. To use BookLib fully, please download the app at
+            You are running a
+            <b class="contents">demo</b>
+            version of BookLib. Your data is stored in the browser session and
+            will not be available elsewhere. To use BookLib fully, please
+            download the app at
             <NuxtLink
               to="https://github.com/deadalley/booklib-app/releases/latest"
               class="hover:text-primary contents font-semibold underline"
@@ -105,7 +107,7 @@
             </NuxtLink>
             .
           </template>
-        </bl-warning-badge> -->
+        </bl-warning-badge>
 
         <!-- Content -->
         <slot />
