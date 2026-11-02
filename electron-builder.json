@@ -80,5 +80,6 @@
     "repo": "booklib-app"
   },
   "npmRebuild": false,
-  "copyright": "Copyright © 2025 deadalley"
+  "copyright": "Copyright © 2025 deadalley",
+  "afterPack": "./scripts/linux-sandbox-wrapper.cjs"
 }

@@ -150,6 +150,14 @@ Each command builds the app first (`pnpm build:electron`), and the installers
 are written to `dist-packaged/`. To build for Windows from Linux without
 Docker, install Wine first (`wine64` and `wine32`).
 
+On Linux, the app is started through a small launcher
+([`scripts/linux-sandbox-wrapper.cjs`](scripts/linux-sandbox-wrapper.cjs)).
+Some distributions, such as Ubuntu 24.04, block the user namespaces that
+Chromium's sandbox needs, and an AppImage can't use the setuid fallback. On
+those systems the launcher starts the AppImage with `--no-sandbox` instead of
+letting it crash. The `.deb` keeps the full sandbox, so prefer it on
+Debian/Ubuntu.
+
 #### Android App (Capacitor)
 
 The Android app wraps the same Nuxt app in a native WebView with
