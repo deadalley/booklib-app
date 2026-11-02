@@ -4,6 +4,9 @@ name: '[🚀] Release'
 # and Android apps and attaches the install files to that release.
 # Run it manually with an existing tag to rebuild the files of a release.
 on:
+  # TEMPORARY: verify the packaging jobs on this branch (no release is touched)
+  push:
+    branches: [claude/exciting-hypatia-iyjaaz]
   release:
     types: [published]
   workflow_dispatch:
