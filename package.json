@@ -24,16 +24,22 @@
     "test:e2e:codegen": "concurrently 'pnpm test:start-app' 'playwright codegen'",
     "test:e2e:report": "playwright show-report",
     "coverage": "vitest run --coverage",
-    "electron:dir": "electron-builder --dir",
-    "electron:build": "electron-builder",
-    "electron:build:win": "electron-builder --win",
-    "electron:build:win:docker": "./scripts/build-windows.sh",
-    "electron:build:linux": "electron-builder --linux",
+    "electron:dir": "pnpm build:electron && electron-builder --dir",
+    "electron:build": "pnpm build:electron && electron-builder",
+    "electron:build:win": "pnpm build:electron && electron-builder --win",
+    "electron:build:win:docker": "./scripts/docker-wine.sh",
+    "electron:build:linux": "pnpm build:electron && electron-builder --linux",
     "test:e2e:mobile": "playwright test --project=mobile-chrome",
     "test:e2e:all": "playwright test",
-    "test:tz": "cross-env TZ=America/Los_Angeles vitest run utils services && cross-env TZ=Pacific/Auckland vitest run utils services"
+    "test:tz": "cross-env TZ=America/Los_Angeles vitest run utils services && cross-env TZ=Pacific/Auckland vitest run utils services",
+    "build:android": "cross-env BUILD_TARGET=capacitor ELECTRON_ENABLED=false nuxt generate && cap sync android",
+    "android:open": "cap open android",
+    "android:build": "pnpm build:android && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
+    "@capacitor/android": "~8.5.3",
+    "@capacitor/core": "~8.5.3",
+    "@capacitor/filesystem": "8.1.5",
     "@formkit/nuxt": "^1.6.9",
     "@nuxt/eslint": "^1.12.1",
     "@nuxt/image": "^2.0.0",
@@ -45,7 +51,6 @@
     "color": "^5.0.3",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
-    "electron-squirrel-startup": "^1.0.1",
     "import-in-the-middle": "^2.0.0",
     "lowdb": "^7.0.1",
     "nuxt": "^4.2.2",
@@ -61,12 +66,12 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "~8.5.3",
     "@faker-js/faker": "^10.1.0",
     "@nuxt/eslint-config": "^1.12.1",
     "@nuxt/test-utils": "^3.21.0",
-    "@tailwindcss/vite": "^4.2.2",
-    "tailwindcss": "^4.2.2",
     "@playwright/test": "^1.57.0",
+    "@tailwindcss/vite": "^4.2.2",
     "@types/color": "^4.2.0",
     "@types/node": "^25.0.2",
     "@types/papaparse": "^5.5.2",
@@ -86,6 +91,7 @@
     "playwright-core": "^1.57.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "unplugin-auto-import": "^20.3.0",
     "unplugin-vue-components": "^30.0.0",
@@ -100,7 +106,8 @@
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
     "overrides": {
-      "@vercel/nft": "^0.27.4"
+      "@vercel/nft": "^0.27.4",
+      "@electron/node-gyp": "10.2.0-electron.1"
     }
   }
 }

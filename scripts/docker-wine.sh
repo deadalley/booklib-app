@@ -25,13 +25,11 @@ docker run --rm -ti \
  -v ~/.cache/pnpm:/root/.cache/pnpm \
  electronuserland/builder:wine \
  /bin/bash -c "cd /project && \
-   echo 'Upgrading pnpm to latest version...' && \
-   npm install -g pnpm@latest && \
+   echo 'Enabling the pnpm version pinned in package.json...' && \
+   corepack enable && \
    echo 'Installing dependencies...' && \
    pnpm install --frozen-lockfile --network-timeout 300000 && \
-   echo 'Building Electron app...' && \
-   pnpm build:electron && \
-   echo 'Building Windows executable (skipping native rebuilds)...' && \
-   pnpm electron:build:win --config.nativeRebuilder=legacy"
+   echo 'Building Windows installer...' && \
+   pnpm electron:build:win"
 
 echo "Windows build completed successfully!"

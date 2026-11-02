@@ -10,16 +10,19 @@ import { atomicWriteFile } from './fs-utils'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN || '',
-  environment: process.env.NODE_ENV || 'development',
-  beforeSend(event) {
-    if (isDevelopment) {
-      logger.debug({ event }, 'Sentry main process event')
-    }
-    return event
-  },
-})
+// Only report errors when a DSN is configured (e.g. in release builds).
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    beforeSend(event) {
+      if (isDevelopment) {
+        logger.debug({ event }, 'Sentry main process event')
+      }
+      return event
+    },
+  })
+}
 
 process.on('uncaughtException', (error) => {
   logger.error({ error }, 'Uncaught Exception in main process')
@@ -66,11 +69,19 @@ let coverStore: CoverStore
 
 function createWindow() {
   win = new BrowserWindow({
+    width: 1280,
+    height: 832,
+    minWidth: 400,
+    minHeight: 500,
+    title: 'BookLib',
+    icon: path.join(process.env.VITE_PUBLIC || RENDERER_DIST, 'icon.png'),
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(MAIN_DIST, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: process.env.NODE_ENV === 'production', // Enable webSecurity in production
+      // NODE_ENV is not set in packaged apps, so rely on app.isPackaged
+      webSecurity: app.isPackaged,
     },
     show: false, // Don't show until ready to avoid flash
   })
