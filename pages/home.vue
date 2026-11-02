@@ -1,6 +1,10 @@
 <template>
   <NuxtLayout name="dashboard" title="Home">
-    <div v-if="isEmpty" class="mx-auto flex w-full max-w-[90rem] flex-col">
+    <div v-if="!loaded" class="grid place-items-center py-24">
+      <bl-loading />
+    </div>
+
+    <div v-else-if="isEmpty" class="mx-auto flex w-full max-w-[90rem] flex-col">
       <div class="mb-8 flex flex-col gap-1">
         <span class="section-label text-primary">Home</span>
         <h3>Welcome to your new library</h3>
@@ -42,128 +46,273 @@
         </bl-button>
       </div>
     </div>
-    <div
-      v-if="!isEmpty"
-      class="mx-auto flex w-full max-w-[90rem] flex-col gap-8"
-    >
-      <div class="flex flex-col gap-1">
-        <span class="section-label text-primary">Home</span>
-        <h3>Welcome to your library</h3>
-      </div>
-      <div class="flex w-full flex-col gap-4 md:flex-row">
-        <bl-section-tile icon="IconBooks" href="/library/books">
-          <template #label>Books</template>
-          <template #total>
-            {{ books?.length }}
-            {{ (books?.length ?? 0) > 1 ? 'books' : 'book' }}
-          </template>
-          <bl-button
-            v-if="!books?.length"
-            to="/library/books/new"
-            size="sm"
-            class="max-sm:hidden"
-          >
-            Create a book
-          </bl-button>
-        </bl-section-tile>
-        <bl-section-tile icon="IconArchive" href="/library/collections">
-          <template #label>Collections</template>
-          <template #total>
-            {{ collections?.length }}
-            {{ (collections?.length ?? 0) > 1 ? 'collections' : 'collection' }}
-          </template>
-          <bl-button
-            v-if="!collections?.length"
-            to="/library/collections/new"
-            size="sm"
-            class="max-sm:hidden"
-          >
-            Create a collection
-          </bl-button>
-        </bl-section-tile>
-        <bl-section-tile icon="IconFeather" href="/library/authors">
-          <template #label>Authors</template>
-          <template #total>
-            <template v-if="authors?.length">
-              {{ authors?.length }}
-              {{ (authors?.length ?? 0) > 1 ? 'authors' : 'author' }}
-            </template>
-            <template v-if="!authors?.length">No authors</template>
-          </template>
-        </bl-section-tile>
-      </div>
-      <div v-if="latestBooks?.length" class="flex min-w-0 flex-col gap-8">
-        <bl-tile>
-          <template #title>Last books added to library</template>
-          <div class="relative min-w-0 overflow-x-auto overflow-y-hidden pb-1">
-            <div class="flex w-max items-stretch gap-6">
-              <bl-book-tile
-                v-for="book in latestBooks"
-                :key="book.id"
-                :book="book"
-                class="w-36 shrink-0"
-              />
-            </div>
-          </div>
-        </bl-tile>
-      </div>
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4">
-          <bl-book-stats-tile :books="books ?? []" />
+
+    <div v-else class="home">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-primary text-xs font-bold tracking-[0.18em] uppercase">
+            {{ dateLabel }}
+          </p>
+          <h3 class="text-ink-primary">{{ greeting }}</h3>
         </div>
-        <div
-          v-if="books.length || authors.length"
-          class="col-span-12 flex flex-col md:col-span-6 2xl:col-span-4"
-        >
-          <bl-book-suggestions-tile
-            :books="books"
-            :authors="authors"
-            :reload-books="refresh"
-          />
-        </div>
-        <div class="col-span-12 flex flex-col gap-4 2xl:col-span-4">
-          <bl-goal-suggestion-tile />
-        </div>
+        <bl-button to="/library/books/new">
+          <template #prependIcon="prependIcon">
+            <IconPlus v-bind="prependIcon" />
+          </template>
+          Add book
+        </bl-button>
+      </div>
+
+      <div class="top">
+        <bl-home-suggestions
+          :items="suggestions"
+          :busy="busy"
+          @act="onAct"
+          @dismiss="dismiss"
+        />
+        <bl-home-library-links :books="books" :collections="collections" />
+      </div>
+
+      <div class="main">
+        <bl-home-continue-reading
+          class="span-7"
+          :books="reading"
+          :authors="authors"
+        />
+        <bl-home-goals class="span-5" :goals="activeGoals" />
+        <bl-home-year-stats :books="books" />
+        <bl-home-recent-books
+          :books="latest"
+          :authors="authors"
+          :today="today"
+        />
       </div>
     </div>
+
+    <Transition name="fade">
+      <div v-if="toast" class="toast" role="status">
+        <IconCheck :size="16" stroke="2.2" />
+        {{ toast }}
+      </div>
+    </Transition>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { IconPlus, IconUpload } from '@tabler/icons-vue'
+import { IconCheck, IconPlus, IconUpload } from '@tabler/icons-vue'
+import { useLocalStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
+import { v4 as uuidv4 } from 'uuid'
 import type { Author } from '~/types/author'
-import type { Book, ViewBook } from '~/types/book'
+import type { Book } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import type { Goal } from '~/types/goal'
 import { useBookLibrary } from '~/composables/use-book-library'
 import { getAssetPath } from '~/utils/assets'
+import { now, todaySimpleDate, toSimpleDate } from '~/utils/date'
+import { getGoalStatus, resolveGoal, stripAutoEntries } from '~/utils/goal'
+import {
+  activeDismissals,
+  buildSuggestions,
+  getBookPercentage,
+  getGreeting,
+  snoozeUntil,
+  type Suggestion,
+} from '~/utils/suggestions'
 
-const { isLibraryEmpty, getAuthors, getBooks, getCollections, getLatestBooks } =
-  useBookLibrary()
+const TOAST_MS = 2600
 
-const isEmpty = ref<boolean>(false)
+const {
+  isLibraryEmpty,
+  getAuthors,
+  getBooks,
+  getCollections,
+  getGoals,
+  createGoal,
+  updateBook,
+} = useBookLibrary()
+
+const loaded = ref(false)
+const isEmpty = ref(false)
 const authors = ref<Author[]>([])
 const books = ref<Book[]>([])
 const collections = ref<Collection[]>([])
-const latestBooks = ref<ViewBook[]>([])
+const goals = ref<Goal[]>([])
 
-const loadData = async () => {
-  isEmpty.value = await isLibraryEmpty()
-  authors.value = await getAuthors()
-  books.value = await getBooks()
-  collections.value = await getCollections()
-  const allLatestBooks = await getLatestBooks()
-  const authorsById = new Map(authors.value.map((a) => [a.id, a.name]))
-  latestBooks.value = allLatestBooks.map((book) => ({
-    ...book,
-    authorName: book.author ? authorsById.get(book.author) : undefined,
-  }))
+const busy = ref<string | null>(null)
+const toast = ref<string | null>(null)
+
+// Dismissed suggestion ids and when they may come back
+const dismissed = useLocalStorage<Record<string, number>>(
+  'bl-home-dismissed',
+  {},
+)
+
+const today = todaySimpleDate()
+const dateLabel = dayjs().format('dddd, MMMM D')
+const greeting = getGreeting(dayjs().hour())
+
+async function load() {
+  const [empty, authorData, bookData, collectionData, goalData] =
+    await Promise.all([
+      isLibraryEmpty(),
+      getAuthors(),
+      getBooks(),
+      getCollections(),
+      getGoals(),
+    ])
+  isEmpty.value = empty
+  authors.value = authorData
+  books.value = bookData
+  collections.value = collectionData
+  goals.value = goalData
+  loaded.value = true
 }
 
-const refresh = loadData
+onMounted(() => {
+  dismissed.value = activeDismissals(dismissed.value, Date.now())
+  load()
+})
 
-onMounted(loadData)
+const suggestions = computed(() =>
+  buildSuggestions({
+    books: books.value,
+    authors: authors.value,
+    goals: goals.value,
+    today,
+  }).filter(({ id }) => !(id in dismissed.value)),
+)
+
+const reading = computed(() =>
+  books.value
+    .filter(({ progress }) => progress.status === 'reading')
+    .sort((a, b) => getBookPercentage(b) - getBookPercentage(a)),
+)
+
+const latest = computed(() =>
+  [...books.value]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 6),
+)
+
+const activeGoals = computed(() =>
+  goals.value
+    .map((goal) => resolveGoal(goal, books.value))
+    .filter((goal) => getGoalStatus(goal) === 'tracking')
+    .sort((a, b) =>
+      toSimpleDate(a.finishAt).localeCompare(toSimpleDate(b.finishAt)),
+    ),
+)
+
+function dismiss(id: string) {
+  dismissed.value = { ...dismissed.value, [id]: snoozeUntil(Date.now()) }
+}
+
+let toastTimer: ReturnType<typeof setTimeout> | undefined
+
+function showToast(message: string) {
+  toast.value = message
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(toastTimer))
+
+async function onAct(item: Suggestion) {
+  const { action } = item
+
+  if (action.type === 'open') {
+    await navigateTo(`/library/books/${action.bookId}`)
+    return
+  }
+
+  busy.value = item.id
+  try {
+    if (action.type === 'start') {
+      await updateBook(action.bookId, {
+        progress: {
+          ...item.book.progress,
+          status: 'reading',
+          startedAt: now(),
+          finishedAt: null,
+        },
+      })
+      dismiss(item.id)
+      showToast(`Started ${item.book.title}`)
+    } else {
+      const goal = goals.value.find(({ id }) => id === action.goalId)
+      const finishedAt = item.book.progress.finishedAt
+      if (!goal || goal.type !== 'books' || !finishedAt) return
+      await createGoal(
+        stripAutoEntries({
+          ...goal,
+          entries: [
+            ...goal.entries,
+            {
+              id: uuidv4(),
+              book: action.bookId,
+              createdAt: toSimpleDate(finishedAt),
+            },
+          ],
+        }),
+      )
+      showToast(`Logged ${item.book.title}`)
+    }
+    await load()
+  } finally {
+    busy.value = null
+  }
+}
 
 useHead({
   title: 'BookLib | Home',
 })
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+.home {
+  @apply mx-auto flex w-full max-w-[90rem] flex-col gap-5;
+  container-type: inline-size;
+}
+.home :deep(:is(button, a):focus-visible) {
+  @apply outline-primary! outline-offset-2!;
+  outline-style: solid !important;
+  outline-width: 2px !important;
+}
+.top {
+  @apply grid grid-cols-[minmax(0,1fr)] gap-4;
+}
+.main {
+  @apply grid grid-cols-[minmax(0,1fr)] gap-4;
+}
+@container (min-width: 900px) {
+  .top {
+    @apply grid-cols-[minmax(0,1fr)_17rem];
+  }
+  .main {
+    @apply grid-cols-12;
+  }
+  .main > * {
+    grid-column: 1 / -1;
+  }
+  .main > .span-7 {
+    grid-column: span 7;
+  }
+  .main > .span-5 {
+    grid-column: span 5;
+  }
+}
+.toast {
+  @apply bg-ink-primary text-ink-inverse fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.2)];
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
