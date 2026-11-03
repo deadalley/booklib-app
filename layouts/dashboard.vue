@@ -122,13 +122,13 @@
 <script setup lang="ts">
 import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
 import { RELEASES_URL, isWebDemo } from '~/utils/platform'
-import { activeTheme } from '~/utils/theme'
 
 const route = useRoute()
 
 const isWebEnvironment = ref<boolean>(isWebDemo())
 
-const loadingColor = activeTheme.colors.primary.DEFAULT
+const { colors } = useTheme()
+const loadingColor = computed(() => colors.value.primary.DEFAULT)
 
 const props = defineProps<{
   title: string

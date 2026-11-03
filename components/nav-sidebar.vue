@@ -54,6 +54,20 @@
         </bl-nav-sidebar-button>
       </div>
       <div class="nav-sidebar-footer">
+        <bl-icon-button
+          variant="tertiary"
+          class="nav-sidebar-theme-toggle"
+          :aria-label="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
+          :title="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
+          @click="toggleTheme"
+        >
+          <template #default="iconProps">
+            <component
+              :is="theme === 'dark' ? IconSun : IconMoon"
+              v-bind="iconProps"
+            />
+          </template>
+        </bl-icon-button>
         <bl-nav-sidebar-button
           to="/settings"
           :active="route.path.includes('settings')"
@@ -81,10 +95,13 @@ import {
   IconDatabaseImport,
   IconSettings,
   IconChevronLeftPipe,
+  IconMoon,
+  IconSun,
 } from '@tabler/icons-vue'
 import { getAssetPath } from '~/utils/assets'
 
 const route = useRoute()
+const { theme, toggleTheme } = useTheme()
 
 const { isLibraryEmpty } = useBookLibrary()
 const isEmpty = ref<boolean>(await isLibraryEmpty())

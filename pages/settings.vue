@@ -5,11 +5,46 @@
         <span class="section-label text-primary">Settings</span>
         <h3>Library settings</h3>
         <p class="text-ink-secondary">
-          Maintenance tools for the data stored on this device.
+          Appearance and maintenance tools for the data stored on this device.
         </p>
       </div>
 
       <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <section class="card" data-testid="settings-theme">
+          <div class="flex items-start gap-4">
+            <span class="settings-icon" aria-hidden="true">
+              <IconPalette :size="20" stroke="1.6" />
+            </span>
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+              <h5 id="settings-theme-title" class="stats-title">Theme</h5>
+              <p class="text-ink-secondary text-sm">
+                Choose a light or dark look, or follow your device’s setting.
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <bl-switch
+              :model-value="preference"
+              aria-labelledby="settings-theme-title"
+              @update:model-value="
+                (value: ThemePreference) => setPreference(value)
+              "
+            >
+              <bl-switch-option
+                v-for="option in THEME_OPTIONS"
+                :key="option.value"
+                :value="option.value"
+                :selected-value="preference"
+              >
+                <template #icon="iconProps">
+                  <component :is="option.icon" v-bind="iconProps" />
+                </template>
+                <template #label>{{ option.label }}</template>
+              </bl-switch-option>
+            </bl-switch>
+          </div>
+        </section>
+
         <section class="card" data-testid="settings-integrity">
           <div class="flex items-start gap-4">
             <span class="settings-icon" aria-hidden="true">
@@ -111,11 +146,24 @@
 import {
   IconAlertTriangle,
   IconCircleCheck,
+  IconDeviceDesktop,
+  IconMoon,
+  IconPalette,
   IconSearch,
+  IconSun,
   IconShieldCheck,
   IconTrash,
 } from '@tabler/icons-vue'
 import type { LibraryIntegrityResult } from '~/types/api'
+import type { ThemePreference } from '~/utils/theme'
+
+const THEME_OPTIONS = [
+  { value: 'system', label: 'System', icon: IconDeviceDesktop },
+  { value: 'light', label: 'Light', icon: IconSun },
+  { value: 'dark', label: 'Dark', icon: IconMoon },
+] as const
+
+const { preference, setPreference } = useTheme()
 
 const { resetLibrary: resetLib, checkLibraryIntegrity } = useBookLibrary()
 

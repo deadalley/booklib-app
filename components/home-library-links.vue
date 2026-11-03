@@ -81,7 +81,7 @@ const links = computed(() => {
   }
 }
 .lib-card {
-  @apply bg-surface-elevated border-stroke-subtle flex items-center gap-3.5 rounded-xl border px-4.5 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)];
+  @apply bg-surface-elevated border-stroke-subtle shadow-card flex items-center gap-3.5 rounded-xl border px-4.5 py-4;
   transition:
     border-color 0.15s,
     transform 0.15s;

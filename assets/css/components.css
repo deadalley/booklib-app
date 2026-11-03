@@ -12,7 +12,13 @@
     @apply border-primary bg-primary text-ink-inverse hover:bg-primary/80 active:bg-primary-800 hover:border-transparent active:border-transparent;
   }
   .button-primary.secondary {
-    @apply border-secondary bg-secondary text-ink-inverse hover:bg-secondary/80 active:bg-secondary-800 hover:border-transparent active:border-transparent;
+    @apply border-secondary-700 bg-secondary-700 text-ink-inverse hover:bg-secondary-800 hover:border-secondary-800 active:bg-secondary-800;
+  }
+  [data-theme='dark'] .button-primary:not(.secondary):not(.button-disabled) {
+    @apply hover:bg-primary-400 hover:border-primary-400;
+  }
+  [data-theme='dark'] .button-primary.secondary {
+    @apply border-secondary-400 bg-secondary-400 hover:bg-secondary-500 hover:border-secondary-500;
   }
   .button-secondary:not(.primary):not(.secondary):not(.button-disabled):not(
       .button-active
@@ -379,6 +385,10 @@
   .nav-sidebar-footer {
     @apply flex gap-3 sm:flex-col;
   }
+  /* Mobile bottom bar has no room; the theme is also set in Settings */
+  .nav-sidebar-theme-toggle {
+    @apply text-ink-secondary! hover:text-ink-primary! self-start max-sm:hidden sm:ml-2;
+  }
   .nav-sidebar-label {
     @apply pointer-events-auto max-w-50 opacity-100;
     @apply inline-block overflow-hidden align-middle whitespace-nowrap transition-all duration-500;
@@ -604,8 +614,13 @@
 
 /* Home */
 .home-card {
-  @apply bg-surface-elevated border-stroke-subtle flex min-w-0 flex-col gap-4 rounded-xl border px-6 py-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)];
+  @apply bg-surface-elevated border-stroke-subtle shadow-card flex min-w-0 flex-col gap-4 rounded-xl border px-6 py-5;
 }
 .home-icon-well {
   @apply bg-primary-50 text-primary rounded-scholarly grid size-9 flex-none place-items-center;
+}
+
+/* Dark theme: a plain black scrim reads better than a tinted one */
+[data-theme='dark'] .modal-overlay {
+  background: rgb(0 0 0 / 0.6);
 }
