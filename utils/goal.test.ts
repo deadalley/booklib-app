@@ -9,7 +9,10 @@ import {
   getGoalRangePreset,
   getGoalRequiredRate,
   getGoalStatus,
+  getGoalTimeLeft,
+  getGoalsOverview,
   getRepeatedGoal,
+  isGoalOnTrack,
   getUnloggedGoalBooks,
   resolveGoal,
   stripAutoEntries,
@@ -397,5 +400,139 @@ describe('getFeaturedGoal', () => {
       getFeaturedGoal([summer, pages, paused, year], '2026-07-01')?.id,
     ).toBe('year')
     expect(getFeaturedGoal([summer, pages], '2026-10-01')).toBeNull()
+  })
+})
+
+const pageEntries = (values: [string, number][]) =>
+  values.map(([createdAt, pages], i) => ({ id: `p${i}`, pages, createdAt }))
+
+describe('isGoalOnTrack', () => {
+  it('compares total goals with an even pace', () => {
+    // Day 182 of 365: an even pace is ~6 books
+    expect(
+      isGoalOnTrack(bookGoal({ entries: entries(6) }), undefined, '2026-07-01'),
+    ).toBe(true)
+    expect(
+      isGoalOnTrack(bookGoal({ entries: entries(3) }), undefined, '2026-07-01'),
+    ).toBe(false)
+  })
+
+  it('treats paused and not-yet-started goals as on track', () => {
+    expect(
+      isGoalOnTrack(
+        bookGoal({ status: 'not-tracking' }),
+        undefined,
+        '2026-07-01',
+      ),
+    ).toBe(true)
+    expect(
+      isGoalOnTrack(
+        bookGoal({ startAt: '2026-08-01' }),
+        undefined,
+        '2026-07-01',
+      ),
+    ).toBe(true)
+  })
+
+  it('never counts a daily goal behind for the day in progress', () => {
+    const goal = pageGoal({ entries: pageEntries([['2026-10-04', 30]]) })
+    expect(isGoalOnTrack(goal, undefined, '2026-10-05')).toBe(true)
+  })
+
+  it('counts a daily goal behind after a missed day', () => {
+    const goal = pageGoal({ entries: pageEntries([['2026-10-03', 30]]) })
+    expect(isGoalOnTrack(goal, undefined, '2026-10-05')).toBe(false)
+  })
+
+  it('allows periodic goals 10% slack on the elapsed part of the period', () => {
+    const monthly = pageGoal({
+      interval: 'monthly',
+      amount: 1000,
+      startAt: '2026-10-01',
+      finishAt: '2026-12-31',
+    })
+    // Oct 16: 15 of 31 days elapsed, so ~484 pages expected, ~435 with slack
+    const ok = {
+      ...monthly,
+      entries: pageEntries([['2026-10-02', 440]]),
+    } as Goal
+    const behind = {
+      ...monthly,
+      entries: pageEntries([['2026-10-02', 400]]),
+    } as Goal
+    expect(isGoalOnTrack(ok, undefined, '2026-10-16')).toBe(true)
+    expect(isGoalOnTrack(behind, undefined, '2026-10-16')).toBe(false)
+  })
+})
+
+describe('getGoalTimeLeft', () => {
+  it('uses days up to two months, then weeks', () => {
+    expect(getGoalTimeLeft({ daysLeft: 1 })).toEqual({
+      value: 1,
+      unit: 'day left',
+    })
+    expect(getGoalTimeLeft({ daysLeft: 0 })).toEqual({
+      value: 1,
+      unit: 'day left',
+    })
+    expect(getGoalTimeLeft({ daysLeft: 45 })).toEqual({
+      value: 45,
+      unit: 'days left',
+    })
+    expect(getGoalTimeLeft({ daysLeft: 70 })).toEqual({
+      value: 10,
+      unit: 'weeks left',
+    })
+  })
+})
+
+describe('getGoalsOverview', () => {
+  it('aggregates statuses, average progress and the next deadline', () => {
+    const today = '2026-07-01'
+    const year = bookGoal({ id: 'year', entries: entries(6) }) // 50%, on track
+    const summer = bookGoal({
+      id: 'summer',
+      amount: 4,
+      startAt: '2026-06-01',
+      finishAt: '2026-08-31',
+      entries: [],
+    }) // 0%, behind
+    const later = bookGoal({
+      id: 'later',
+      startAt: '2026-08-01',
+      finishAt: '2026-08-15',
+    })
+    const paused = bookGoal({ id: 'paused', status: 'not-tracking' })
+    const done = bookGoal({ id: 'done', amount: 2, entries: entries(2) })
+    const expired = bookGoal({
+      id: 'expired',
+      startAt: '2025-01-01',
+      finishAt: '2025-12-31',
+    })
+
+    const overview = getGoalsOverview(
+      [year, summer, later, paused, done, expired],
+      today,
+    )
+
+    expect(overview.active.map(({ goal }) => goal.id)).toEqual([
+      'year',
+      'summer',
+      'later',
+    ])
+    expect(overview.paused).toBe(1)
+    expect(overview.completed).toBe(1)
+    expect(overview.expired).toBe(1)
+    expect(overview.average).toBe(Math.round((50 + 0 + 0) / 3))
+    expect(overview.behind).toBe(1)
+    // "later" ends sooner but hasn't started
+    expect(overview.next?.goal.id).toBe('summer')
+    expect(overview.next?.onTrack).toBe(false)
+  })
+
+  it('has no next deadline without active goals', () => {
+    const overview = getGoalsOverview([], '2026-07-01')
+    expect(overview.next).toBeNull()
+    expect(overview.average).toBe(0)
   })
 })
