@@ -1,6 +1,6 @@
 # Storage Service Architecture
 
-The StorageService has been updated to support multiple storage backends: Electron file-based storage, Node.js JSONFilePreset for local development, and web-based localStorage, providing a unified interface for database operations.
+The StorageService supports multiple storage backends: Electron file-based storage, Android (Capacitor) file-based storage, and web-based localStorage, providing a unified interface for database operations.
 
 ## Key Components
 
@@ -10,13 +10,19 @@ The StorageService has been updated to support multiple storage backends: Electr
 - Provides async read/write operations for JSON data storage
 - Automatically handles directory creation and file management
 
-### 2. DatabaseClient (`services/database-client.ts`)
+### 2. CapacitorAdapter (`services/capacitor-adapter.ts`)
+
+- LowDB adapter for the Android app, built on `@capacitor/filesystem`
+- Stores `booklib-data.json` in the app's private data directory (`Directory.Data`)
+- Saves are crash-safe: the data is written to `booklib-data.json.tmp` first, then to the file itself. If the file is missing or unreadable on start, the temp copy is used
+
+### 3. DatabaseClient (`services/database-client.ts`)
 
 - Unified interface that abstracts the differences between Electron, Node.js, and web storage
 - Automatically detects the environment and uses the appropriate storage method
 - Provides consistent async API for all platforms
 
-### 3. Electron IPC Handlers (`electron/main.ts`)
+### 4. Electron IPC Handlers (`electron/main.ts`)
 
 - File operations: `file:read`, `file:write`, `file:exists`
 - `file:write` is atomic (`electron/fs-utils.ts`): it writes `<file>.tmp`, flushes it to disk and renames it over the target, so a crash mid-save leaves the previous file intact
@@ -24,7 +30,7 @@ The StorageService has been updated to support multiple storage backends: Electr
 - Directory operations: `dir:ensure`
 - Database path: `db:getPath` (returns path in user data directory)
 
-### 4. Electron Preload Script (`electron/preload.ts`)
+### 5. Electron Preload Script (`electron/preload.ts`)
 
 - Exposes file system APIs to the renderer process via `window.electronAPI`
 - Provides secure access to file operations through IPC
@@ -48,9 +54,13 @@ The StorageService has been updated to support multiple storage backends: Electr
 
 **Electron apps:**
 
-- **Windows**: `%APPDATA%/booklib-app/booklib-data.json`
-- **macOS**: `~/Library/Application Support/booklib-app/booklib-data.json`
-- **Linux**: `~/.config/booklib-app/booklib-data.json`
+- **Windows**: `%APPDATA%/booklib/booklib-data.json`
+- **macOS**: `~/Library/Application Support/booklib/booklib-data.json`
+- **Linux**: `~/.config/booklib/booklib-data.json`
+
+**Android app:**
+
+- `/data/data/com.booklib.app/files/booklib-data.json` (private to the app; removed when the app is uninstalled)
 
 **Web Environment & Local Development:**
 
@@ -58,7 +68,7 @@ The StorageService has been updated to support multiple storage backends: Electr
 
 ## Book Covers
 
-Covers are only supported in the Electron app; the web build keeps the upload button disabled.
+Covers are only supported in the Electron app; the web demo and the Android app keep the upload button disabled.
 
 - Image files live in `<userData>/covers/<bookId>.<ext>` (jpg, png, webp or gif, up to 10 MB), managed by `CoverStore` in `electron/covers.ts`.
 - The main process serves them through the `booklib-cover://` protocol. `cover_src` stores a URL such as `booklib-cover://<bookId>.png?v=<timestamp>`; the `?v=` changes on every upload so a replaced image is not served from the cache. Covers with an `http(s)` URL (for example from an import) are shown as they are.
@@ -83,7 +93,10 @@ const books = await storageService.getBooks({})
 The service detects the environment in this order:
 
 1. **Electron**: Checks for `window.electronAPI`
-2. **Browser**: Falls back to LocalStorage
+2. **Android**: `Capacitor.isNativePlatform()`
+3. **Browser**: Falls back to LocalStorage
+
+`getAppPlatform()` in `utils/platform.ts` does this detection for the rest of the app.
 
 ## Schema Versioning
 

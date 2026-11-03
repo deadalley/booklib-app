@@ -95,15 +95,15 @@
           <template #content>
             You are running a
             <b class="contents">demo</b>
-            version of BookLib. Your data is stored in the browser session and
-            will not be available elsewhere. To use BookLib fully, please
-            download the app at
+            version of BookLib. Your data is stored in this browser only and
+            will not be available elsewhere. To keep your library safely on your
+            device,
             <NuxtLink
-              to="https://github.com/deadalley/booklib-app/releases/latest"
+              :to="RELEASES_URL"
               class="hover:text-primary contents font-semibold underline"
               target="_blank"
             >
-              @deadalley/booklib-app
+              download BookLib for Windows, Linux or Android
             </NuxtLink>
             .
           </template>
@@ -121,13 +121,12 @@
 
 <script setup lang="ts">
 import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
+import { RELEASES_URL, isWebDemo } from '~/utils/platform'
 import { activeTheme } from '~/utils/theme'
 
 const route = useRoute()
 
-const isWebEnvironment = ref<boolean>(
-  typeof window !== 'undefined' && !('electronAPI' in window),
-)
+const isWebEnvironment = ref<boolean>(isWebDemo())
 
 const loadingColor = activeTheme.colors.primary.DEFAULT
 

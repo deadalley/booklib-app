@@ -1,13 +1,18 @@
 <template>
   <bl-tooltip
     class="relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl lg:flex-1"
-    :disabled="!isWebEnvironment"
+    :disabled="!coversUnavailable"
   >
     <template #tooltip-content>
-      You are running a
-      <b class="contents">demo</b>
-      version of BookLib. Uploading custom book covers is not available in this
-      version.
+      <template v-if="isAndroid">
+        Uploading custom book covers is not available on Android yet.
+      </template>
+      <template v-else>
+        You are running a
+        <b class="contents">demo</b>
+        version of BookLib. Uploading custom book covers is not available in
+        this version.
+      </template>
     </template>
     <div
       class="border-stroke relative inline-flex h-min w-full flex-col items-center gap-3 rounded-xl border lg:flex-1"
@@ -53,7 +58,7 @@
         :class="{
           'opacity-0': !hovered,
           'opacity-60': hovered,
-          'cursor-pointer': !isWebEnvironment,
+          'cursor-pointer': !coversUnavailable,
         }"
         @click="onUploadClick()"
       />
@@ -77,6 +82,7 @@
 <script setup lang="ts">
 import { IconUpload, IconX } from '@tabler/icons-vue'
 import type { Book } from '~/types/book'
+import { getAppPlatform, supportsCoverUploads } from '~/utils/platform'
 
 const fileInput = ref()
 
@@ -95,12 +101,13 @@ const hovered = ref(false)
 
 const { updateBookCover, deleteBookCover } = useBookLibrary()
 
-const isWebEnvironment = ref<boolean>(
-  typeof window !== 'undefined' && !('electronAPI' in window),
-)
+// Cover files are stored by the desktop app; the web demo and Android
+// app can't upload them yet.
+const coversUnavailable = ref<boolean>(!supportsCoverUploads())
+const isAndroid = getAppPlatform() === 'android'
 
 function setHovered(value: boolean) {
-  if (isWebEnvironment.value) return
+  if (coversUnavailable.value) return
 
   hovered.value = value
 }
@@ -110,7 +117,7 @@ function onUploadClick() {
 }
 
 async function onFileChange(e: Event) {
-  if (isWebEnvironment.value) return
+  if (coversUnavailable.value) return
 
   const input = e.target as HTMLInputElement
   const file = input?.files?.[0]

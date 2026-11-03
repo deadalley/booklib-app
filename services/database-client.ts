@@ -1,8 +1,10 @@
 import type { Database } from '~/types/api'
-import type { Low } from 'lowdb'
+import type { Adapter, Low } from 'lowdb'
 import { LocalStoragePreset } from 'lowdb/browser'
 import { Low as LowClass } from 'lowdb'
 import { ElectronAdapter } from './electron-adapter'
+import { CapacitorAdapter } from './capacitor-adapter'
+import { getAppPlatform } from '~/utils/platform'
 
 export interface DatabaseClient {
   data: Database
@@ -10,12 +12,13 @@ export interface DatabaseClient {
   write(): Promise<void>
 }
 
-class ElectronDatabaseClient implements DatabaseClient {
+// File-backed client used by the desktop (Electron) and Android (Capacitor)
+// apps; only the adapter that does the file I/O differs.
+class FileDatabaseClient implements DatabaseClient {
   private lowClient: Low<Database>
   private defaultData: Database
 
-  constructor(filePath: string, defaultData: Database) {
-    const adapter = new ElectronAdapter<Database>(filePath)
+  constructor(adapter: Adapter<Database>, defaultData: Database) {
     this.lowClient = new LowClass(adapter, defaultData)
     this.defaultData = defaultData
   }
@@ -73,10 +76,14 @@ export async function createDatabaseClient(
   dbPath: string,
   defaultData: Database,
 ): Promise<DatabaseClient> {
-  // Check if we're in Electron environment
-  if (typeof window !== 'undefined' && 'electronAPI' in window) {
-    console.log('Creating ElectronDatabaseClient with path:', dbPath)
-    const client = new ElectronDatabaseClient(dbPath, defaultData)
+  const platform = getAppPlatform()
+  if (platform === 'electron' || platform === 'android') {
+    console.log(`Creating ${platform} database client with path:`, dbPath)
+    const adapter =
+      platform === 'electron'
+        ? new ElectronAdapter<Database>(dbPath)
+        : new CapacitorAdapter<Database>(dbPath)
+    const client = new FileDatabaseClient(adapter, defaultData)
     await client.read()
     return client
   }

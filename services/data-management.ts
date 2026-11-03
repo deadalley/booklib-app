@@ -52,7 +52,8 @@ export class BookLibDataManagementService {
     if (typeof window === 'undefined' && typeof process !== 'undefined') {
       return './booklib-data.json'
     }
-    // For web app, use localStorage fallback (this path won't be used but needed for consistency)
+    // Android app: path inside the app's private data directory.
+    // Web app: unused, since data lives in localStorage.
     return 'booklib-data.json'
   }
 

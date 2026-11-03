@@ -1,371 +1,216 @@
 name: '[🚀] Release'
 
+# Publishing a GitHub release (with a tag such as v1.2.0) builds the desktop
+# and Android apps and attaches the install files to that release.
+# Run it manually with an existing tag to rebuild the files of a release.
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to release (e.g., v1.0.0)'
+      tag:
+        description: 'Tag of an existing release to build and attach files to (e.g. v1.2.0)'
         required: true
         type: string
 
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: true
+
 env:
-  BASE_URL: http://127.0.0.1:3001
-  USER_DB_PATH: ./booklib.json
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
-  build-linux:
-    name: Build Linux
-    runs-on: ubuntu-latest
+  desktop:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            script: electron:build:linux
+            files: |
+              dist-packaged/*.AppImage
+              dist-packaged/*.deb
+          - name: Windows
+            os: windows-latest
+            script: electron:build:win
+            files: |
+              dist-packaged/*.exe
+              dist-packaged/*.zip
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG || github.ref }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-
-      - name: Get pnpm cache directory path
-        id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
-        id: pnpm-cache
-        with:
-          path: |
-            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build app for Electron
-        run: pnpm build:electron
+      - name: Set app version from tag
+        if: env.TAG != ''
+        run: npm pkg set version="${TAG#v}"
 
-      - name: Verify build output
-        run: |
-          echo "Checking build outputs..."
-          ls -la .output/ || echo ".output directory not found"
-          ls -la dist-electron/ || echo "dist-electron directory not found"
-          ls -la .output/public/ || echo ".output/public directory not found"
-
-      - name: Package Electron app for Linux
-        run: pnpm electron:build:linux --publish=never
+      - name: Build and package
+        run: pnpm run ${{ matrix.script }} --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No code-signing certificate is configured
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Verify packaged app structure
-        run: |
-          echo "Checking packaged app structure..."
-          ls -la dist-packaged/ || echo "dist-packaged directory not found"
-          find dist-packaged/ -name "*.AppImage" -exec echo "Found AppImage: {}" \;
-          find dist-packaged/ -name "*.deb" -exec echo "Found DEB: {}" \;
-          find dist-packaged/ -name "*.zip" -exec echo "Found ZIP: {}" \;
+      - name: List packaged files
+        run: ls -la dist-packaged
 
-      - name: Upload Linux artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-builds
-          path: |
-            dist-packaged/*.AppImage
-            dist-packaged/*.deb
-            dist-packaged/*.zip
-          retention-days: 5
+          name: ${{ matrix.name }}
+          path: ${{ matrix.files }}
+          retention-days: 7
 
-  build-windows:
-    name: Build Windows (Docker + Wine)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-
-      - name: Get pnpm cache directory path
-        id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
-        id: pnpm-cache
-        with:
-          path: |
-            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build app for Electron
-        run: pnpm build:electron
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Pull Docker image
-        run: docker pull electronuserland/builder:wine
-
-      - name: Build Windows executable with Docker
-        run: |
-          docker run --rm \
-            --env ELECTRON_CACHE="/root/.cache/electron" \
-            --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
-            --env GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-            --env pnpm_CACHE_FOLDER="/root/.cache/pnpm" \
-            --env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="true" \
-            --env ELECTRON_SKIP_BINARY_DOWNLOAD="true" \
-            -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}-node-modules:/project/node_modules \
-            -v ~/.cache/pnpm:/root/.cache/pnpm \
-            electronuserland/builder:wine \
-            /bin/bash -c "cd /project && \
-              echo 'Upgrading pnpm to latest version...' && \
-              npm install -g pnpm@latest && \
-              echo 'Installing dependencies...' && \
-              pnpm install --frozen-lockfile --network-timeout 300000 && \
-              echo 'Building Electron app...' && \
-              pnpm build:electron && \
-              echo 'Building Windows executable...' && \
-              pnpm electron:build:win --publish=never --config.nativeRebuilder=legacy"
-
-      - name: Verify Windows build artifacts
-        run: |
-          echo "Checking Windows build artifacts..."
-          ls -la dist-packaged/ || echo "dist-packaged directory not found"
-          find dist-packaged/ -name "*.exe" -exec echo "Found EXE: {}" \;
-          find dist-packaged/ -name "*.msi" -exec echo "Found MSI: {}" \;
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-builds
-          path: |
-            dist-packaged/*.exe
-            dist-packaged/*.msi
-            dist-packaged/*Setup*.exe
-          retention-days: 5
-
-  release:
-    name: Create release
-    needs: [build-linux, build-windows]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history for git operations
-
-      - name: Get version
-        id: version
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          # Ensure version starts with 'v'
-          if [[ ! "$VERSION" =~ ^v ]]; then
-            VERSION="v$VERSION"
-          fi
-          # Also create a version without 'v' for package.json
-          VERSION_NO_V="${VERSION#v}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "version_no_v=$VERSION_NO_V" >> $GITHUB_OUTPUT
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-
-      - name: Get pnpm cache directory path
-        id: pnpm-cache-dir-path
-        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
-        id: pnpm-cache
-        with:
-          path: |
-            ${{ steps.pnpm-cache-dir-path.outputs.dir }}
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Update package.json version
-        run: |
-          # Check current version in package.json
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          TARGET_VERSION="${{ steps.version.outputs.version_no_v }}"
-
-          echo "Current version: $CURRENT_VERSION"
-          echo "Target version: $TARGET_VERSION"
-
-          if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
-            echo "Version is already $TARGET_VERSION, no update needed"
-          else
-            # Update the version in package.json
-            npm version $TARGET_VERSION --no-git-tag-version
-            echo "Updated package.json version to $TARGET_VERSION"
-          fi
-
-      - name: Commit version update
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }}" || echo "No changes to commit"
-          git push origin main
-
-      - name: Create and push tag
-        run: |
-          # Check if tag already exists
-          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag ${{ steps.version.outputs.version }} already exists"
-          else
-            git tag "${{ steps.version.outputs.version }}"
-            git push origin "${{ steps.version.outputs.version }}"
-            echo "Created and pushed tag ${{ steps.version.outputs.version }}"
-          fi
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-
-      - name: Generate changelog
-        id: changelog
-        run: |
-          # Create a simple changelog from recent commits
-          CHANGELOG="## What's Changed\n\n"
-
-          # Get commits since last tag (or last 10 commits if no previous tag)
-          if git describe --tags --abbrev=0 HEAD~1 >/dev/null 2>&1; then
-            LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1)
-            COMMITS=$(git log --oneline --pretty=format:"* %s" $LAST_TAG..HEAD)
-          else
-            COMMITS=$(git log --oneline --pretty=format:"* %s" -10)
-          fi
-
-          if [ -n "$COMMITS" ]; then
-            CHANGELOG="$CHANGELOG$COMMITS\n\n"
-          else
-            CHANGELOG="${CHANGELOG}* Initial release\n\n"
-          fi
-
-          CHANGELOG="${CHANGELOG}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
-
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Create Release
+      - name: Attach files to release
+        if: env.TAG != ''
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: BookLib ${{ steps.version.outputs.version }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-          files: |
-            ./artifacts/linux-builds/*.AppImage
-            ./artifacts/linux-builds/*.deb
-            ./artifacts/linux-builds/*.zip
-            ./artifacts/windows-builds/*.exe
-            ./artifacts/windows-builds/*.msi
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.TAG }}
+          files: ${{ matrix.files }}
+          fail_on_unmatched_files: true
 
-  summary:
-    name: Release Summary
+  android:
+    name: Build Android
     runs-on: ubuntu-latest
-    needs: [build-linux, build-windows, release]
-    if: always()
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          path: ./artifacts
+          ref: ${{ env.TAG || github.ref }}
 
-      - name: Display release summary
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          # The default also asks for the removed legacy `tools` package.
+          # Gradle downloads the SDK platform and build tools it needs.
+          packages: platform-tools
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compute version
+        id: version
         run: |
-          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          VERSION="${TAG#v}"
+          VERSION="${VERSION:-$(node -p "require('./package.json').version")}"
+          # Android needs an increasing integer: 1.2.3 -> 10203
+          IFS=. read -r MAJOR MINOR PATCH <<< "${VERSION%%-*}"
+          CODE=$(( ${MAJOR:-0} * 10000 + ${MINOR:-0} * 100 + ${PATCH:-0} ))
+          if [ "$CODE" -lt 1 ]; then CODE=1; fi
+          echo "name=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
 
-          # Check Linux build
-          if [ -d "./artifacts/linux-builds" ]; then
-            echo "### ✅ Linux Build Successful" >> $GITHUB_STEP_SUMMARY
-            echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
-            ls -la ./artifacts/linux-builds/ | tail -n +2 | while read line; do
-              filename=$(echo "$line" | awk '{print $NF}')
-              size=$(echo "$line" | awk '{print $5}')
-              echo "- \`$filename\` ($size bytes)" >> $GITHUB_STEP_SUMMARY
-            done
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### ❌ Linux Build Failed or Skipped" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+      - name: Build web app and sync Android project
+        run: pnpm build:android
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          ./gradlew assembleDebug --no-daemon \
+            -PappVersionName=${{ steps.version.outputs.name }} \
+            -PappVersionCode=${{ steps.version.outputs.code }}
+
+      - name: Rename APK
+        run: |
+          mkdir -p dist-packaged
+          mv android/app/build/outputs/apk/debug/app-debug.apk \
+            "dist-packaged/BookLib-${{ steps.version.outputs.name }}-android.apk"
+          ls -la dist-packaged
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android
+          path: dist-packaged/*.apk
+          retention-days: 7
+
+      - name: Attach files to release
+        if: env.TAG != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: dist-packaged/*.apk
+          fail_on_unmatched_files: true
+
+  release-notes:
+    name: Add download links
+    needs: [desktop, android]
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add downloads section to release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          VERSION="${TAG#v}"
+          BASE="https://github.com/$REPO/releases/download/$TAG"
+          MARKER='<!-- booklib-downloads -->'
+
+          gh release view "$TAG" --repo "$REPO" --json body --jq .body > notes.md
+          if grep -q "$MARKER" notes.md; then
+            echo "Release notes already have a downloads section"
+            exit 0
           fi
 
-          # Check Windows build
-          if [ -d "./artifacts/windows-builds" ]; then
-            echo "### ✅ Windows Build Successful" >> $GITHUB_STEP_SUMMARY
-            echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
-            ls -la ./artifacts/windows-builds/ | tail -n +2 | while read line; do
-              filename=$(echo "$line" | awk '{print $NF}')
-              size=$(echo "$line" | awk '{print $5}')
-              echo "- \`$filename\` ($size bytes)" >> $GITHUB_STEP_SUMMARY
-            done
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### ❌ Windows Build Failed or Skipped" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "$MARKER"
+            echo "## ⬇️ Download BookLib"
+            echo
+            echo "| Platform | File | How to install |"
+            echo "| --- | --- | --- |"
+            echo "| Windows | [BookLib-Setup-$VERSION-x64.exe]($BASE/BookLib-Setup-$VERSION-x64.exe) | Run the installer. Windows may show a SmartScreen warning because the app is not signed: choose **More info → Run anyway**. |"
+            echo "| Windows (portable) | [BookLib-$VERSION-win-x64.zip]($BASE/BookLib-$VERSION-win-x64.zip) | Unzip and run \`BookLib.exe\`. |"
+            echo "| Linux | [BookLib-$VERSION-x86_64.AppImage]($BASE/BookLib-$VERSION-x86_64.AppImage) | Make it executable (\`chmod +x\`) and run it. |"
+            echo "| Linux (Debian/Ubuntu) | [booklib_${VERSION}_amd64.deb]($BASE/booklib_${VERSION}_amd64.deb) | \`sudo apt install ./booklib_${VERSION}_amd64.deb\` |"
+            echo "| Android | [BookLib-$VERSION-android.apk]($BASE/BookLib-$VERSION-android.apk) | Open the file on your phone and allow installing apps from your browser or file manager when asked. |"
+            echo
+            if [ -s notes.md ]; then
+              echo
+              cat notes.md
+            fi
+          } > new-notes.md
 
-          # Release status
-          echo "### 📦 Release Status" >> $GITHUB_STEP_SUMMARY
-          echo "The release has been created as a **draft**. Please review and publish manually." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }})" >> $GITHUB_STEP_SUMMARY
+          gh release edit "$TAG" --repo "$REPO" --notes-file new-notes.md

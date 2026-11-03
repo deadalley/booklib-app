@@ -61,3 +61,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Build desktop app bundle
+        run: pnpm build:electron

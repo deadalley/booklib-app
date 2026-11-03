@@ -18,7 +18,14 @@
   <a href="https://booklib-app.netlify.app" target="_blank">
     <img src="https://img.shields.io/badge/📖%20Live%20Demo-Try%20Now-4285f4?style=for-the-badge&logoColor=white&labelColor=2d3748" alt="BookLib Live Demo"/>
   </a>
+  <a href="https://github.com/deadalley/booklib-app/releases/latest" target="_blank">
+    <img src="https://img.shields.io/badge/⬇️%20Download-Windows%20·%20Linux%20·%20Android-ca3d3d?style=for-the-badge&logoColor=white&labelColor=2d3748" alt="Download BookLib"/>
+  </a>
 </div>
+
+The live demo keeps your library in the browser only. To keep it safely on
+your device, download the app for Windows, Linux or Android from the
+[latest release](https://github.com/deadalley/booklib-app/releases/latest).
 
 <div>
   <div align="center">
@@ -45,7 +52,9 @@
     - [Building](#building)
     - [Testing](#testing)
     - [Linting](#linting)
-    - [Electron Distribution](#electron-distribution)
+    - [Desktop App (Electron)](#desktop-app-electron)
+    - [Android App (Capacitor)](#android-app-capacitor)
+    - [Releasing](#releasing)
 - [Architecture](#architecture)
   - [Tech Stack](#tech-stack)
   - [Project Structure](#project-structure)
@@ -127,15 +136,53 @@ pnpm lint:ts         # TypeScript type checking
 pnpm lint:prettier   # Prettier formatting check
 ```
 
-#### Electron Distribution
+#### Desktop App (Electron)
 
 ```bash
-pnpm electron:build        # Build for current platform
-pnpm electron:build:win    # Build for Windows
-pnpm electron:build:mac    # Build for macOS
-pnpm electron:build:linux  # Build for Linux
-pnpm electron:publish      # Build and publish
+pnpm dev:electron             # Run the desktop app in development
+pnpm electron:dir             # Build an unpacked app in dist-packaged/ (quick local test)
+pnpm electron:build:linux     # Build the AppImage and .deb
+pnpm electron:build:win       # Build the Windows installer (.exe) and portable .zip
+pnpm electron:build:win:docker # Build for Windows from Linux/macOS using Docker + Wine
 ```
+
+Each command builds the app first (`pnpm build:electron`), and the installers
+are written to `dist-packaged/`. To build for Windows from Linux without
+Docker, install Wine first (`wine64` and `wine32`).
+
+On Linux, the app is started through a small launcher
+([`scripts/linux-sandbox-wrapper.cjs`](scripts/linux-sandbox-wrapper.cjs)).
+Some distributions, such as Ubuntu 24.04, block the user namespaces that
+Chromium's sandbox needs, and an AppImage can't use the setuid fallback. On
+those systems the launcher starts the AppImage with `--no-sandbox` instead of
+letting it crash. The `.deb` keeps the full sandbox: it installs an AppArmor
+profile (`build/apparmor-profile.tpl`) and AppStream metadata
+(`build/booklib.metainfo.xml`) so software centres such as KDE Discover show the
+app's name and icon. Prefer it on Debian/Ubuntu.
+
+All packages are `devDependencies`: the app is fully bundled, and keeping
+`dependencies` empty stops electron-builder from scanning `node_modules`.
+
+#### Android App (Capacitor)
+
+The Android app wraps the same Nuxt app in a native WebView with
+[Capacitor](https://capacitorjs.com). It needs JDK 21 and the Android SDK
+(installed with Android Studio, or set `ANDROID_HOME`).
+
+```bash
+pnpm build:android   # Build the web app and copy it into android/
+pnpm android:open    # Open the project in Android Studio to run it on a device
+pnpm android:build   # Build a debug APK in android/app/build/outputs/apk/debug/
+```
+
+#### Releasing
+
+Publishing a [GitHub release](https://github.com/deadalley/booklib-app/releases/new)
+with a version tag such as `v1.2.0` runs the
+[release workflow](.github/workflows/release.yml). It builds the Windows,
+Linux and Android apps, uses the tag as the app version, attaches the install
+files to the release and adds a download table to the release notes. To rebuild
+the files of an existing release, run the workflow manually with its tag.
 
 ## Architecture
 
@@ -149,6 +196,7 @@ pnpm electron:publish      # Build and publish
 - **Tables**: TanStack Table
 - **Testing**: Vitest + Playwright
 - **Desktop**: Electron
+- **Android**: Capacitor
 - **Database**: LowDB (JSON-based)
 
 ### Project Structure
@@ -165,6 +213,7 @@ booklib-app/
 ├── assets/            # Static assets and styles
 ├── public/            # Public static files
 ├── electron/          # Electron main process files
+├── android/           # Android (Capacitor) project
 ├── tests/             # Test files
 └── playwright-report/ # E2E test reports
 ```
@@ -174,6 +223,7 @@ booklib-app/
 BookLib uses a flexible storage system that adapts to the environment:
 
 - **Electron**: File-based storage in user data directory
+- **Android**: File-based storage in the app's private data directory
 - **Web**: LocalStorage fallback for browser compatibility
 
 See [STORAGE_ARCHITECTURE.md](STORAGE_ARCHITECTURE.md) for detailed information.
