@@ -67,6 +67,7 @@ export type ThemeName = 'light' | 'dark'
 export type ThemePreference = ThemeName | 'system'
 
 export const THEME_STORAGE_KEY = 'booklib.theme'
+export const DEFAULT_THEME_PREFERENCE: ThemePreference = 'light'
 
 /** BookLib v2 design tokens (the v1 "legacy" theme was retired). */
 export const activeTheme: ThemeTokens = {
@@ -264,7 +265,7 @@ export function themeCss(): string {
  * Runs before first paint (inlined in the document head) so the saved theme
  * is applied without a flash of the light theme.
  */
-export const themeBootScript = `(function(){try{var p=localStorage.getItem('${THEME_STORAGE_KEY}');var d=p==='dark'||(p!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var t=d?'dark':'light';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'${darkTheme.colors.surface.canvas}':'${activeTheme.colors.surface.canvas}');}catch(e){}})()`
+export const themeBootScript = `(function(){try{var p=localStorage.getItem('${THEME_STORAGE_KEY}');var d=p==='dark'||(p==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var t=d?'dark':'light';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'${darkTheme.colors.surface.canvas}':'${activeTheme.colors.surface.canvas}');}catch(e){}})()`
 
 function toVarRefs<T extends Record<string, Record<string, string>>>(
   values: T,

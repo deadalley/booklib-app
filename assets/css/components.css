@@ -385,10 +385,6 @@
   .nav-sidebar-footer {
     @apply flex gap-3 sm:flex-col;
   }
-  /* Mobile bottom bar has no room; the theme is also set in Settings */
-  .nav-sidebar-theme-toggle {
-    @apply text-ink-secondary! hover:text-ink-primary! self-start max-sm:hidden sm:ml-2;
-  }
   .nav-sidebar-label {
     @apply pointer-events-auto max-w-50 opacity-100;
     @apply inline-block overflow-hidden align-middle whitespace-nowrap transition-all duration-500;

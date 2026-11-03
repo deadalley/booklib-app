@@ -1,4 +1,5 @@
 import {
+  DEFAULT_THEME_PREFERENCE,
   THEMES,
   THEME_STORAGE_KEY,
   type ThemeName,
@@ -7,7 +8,7 @@ import {
 
 const PREFERENCES: ThemePreference[] = ['system', 'light', 'dark']
 
-const preference = ref<ThemePreference>('system')
+const preference = ref<ThemePreference>(DEFAULT_THEME_PREFERENCE)
 const systemTheme = ref<ThemeName>('light')
 let initialized = false
 
@@ -16,16 +17,19 @@ function readPreference(): ThemePreference {
     const saved = localStorage.getItem(THEME_STORAGE_KEY)
     return PREFERENCES.includes(saved as ThemePreference)
       ? (saved as ThemePreference)
-      : 'system'
+      : DEFAULT_THEME_PREFERENCE
   } catch {
-    return 'system'
+    return DEFAULT_THEME_PREFERENCE
   }
 }
 
 function writePreference(value: ThemePreference) {
   try {
-    if (value === 'system') localStorage.removeItem(THEME_STORAGE_KEY)
-    else localStorage.setItem(THEME_STORAGE_KEY, value)
+    if (value === DEFAULT_THEME_PREFERENCE) {
+      localStorage.removeItem(THEME_STORAGE_KEY)
+    } else {
+      localStorage.setItem(THEME_STORAGE_KEY, value)
+    }
   } catch {
     // Storage can be unavailable (private mode); the choice lasts the session
   }
@@ -58,7 +62,7 @@ function init() {
 }
 
 /**
- * The light/dark theme. The preference ('system' by default) is stored on
+ * The light/dark theme. The preference ('light' by default) is stored on
  * this device; 'system' follows the OS setting and its changes.
  */
 export function useTheme() {

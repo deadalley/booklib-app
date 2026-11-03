@@ -7,9 +7,22 @@ test.describe('theme', () => {
     await seedLibrary(page, makeDb({ books: [makeBook('Book 1')] }))
   })
 
-  test('follows the system theme by default', async ({ page }) => {
+  test('uses the light theme by default', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' })
     await page.goto('/settings')
+    await expect(html(page)).toHaveAttribute('data-theme', 'light')
+    await expect(
+      page.getByTestId('settings-theme').getByRole('radio', { name: 'Light' }),
+    ).toBeChecked()
+  })
+
+  test('follows the system theme when chosen', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto('/settings')
+    await page
+      .getByTestId('settings-theme')
+      .getByRole('radio', { name: 'System' })
+      .click()
     await expect(html(page)).toHaveAttribute('data-theme', 'dark')
     await page.emulateMedia({ colorScheme: 'light' })
     await expect(html(page)).toHaveAttribute('data-theme', 'light')
@@ -30,13 +43,11 @@ test.describe('theme', () => {
     await page.reload()
     await expect(html(page)).toHaveAttribute('data-theme', 'dark')
 
-    await section.getByRole('radio', { name: 'System' }).click()
+    await section.getByRole('radio', { name: 'Light' }).click()
     await expect(html(page)).toHaveAttribute('data-theme', 'light')
   })
 
-  test('toggles from the sidebar', async ({ page }) => {
-    await page.setViewportSize({ width: 1400, height: 900 })
-    await page.emulateMedia({ colorScheme: 'light' })
+  test('toggles from the header', async ({ page }) => {
     await page.goto('/home')
     await page.getByRole('button', { name: 'Switch to dark theme' }).click()
     await expect(html(page)).toHaveAttribute('data-theme', 'dark')
