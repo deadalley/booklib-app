@@ -73,11 +73,6 @@
             Library
           </p>
           <h3 class="text-ink-primary text-balance">Across your library</h3>
-          <p class="text-ink-secondary">
-            All {{ formatCount(books.length) }}
-            {{ books.length === 1 ? 'book' : 'books' }}, whatever the period
-            above
-          </p>
         </div>
 
         <bl-stats-tile class="span-5" title="Share by">
