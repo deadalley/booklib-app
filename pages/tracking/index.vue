@@ -57,13 +57,6 @@
           @dismiss="dismissCallout"
         />
 
-        <bl-goal-today-panel
-          v-if="groups.active.length"
-          :goals="groups.active"
-          @jump="jumpTo"
-          @log="(goal) => (logFor = goal.id)"
-        />
-
         <section v-if="groups.active.length" class="group">
           <p class="section-label">Active · {{ groups.active.length }}</p>
           <bl-goal-tile
