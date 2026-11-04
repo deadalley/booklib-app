@@ -241,7 +241,7 @@ async function onAct(item: Suggestion) {
       showToast(`Started ${item.book.title}`)
     } else {
       const goal = goals.value.find(({ id }) => id === action.goalId)
-      const finishedAt = item.book.progress.finishedAt
+      const finishedAt = getBookFinishedAt(item.book)
       if (!goal || goal.type !== 'books' || !finishedAt) return
       await createGoal(
         stripAutoEntries({

@@ -50,11 +50,7 @@
       </div>
 
       <div class="grid-12">
-        <bl-stats-tile
-          class="span-8"
-          title="Finished books"
-          :sub="range === 'all' ? 'By year' : 'By month'"
-        >
+        <bl-stats-tile class="span-8" title="Finished books" :sub="activitySub">
           <bl-stats-activity v-model="selectedBucket" :buckets="buckets" />
         </bl-stats-tile>
 
@@ -330,19 +326,32 @@ const rangeStart = computed(() => {
   return null
 })
 
-const finishedAll = computed(() =>
-  books.value.filter(
-    ({ progress }) => progress.status === 'read' && !!progress.finishedAt,
-  ),
+// Every book marked as read is finished, even without a finish date
+const finishedAll = computed(() => books.value.filter(isBookFinished))
+
+// Read books with a known (or derived) finish date can be placed in a period
+const finishedDated = computed(() =>
+  finishedAll.value.filter((book) => !!getBookFinishedAt(book)),
 )
 
+// Undated read books count in the totals but can't be placed on the chart
+const activitySub = computed(() => {
+  const by = range.value === 'all' ? 'By year' : 'By month'
+  const undated = finishedAll.value.length - finishedDated.value.length
+  return range.value === 'all' && undated
+    ? `${by} · ${undated} read without a date`
+    : by
+})
+
 const finishedOn = (book: Book) =>
-  dayjs.utc(toSimpleDate(book.progress.finishedAt!))
+  dayjs.utc(toSimpleDate(getBookFinishedAt(book)!))
 
 const finished = computed(() =>
-  finishedAll.value.filter(
-    (book) => !rangeStart.value || !finishedOn(book).isBefore(rangeStart.value),
-  ),
+  rangeStart.value
+    ? finishedDated.value.filter(
+        (book) => !finishedOn(book).isBefore(rangeStart.value!),
+      )
+    : finishedAll.value,
 )
 
 const pagesRead = computed(() =>
@@ -358,8 +367,9 @@ const longestBook = computed(() =>
 )
 
 const averageDays = computed(() => {
+  // Only books with a real start and finish date say how long a read took
   const durations = finished.value
-    .filter(({ progress }) => !!progress.startedAt)
+    .filter(({ progress }) => !!progress.startedAt && !!progress.finishedAt)
     .map((book) =>
       Math.max(
         1,
@@ -385,7 +395,7 @@ const featuredGoal = computed(() =>
 
 const buckets = computed<StatsActivityBucket[]>(() => {
   if (range.value === 'all') {
-    const years = finishedAll.value.map((book) => finishedOn(book).year())
+    const years = finishedDated.value.map((book) => finishedOn(book).year())
     const first = years.length ? Math.min(...years) : today.year()
     return Array.from({ length: today.year() - first + 1 }, (_, index) => {
       const year = first + index
@@ -393,7 +403,7 @@ const buckets = computed<StatsActivityBucket[]>(() => {
         key: `y${year}`,
         label: String(year),
         short: String(year),
-        books: finishedAll.value.filter(
+        books: finishedDated.value.filter(
           (book) => finishedOn(book).year() === year,
         ),
       }
@@ -410,7 +420,7 @@ const buckets = computed<StatsActivityBucket[]>(() => {
         range.value === 'year'
           ? monthName
           : `${monthName[0]}${month.month() === 0 ? ` '${month.format('YY')}` : ''}`,
-      books: finishedAll.value.filter((book) =>
+      books: finishedDated.value.filter((book) =>
         finishedOn(book).isSame(month, 'month'),
       ),
     }

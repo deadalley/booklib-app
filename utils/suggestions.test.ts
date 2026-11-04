@@ -136,6 +136,26 @@ describe('getBookPercentage', () => {
     expect(getBookPercentage(read('b1'))).toBe(100)
     expect(getBookPercentage(book('b1', { pages: null }))).toBe(0)
   })
+
+  it('is 100% once read, whatever the logs say or without a page count', () => {
+    const logged = book('b1', {
+      progress: {
+        status: 'read',
+        currentPage: 40,
+        startedAt: null,
+        finishedAt: null,
+        notes: [
+          { createdAt: '2026-10-01T00:00:00.000Z', page: 40, content: '' },
+        ],
+      },
+    })
+    expect(getBookPercentage(logged)).toBe(100)
+    expect(
+      getBookPercentage(
+        book('b2', { pages: null, progress: { status: 'read' } as never }),
+      ),
+    ).toBe(100)
+  })
 })
 
 describe('buildSuggestions', () => {

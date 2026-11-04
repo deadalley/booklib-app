@@ -239,6 +239,24 @@ describe('auto-counting', () => {
     ])
   })
 
+  it('counts read books without a finish date by their last log entry', () => {
+    const logged = book('6', {
+      progress: {
+        ...book('6').progress,
+        finishedAt: null,
+        currentPage: 20,
+        notes: [
+          { createdAt: '2026-04-10T00:00:00.000Z', page: 20, content: '' },
+        ],
+      },
+    })
+    const undated = book('7', {
+      progress: { ...book('7').progress, finishedAt: null },
+    })
+    const resolved = resolveGoal(bookGoal({ auto: true }), [logged, undated])
+    expect(resolved.entries.map((entry) => entry.id)).toEqual(['auto-6'])
+  })
+
   it('leaves goals without auto-counting alone', () => {
     const goal = bookGoal()
     expect(resolveGoal(goal, books)).toBe(goal)

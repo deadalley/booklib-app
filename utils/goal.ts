@@ -7,6 +7,7 @@ import type {
   GoalPeriod,
   GoalPeriodUnit,
 } from '~/types/goal'
+import { getBookFinishedAt } from './book-progress'
 import { GOAL_INTERVAL_MAP } from './constants'
 import { todaySimpleDate, toSimpleDate } from './date'
 
@@ -397,8 +398,9 @@ function matchesGoalFilters(goal: Goal, book: Book): boolean {
 }
 
 function finishedInGoalWindow(goal: Goal, book: Book): boolean {
-  if (book.progress.status !== 'read' || !book.progress.finishedAt) return false
-  const finished = dayKey(book.progress.finishedAt)
+  const finishedAt = getBookFinishedAt(book)
+  if (!finishedAt) return false
+  const finished = dayKey(finishedAt)
   return finished >= dayKey(goal.startAt) && finished <= dayKey(goal.finishAt)
 }
 
@@ -424,7 +426,7 @@ export function resolveGoal(goal: Goal, books: Book[]): Goal {
     .map((book) => ({
       id: `auto-${book.id}`,
       book: book.id,
-      createdAt: book.progress.finishedAt!,
+      createdAt: getBookFinishedAt(book)!,
       auto: true,
     }))
 
