@@ -70,10 +70,19 @@
           <bl-stats-current :books="currentlyReading" />
         </bl-stats-tile>
 
-        <p class="section-label mt-4">
-          Across your library · {{ books.length }}
-          {{ books.length === 1 ? 'book' : 'books' }}
-        </p>
+        <!-- Same header style as the page header: the period switch above
+             doesn't apply to this section -->
+        <div class="mt-6 flex flex-col gap-1" data-testid="library-section">
+          <p class="text-primary text-xs font-bold tracking-[0.18em] uppercase">
+            Library
+          </p>
+          <h3 class="text-ink-primary text-balance">Across your library</h3>
+          <p class="text-ink-secondary">
+            All {{ formatCount(books.length) }}
+            {{ books.length === 1 ? 'book' : 'books' }}, whatever the period
+            above
+          </p>
+        </div>
 
         <bl-stats-tile class="span-5" title="Share by">
           <template #actions>
