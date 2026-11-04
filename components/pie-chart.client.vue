@@ -32,9 +32,11 @@ const props = defineProps<{
   unit?: string
 }>()
 
+const { colors } = useTheme()
+
 const option = computed<EChartsOption>(() => ({
   color: props.items.map((_, index) =>
-    Color(tailwind.colors.primary.DEFAULT)
+    Color(colors.value.primary.DEFAULT)
       .lighten(index * 0.1)
       .hex(),
   ),
@@ -56,7 +58,7 @@ const option = computed<EChartsOption>(() => ({
             fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
             fontSize: 14,
-            color: tailwind.colors.ink.secondary,
+            color: colors.value.ink.secondary,
             verticalAlign: 'middle',
             padding: [0, 6, 0, 0],
           },
@@ -64,18 +66,18 @@ const option = computed<EChartsOption>(() => ({
             fontFamily: tailwind.fontFamily.display[0],
             fontWeight: 500,
             fontSize: 14,
-            color: tailwind.colors.ink.inverse,
-            backgroundColor: tailwind.colors.primary.DEFAULT,
+            color: colors.value.ink.inverse,
+            backgroundColor: colors.value.primary.DEFAULT,
             verticalAlign: 'middle',
             padding: [4, 6],
             borderRadius: 4,
           },
         },
-        color: tailwind.colors.ink.primary,
+        color: colors.value.ink.primary,
       },
       labelLine: {
         lineStyle: {
-          color: tailwind.colors.ink.primary,
+          color: colors.value.ink.primary,
         },
         smooth: 0.1,
       },

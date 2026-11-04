@@ -133,6 +133,7 @@ for (const viewport of VIEWPORTS) {
     test('modals fit inside the viewport', async ({ page }) => {
       await page.goto('/tracking')
       await page.getByRole('button', { name: 'New goal' }).first().click()
+      await page.getByTestId('path-custom').click()
       const dialog = page.getByRole('dialog', { name: /goal/i })
       await expect(dialog).toBeVisible()
       const box = (await dialog.boundingBox())!

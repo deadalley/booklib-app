@@ -2,7 +2,11 @@
   <article
     :id="`goal-${goal.id}`"
     class="card tile"
-    :class="{ open, muted: info.status !== 'tracking' }"
+    :class="{
+      open,
+      muted: info.status !== 'tracking',
+      challenge: !!goal.challenge,
+    }"
   >
     <header class="flex flex-wrap items-start justify-between gap-4">
       <button
@@ -20,6 +24,10 @@
             <span class="goal-tag" :class="`goal-tag-${info.status}`">
               {{ GOAL_STATUS_LABELS[info.status] }}
             </span>
+            <bl-challenge-badge
+              v-if="goal.challenge"
+              :level="getChallengeLevel(goal)"
+            />
           </span>
           <span class="meta">
             <span v-for="item in meta" :key="item">{{ item }}</span>
@@ -197,11 +205,13 @@ const isDone = computed(
   () => info.value.status === 'completed' || info.value.status === 'expired',
 )
 
-const typeIcon = computed(() =>
-  info.value.status === 'completed'
-    ? 'IconTrophy'
-    : GOAL_TYPE_MAP[props.goal.type].icon,
-)
+const typeIcon = computed(() => {
+  if (info.value.status === 'completed') return 'IconTrophy'
+  if (props.goal.challenge) {
+    return getChallenge(props.goal.challenge)?.icon ?? 'IconFlame'
+  }
+  return GOAL_TYPE_MAP[props.goal.type].icon
+})
 
 const logLabel = computed(() =>
   props.goal.type === 'books' ? 'Log book' : `Log ${props.goal.type}`,
@@ -303,7 +313,14 @@ function togglePause() {
 .icon-well {
   @apply bg-primary-50 text-primary rounded-scholarly grid size-11 flex-none place-items-center;
 }
-.tile.muted .icon-well {
+.tile.challenge {
+  @apply border-secondary-200;
+}
+.tile.challenge .icon-well {
+  @apply bg-secondary-50 text-secondary-700;
+}
+.tile.muted .icon-well,
+.tile.challenge.muted .icon-well {
   @apply bg-surface-container text-ink-muted;
 }
 .title {

@@ -6,6 +6,11 @@ export type GoalInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'total'
 
 export type GoalStatus = 'tracking' | 'not-tracking'
 
+/** 1 = Moderate, 2 = Hard, 3 = Extreme */
+export type ChallengeLevel = 1 | 2 | 3
+
+export type NewGoalStep = 'choose' | 'challenges' | 'review' | 'custom'
+
 export type BookGoalEntry = {
   id: string
   book: Book['id']
@@ -55,6 +60,9 @@ export type Goal = (BookGoal | PageGoal | HourGoal) & {
   genres: string[]
   // Book goals only: count books marked as read within the goal window
   auto?: boolean
+  // Set when the goal was started from a challenge preset (utils/challenges)
+  challenge?: string
+  level?: ChallengeLevel
 }
 
 export type GoalDisplayStatus = GoalStatus | 'completed' | 'expired'

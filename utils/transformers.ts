@@ -165,6 +165,9 @@ export function dbGoalToGoal(dbGoal: GoalDB): Goal {
     genres: dbGoal.genres,
     completedAt: dbGoal.completed_at,
     auto: !!dbGoal.auto,
+    ...(dbGoal.challenge
+      ? { challenge: dbGoal.challenge, level: dbGoal.level }
+      : {}),
     ...typeAndEntries,
   } as Goal
 }
@@ -218,6 +221,7 @@ export function goalToDbGoal(goal: Goal): GoalDB {
     genres: goal.genres || [],
     completed_at: goal.completedAt || null,
     auto: goal.type === 'books' && !!goal.auto,
+    ...(goal.challenge ? { challenge: goal.challenge, level: goal.level } : {}),
     ...getGoalTypeAndEntriesDb(goal),
   }
 }

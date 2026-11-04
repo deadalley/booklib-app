@@ -8,7 +8,7 @@
           </p>
           <h3>Goals</h3>
         </div>
-        <bl-button @click="openGoalModal('new')">
+        <bl-button @click="openFlow('choose')">
           <template #prependIcon="iconProps">
             <IconPlus v-bind="iconProps" />
           </template>
@@ -16,21 +16,45 @@
         </bl-button>
       </div>
 
-      <bl-empty v-if="loaded && !goals.length" icon="IconChartAreaLine">
-        <template #label>
-          <p>You don’t have any goals yet.</p>
-        </template>
-        <template #action>
-          <bl-button @click="openGoalModal('new')">Create a new goal</bl-button>
-        </template>
-      </bl-empty>
+      <template v-if="loaded && !goals.length">
+        <div class="empty" data-testid="goals-empty">
+          <IconTarget :size="58" stroke="1" class="text-primary" />
+          <div class="flex flex-col gap-2 text-center">
+            <p class="font-display text-ink-primary text-2xl font-semibold">
+              No goals yet
+            </p>
+            <p class="text-ink-secondary">
+              Set a target of your own, or start with a challenge.
+            </p>
+          </div>
+          <div class="mt-3 flex flex-wrap justify-center gap-2">
+            <bl-button variant="secondary" @click="openFlow('custom')">
+              Custom goal
+            </bl-button>
+            <bl-button @click="openFlow('challenges')">
+              <template #prependIcon="iconProps">
+                <IconFlame v-bind="iconProps" />
+              </template>
+              Browse challenges
+            </bl-button>
+          </div>
+        </div>
+        <bl-challenge-callout
+          v-if="showCallout"
+          @browse="openFlow('challenges')"
+          @pick="(challenge) => openFlow('review', challenge.id)"
+          @dismiss="dismissCallout"
+        />
+      </template>
 
-      <template v-else>
-        <bl-goal-today-panel
-          v-if="groups.active.length"
-          :goals="groups.active"
-          @jump="jumpTo"
-          @log="(goal) => (logFor = goal.id)"
+      <template v-else-if="loaded">
+        <bl-goals-overview :goals="resolvedGoals" @jump="jumpTo" />
+
+        <bl-challenge-callout
+          v-if="showCallout"
+          @browse="openFlow('challenges')"
+          @pick="(challenge) => openFlow('review', challenge.id)"
+          @dismiss="dismissCallout"
         />
 
         <section v-if="groups.active.length" class="group">
@@ -79,6 +103,18 @@
         </section>
       </template>
     </div>
+
+    <bl-new-goal-flow
+      v-if="newGoalFlow"
+      :model-value="true"
+      :initial-step="newGoalFlow.step"
+      :challenge-id="newGoalFlow.challengeId"
+      :goals="resolvedGoals"
+      :authors="authors"
+      :books="books"
+      @update:model-value="(value) => !value && (newGoalFlow = null)"
+      @save="onCreateGoal"
+    />
 
     <bl-goal-modal
       v-if="goalModal"
@@ -140,10 +176,17 @@
 </template>
 
 <script setup lang="ts">
-import { IconChevronDown, IconPlus } from '@tabler/icons-vue'
+import {
+  IconChevronDown,
+  IconFlame,
+  IconPlus,
+  IconTarget,
+} from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
-import type { Goal } from '~/types/goal'
+import type { Goal, NewGoalStep } from '~/types/goal'
+
+const CALLOUT_DISMISSED_KEY = 'booklib.challengeCalloutDismissed'
 
 const props = defineProps<{ openNew?: boolean }>()
 
@@ -163,9 +206,30 @@ const logFor = ref<string | null>(null)
 const dayFor = ref<{ goalId: string; day: string } | null>(null)
 const confirmDelete = ref<Goal | null>(null)
 const goalModal = ref<{
-  mode: 'new' | 'edit' | 'repeat'
+  mode: 'edit' | 'repeat'
   goal: Goal | null
 } | null>(null)
+const newGoalFlow = ref<{ step: NewGoalStep; challengeId?: string } | null>(
+  null,
+)
+const calloutDismissed = ref(readCalloutDismissed())
+
+function readCalloutDismissed() {
+  try {
+    return localStorage.getItem(CALLOUT_DISMISSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function dismissCallout() {
+  calloutDismissed.value = true
+  try {
+    localStorage.setItem(CALLOUT_DISMISSED_KEY, '1')
+  } catch {
+    // The call-out stays hidden for this session
+  }
+}
 
 async function load() {
   const [authorData, bookData, goalData] = await Promise.all([
@@ -209,6 +273,14 @@ const groups = computed(() => {
 
   return { active, paused, done }
 })
+
+// Challenges stay reachable from "New goal" once the call-out is dismissed
+const showCallout = computed(
+  () =>
+    loaded.value &&
+    !calloutDismissed.value &&
+    !resolvedGoals.value.some(isLiveChallenge),
+)
 
 const findGoal = (id: string | null | undefined) =>
   resolvedGoals.value.find((goal) => goal.id === id)
@@ -257,11 +329,17 @@ function jumpTo(id: string) {
   })
 }
 
-function openGoalModal(
-  mode: 'new' | 'edit' | 'repeat',
-  goal: Goal | null = null,
-) {
+function openGoalModal(mode: 'edit' | 'repeat', goal: Goal | null = null) {
   goalModal.value = { mode, goal }
+}
+
+function openFlow(step: NewGoalStep, challengeId?: string) {
+  newGoalFlow.value = { step, challengeId }
+}
+
+async function onCreateGoal(goal: Goal) {
+  newGoalFlow.value = null
+  await onSaveGoalFromModal(goal)
 }
 
 async function saveGoal(goal: Goal) {
@@ -302,7 +380,7 @@ onMounted(async () => {
     expand(firstActive)
   }
 
-  if (props.openNew) openGoalModal('new')
+  if (props.openNew) openFlow('choose')
 })
 
 useHead({
@@ -319,6 +397,9 @@ useHead({
 }
 .group {
   @apply flex flex-col gap-4;
+}
+.empty {
+  @apply bg-surface-subtle flex flex-col items-center gap-5 rounded-xl px-4 py-12;
 }
 .tracking :deep(:focus-visible) {
   @apply outline-primary! outline-offset-2!;

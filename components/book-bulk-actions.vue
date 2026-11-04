@@ -229,6 +229,8 @@ function onAuthorConfirm() {
 @reference '../assets/css/main.css';
 
 .bulk-actions-bar {
+  /* Always dark, so its text stays light in both themes */
+  --ink-inverse: var(--ink-on-dark);
   @apply bg-surface-inverse text-ink-inverse flex max-w-full flex-wrap items-center justify-center gap-6 rounded-xl px-6 py-4 shadow-2xl;
   @apply max-sm:gap-3 max-sm:px-4 max-sm:py-3;
 }

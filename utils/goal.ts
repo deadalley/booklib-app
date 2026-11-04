@@ -7,6 +7,7 @@ import type {
   GoalPeriod,
   GoalPeriodUnit,
 } from '~/types/goal'
+import { getBookFinishedAt } from './book-progress'
 import { GOAL_INTERVAL_MAP } from './constants'
 import { todaySimpleDate, toSimpleDate } from './date'
 
@@ -273,6 +274,95 @@ export function getFeaturedGoal(
   )
 }
 
+/**
+ * Whether a goal is keeping up. Paused, finished and not-yet-started goals
+ * count as on track. Daily goals only fall behind once a whole day is missed,
+ * so a day still in progress never counts against them.
+ */
+export function isGoalOnTrack(
+  goal: Goal,
+  goalInfo?: GoalInfo,
+  today = todayKey(),
+): boolean {
+  const info = goalInfo ?? getGoalInfo(goal, today)
+  if (info.status !== 'tracking' || !info.started) return true
+  if (goal.interval === 'total') return info.paceOffset >= 0
+
+  const current = info.current
+  if (!current || current.value >= goal.amount) return true
+
+  if (goal.interval === 'daily') {
+    const index = info.periods.indexOf(current)
+    return index <= 0 || info.periods[index - 1]!.value >= goal.amount
+  }
+
+  // Days of the current period already behind us; today is still in play
+  const elapsed =
+    daysBetween(current.start, today) /
+    (daysBetween(current.start, current.end) + 1)
+  return current.value >= goal.amount * elapsed * 0.9
+}
+
+export function getGoalTimeLeft(info: Pick<GoalInfo, 'daysLeft'>): {
+  value: number
+  unit: string
+} {
+  const days = info.daysLeft
+  if (days <= 1) return { value: 1, unit: 'day left' }
+  if (days <= 60) return { value: days, unit: 'days left' }
+  return { value: Math.round(days / 7), unit: 'weeks left' }
+}
+
+export type GoalWithInfo = { goal: Goal; info: GoalInfo }
+
+export type GoalsOverview = {
+  active: GoalWithInfo[]
+  paused: number
+  completed: number
+  expired: number
+  // Mean of the active goals' percentages
+  average: number
+  behind: number
+  // The started active goal with the earliest finish date
+  next: (GoalWithInfo & { onTrack: boolean }) | null
+}
+
+export function getGoalsOverview(
+  goals: Goal[],
+  today = todayKey(),
+): GoalsOverview {
+  const rows = goals.map((goal) => ({ goal, info: getGoalInfo(goal, today) }))
+  const count = (status: GoalDisplayStatus) =>
+    rows.filter(({ info }) => info.status === status).length
+
+  const active = rows.filter(({ info }) => info.status === 'tracking')
+  const average = active.length
+    ? Math.round(sum(active.map(({ info }) => info.pct)) / active.length)
+    : 0
+  const behind = active.filter(
+    ({ goal, info }) => !isGoalOnTrack(goal, info, today),
+  ).length
+
+  const next =
+    active
+      .filter(({ info }) => info.started)
+      .sort((a, b) =>
+        dayKey(a.goal.finishAt).localeCompare(dayKey(b.goal.finishAt)),
+      )[0] ?? null
+
+  return {
+    active,
+    paused: count('not-tracking'),
+    completed: count('completed'),
+    expired: count('expired'),
+    average,
+    behind,
+    next: next
+      ? { ...next, onTrack: isGoalOnTrack(next.goal, next.info, today) }
+      : null,
+  }
+}
+
 export function getGoalPaceUnit(goal: Goal): 'day' | 'week' | 'month' {
   const span = daysBetween(dayKey(goal.startAt), dayKey(goal.finishAt))
   if (span > 120) return 'month'
@@ -308,8 +398,9 @@ function matchesGoalFilters(goal: Goal, book: Book): boolean {
 }
 
 function finishedInGoalWindow(goal: Goal, book: Book): boolean {
-  if (book.progress.status !== 'read' || !book.progress.finishedAt) return false
-  const finished = dayKey(book.progress.finishedAt)
+  const finishedAt = getBookFinishedAt(book)
+  if (!finishedAt) return false
+  const finished = dayKey(finishedAt)
   return finished >= dayKey(goal.startAt) && finished <= dayKey(goal.finishAt)
 }
 
@@ -335,7 +426,7 @@ export function resolveGoal(goal: Goal, books: Book[]): Goal {
     .map((book) => ({
       id: `auto-${book.id}`,
       book: book.id,
-      createdAt: book.progress.finishedAt!,
+      createdAt: getBookFinishedAt(book)!,
       auto: true,
     }))
 

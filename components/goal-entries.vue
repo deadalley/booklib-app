@@ -224,7 +224,7 @@ function logUnlogged() {
       ...unlogged.value.map((book) => ({
         id: uuidv4(),
         book: book.id,
-        createdAt: toSimpleDate(book.progress.finishedAt!),
+        createdAt: toSimpleDate(getBookFinishedAt(book)!),
       })),
     ] as Entry[]),
   )

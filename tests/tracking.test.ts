@@ -11,6 +11,12 @@ import {
 
 const goalDialog = (page: Page) => page.getByRole('dialog', { name: /goal/i })
 
+/** "New goal" opens the flow at step 1; continue to the custom goal form. */
+async function openCustomGoal(page: Page) {
+  await page.getByRole('button', { name: 'New goal' }).first().click()
+  await page.getByTestId('path-custom').click()
+}
+
 /** The user's local calendar day, as the app uses for "today". */
 async function localToday(page: Page) {
   return page.evaluate(() => {
@@ -31,7 +37,7 @@ test.describe('creating goals', () => {
   })
 
   test('creates a yearly total book goal', async ({ page }) => {
-    await page.getByRole('button', { name: 'New goal' }).first().click()
+    await openCustomGoal(page)
     const dialog = goalDialog(page)
     await dialog.getByLabel('Goal title').fill('Read 10 books')
     await dialog.getByLabel('Amount').fill('10')
@@ -52,12 +58,92 @@ test.describe('creating goals', () => {
   })
 
   test('validates the title', async ({ page }) => {
-    await page.getByRole('button', { name: 'New goal' }).first().click()
+    await openCustomGoal(page)
     const dialog = goalDialog(page)
     await dialog.getByLabel('Goal title').fill('')
     await dialog.getByRole('button', { name: 'Create goal' }).click()
     await expect(dialog).toBeVisible()
     expect((await readLibrary(page)).goals).toEqual([])
+  })
+})
+
+test.describe('challenges', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedLibrary(page, makeDb({ books: [makeBook('Book 1')] }))
+    await page.goto('/tracking')
+    await expect(page.getByTestId('goals-empty')).toBeVisible()
+  })
+
+  test('starts a challenge from the new goal flow', async ({ page }) => {
+    await page.getByRole('button', { name: 'New goal' }).first().click()
+    await page.getByTestId('path-challenge').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByText('Choose a challenge')).toBeVisible()
+    await dialog.getByRole('radio', { name: 'Moderate' }).click()
+    await expect(dialog.getByTestId('challenge-52-books')).toBeHidden()
+    await dialog.getByTestId('challenge-30-day').click()
+
+    const review = dialog.getByTestId('challenge-review')
+    await expect(review.getByLabel('Name')).toHaveValue('30-day streak')
+    await expect(review.getByTestId('challenge-pace')).toContainText(
+      '20 pages every day',
+    )
+    await expect(review.getByText('Matches the preset')).toBeVisible()
+    await review.getByLabel(/^Target/).fill('30')
+    await expect(review.getByText('Tougher than the preset')).toBeVisible()
+    await review.getByRole('button', { name: 'Accept challenge' }).click()
+
+    await expect(
+      page.getByRole('heading', { name: '30-day streak' }),
+    ).toBeVisible()
+    await expect(page.getByTitle('Moderate challenge')).toBeVisible()
+    const [goal] = (await readLibrary(page)).goals
+    expect(goal).toMatchObject({
+      title: '30-day streak',
+      type: 'pages',
+      interval: 'daily',
+      amount: 30,
+      challenge: '30-day',
+      level: 1,
+    })
+    // A live challenge hides the call-out
+    await expect(page.getByTestId('challenge-callout')).toBeHidden()
+    await expect(page.getByTestId('goals-overview')).toBeVisible()
+  })
+
+  test('validates the review step', async ({ page }) => {
+    await page
+      .getByTestId('challenge-callout')
+      .getByTestId('challenge-1000-pages')
+      .click()
+    const review = page.getByTestId('challenge-review')
+    await review.getByLabel('Name').fill('')
+    await review.getByRole('button', { name: 'Accept challenge' }).click()
+    await expect(review.getByText('Give your challenge a name')).toBeVisible()
+    expect((await readLibrary(page)).goals).toEqual([])
+  })
+
+  test('dismisses the call-out for good', async ({ page }) => {
+    const callout = page.getByTestId('challenge-callout')
+    await callout.getByRole('button', { name: 'Dismiss challenges' }).click()
+    await expect(callout).toBeHidden()
+    await page.reload()
+    await expect(page.getByTestId('goals-empty')).toBeVisible()
+    await expect(callout).toBeHidden()
+  })
+})
+
+test.describe('goals overview', () => {
+  test('summarizes goals and jumps to the next deadline', async ({ page }) => {
+    const soon = makeGoal('Finish soon', { amount: 5 })
+    await seedLibrary(page, makeDb({ goals: [soon] }))
+    await page.goto('/tracking')
+
+    const overview = page.getByTestId('goals-overview')
+    await expect(overview).toContainText('Average across 1 active goal')
+    await overview.getByRole('button', { name: /Finish soon/ }).click()
+    await expect(page.locator(`#goal-${soon.id}`)).toBeInViewport()
   })
 })
 
