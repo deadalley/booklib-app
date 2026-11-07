@@ -124,13 +124,37 @@ test.describe('challenges', () => {
     expect((await readLibrary(page)).goals).toEqual([])
   })
 
-  test('dismisses the call-out for good', async ({ page }) => {
-    const callout = page.getByTestId('challenge-callout')
-    await callout.getByRole('button', { name: 'Dismiss challenges' }).click()
-    await expect(callout).toBeHidden()
+  test('minimizes the section and shows challenges in a modal', async ({
+    page,
+  }) => {
+    const section = page.getByTestId('challenge-callout')
+    const restore = page.getByRole('button', {
+      name: 'Show reading challenges',
+    })
+    await expect(restore).toBeHidden()
+
+    await section.getByRole('button', { name: 'Minimize challenges' }).click()
+    await expect(section).toBeHidden()
+    await expect(restore).toBeVisible()
+
+    // Stays minimized across visits
     await page.reload()
     await expect(page.getByTestId('goals-empty')).toBeVisible()
-    await expect(callout).toBeHidden()
+    await expect(section).toBeHidden()
+
+    // The modal doesn't restore the section; picking goes to the review step
+    await restore.click()
+    const modal = page.getByTestId('challenges-modal')
+    await expect(modal).toBeVisible()
+    await modal.getByTestId('challenge-30-day').click()
+    await expect(page.getByTestId('challenge-review')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(section).toBeHidden()
+
+    // Browse all opens the challenge grid
+    await restore.click()
+    await modal.getByRole('button', { name: 'Browse all challenges' }).click()
+    await expect(page.getByText('Choose a challenge')).toBeVisible()
   })
 })
 

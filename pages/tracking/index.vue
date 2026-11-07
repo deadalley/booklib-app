@@ -8,12 +8,26 @@
           </p>
           <h3>Goals</h3>
         </div>
-        <bl-button @click="openFlow('choose')">
-          <template #prependIcon="iconProps">
-            <IconPlus v-bind="iconProps" />
-          </template>
-          New goal
-        </bl-button>
+        <div class="flex items-center gap-2">
+          <!-- Brings back a minimized challenges section, as a modal -->
+          <bl-icon-button
+            v-if="challengesMinimized"
+            variant="secondary"
+            class="text-secondary-700!"
+            aria-haspopup="dialog"
+            aria-label="Show reading challenges"
+            title="Show reading challenges"
+            @click="challengesModalOpen = true"
+          >
+            <IconFlame :size="20" stroke="1.8" />
+          </bl-icon-button>
+          <bl-button @click="openFlow('choose')">
+            <template #prependIcon="iconProps">
+              <IconPlus v-bind="iconProps" />
+            </template>
+            New goal
+          </bl-button>
+        </div>
       </div>
 
       <template v-if="loaded && !goals.length">
@@ -43,7 +57,7 @@
           v-if="showCallout"
           @browse="openFlow('challenges')"
           @pick="(challenge) => openFlow('review', challenge.id)"
-          @dismiss="dismissCallout"
+          @minimize="minimizeChallenges"
         />
       </template>
 
@@ -54,7 +68,7 @@
           v-if="showCallout"
           @browse="openFlow('challenges')"
           @pick="(challenge) => openFlow('review', challenge.id)"
-          @dismiss="dismissCallout"
+          @minimize="minimizeChallenges"
         />
 
         <section v-if="groups.active.length" class="group">
@@ -103,6 +117,23 @@
         </section>
       </template>
     </div>
+
+    <bl-challenges-modal
+      v-if="challengesModalOpen"
+      v-model="challengesModalOpen"
+      @pick="
+        (challenge) => {
+          challengesModalOpen = false
+          openFlow('review', challenge.id)
+        }
+      "
+      @browse="
+        () => {
+          challengesModalOpen = false
+          openFlow('challenges')
+        }
+      "
+    />
 
     <bl-new-goal-flow
       v-if="newGoalFlow"
@@ -186,7 +217,8 @@ import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Goal, NewGoalStep } from '~/types/goal'
 
-const CALLOUT_DISMISSED_KEY = 'booklib.challengeCalloutDismissed'
+// Kept from the former dismissible call-out so earlier dismissals carry over
+const CHALLENGES_MINIMIZED_KEY = 'booklib.challengeCalloutDismissed'
 
 const props = defineProps<{ openNew?: boolean }>()
 
@@ -212,22 +244,23 @@ const goalModal = ref<{
 const newGoalFlow = ref<{ step: NewGoalStep; challengeId?: string } | null>(
   null,
 )
-const calloutDismissed = ref(readCalloutDismissed())
+const challengesMinimized = ref(readChallengesMinimized())
+const challengesModalOpen = ref(false)
 
-function readCalloutDismissed() {
+function readChallengesMinimized() {
   try {
-    return localStorage.getItem(CALLOUT_DISMISSED_KEY) === '1'
+    return localStorage.getItem(CHALLENGES_MINIMIZED_KEY) === '1'
   } catch {
     return false
   }
 }
 
-function dismissCallout() {
-  calloutDismissed.value = true
+function minimizeChallenges() {
+  challengesMinimized.value = true
   try {
-    localStorage.setItem(CALLOUT_DISMISSED_KEY, '1')
+    localStorage.setItem(CHALLENGES_MINIMIZED_KEY, '1')
   } catch {
-    // The call-out stays hidden for this session
+    // The section stays minimized for this session
   }
 }
 
@@ -274,11 +307,11 @@ const groups = computed(() => {
   return { active, paused, done }
 })
 
-// Challenges stay reachable from "New goal" once the call-out is dismissed
+// Once minimized, challenges open in a modal from the header icon instead
 const showCallout = computed(
   () =>
     loaded.value &&
-    !calloutDismissed.value &&
+    !challengesMinimized.value &&
     !resolvedGoals.value.some(isLiveChallenge),
 )
 
