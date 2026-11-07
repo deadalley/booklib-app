@@ -70,7 +70,11 @@
 
     <div v-else-if="step === 'challenges'" class="browse">
       <div class="browse-bar">
-        <bl-button variant="tertiary" @click="step = 'choose'">
+        <bl-button
+          v-if="initialStep !== 'challenges'"
+          variant="tertiary"
+          @click="step = 'choose'"
+        >
           <template #prependIcon="iconProps">
             <IconArrowLeft v-bind="iconProps" />
           </template>

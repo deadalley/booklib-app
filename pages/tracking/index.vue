@@ -16,9 +16,9 @@
             aria-haspopup="dialog"
             aria-label="Show reading challenges"
             title="Show reading challenges"
-            @click="challengesModalOpen = true"
+            @click="openFlow('challenges')"
           >
-            <template #prependIcon="iconProps">
+            <template #prependIcon>
               <IconFlame :size="20" stroke="1.8" />
             </template>
             Challenges
@@ -119,23 +119,6 @@
         </section>
       </template>
     </div>
-
-    <bl-challenges-modal
-      v-if="challengesModalOpen"
-      v-model="challengesModalOpen"
-      @pick="
-        (challenge) => {
-          challengesModalOpen = false
-          openFlow('review', challenge.id)
-        }
-      "
-      @browse="
-        () => {
-          challengesModalOpen = false
-          openFlow('challenges')
-        }
-      "
-    />
 
     <bl-new-goal-flow
       v-if="newGoalFlow"
@@ -247,7 +230,6 @@ const newGoalFlow = ref<{ step: NewGoalStep; challengeId?: string } | null>(
   null,
 )
 const challengesMinimized = ref(readChallengesMinimized())
-const challengesModalOpen = ref(false)
 
 function readChallengesMinimized() {
   try {
