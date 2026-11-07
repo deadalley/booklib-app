@@ -10,17 +10,19 @@
         </div>
         <div class="flex items-center gap-2">
           <!-- Brings back a minimized challenges section, as a modal -->
-          <bl-icon-button
+          <bl-button
             v-if="challengesMinimized"
             variant="secondary"
-            class="text-secondary-700!"
             aria-haspopup="dialog"
             aria-label="Show reading challenges"
             title="Show reading challenges"
             @click="challengesModalOpen = true"
           >
-            <IconFlame :size="20" stroke="1.8" />
-          </bl-icon-button>
+            <template #prependIcon="iconProps">
+              <IconFlame :size="20" stroke="1.8" />
+            </template>
+            Challenges
+          </bl-button>
           <bl-button @click="openFlow('choose')">
             <template #prependIcon="iconProps">
               <IconPlus v-bind="iconProps" />
