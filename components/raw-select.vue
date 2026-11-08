@@ -116,7 +116,6 @@ export type SelectOption = {
   subtitle?: string
   imageSrc?: string | null
   href?: string
-  group?: 'books' | 'collections' | 'authors'
 }
 export type SelectProps = {
   dataTestid?: string

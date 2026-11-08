@@ -16,7 +16,7 @@
           ref="inputRef"
           v-model="searchTerm"
           class="min-w-0 flex-1"
-          placeholder="Search books, collections, authors..."
+          :placeholder="SEARCH_PLACEHOLDER"
         />
         <IconX
           v-if="searchTerm"
@@ -68,6 +68,7 @@ const { visibleGroups, notFoundLabel } = useSearchFilter(
   searchTerm,
 )
 
+// Also on mount: the modal is usually created already open
 watch(
   () => props.open,
   (open) => {
@@ -76,5 +77,6 @@ watch(
       nextTick(() => inputRef.value?.focus())
     }
   },
+  { immediate: true },
 )
 </script>
