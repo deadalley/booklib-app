@@ -1,12 +1,16 @@
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <bl-genre-tag
+    <bl-chip
       v-for="(genre, index) in genres"
       :key="genre"
-      :genre="genre"
+      rounded
       removable
+      :remove-label="`Remove ${genre}`"
+      data-testid="genre-tag"
       @remove="$emit('remove', index)"
-    />
+    >
+      {{ genre }}
+    </bl-chip>
 
     <div
       class="form-inner text-ink-muted w-44! gap-1.5! rounded-full! px-3! py-1! text-sm!"

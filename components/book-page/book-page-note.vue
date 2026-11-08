@@ -3,9 +3,14 @@
     <div class="flex min-w-0 flex-1 flex-col gap-[0.1875rem]">
       <div class="flex items-baseline gap-2">
         <span class="log-date">{{ formattedDate }}</span>
-        <span v-if="note.page !== undefined" class="log-page">
+        <bl-chip
+          v-if="note.page !== undefined"
+          size="xs"
+          rounded
+          variant="secondary"
+        >
           p. {{ note.page }}
-        </span>
+        </bl-chip>
       </div>
       <p v-if="note.content" class="log-text">{{ note.content }}</p>
     </div>
@@ -13,7 +18,7 @@
     <div class="log-tools">
       <bl-icon-button
         variant="tertiary"
-        class="p-1!"
+        size="sm"
         aria-label="Edit entry"
         @click="emit('edit')"
       >
@@ -23,7 +28,7 @@
       </bl-icon-button>
       <bl-icon-button
         variant="tertiary"
-        class="p-1!"
+        size="sm"
         aria-label="Delete entry"
         @click="emit('delete')"
       >
@@ -69,10 +74,6 @@ const formattedDate = computed(() => toFullDateCompact(props.note.createdAt))
 
 .log-date {
   @apply text-ink-primary text-[0.8125rem] font-bold;
-}
-
-.log-page {
-  @apply text-primary bg-primary-100 rounded-full px-[0.4375rem] py-px text-[0.6875rem] font-bold tracking-[0.06em];
 }
 
 .log-text {

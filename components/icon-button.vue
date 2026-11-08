@@ -1,8 +1,11 @@
 <template>
   <button
     type="button"
-    class="button p-2"
+    class="button"
     :class="{
+      'p-1': size === 'sm',
+      'p-2': size === 'md',
+      'size-11 p-0': size === 'lg',
       'button-primary': variant === 'primary',
       'button-secondary': variant === 'secondary',
       'button-tertiary': variant === 'tertiary',
@@ -22,7 +25,8 @@ withDefaults(
     disabled?: boolean
     variant?: 'primary' | 'secondary' | 'tertiary'
     keepStyle?: boolean // when button is disabled but is displayed in the same style
+    size?: 'sm' | 'md' | 'lg'
   }>(),
-  { variant: 'primary' },
+  { variant: 'primary', size: 'md' },
 )
 </script>

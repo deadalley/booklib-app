@@ -74,13 +74,13 @@
       </div>
 
       <div class="main">
+        <bl-home-year-stats :books="books" :authors="authors" :goals="goals" />
         <bl-home-continue-reading
           class="span-7"
           :books="reading"
           :authors="authors"
         />
         <bl-home-goals class="span-5" :goals="activeGoals" />
-        <bl-home-year-stats :books="books" />
         <bl-home-recent-books
           :books="latest"
           :authors="authors"

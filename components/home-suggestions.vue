@@ -11,10 +11,7 @@
     class="home-card carousel"
     aria-roledescription="carousel"
     aria-label="Suggestions"
-    @mouseenter="hovered = true"
-    @mouseleave="hovered = false"
-    @focusin="focused = true"
-    @focusout="onFocusOut"
+    v-on="carousel.listeners"
     @keydown.left="go(-1)"
     @keydown.right="go(1)"
   >
@@ -30,9 +27,16 @@
       >
         <div class="cover">
           <bl-home-book-cover :book="item.book" class="size-full p-4!" />
-          <span v-if="item.kind === 'almost'" class="cover-pct">
+          <bl-chip
+            v-if="item.kind === 'almost'"
+            size="sm"
+            rounded
+            bold
+            variant="primary"
+            class="absolute right-1.5 bottom-1.5"
+          >
             {{ item.progress }}%
-          </span>
+          </bl-chip>
         </div>
         <div class="flex min-w-0 flex-col gap-2">
           <p class="eyebrow">
@@ -70,22 +74,17 @@
     </div>
 
     <div v-if="items.length > 1" class="nav">
-      <div class="flex flex-1 gap-1.5">
-        <button
-          v-for="(item, k) in items"
-          :key="item.id"
-          type="button"
-          class="dot"
-          :class="{ on: k === index }"
-          :aria-label="`Suggestion ${k + 1}`"
-          :aria-current="k === index"
-          @click="index = k"
-        />
-      </div>
+      <bl-carousel-dots
+        v-model="index"
+        :count="items.length"
+        label="Suggestion"
+        size="sm"
+        class="-ml-2 flex-1"
+      />
       <span class="count">{{ index + 1 }} / {{ items.length }}</span>
       <bl-icon-button
         variant="secondary"
-        class="size-8"
+        size="sm"
         aria-label="Previous suggestion"
         @click="go(-1)"
       >
@@ -93,7 +92,7 @@
       </bl-icon-button>
       <bl-icon-button
         variant="secondary"
-        class="size-8"
+        size="sm"
         aria-label="Next suggestion"
         @click="go(1)"
       >
@@ -132,33 +131,8 @@ const emit = defineEmits<{
   (e: 'dismiss', id: string): void
 }>()
 
-const index = ref(0)
-const hovered = ref(false)
-const focused = ref(false)
-
-function go(step: number) {
-  const n = props.items.length
-  if (n) index.value = (index.value + step + n) % n
-}
-
-function onFocusOut(event: FocusEvent) {
-  const root = event.currentTarget as HTMLElement
-  if (!root.contains(event.relatedTarget as Node | null)) focused.value = false
-}
-
-// A dismissal can leave the index past the end
-watch(
-  () => props.items.length,
-  (n) => {
-    if (n && index.value >= n) index.value = n - 1
-  },
-)
-
-watchEffect((onCleanup) => {
-  if (hovered.value || focused.value || props.items.length < 2) return
-  const timer = setInterval(() => go(1), AUTOPLAY_MS)
-  onCleanup(() => clearInterval(timer))
-})
+const carousel = useCarousel(() => props.items.length, AUTOPLAY_MS)
+const { index, go } = carousel
 </script>
 
 <style scoped>
@@ -188,9 +162,6 @@ watchEffect((onCleanup) => {
 .cover > :first-child {
   @apply rounded-none;
 }
-.cover-pct {
-  @apply bg-primary text-ink-inverse absolute right-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-xs font-bold;
-}
 .eyebrow {
   @apply text-primary inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.12em] uppercase;
 }
@@ -202,15 +173,6 @@ watchEffect((onCleanup) => {
 }
 .nav {
   @apply absolute right-6 bottom-4 left-48 flex items-center gap-2;
-}
-.dot {
-  @apply bg-stroke size-2 cursor-pointer rounded-full p-0;
-  transition:
-    width 0.2s,
-    background-color 0.2s;
-}
-.dot.on {
-  @apply bg-primary w-6;
 }
 .count {
   @apply text-ink-muted mr-1 text-[0.8125rem] font-semibold tabular-nums;

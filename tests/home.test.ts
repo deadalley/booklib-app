@@ -98,14 +98,17 @@ test.describe('home', () => {
     const goals = page.getByRole('region', { name: 'Goals' })
     await expect(goals.getByText(`Read 12 books in ${year}`)).toBeVisible()
 
-    const stats = page.getByRole('region', { name: `Your ${year} so far` })
-    await expect(stats.getByText('books finished')).toBeVisible()
-    await expect(stats.getByText('5.0')).toBeVisible()
+    const review = page.getByTestId('home-year-review')
+    await expect(review.getByText(`Your ${year} in books`)).toBeVisible()
+    await expect(review.getByText('Books finished')).toBeVisible()
+    await expect(
+      review.getByRole('link', { name: `See your ${year} in review` }),
+    ).toHaveAttribute('href', `/stats/year/${year}`)
 
     const recent = page.getByRole('region', { name: 'Recently added' })
-    const tiles = recent.getByRole('link', { name: /Added/ })
-    await expect(tiles).toHaveCount(4)
-    await expect(tiles.first()).toContainText('Added 2 days ago')
+    const added = recent.getByText(/^Added /)
+    await expect(added).toHaveCount(4)
+    await expect(added.first()).toHaveText('Added 2 days ago')
   })
 
   test('orders the suggestions by kind', async ({ page }) => {

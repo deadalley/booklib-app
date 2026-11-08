@@ -71,32 +71,35 @@
           <!-- Global search bar -->
           <bl-global-search />
 
-          <button
-            type="button"
-            class="text-ink-secondary hover:text-primary grid flex-none cursor-pointer place-items-center"
+          <bl-icon-button
+            variant="tertiary"
+            class="flex-none"
             :aria-label="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
             :title="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
             data-testid="theme-toggle"
             @click="toggleTheme"
           >
-            <component
-              :is="theme === 'dark' ? IconSun : IconMoon"
-              :size="ICON_SIZE_MEDIUM"
-              stroke="1.5"
-            />
-          </button>
+            <template #default="iconProps">
+              <component
+                :is="theme === 'dark' ? IconSun : IconMoon"
+                v-bind="iconProps"
+              />
+            </template>
+          </bl-icon-button>
 
           <slot name="action-btn" />
 
-          <button
+          <bl-icon-button
             v-if="!!navigationItems?.length"
-            type="button"
-            class="hover:text-primary cursor-pointer lg:hidden"
+            variant="tertiary"
+            class="lg:hidden"
             aria-label="Open section menu"
             @click="sidebarOpen = !sidebarOpen"
           >
-            <IconMenu2 :size="ICON_SIZE_MEDIUM" stroke="1.5" />
-          </button>
+            <template #default="iconProps">
+              <IconMenu2 v-bind="iconProps" />
+            </template>
+          </bl-icon-button>
         </div>
       </nav>
       <div

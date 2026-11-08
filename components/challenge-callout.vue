@@ -13,11 +13,7 @@
         </p>
       </div>
       <div class="flex items-center gap-2">
-        <button
-          type="button"
-          class="link inline-flex items-center gap-1 self-center"
-          @click="$emit('browse')"
-        >
+        <button type="button" class="link self-center" @click="$emit('browse')">
           Browse all
           <IconArrowRight :size="14" stroke="2" />
         </button>

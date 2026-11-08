@@ -15,16 +15,15 @@
         <div
           class="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2"
         >
-          <button
+          <bl-option-card
             v-for="template in templates"
             :key="template.label"
-            type="button"
-            class="template"
+            layout="stack"
+            size="sm"
+            :icon="template.icon"
+            :title="template.label"
             @click="applyTemplate(template.values)"
-          >
-            <component :is="icons[template.icon]" :size="18" stroke="1.6" />
-            {{ template.label }}
-          </button>
+          />
         </div>
       </div>
 
@@ -108,17 +107,16 @@
         <div v-if="genres.length" class="form-wrapper">
           <span class="form-label">From genres</span>
           <div class="flex flex-wrap gap-1.5">
-            <button
+            <bl-pill
               v-for="genre in genres"
               :key="genre"
-              type="button"
-              class="pill small-pill"
-              :class="{ 'pill-selected': form.genres.includes(genre) }"
-              :aria-pressed="form.genres.includes(genre)"
+              as="button"
+              size="sm"
+              :selected="form.genres.includes(genre)"
               @click="toggleGenre(genre)"
             >
               {{ genre }}
-            </button>
+            </bl-pill>
           </div>
         </div>
       </fieldset>
@@ -129,16 +127,16 @@
           Duration
         </legend>
         <div class="flex flex-wrap gap-1.5">
-          <button
+          <bl-pill
             v-for="preset in PRESETS"
             :key="preset.value"
-            type="button"
-            class="pill small-pill"
-            :class="{ 'pill-selected': isPresetSelected(preset.value) }"
+            as="button"
+            size="sm"
+            :selected="isPresetSelected(preset.value)"
             @click="applyPreset(preset.value)"
           >
             {{ preset.label }}
-          </button>
+          </bl-pill>
         </div>
         <div class="row">
           <label class="form-wrapper">
@@ -201,12 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconArrowLeft,
-  IconCalendar,
-  IconTarget,
-  icons,
-} from '@tabler/icons-vue'
+import { IconArrowLeft, IconCalendar, IconTarget } from '@tabler/icons-vue'
 import { uniq } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import type { Author } from '~/types/author'
@@ -471,12 +464,6 @@ function onSubmit() {
   @apply -m-0.5 flex max-h-[min(70vh,44rem)] flex-col gap-5 overflow-y-auto p-0.5;
   container-type: inline-size;
 }
-.template {
-  @apply border-stroke bg-surface-elevated rounded-scholarly text-ink-primary hover:border-primary hover:bg-primary-50 flex cursor-pointer flex-col items-start gap-1.5 border px-3 py-2.5 text-left text-sm font-semibold;
-}
-.template svg {
-  @apply text-primary;
-}
 .fieldset {
   @apply m-0 flex flex-col gap-3 border-0 p-0;
 }
@@ -488,9 +475,6 @@ function onSubmit() {
 }
 .row > .form-wrapper:not(.flex-none) {
   @apply min-w-0 flex-1;
-}
-.small-pill {
-  @apply text-ink-secondary px-3 py-1 text-[0.8125rem] font-semibold whitespace-nowrap;
 }
 .form-inner.error {
   @apply border-primary-500;

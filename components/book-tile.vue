@@ -40,9 +40,26 @@
           <component :is="icons[floatingIcon]" :size="14" stroke="1.75" />
         </span>
 
-        <span class="book-tile-status" :class="statusClass">
+        <!-- A ranked list (Year in Review) shows the rank instead -->
+        <bl-chip
+          v-if="rank"
+          size="sm"
+          rounded
+          bold
+          :variant="rank === 1 ? 'primary' : 'default'"
+          class="absolute top-3 left-3"
+        >
+          #{{ rank }}
+        </bl-chip>
+        <bl-chip
+          v-else
+          size="xs"
+          rounded
+          :variant="book.progress.status === 'reading' ? 'primary' : 'default'"
+          class="absolute top-3 right-3"
+        >
           {{ statusLabel }}
-        </span>
+        </bl-chip>
 
         <span
           v-if="selectable"
@@ -62,6 +79,7 @@
           <p class="book-tile-author">
             {{ book.authorName ?? 'Unknown author' }}
           </p>
+          <p v-if="caption" class="book-tile-caption">{{ caption }}</p>
         </div>
 
         <div class="book-tile-meta">
@@ -101,6 +119,9 @@ const props = defineProps<{
   selectable?: boolean
   draggable?: boolean
   floatingIcon?: keyof typeof icons
+  rank?: number
+  // An extra line under the author, e.g. "Added 2 days ago"
+  caption?: string
 }>()
 
 const emit = defineEmits(['selected'])
@@ -115,17 +136,6 @@ const statusLabel = computed(() => {
       return 'Reading'
     default:
       return 'To Read'
-  }
-})
-
-const statusClass = computed(() => {
-  switch (props.book.progress.status) {
-    case 'read':
-      return 'book-tile-status-completed'
-    case 'reading':
-      return 'book-tile-status-reading'
-    default:
-      return 'book-tile-status-to-read'
   }
 })
 

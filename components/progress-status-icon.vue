@@ -1,7 +1,13 @@
 <template>
   <!-- The tooltip always carries the full label: the chip may be truncated -->
   <bl-tooltip v-if="PROGRESS_STATUS_MAP[status]" class="max-w-full min-w-0">
-    <span v-if="!iconOnly" class="status-chip">
+    <bl-chip
+      v-if="!iconOnly"
+      size="sm"
+      rounded
+      variant="primary"
+      class="max-w-full min-w-0 cursor-default"
+    >
       <component
         :is="icons[PROGRESS_STATUS_MAP[status].icon]"
         :size="14"
@@ -12,7 +18,7 @@
       <span class="truncate">
         {{ PROGRESS_STATUS_MAP[status].description }}
       </span>
-    </span>
+    </bl-chip>
     <bl-icon-button v-if="iconOnly" disabled keep-style>
       <template #default="iconProps">
         <component
@@ -36,9 +42,4 @@ defineProps<{ status: BookProgressStatus; iconOnly?: boolean }>()
 
 <style scoped>
 @reference '../assets/css/main.css';
-
-/* Compact and shrinkable so it always fits its table column */
-.status-chip {
-  @apply bg-primary text-ink-inverse inline-flex max-w-full min-w-0 cursor-default items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap;
-}
 </style>

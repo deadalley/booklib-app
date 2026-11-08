@@ -25,9 +25,14 @@
           <p class="goal-link-tile-kicker">{{ windowSummary }}</p>
         </div>
 
-        <span class="goal-link-tile-status" :class="statusClass">
+        <bl-chip
+          size="xs"
+          rounded
+          class="shrink-0"
+          v-bind="GOAL_STATUS_CHIPS[status ?? 'expired']"
+        >
           {{ statusLabel }}
-        </span>
+        </bl-chip>
       </div>
 
       <div class="goal-link-tile-progress-row">
@@ -124,23 +129,6 @@ const genresSummary = computed(() => {
 const status = computed(() => getGoalStatus(props.goal))
 const statusLabel = computed(() => getGoalStatusLabel(props.goal))
 
-const statusClass = computed(() => {
-  if (!props.goal.status) return 'goal-link-tile-status-expired'
-
-  switch (status.value) {
-    case 'tracking':
-      return 'goal-link-tile-status-tracking'
-    case 'not-tracking':
-      return 'goal-link-tile-status-not-tracking'
-    case 'completed':
-      return 'goal-link-tile-status-completed'
-    case 'expired':
-      return 'goal-link-tile-status-expired'
-    default:
-      return 'goal-link-tile-status-expired'
-  }
-})
-
 const accentClass = computed(() => {
   if (['completed', 'expired', 'not-tracking'].includes(status.value)) {
     return 'goal-link-tile-accent-muted'
@@ -236,26 +224,6 @@ const progressBarColor = computed(() => getGoalProgressColor(props.goal, 'bg'))
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-}
-
-.goal-link-tile-status {
-  @apply inline-flex w-fit shrink-0 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase;
-}
-
-.goal-link-tile-status-tracking {
-  @apply bg-primary text-ink-inverse;
-}
-
-.goal-link-tile-status-not-tracking {
-  @apply bg-ink-secondary/30 text-ink-inverse;
-}
-
-.goal-link-tile-status-completed {
-  @apply bg-surface text-ink-secondary;
-}
-
-.goal-link-tile-status-expired {
-  @apply bg-surface text-ink-secondary;
 }
 
 .goal-link-tile-progress-row {

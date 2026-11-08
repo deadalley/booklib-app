@@ -10,23 +10,23 @@
           <!-- Title -->
           <h3>{{ title }}</h3>
           <!-- Total -->
-          <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
+          <bl-chip v-if="total">{{ total }}</bl-chip>
           <!-- Sidebar trigger button -->
           <div class="flex flex-1 justify-end sm:hidden">
-            <button
-              type="button"
-              class="text-ink-secondary hover:text-primary cursor-pointer"
+            <bl-icon-button
+              variant="tertiary"
               :aria-expanded="actionsOpen"
               :aria-label="actionsOpen ? 'Hide actions' : 'Show actions'"
               @click="actionsOpen = !actionsOpen"
             >
-              <IconChevronDown
-                :size="ICON_SIZE_MEDIUM"
-                stroke="1.5"
-                class="transition-all duration-300"
-                :class="{ 'rotate-180': actionsOpen }"
-              />
-            </button>
+              <template #default="iconProps">
+                <IconChevronDown
+                  v-bind="iconProps"
+                  class="transition-all duration-300"
+                  :class="{ 'rotate-180': actionsOpen }"
+                />
+              </template>
+            </bl-icon-button>
           </div>
         </div>
         <slot v-if="!isMobile" name="headerActions" />

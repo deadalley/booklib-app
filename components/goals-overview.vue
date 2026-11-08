@@ -14,18 +14,21 @@
             <b>{{ overview.average }}</b>
             <span>%</span>
           </p>
-          <span class="pill" :class="overview.behind ? 'warn' : 'ok'">
-            <component
-              :is="overview.behind ? IconAlertTriangle : IconCheck"
-              :size="14"
-              stroke="2.2"
-            />
+          <bl-chip rounded bold size="sm" v-bind="statusChip(!overview.behind)">
+            <template #prependIcon>
+              <component
+                :is="overview.behind ? IconAlertTriangle : IconCheck"
+                :size="14"
+                stroke="2.2"
+                :class="{ 'text-primary': !overview.behind }"
+              />
+            </template>
             {{
               overview.behind
                 ? `${overview.behind} of ${overview.active.length} behind`
                 : 'All on track'
             }}
-          </span>
+          </bl-chip>
         </div>
         <div class="bar" aria-hidden="true">
           <span :style="{ width: `${overview.average}%` }" />
@@ -71,14 +74,17 @@
             <span :style="{ width: `${next.info.pct}%` }" />
           </span>
         </button>
-        <span class="pill" :class="next.onTrack ? 'ok' : 'warn'">
-          <component
-            :is="next.onTrack ? IconCheck : IconAlertTriangle"
-            :size="14"
-            stroke="2.2"
-          />
+        <bl-chip rounded bold size="sm" v-bind="statusChip(next.onTrack)">
+          <template #prependIcon>
+            <component
+              :is="next.onTrack ? IconCheck : IconAlertTriangle"
+              :size="14"
+              stroke="2.2"
+              :class="{ 'text-primary': next.onTrack }"
+            />
+          </template>
           {{ next.onTrack ? 'On track' : 'Behind pace' }}
-        </span>
+        </bl-chip>
       </template>
       <p v-else class="note flex flex-1 items-center gap-2 leading-snug">
         <IconCalendar :size="18" stroke="1.6" class="flex-none" />
@@ -103,6 +109,10 @@ const props = defineProps<{ goals: Goal[] }>()
 defineEmits<{ (e: 'jump', id: string): void }>()
 
 const overview = computed(() => getGoalsOverview(props.goals))
+
+// On track: a neutral chip; behind: the amber one
+const statusChip = (onTrack: boolean) =>
+  onTrack ? {} : { variant: 'secondary' as const, color: 'secondary' as const }
 const next = computed(() => overview.value.next)
 const timeLeft = computed(() => next.value && getGoalTimeLeft(next.value.info))
 
@@ -176,18 +186,6 @@ const nextProgress = computed(() => {
 }
 .note {
   @apply text-ink-muted text-[0.8125rem] font-semibold;
-}
-.pill {
-  @apply inline-flex w-fit items-center gap-1.5 rounded-full border border-transparent px-2.5 py-0.75 text-xs font-bold whitespace-nowrap;
-}
-.pill.ok {
-  @apply bg-surface-container text-ink-secondary;
-}
-.pill.ok svg {
-  @apply text-primary;
-}
-.pill.warn {
-  @apply bg-secondary-50 text-secondary-800 border-secondary-200;
 }
 .bar {
   @apply bg-surface-container h-2.5 overflow-hidden rounded-full;

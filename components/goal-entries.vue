@@ -96,13 +96,15 @@
             </span>
           </span>
           <span class="entry-date">{{ formatGoalDate(entry.createdAt) }}</span>
-          <span
+          <bl-chip
             v-if="isAuto(entry)"
-            class="auto-tag"
+            size="xs"
+            rounded
+            class="justify-self-end"
             title="Counted from your library"
           >
             Auto
-          </span>
+          </bl-chip>
           <span v-else class="entry-tools">
             <bl-icon-button
               variant="tertiary"
@@ -264,8 +266,5 @@ function logUnlogged() {
 .entry-list li:hover .entry-tools,
 .entry-tools:focus-within {
   @apply opacity-100;
-}
-.auto-tag {
-  @apply bg-surface-container text-ink-secondary justify-self-end rounded-full px-2 py-0.5 text-[0.6875rem] font-bold tracking-widest uppercase;
 }
 </style>

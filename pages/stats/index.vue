@@ -66,6 +66,28 @@
           <bl-stats-current :books="currentlyReading" />
         </bl-stats-tile>
 
+        <bl-section-tile
+          v-if="reviewCallout"
+          :href="`/stats/year/${reviewCallout.year}`"
+          icon="IconSparkles"
+          :aria-label="reviewCallout.ariaLabel"
+          class="review-callout"
+          data-testid="year-review-callout"
+        >
+          <template #eyebrow>{{ reviewCallout.eyebrow }}</template>
+          <template #label>{{ reviewCallout.title }}</template>
+          <template #description>{{ reviewCallout.description }}</template>
+          <!-- The whole tile is the link; this is a visual cue only -->
+          <bl-button
+            :to="`/stats/year/${reviewCallout.year}`"
+            variant="secondary"
+            tabindex="-1"
+            aria-hidden="true"
+          >
+            {{ reviewCallout.cta }}
+          </bl-button>
+        </bl-section-tile>
+
         <!-- Same header style as the page header: the period switch above
              doesn't apply to this section -->
         <div class="mt-6 flex flex-col gap-1" data-testid="library-section">
@@ -303,6 +325,37 @@ const rankOrder = ref<'top' | 'low'>('top')
 const selectedBucket = ref<string | null>(null)
 
 watch(range, () => (selectedBucket.value = null))
+
+// Year in Review callout: this year so far, or last year's once a new year
+// starts with nothing logged yet
+const reviewCallout = computed(() => {
+  const year = getCurrentYear()
+  const current = getYearTotals(books.value, year)
+  const plural = (count: number, word: string) =>
+    `${formatCount(count)} ${word}${count === 1 ? '' : 's'}`
+
+  if (current.books || current.days) {
+    return {
+      year,
+      eyebrow: 'Year in progress',
+      title: `Your ${year} in books`,
+      description: `${formatCount(current.books)} finished, ${plural(current.days, 'reading day')} so far.`,
+      cta: 'Open year in review →',
+      ariaLabel: `Open your ${year} year in review`,
+    }
+  }
+
+  const previous = getYearTotals(books.value, year - 1)
+  if (!previous.books && !previous.days) return null
+  return {
+    year: year - 1,
+    eyebrow: 'Ready to open',
+    title: `Your ${year - 1} in review is ready`,
+    description: `${plural(previous.books, 'book')} finished and ${plural(previous.days, 'reading day')}. Take a look back at the whole year.`,
+    cta: `Open ${year - 1} in review →`,
+    ariaLabel: `Open your ${year - 1} in review`,
+  }
+})
 
 const RANGE_TITLES = computed<Record<Range, string>>(() => ({
   year: String(getCurrentYear()),
@@ -740,7 +793,7 @@ useHead({
 </script>
 
 <style scoped>
-@reference '../assets/css/main.css';
+@reference '../../assets/css/main.css';
 
 .stats {
   @apply mx-auto flex w-full max-w-[90rem] flex-col gap-6;

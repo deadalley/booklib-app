@@ -77,9 +77,9 @@
           }}
         </span>
       </span>
-      <span class="comparison" :class="comparison">
+      <bl-chip size="sm" rounded bold v-bind="COMPARISON_CHIPS[comparison]">
         {{ CHALLENGE_COMPARISON_LABELS[comparison] }}
-      </span>
+      </bl-chip>
     </div>
 
     <button
@@ -179,6 +179,12 @@ const target = computed<ChallengeTarget>(() => ({
   finishAt: form.finishAt,
 }))
 
+const COMPARISON_CHIPS = {
+  preset: { variant: 'secondary', color: 'secondary' },
+  tougher: { variant: 'secondary', color: 'primary' },
+  easier: {},
+} as const
+
 const comparison = computed(() => {
   if (!isValid.value) return 'preset'
   const preset = presetForm()
@@ -269,18 +275,6 @@ function onSubmit() {
 }
 .pace {
   @apply bg-surface-subtle border-stroke-subtle rounded-scholarly flex flex-wrap items-center gap-x-3 gap-y-2 border px-4 py-3;
-}
-.comparison {
-  @apply rounded-full border border-transparent px-2.5 py-0.75 text-xs font-bold whitespace-nowrap;
-}
-.comparison.preset {
-  @apply bg-secondary-50 text-secondary-800 border-secondary-200;
-}
-.comparison.tougher {
-  @apply bg-primary-50 text-primary-700 border-primary-200;
-}
-.comparison.easier {
-  @apply bg-surface-container text-ink-secondary;
 }
 .actions {
   @apply flex flex-wrap items-center justify-end gap-2;

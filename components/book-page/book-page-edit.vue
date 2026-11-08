@@ -1,11 +1,7 @@
 <template>
   <section class="@container mx-auto flex w-full max-w-[90rem] flex-col gap-8">
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <button
-        type="button"
-        class="text-ink-secondary hover:text-primary inline-flex cursor-pointer items-center gap-2 py-2 text-base font-semibold"
-        @click="$emit('cancel')"
-      >
+      <button type="button" class="link-back" @click="$emit('cancel')">
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         Back
       </button>
@@ -192,13 +188,11 @@
             <section v-if="customCollections.length" class="book-page-section">
               <p class="book-page-section-title">Collections</p>
               <div class="flex flex-wrap gap-2">
-                <button
+                <bl-pill
                   v-for="collection in customCollections"
                   :key="collection.id"
-                  type="button"
-                  class="pill"
-                  :class="{ 'pill-selected': collection.selected }"
-                  :aria-pressed="!!collection.selected"
+                  as="button"
+                  :selected="!!collection.selected"
                   @click="
                     $emit('collection-select', {
                       collectionId: String(collection.id),
@@ -208,7 +202,7 @@
                 >
                   <IconCheck v-if="collection.selected" :size="14" stroke="2" />
                   {{ collection.name }}
-                </button>
+                </bl-pill>
               </div>
             </section>
           </FormKit>

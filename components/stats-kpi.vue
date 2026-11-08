@@ -20,6 +20,8 @@
     >
       {{ hint }}
     </p>
+    <!-- Extra detail under the number, e.g. a change from last year -->
+    <slot />
   </div>
 </template>
 
