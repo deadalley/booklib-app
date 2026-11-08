@@ -11,10 +11,7 @@
     class="home-card carousel"
     aria-roledescription="carousel"
     aria-label="Suggestions"
-    @mouseenter="hovered = true"
-    @mouseleave="hovered = false"
-    @focusin="focused = true"
-    @focusout="onFocusOut"
+    v-on="carousel.listeners"
     @keydown.left="go(-1)"
     @keydown.right="go(1)"
   >
@@ -132,33 +129,8 @@ const emit = defineEmits<{
   (e: 'dismiss', id: string): void
 }>()
 
-const index = ref(0)
-const hovered = ref(false)
-const focused = ref(false)
-
-function go(step: number) {
-  const n = props.items.length
-  if (n) index.value = (index.value + step + n) % n
-}
-
-function onFocusOut(event: FocusEvent) {
-  const root = event.currentTarget as HTMLElement
-  if (!root.contains(event.relatedTarget as Node | null)) focused.value = false
-}
-
-// A dismissal can leave the index past the end
-watch(
-  () => props.items.length,
-  (n) => {
-    if (n && index.value >= n) index.value = n - 1
-  },
-)
-
-watchEffect((onCleanup) => {
-  if (hovered.value || focused.value || props.items.length < 2) return
-  const timer = setInterval(() => go(1), AUTOPLAY_MS)
-  onCleanup(() => clearInterval(timer))
-})
+const carousel = useCarousel(() => props.items.length, AUTOPLAY_MS)
+const { index, go } = carousel
 </script>
 
 <style scoped>

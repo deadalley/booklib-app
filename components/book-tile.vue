@@ -40,7 +40,15 @@
           <component :is="icons[floatingIcon]" :size="14" stroke="1.75" />
         </span>
 
-        <span class="book-tile-status" :class="statusClass">
+        <!-- A ranked list (Year in Review) shows the rank instead -->
+        <span
+          v-if="rank"
+          class="book-tile-floating-icon text-xs font-bold"
+          :class="{ 'book-tile-rank-first': rank === 1 }"
+        >
+          #{{ rank }}
+        </span>
+        <span v-else class="book-tile-status" :class="statusClass">
           {{ statusLabel }}
         </span>
 
@@ -101,6 +109,7 @@ const props = defineProps<{
   selectable?: boolean
   draggable?: boolean
   floatingIcon?: keyof typeof icons
+  rank?: number
 }>()
 
 const emit = defineEmits(['selected'])
