@@ -1,11 +1,7 @@
 <template>
   <section class="@container mx-auto flex w-full max-w-[90rem] flex-col gap-8">
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <button
-        type="button"
-        class="text-ink-secondary hover:text-primary inline-flex cursor-pointer items-center gap-2 py-2 text-base font-semibold"
-        @click="$emit('cancel')"
-      >
+      <button type="button" class="link-back" @click="$emit('cancel')">
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         Back
       </button>
@@ -66,7 +62,7 @@
           <button
             v-if="selected.length"
             type="button"
-            class="text-ink-muted hover:text-primary cursor-pointer text-[0.8125rem] font-semibold underline"
+            class="link-muted"
             @click="selected = []"
           >
             Clear selection

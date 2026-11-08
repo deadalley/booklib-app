@@ -18,23 +18,15 @@
       v-if="insights.length > 1"
       class="flex items-center justify-between gap-3"
     >
-      <div role="group" aria-label="Choose a highlight" class="flex">
-        <button
-          v-for="(insight, k) in insights"
-          :key="insight.headline"
-          type="button"
-          class="dot-button"
-          :aria-label="`Highlight ${k + 1} of ${insights.length}`"
-          :aria-current="k === index"
-          @click="carousel.pick(k)"
-        >
-          <span class="dot" :class="{ on: k === index }" />
-        </button>
-      </div>
+      <bl-carousel-dots
+        v-model="index"
+        :count="insights.length"
+        label="Highlight"
+      />
       <div class="flex items-center gap-2">
         <bl-icon-button
           variant="secondary"
-          class="size-11"
+          size="lg"
           :aria-label="
             paused
               ? 'Resume automatic highlights'
@@ -50,7 +42,7 @@
         </bl-icon-button>
         <bl-icon-button
           variant="secondary"
-          class="size-11"
+          size="lg"
           aria-label="Previous highlight"
           @click="carousel.go(-1)"
         >
@@ -58,7 +50,7 @@
         </bl-icon-button>
         <bl-icon-button
           variant="secondary"
-          class="size-11"
+          size="lg"
           aria-label="Next highlight"
           @click="carousel.go(1)"
         >
@@ -111,15 +103,6 @@ const slide = computed(() => props.insights[index.value] ?? props.insights[0]!)
 .sub {
   @apply text-ink-secondary text-lg;
 }
-.dot-button {
-  @apply grid h-11 w-6 cursor-pointer place-items-center p-0;
-}
-.dot {
-  @apply bg-stroke block h-2 w-2 rounded-full transition-all;
-}
-.dot.on {
-  @apply bg-primary w-[22px];
-}
 
 @container (max-width: 640px) {
   .highlights {
@@ -139,9 +122,6 @@ const slide = computed(() => props.insights[index.value] ?? props.insights[0]!)
   }
   .sub {
     @apply text-[0.9375rem];
-  }
-  .dot-button {
-    @apply w-[22px];
   }
 }
 </style>

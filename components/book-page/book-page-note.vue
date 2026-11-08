@@ -13,7 +13,7 @@
     <div class="log-tools">
       <bl-icon-button
         variant="tertiary"
-        class="p-1!"
+        size="sm"
         aria-label="Edit entry"
         @click="emit('edit')"
       >
@@ -23,7 +23,7 @@
       </bl-icon-button>
       <bl-icon-button
         variant="tertiary"
-        class="p-1!"
+        size="sm"
         aria-label="Delete entry"
         @click="emit('delete')"
       >

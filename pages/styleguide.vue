@@ -113,6 +113,50 @@
                     </bl-icon-button>
                   </div>
                 </div>
+
+                <div class="flex flex-col gap-2">
+                  <p class="text-ink-secondary text-sm">
+                    Icon button sizes (sm · md · lg = 44px)
+                  </p>
+                  <div class="flex items-center gap-3">
+                    <bl-icon-button
+                      v-for="size in ICON_BUTTON_SIZES"
+                      :key="size"
+                      variant="secondary"
+                      :size="size"
+                      :aria-label="`Next (${size})`"
+                    >
+                      <IconChevronRight :size="16" stroke="2" />
+                    </bl-icon-button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t-stroke flex flex-col gap-3 border-t pt-4">
+                <p class="text-ink-secondary text-sm">Links</p>
+                <div class="flex flex-wrap items-center gap-6">
+                  <a href="#" class="link" @click.prevent>
+                    Browse all
+                    <IconArrowRight :size="14" stroke="2" />
+                  </a>
+                  <button type="button" class="link link-quiet">Expand</button>
+                  <button type="button" class="link-muted">
+                    Clear selection
+                  </button>
+                  <a href="#" class="link-back" @click.prevent>
+                    <IconArrowLeft :size="18" stroke="1.5" />
+                    Back
+                  </a>
+                </div>
+                <p class="text-ink-muted text-xs">
+                  <code>.link</code>
+                  ·
+                  <code>.link.link-quiet</code>
+                  ·
+                  <code>.link-muted</code>
+                  ·
+                  <code>.link-back</code>
+                </p>
               </div>
             </div>
           </bl-tile>
@@ -126,6 +170,23 @@
               <div class="flex flex-wrap items-center gap-3">
                 <bl-pill>Default</bl-pill>
                 <bl-pill selected>Selected</bl-pill>
+                <bl-pill size="sm">Small</bl-pill>
+                <bl-pill size="sm" selected>Small selected</bl-pill>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <bl-pill
+                  v-for="genreOption in genreOptions.slice(0, 3)"
+                  :key="genreOption.value"
+                  as="button"
+                  size="sm"
+                  :selected="pickedGenres.includes(genreOption.value)"
+                  @click="togglePickedGenre(genreOption.value)"
+                >
+                  {{ genreOption.label }}
+                </bl-pill>
+                <span class="text-ink-muted text-xs">
+                  as="button" toggles (aria-pressed)
+                </span>
               </div>
 
               <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
@@ -142,6 +203,31 @@
                   <bl-chip>Default</bl-chip>
                   <bl-chip bold>Bold</bl-chip>
                   <bl-chip rounded>Rounded</bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip size="sm" rounded bold>
+                    <template #prependIcon>
+                      <IconTrendingUp
+                        :size="14"
+                        stroke="2.2"
+                        class="text-primary"
+                      />
+                    </template>
+                    vs 2025: +5
+                  </bl-chip>
+                  <bl-chip size="sm" rounded bold variant="primary">
+                    Completed Mar 11
+                  </bl-chip>
+                  <bl-chip
+                    size="sm"
+                    rounded
+                    bold
+                    variant="secondary"
+                    color="secondary"
+                  >
+                    Running
+                  </bl-chip>
+                  <span class="text-ink-muted text-xs">size="sm"</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                   <bl-chip variant="primary">Primary</bl-chip>
@@ -399,6 +485,114 @@
           </bl-tile>
         </div>
 
+        <div class="col-span-12 xl:col-span-6">
+          <bl-tile>
+            <template #title>Badges & tags</template>
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <bl-genre-tag genre="Science fiction" />
+                <bl-genre-tag genre="Fantasy" size="sm" />
+                <bl-genre-tag genre="Removable" removable />
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <bl-challenge-difficulty-badge
+                  v-for="level in CHALLENGE_LEVELS"
+                  :key="level"
+                  :level="level"
+                />
+                <bl-challenge-badge :level="2" />
+              </div>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12 xl:col-span-6">
+          <bl-tile>
+            <template #title>Progress & carousels</template>
+            <div class="flex flex-col gap-4">
+              <div
+                v-for="size in PROGRESS_SIZES"
+                :key="size"
+                class="flex items-center gap-3"
+              >
+                <span class="text-ink-muted w-6 text-xs">{{ size }}</span>
+                <bl-progress-bar :progress-value="62" :size="size" />
+              </div>
+              <div class="flex flex-wrap items-center gap-6">
+                <bl-carousel-dots
+                  v-model="dotIndex"
+                  :count="5"
+                  label="Highlight"
+                />
+                <bl-carousel-dots
+                  v-model="dotIndex"
+                  :count="5"
+                  label="Insight"
+                  size="sm"
+                />
+                <span class="text-ink-muted text-xs">
+                  carousel-dots md (44px targets) · sm
+                </span>
+              </div>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12">
+          <bl-tile>
+            <template #title>Cards & tiles</template>
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <bl-stats-kpi icon="IconBooks" value="18" unit="books finished">
+                <bl-chip size="sm" rounded bold class="mt-1">
+                  vs 2025: +5
+                </bl-chip>
+              </bl-stats-kpi>
+              <bl-stats-tile title="Stats tile" sub="Title, sub and actions">
+                <bl-stats-empty label="No data" />
+              </bl-stats-tile>
+              <bl-section-tile href="/styleguide" icon="IconSparkles">
+                <template #eyebrow>Eyebrow</template>
+                <template #label>Section tile</template>
+                <template #description>The whole card is the link.</template>
+              </bl-section-tile>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12 xl:col-span-6">
+          <bl-tile>
+            <template #title>Overlays</template>
+            <div class="flex flex-wrap items-center gap-4">
+              <bl-modal size="sm" icon="IconSparkles">
+                <template #trigger>
+                  <bl-button variant="secondary">Open modal</bl-button>
+                </template>
+                <template #title>Modal title</template>
+                <template #subtitle>Optional subtitle</template>
+                <p class="text-ink-secondary">Modal body content.</p>
+                <template #cancel-label>Cancel</template>
+                <template #action-label>Confirm</template>
+              </bl-modal>
+              <bl-tooltip>
+                <bl-button variant="tertiary">Hover for tooltip</bl-button>
+                <template #tooltip-content>Tooltip content</template>
+              </bl-tooltip>
+            </div>
+          </bl-tile>
+        </div>
+
+        <div class="col-span-12 xl:col-span-6">
+          <bl-tile>
+            <template #title>Empty states</template>
+            <bl-empty icon="IconBooks">
+              <template #label>Nothing here yet</template>
+              <template #action>
+                <bl-button size="sm">Add a book</bl-button>
+              </template>
+            </bl-empty>
+          </bl-tile>
+        </div>
+
         <div class="col-span-12">
           <bl-tile>
             <template #title>Book Status Stepper</template>
@@ -590,7 +784,11 @@
 <script setup lang="ts">
 import {
   IconAlertTriangle,
+  IconArrowLeft,
+  IconArrowRight,
   IconBooks,
+  IconChevronRight,
+  IconTrendingUp,
   IconChevronDown,
   IconChevronUp,
   IconHome,
@@ -622,6 +820,18 @@ const owned = ref(true)
 const wishlist = ref(false)
 const rating = ref(4)
 const stepperStatus = ref<BookProgressStatus>('reading')
+const dotIndex = ref(1)
+const pickedGenres = ref<string[]>(['sci-fi'])
+
+const ICON_BUTTON_SIZES = ['sm', 'md', 'lg'] as const
+const PROGRESS_SIZES = ['xs', 'sm', 'md', 'lg'] as const
+const CHALLENGE_LEVELS = [1, 2, 3] as const
+
+function togglePickedGenre(value: string) {
+  pickedGenres.value = pickedGenres.value.includes(value)
+    ? pickedGenres.value.filter((genre) => genre !== value)
+    : [...pickedGenres.value, value]
+}
 
 const breadcrumbsLibrary = [
   { label: 'Library', to: '/library/books' },

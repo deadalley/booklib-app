@@ -39,7 +39,13 @@
           <div v-for="stat in stats" :key="stat.unit">
             <p class="number">{{ stat.value }}</p>
             <p class="unit">{{ stat.unit }}</p>
-            <bl-chip v-if="stat.delta" rounded bold class="delta mt-2 text-xs">
+            <bl-chip
+              v-if="stat.delta"
+              rounded
+              bold
+              size="sm"
+              class="delta mt-2"
+            >
               <template #prependIcon>
                 <IconTrendingUp
                   v-if="stat.delta.direction === 'up'"
@@ -63,24 +69,15 @@
             <p class="text-ink-primary text-[0.9375rem] font-bold">
               {{ insight.headline }}
             </p>
-            <div
+            <bl-carousel-dots
               v-if="review.insights.length > 1"
-              role="group"
-              aria-label="Choose an insight"
-              class="-ml-2 flex"
-            >
-              <button
-                v-for="(item, k) in review.insights"
-                :key="item.headline"
-                type="button"
-                class="dot-button"
-                :aria-label="`Insight ${k + 1} of ${review.insights.length}`"
-                :aria-current="k === index"
-                @click="carousel.pick(k, { hold: true })"
-              >
-                <span class="dot" :class="{ on: k === index }" />
-              </button>
-            </div>
+              :model-value="index"
+              :count="review.insights.length"
+              label="Insight"
+              size="sm"
+              class="-ml-2"
+              @update:model-value="(k) => carousel.pick(k, { hold: true })"
+            />
           </div>
         </div>
         <bl-button
@@ -197,15 +194,6 @@ const insight = computed(() => review.value.insights[index.value])
 }
 .insight-big {
   @apply font-display text-primary min-w-11 flex-none text-[26px] leading-none font-semibold;
-}
-.dot-button {
-  @apply grid size-6 cursor-pointer place-items-center p-0;
-}
-.dot {
-  @apply bg-primary-200 block h-1.5 w-1.5 rounded-full transition-all;
-}
-.dot.on {
-  @apply bg-primary w-4;
 }
 .see-review {
   @apply w-fit;

@@ -108,17 +108,16 @@
         <div v-if="genres.length" class="form-wrapper">
           <span class="form-label">From genres</span>
           <div class="flex flex-wrap gap-1.5">
-            <button
+            <bl-pill
               v-for="genre in genres"
               :key="genre"
-              type="button"
-              class="pill small-pill"
-              :class="{ 'pill-selected': form.genres.includes(genre) }"
-              :aria-pressed="form.genres.includes(genre)"
+              as="button"
+              size="sm"
+              :selected="form.genres.includes(genre)"
               @click="toggleGenre(genre)"
             >
               {{ genre }}
-            </button>
+            </bl-pill>
           </div>
         </div>
       </fieldset>
@@ -129,16 +128,16 @@
           Duration
         </legend>
         <div class="flex flex-wrap gap-1.5">
-          <button
+          <bl-pill
             v-for="preset in PRESETS"
             :key="preset.value"
-            type="button"
-            class="pill small-pill"
-            :class="{ 'pill-selected': isPresetSelected(preset.value) }"
+            as="button"
+            size="sm"
+            :selected="isPresetSelected(preset.value)"
             @click="applyPreset(preset.value)"
           >
             {{ preset.label }}
-          </button>
+          </bl-pill>
         </div>
         <div class="row">
           <label class="form-wrapper">
@@ -488,9 +487,6 @@ function onSubmit() {
 }
 .row > .form-wrapper:not(.flex-none) {
   @apply min-w-0 flex-1;
-}
-.small-pill {
-  @apply text-ink-secondary px-3 py-1 text-[0.8125rem] font-semibold whitespace-nowrap;
 }
 .form-inner.error {
   @apply border-primary-500;

@@ -35,14 +35,14 @@
           <NuxtLink
             v-if="open"
             :to="`/library/${collectionType}/${collection.id}`"
-            class="text-primary text-xs font-bold tracking-widest uppercase"
+            class="link"
           >
             See All
           </NuxtLink>
           <button
             v-else
             type="button"
-            class="text-ink-muted hover:text-primary cursor-pointer text-xs font-bold tracking-widest uppercase"
+            class="link link-quiet"
             @click="open = true"
           >
             Expand

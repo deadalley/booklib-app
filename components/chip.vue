@@ -10,6 +10,7 @@
         secondary: props.color === 'secondary',
         bold: props.bold,
         rounded: props.rounded,
+        sm: props.size === 'sm',
       },
       $attrs.class,
     ]"
@@ -27,11 +28,13 @@ const props = withDefaults(
     color?: 'primary' | 'secondary'
     bold?: boolean
     rounded?: boolean
+    size?: 'sm' | 'md'
   }>(),
   {
     variant: 'default',
     bold: false,
     rounded: false,
+    size: 'md',
   },
 )
 </script>
@@ -63,5 +66,8 @@ const props = withDefaults(
 }
 .rounded {
   @apply rounded-full;
+}
+.sm {
+  @apply gap-1 px-2.5 py-0.5 text-xs;
 }
 </style>

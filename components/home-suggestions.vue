@@ -67,22 +67,17 @@
     </div>
 
     <div v-if="items.length > 1" class="nav">
-      <div class="flex flex-1 gap-1.5">
-        <button
-          v-for="(item, k) in items"
-          :key="item.id"
-          type="button"
-          class="dot"
-          :class="{ on: k === index }"
-          :aria-label="`Suggestion ${k + 1}`"
-          :aria-current="k === index"
-          @click="index = k"
-        />
-      </div>
+      <bl-carousel-dots
+        v-model="index"
+        :count="items.length"
+        label="Suggestion"
+        size="sm"
+        class="-ml-2 flex-1"
+      />
       <span class="count">{{ index + 1 }} / {{ items.length }}</span>
       <bl-icon-button
         variant="secondary"
-        class="size-8"
+        size="sm"
         aria-label="Previous suggestion"
         @click="go(-1)"
       >
@@ -90,7 +85,7 @@
       </bl-icon-button>
       <bl-icon-button
         variant="secondary"
-        class="size-8"
+        size="sm"
         aria-label="Next suggestion"
         @click="go(1)"
       >
@@ -174,15 +169,6 @@ const { index, go } = carousel
 }
 .nav {
   @apply absolute right-6 bottom-4 left-48 flex items-center gap-2;
-}
-.dot {
-  @apply bg-stroke size-2 cursor-pointer rounded-full p-0;
-  transition:
-    width 0.2s,
-    background-color 0.2s;
-}
-.dot.on {
-  @apply bg-primary w-6;
 }
 .count {
   @apply text-ink-muted mr-1 text-[0.8125rem] font-semibold tabular-nums;

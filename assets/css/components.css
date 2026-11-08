@@ -1,7 +1,20 @@
 @layer components {
   /* Links */
+  /* Uppercase action link ("See all", "Browse all →") */
   .link {
-    @apply text-primary cursor-pointer self-start p-0 text-left text-[0.8125rem] font-bold tracking-widest whitespace-nowrap uppercase underline-offset-[3px] hover:underline;
+    @apply text-primary inline-flex cursor-pointer items-center gap-1 self-start p-0 text-left text-[0.8125rem] font-bold tracking-widest whitespace-nowrap uppercase underline-offset-[3px] hover:underline;
+  }
+  /* Same, for secondary actions ("Expand") */
+  .link-quiet {
+    @apply text-ink-muted hover:text-primary hover:no-underline;
+  }
+  /* Small sentence-case text action ("Clear selection") */
+  .link-muted {
+    @apply text-ink-muted hover:text-primary cursor-pointer text-[0.8125rem] font-semibold underline;
+  }
+  /* Back navigation at the top of a page */
+  .link-back {
+    @apply text-ink-secondary hover:text-primary inline-flex min-h-11 cursor-pointer items-center gap-2 text-base font-semibold;
   }
   /* Buttons */
   .button {
@@ -185,6 +198,9 @@
   .pill {
     @apply rounded-scholarly active:bg-surface border-stroke bg-surface-subtle hover:bg-surface-subtle/20 border;
     @apply relative inline-flex cursor-pointer items-center gap-2 px-4 py-1 font-medium transition-all;
+  }
+  .pill-sm {
+    @apply text-ink-secondary px-3 py-1 text-[0.8125rem] font-semibold whitespace-nowrap;
   }
   .pill-selected {
     @apply border-stroke-strong bg-surface-container hover:bg-surface/80;

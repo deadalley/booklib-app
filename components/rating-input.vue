@@ -31,7 +31,7 @@
     <button
       v-if="rating"
       type="button"
-      class="text-ink-muted hover:text-primary ml-1 cursor-pointer text-[0.8125rem] font-semibold underline"
+      class="link-muted ml-1"
       @click="$emit('commit', null)"
     >
       Clear

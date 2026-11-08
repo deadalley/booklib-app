@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div class="min-w-0 flex-1">
-          <NuxtLink to="/stats" class="back-link">
+          <NuxtLink to="/stats" class="link-back">
             <IconChevronLeft :size="16" stroke="2" />
             Statistics
           </NuxtLink>
@@ -21,7 +21,7 @@
         >
           <bl-icon-button
             variant="secondary"
-            class="size-11"
+            size="lg"
             aria-label="Previous year"
             :disabled="!olderYear"
             @click="goToYear(olderYear)"
@@ -36,7 +36,7 @@
           />
           <bl-icon-button
             variant="secondary"
-            class="size-11"
+            size="lg"
             aria-label="Next year"
             :disabled="!newerYear"
             @click="goToYear(newerYear)"
@@ -130,7 +130,7 @@
                 :value="kpi.value"
                 :unit="kpi.unit"
               >
-                <bl-chip v-if="kpi.delta" rounded bold class="mt-1 text-xs">
+                <bl-chip v-if="kpi.delta" rounded bold size="sm" class="mt-1">
                   <template #prependIcon>
                     <component
                       :is="DELTA_ICONS[kpi.delta.direction]"
@@ -325,12 +325,7 @@
                     {{ row.pct }}%
                   </span>
                 </div>
-                <bl-chip
-                  rounded
-                  bold
-                  class="text-xs"
-                  v-bind="GOAL_CHIP[row.status]"
-                >
+                <bl-chip rounded bold size="sm" v-bind="GOAL_CHIP[row.status]">
                   {{ goalStatusLabel(row) }}
                 </bl-chip>
               </li>
@@ -738,9 +733,6 @@ useHead({ title: () => `BookLib | ${year.value} in review` })
 }
 .review > :first-child {
   @apply -mb-8;
-}
-.back-link {
-  @apply text-primary inline-flex min-h-11 items-center gap-1.5 text-sm font-bold;
 }
 .eyebrow {
   @apply text-primary mt-2 mb-1.5 text-[0.8125rem] font-bold tracking-[0.12em] uppercase;
