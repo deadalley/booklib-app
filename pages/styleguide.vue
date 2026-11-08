@@ -190,14 +190,6 @@
               </div>
 
               <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
-                <p class="text-ink-secondary text-sm">Tags</p>
-                <div class="flex flex-wrap items-center gap-2">
-                  <bl-chip>128 books</bl-chip>
-                  <bl-chip variant="primary">12 finished</bl-chip>
-                </div>
-              </div>
-
-              <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
                 <p class="text-ink-secondary text-sm">Chips</p>
                 <div class="flex flex-wrap items-center gap-2">
                   <bl-chip>Default</bl-chip>
