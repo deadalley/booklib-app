@@ -106,9 +106,9 @@ test.describe('home', () => {
     ).toHaveAttribute('href', `/stats/year/${year}`)
 
     const recent = page.getByRole('region', { name: 'Recently added' })
-    const tiles = recent.getByRole('link', { name: /Added/ })
-    await expect(tiles).toHaveCount(4)
-    await expect(tiles.first()).toContainText('Added 2 days ago')
+    const added = recent.getByText(/^Added /)
+    await expect(added).toHaveCount(4)
+    await expect(added.first()).toHaveText('Added 2 days ago')
   })
 
   test('orders the suggestions by kind', async ({ page }) => {

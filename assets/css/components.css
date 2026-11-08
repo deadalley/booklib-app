@@ -120,7 +120,8 @@
     @apply flex flex-col gap-1;
   }
   .book-tile-title {
-    @apply overflow-hidden pb-0! leading-tight;
+    /* Long single words break instead of being cut off on narrow cards */
+    @apply overflow-hidden pb-0! leading-tight wrap-break-word;
     line-clamp: 2;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -128,6 +129,9 @@
   }
   .book-tile-author {
     @apply text-ink-secondary truncate text-sm;
+  }
+  .book-tile-caption {
+    @apply text-ink-muted truncate text-xs font-semibold;
   }
   .book-tile-meta {
     @apply border-stroke flex items-center justify-between border-t pt-2;

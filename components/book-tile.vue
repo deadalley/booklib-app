@@ -79,6 +79,7 @@
           <p class="book-tile-author">
             {{ book.authorName ?? 'Unknown author' }}
           </p>
+          <p v-if="caption" class="book-tile-caption">{{ caption }}</p>
         </div>
 
         <div class="book-tile-meta">
@@ -119,6 +120,8 @@ const props = defineProps<{
   draggable?: boolean
   floatingIcon?: keyof typeof icons
   rank?: number
+  // An extra line under the author, e.g. "Added 2 days ago"
+  caption?: string
 }>()
 
 const emit = defineEmits(['selected'])
