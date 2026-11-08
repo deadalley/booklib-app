@@ -39,7 +39,7 @@
           <div v-for="stat in stats" :key="stat.unit">
             <p class="number">{{ stat.value }}</p>
             <p class="unit">{{ stat.unit }}</p>
-            <bl-chip v-if="stat.delta" rounded bold class="mt-2 text-xs">
+            <bl-chip v-if="stat.delta" rounded bold class="delta mt-2 text-xs">
               <template #prependIcon>
                 <IconTrendingUp
                   v-if="stat.delta.direction === 'up'"
@@ -94,33 +94,13 @@
 
       <div v-if="review.top.length" class="top">
         <h5 class="stats-title text-xs!">Your top {{ topBooks.length }}</h5>
-        <div class="flex items-start gap-3">
-          <NuxtLink
+        <div class="top-books">
+          <bl-book-tile
             v-for="(book, rank) in topBooks"
             :key="book.id"
-            :to="`/library/books/${book.id}`"
-            class="top-book group"
-          >
-            <span class="top-cover">
-              <bl-home-book-cover :book="book" class="size-full" />
-              <span class="rank">#{{ rank + 1 }}</span>
-            </span>
-            <span
-              class="group-hover:text-primary text-sm leading-tight font-bold"
-            >
-              {{ book.title }}
-            </span>
-            <span class="text-ink-secondary text-[0.8125rem]">
-              {{ book.authorName ?? 'Unknown author' }}
-            </span>
-            <span
-              v-if="book.rating != null"
-              class="flex items-center gap-1 text-[0.8125rem] font-bold"
-            >
-              <IconStarFilled :size="12" class="text-primary" />
-              {{ book.rating.toFixed(1) }}
-            </span>
-          </NuxtLink>
+            :book="book"
+            :rank="rank + 1"
+          />
         </div>
       </div>
     </div>
@@ -128,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconSparkles, IconStarFilled, IconTrendingUp } from '@tabler/icons-vue'
+import { IconSparkles, IconTrendingUp } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Goal } from '~/types/goal'
@@ -233,17 +213,8 @@ const insight = computed(() => review.value.insights[index.value])
 .top {
   @apply border-stroke-subtle flex w-[460px] flex-none flex-col gap-3 border-l pl-10;
 }
-.top-book {
-  @apply flex min-w-0 flex-1 flex-col gap-0.5;
-}
-.top-cover {
-  @apply relative mb-2 block aspect-[2/3] w-full overflow-hidden rounded-md;
-}
-.top-cover > :first-child {
-  @apply rounded-none;
-}
-.rank {
-  @apply bg-surface-elevated text-ink-secondary border-stroke absolute top-1.5 left-1.5 rounded-full border px-2 text-[11px] font-bold;
+.top-books {
+  @apply grid grid-cols-3 gap-3;
 }
 .empty {
   @apply flex flex-row items-center gap-10;
@@ -268,6 +239,10 @@ const insight = computed(() => review.value.insights[index.value])
   }
   .see-review {
     @apply w-full;
+  }
+  /* Let "vs 2025: +540" wrap instead of overflowing the column */
+  .delta {
+    @apply max-w-full whitespace-normal!;
   }
   .top {
     @apply border-stroke-subtle w-full border-t border-l-0 pt-4.5 pl-0;
