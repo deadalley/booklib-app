@@ -230,6 +230,22 @@
                   <span class="text-ink-muted text-xs">size="sm"</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip size="xs" rounded variant="primary">Active</bl-chip>
+                  <bl-chip
+                    size="xs"
+                    rounded
+                    variant="secondary"
+                    color="secondary"
+                  >
+                    Paused
+                  </bl-chip>
+                  <bl-chip size="xs" rounded>Finished</bl-chip>
+                  <bl-chip size="xs" rounded variant="secondary">p. 40</bl-chip>
+                  <span class="text-ink-muted text-xs">
+                    size="xs": status badges
+                  </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
                   <bl-chip variant="primary">Primary</bl-chip>
                   <bl-chip variant="primary" bold>Bold</bl-chip>
                   <bl-chip variant="primary" rounded>Rounded</bl-chip>
@@ -559,6 +575,64 @@
           </bl-tile>
         </div>
 
+        <div class="col-span-12">
+          <bl-tile>
+            <template #title>Option cards</template>
+            <div class="flex flex-col gap-5">
+              <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
+                <bl-option-card
+                  v-for="option in OPTION_CARDS"
+                  :key="option.title"
+                  size="sm"
+                  :icon="option.icon"
+                  :title="option.title"
+                  :selected="pickedOption === option.title"
+                  :aria-pressed="pickedOption === option.title"
+                  @click="pickedOption = option.title"
+                />
+              </div>
+              <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
+                <bl-option-card
+                  title="JSON"
+                  description="Row layout (default), size md, selected"
+                  selected
+                >
+                  <template #trailing>
+                    <IconChevronRight :size="18" stroke="1.5" />
+                  </template>
+                </bl-option-card>
+                <bl-option-card
+                  layout="stack"
+                  size="sm"
+                  icon="IconBooks"
+                  title="Stack, size sm"
+                />
+              </div>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <bl-option-card
+                  layout="stack"
+                  size="lg"
+                  icon="IconTarget"
+                  title="Size lg"
+                  description="Picks a path. Footer slot below."
+                >
+                  <template #footer>Primary tone</template>
+                </bl-option-card>
+                <bl-option-card
+                  layout="stack"
+                  size="lg"
+                  tone="secondary"
+                  icon="IconFlame"
+                  title="Secondary tone"
+                  description="The amber treatment, e.g. challenges."
+                >
+                  <template #footer>tone="secondary"</template>
+                </bl-option-card>
+              </div>
+            </div>
+          </bl-tile>
+        </div>
+
         <div class="col-span-12 xl:col-span-6">
           <bl-tile>
             <template #title>Overlays</template>
@@ -821,6 +895,13 @@ const wishlist = ref(false)
 const rating = ref(4)
 const stepperStatus = ref<BookProgressStatus>('reading')
 const dotIndex = ref(1)
+const pickedOption = ref('Paperback')
+const OPTION_CARDS = [
+  { title: 'Hardcover', icon: 'IconBook' },
+  { title: 'Paperback', icon: 'IconBook2' },
+  { title: 'Ebook', icon: 'IconDeviceTablet' },
+  { title: 'Audiobook', icon: 'IconHeadphones' },
+] as const
 const pickedGenres = ref<string[]>(['sci-fi'])
 
 const ICON_BUTTON_SIZES = ['sm', 'md', 'lg'] as const

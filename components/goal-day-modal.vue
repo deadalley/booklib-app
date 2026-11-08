@@ -13,12 +13,15 @@
           {{ formatGoalNumber(total) }}
         </b>
         <span class="whitespace-nowrap">/ {{ goal.amount }} {{ unit }}</span>
-        <span
+        <bl-chip
           v-if="total >= goal.amount"
-          class="goal-tag goal-tag-tracking ml-1 self-center"
+          size="xs"
+          rounded
+          variant="primary"
+          class="ml-1 self-center"
         >
           Target met
-        </span>
+        </bl-chip>
       </div>
 
       <ul class="flex w-full flex-col gap-2">

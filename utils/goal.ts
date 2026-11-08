@@ -116,6 +116,17 @@ export const GOAL_STATUS_LABELS: Record<GoalDisplayStatus, string> = {
   expired: 'Expired',
 }
 
+/** Chip props (bl-chip) for a goal's status badge */
+export const GOAL_STATUS_CHIPS: Record<
+  GoalDisplayStatus,
+  { variant?: 'primary' | 'secondary'; color?: 'primary' | 'secondary' }
+> = {
+  tracking: { variant: 'primary' },
+  'not-tracking': { variant: 'secondary', color: 'secondary' },
+  completed: {},
+  expired: {},
+}
+
 export function getGoalStatusLabel(goal: Goal): string {
   return GOAL_STATUS_LABELS[getGoalStatus(goal)]
 }

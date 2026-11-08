@@ -27,9 +27,16 @@
       >
         <div class="cover">
           <bl-home-book-cover :book="item.book" class="size-full p-4!" />
-          <span v-if="item.kind === 'almost'" class="cover-pct">
+          <bl-chip
+            v-if="item.kind === 'almost'"
+            size="sm"
+            rounded
+            bold
+            variant="primary"
+            class="absolute right-1.5 bottom-1.5"
+          >
             {{ item.progress }}%
-          </span>
+          </bl-chip>
         </div>
         <div class="flex min-w-0 flex-col gap-2">
           <p class="eyebrow">
@@ -154,9 +161,6 @@ const { index, go } = carousel
 }
 .cover > :first-child {
   @apply rounded-none;
-}
-.cover-pct {
-  @apply bg-primary text-ink-inverse absolute right-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-xs font-bold;
 }
 .eyebrow {
   @apply text-primary inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.12em] uppercase;

@@ -21,9 +21,9 @@
         <span class="flex min-w-0 flex-col gap-1.5">
           <span class="flex flex-wrap items-center gap-2.5">
             <h5 class="title">{{ goal.title }}</h5>
-            <span class="goal-tag" :class="`goal-tag-${info.status}`">
+            <bl-chip size="xs" rounded v-bind="GOAL_STATUS_CHIPS[info.status]">
               {{ GOAL_STATUS_LABELS[info.status] }}
-            </span>
+            </bl-chip>
             <bl-challenge-badge
               v-if="goal.challenge"
               :level="getChallengeLevel(goal)"
@@ -79,14 +79,15 @@
             <IconTrash v-bind="iconProps" />
           </template>
         </bl-icon-button>
-        <button
-          type="button"
-          class="chevron"
+        <bl-icon-button
+          variant="tertiary"
           :aria-label="open ? 'Collapse goal' : 'Expand goal'"
           @click="$emit('toggle')"
         >
-          <IconChevronDown :size="18" stroke="2" />
-        </button>
+          <template #default="iconProps">
+            <IconChevronDown v-bind="iconProps" class="chevron" />
+          </template>
+        </bl-icon-button>
       </div>
     </header>
 
@@ -126,9 +127,15 @@
         >
           <component :is="icons[item.icon]" :size="16" stroke="1.8" />
           {{ item.label }}
-          <span v-if="item.value === 'entries'" class="badge">
+          <bl-chip
+            v-if="item.value === 'entries'"
+            size="sm"
+            rounded
+            bold
+            :variant="tab === item.value ? 'secondary' : 'default'"
+          >
             {{ goal.entries.length }}
-          </span>
+          </bl-chip>
         </button>
       </div>
       <div
@@ -340,7 +347,7 @@ function togglePause() {
   content: '·';
 }
 .chevron {
-  @apply text-ink-muted hover:bg-surface-subtle hover:text-primary rounded-scholarly grid size-8 cursor-pointer place-items-center transition-transform duration-200;
+  @apply transition-transform duration-200;
 }
 .tile.open .chevron {
   @apply rotate-180;
@@ -377,11 +384,5 @@ function togglePause() {
 }
 .tab.selected {
   @apply text-primary border-primary;
-}
-.badge {
-  @apply bg-surface-container text-ink-secondary min-w-[1.375rem] rounded-full px-1.5 text-center text-xs leading-[1.375rem] font-bold;
-}
-.tab.selected .badge {
-  @apply bg-primary-50 text-primary;
 }
 </style>

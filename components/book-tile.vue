@@ -41,16 +41,25 @@
         </span>
 
         <!-- A ranked list (Year in Review) shows the rank instead -->
-        <span
+        <bl-chip
           v-if="rank"
-          class="book-tile-floating-icon text-xs font-bold"
-          :class="{ 'book-tile-rank-first': rank === 1 }"
+          size="sm"
+          rounded
+          bold
+          :variant="rank === 1 ? 'primary' : 'default'"
+          class="absolute top-3 left-3"
         >
           #{{ rank }}
-        </span>
-        <span v-else class="book-tile-status" :class="statusClass">
+        </bl-chip>
+        <bl-chip
+          v-else
+          size="xs"
+          rounded
+          :variant="book.progress.status === 'reading' ? 'primary' : 'default'"
+          class="absolute top-3 right-3"
+        >
           {{ statusLabel }}
-        </span>
+        </bl-chip>
 
         <span
           v-if="selectable"
@@ -124,17 +133,6 @@ const statusLabel = computed(() => {
       return 'Reading'
     default:
       return 'To Read'
-  }
-})
-
-const statusClass = computed(() => {
-  switch (props.book.progress.status) {
-    case 'read':
-      return 'book-tile-status-completed'
-    case 'reading':
-      return 'book-tile-status-reading'
-    default:
-      return 'book-tile-status-to-read'
   }
 })
 

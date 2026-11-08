@@ -77,9 +77,15 @@
           <template #eyebrow>{{ reviewCallout.eyebrow }}</template>
           <template #label>{{ reviewCallout.title }}</template>
           <template #description>{{ reviewCallout.description }}</template>
-          <span class="button button-secondary px-4 py-2" aria-hidden="true">
+          <!-- The whole tile is the link; this is a visual cue only -->
+          <bl-button
+            :to="`/stats/year/${reviewCallout.year}`"
+            variant="secondary"
+            tabindex="-1"
+            aria-hidden="true"
+          >
             {{ reviewCallout.cta }}
-          </span>
+          </bl-button>
         </bl-section-tile>
 
         <!-- Same header style as the page header: the period switch above

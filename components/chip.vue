@@ -11,6 +11,7 @@
         bold: props.bold,
         rounded: props.rounded,
         sm: props.size === 'sm',
+        xs: props.size === 'xs',
       },
       $attrs.class,
     ]"
@@ -28,7 +29,8 @@ const props = withDefaults(
     color?: 'primary' | 'secondary'
     bold?: boolean
     rounded?: boolean
-    size?: 'sm' | 'md'
+    // xs: an uppercase status badge; sm: a compact pill
+    size?: 'xs' | 'sm' | 'md'
   }>(),
   {
     variant: 'default',
@@ -69,5 +71,8 @@ const props = withDefaults(
 }
 .sm {
   @apply gap-1 px-2.5 py-0.5 text-xs;
+}
+.xs {
+  @apply gap-1 px-2 py-0.5 text-[0.6875rem] font-bold tracking-widest uppercase;
 }
 </style>

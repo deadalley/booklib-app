@@ -107,17 +107,16 @@
         <label class="filter-section-label">Format</label>
       </div>
       <div class="format-grid">
-        <button
+        <bl-option-card
           v-for="item in Object.values(BOOK_FORMAT_MAP)"
           :key="item.id"
-          type="button"
-          class="format-option"
-          :class="{ selected: !!selectedFormats?.includes(item.id) }"
+          size="sm"
+          :icon="item.icon"
+          :title="item.description"
+          :selected="!!selectedFormats?.includes(item.id)"
+          :aria-pressed="!!selectedFormats?.includes(item.id)"
           @click="onSelectFormat(item.id)"
-        >
-          <component :is="icons[item.icon]" :size="14" stroke="1.8" />
-          <span>{{ item.description }}</span>
-        </button>
+        />
       </div>
     </div>
 
@@ -126,7 +125,6 @@
 </template>
 
 <script setup lang="ts">
-import { icons } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type {
   Book,

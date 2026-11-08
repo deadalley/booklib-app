@@ -8,15 +8,17 @@
   />
 
   <!-- Mobile: icon button that opens a modal -->
-  <button
+  <bl-icon-button
     v-if="!isLibraryEmpty"
-    type="button"
-    class="hover:text-primary flex cursor-pointer sm:hidden"
+    variant="tertiary"
+    class="sm:hidden"
     aria-label="Search"
     @click="mobileOpen = true"
   >
-    <IconSearch :size="ICON_SIZE_MEDIUM" stroke="1.5" />
-  </button>
+    <template #default="iconProps">
+      <IconSearch v-bind="iconProps" />
+    </template>
+  </bl-icon-button>
 
   <bl-search-modal
     v-if="mobileOpen"

@@ -15,16 +15,15 @@
         <div
           class="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2"
         >
-          <button
+          <bl-option-card
             v-for="template in templates"
             :key="template.label"
-            type="button"
-            class="template"
+            layout="stack"
+            size="sm"
+            :icon="template.icon"
+            :title="template.label"
             @click="applyTemplate(template.values)"
-          >
-            <component :is="icons[template.icon]" :size="18" stroke="1.6" />
-            {{ template.label }}
-          </button>
+          />
         </div>
       </div>
 
@@ -200,12 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconArrowLeft,
-  IconCalendar,
-  IconTarget,
-  icons,
-} from '@tabler/icons-vue'
+import { IconArrowLeft, IconCalendar, IconTarget } from '@tabler/icons-vue'
 import { uniq } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import type { Author } from '~/types/author'
@@ -469,12 +463,6 @@ function onSubmit() {
 .goal-form {
   @apply -m-0.5 flex max-h-[min(70vh,44rem)] flex-col gap-5 overflow-y-auto p-0.5;
   container-type: inline-size;
-}
-.template {
-  @apply border-stroke bg-surface-elevated rounded-scholarly text-ink-primary hover:border-primary hover:bg-primary-50 flex cursor-pointer flex-col items-start gap-1.5 border px-3 py-2.5 text-left text-sm font-semibold;
-}
-.template svg {
-  @apply text-primary;
 }
 .fieldset {
   @apply m-0 flex flex-col gap-3 border-0 p-0;

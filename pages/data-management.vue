@@ -149,22 +149,26 @@
           <div class="flex flex-col gap-2">
             <span class="section-label">Templates</span>
             <div class="grid grid-cols-2 gap-2">
-              <button
+              <bl-option-card
                 v-for="template in templates"
                 :key="template.value"
-                type="button"
-                class="platform-btn"
                 @click="downloadTemplate(template.value)"
               >
-                <component
-                  :is="template.icon"
-                  :size="16"
-                  stroke="1.5"
-                  class="shrink-0"
-                />
-                {{ template.label }}
-                <IconDownload :size="14" class="text-ink-muted ml-auto" />
-              </button>
+                <template #title>
+                  <span class="flex items-center gap-2">
+                    <component
+                      :is="template.icon"
+                      :size="16"
+                      stroke="1.5"
+                      class="text-primary shrink-0"
+                    />
+                    {{ template.label }}
+                  </span>
+                </template>
+                <template #trailing>
+                  <IconDownload :size="14" />
+                </template>
+              </bl-option-card>
             </div>
           </div>
 
@@ -238,40 +242,20 @@
 
           <div class="flex flex-col gap-2" role="radiogroup">
             <span class="section-label">Format</span>
-            <button
+            <bl-option-card
               v-for="format in exportFormats"
               :key="format.value"
-              type="button"
               role="radio"
               :aria-checked="exportType === format.value"
-              class="export-format-option"
-              :class="{
-                'export-format-option-active': exportType === format.value,
-              }"
+              :selected="exportType === format.value"
+              :title="format.label"
+              :description="format.description"
               @click="exportType = format.value"
             >
-              <div
-                class="export-format-radio"
-                :class="{
-                  'export-format-radio-checked': exportType === format.value,
-                }"
-              >
-                <div
-                  v-if="exportType === format.value"
-                  class="export-format-radio-dot"
-                />
-              </div>
-              <div class="flex-1 text-left">
-                <p class="text-sm font-medium">{{ format.label }}</p>
-                <p class="text-ink-muted text-xs">{{ format.description }}</p>
-              </div>
-              <component
-                :is="format.icon"
-                :size="18"
-                stroke="1.5"
-                class="text-ink-muted shrink-0"
-              />
-            </button>
+              <template #trailing>
+                <component :is="format.icon" :size="18" stroke="1.5" />
+              </template>
+            </bl-option-card>
           </div>
 
           <div

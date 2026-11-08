@@ -21,40 +21,31 @@
     <template #subtitle>{{ SUBTITLES[step] }}</template>
 
     <div v-if="step === 'choose'" class="paths">
-      <button
-        type="button"
-        class="path"
+      <bl-option-card
+        layout="stack"
+        size="lg"
+        icon="IconTarget"
+        title="Custom goal"
+        description="Choose what to count, how often and for how long. Filter by author or genre."
         data-testid="path-custom"
         @click="step = 'custom'"
       >
-        <span class="path-icon">
-          <IconTarget :size="24" stroke="1.6" />
-        </span>
-        <span class="path-heading">Custom goal</span>
-        <span class="path-description">
-          Choose what to count, how often and for how long. Filter by author or
-          genre.
-        </span>
-        <span class="path-foot">
+        <template #footer>
           Books, pages or hours
-          <IconArrowRight :size="16" stroke="2" class="path-arrow" />
-        </span>
-      </button>
-      <button
-        type="button"
-        class="path challenge"
+          <IconArrowRight :size="16" stroke="2" class="text-primary ml-auto" />
+        </template>
+      </bl-option-card>
+      <bl-option-card
+        layout="stack"
+        size="lg"
+        tone="secondary"
+        icon="IconFlame"
+        title="Challenge"
+        description="A preset stretch target on a fixed clock. Harder by design, and marked on your goal."
         data-testid="path-challenge"
         @click="step = 'challenges'"
       >
-        <span class="path-icon">
-          <IconFlame :size="24" stroke="1.6" />
-        </span>
-        <span class="path-heading">Challenge</span>
-        <span class="path-description">
-          A preset stretch target on a fixed clock. Harder by design, and marked
-          on your goal.
-        </span>
-        <span class="path-foot">
+        <template #footer>
           <span class="text-secondary-700 inline-flex gap-1.5">
             <bl-challenge-difficulty-meter
               v-for="level in LEVELS"
@@ -63,9 +54,13 @@
             />
           </span>
           {{ CHALLENGES.length }} challenges
-          <IconArrowRight :size="16" stroke="2" class="path-arrow" />
-        </span>
-      </button>
+          <IconArrowRight
+            :size="16"
+            stroke="2"
+            class="text-secondary-700 ml-auto"
+          />
+        </template>
+      </bl-option-card>
     </div>
 
     <div v-else-if="step === 'challenges'" class="browse">
@@ -118,12 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconFlame,
-  IconTarget,
-} from '@tabler/icons-vue'
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { ChallengeLevel, Goal, NewGoalStep } from '~/types/goal'
@@ -197,48 +187,6 @@ function pick(picked: ChallengePreset) {
 .paths {
   @apply mt-1 grid gap-4;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-}
-.path {
-  @apply border-stroke bg-surface-elevated flex cursor-pointer flex-col gap-2 rounded-xl border p-5 text-left;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
-}
-.path:hover {
-  @apply border-primary -translate-y-px;
-  box-shadow: 0 0 0 1px var(--primary);
-}
-.path-icon {
-  @apply bg-primary-50 text-primary mb-1 grid size-12 place-items-center rounded-xl;
-}
-.path-heading {
-  @apply font-display text-ink-primary text-[1.375rem] font-semibold;
-}
-.path-description {
-  @apply text-ink-secondary flex-1 text-sm leading-[1.45] text-pretty;
-}
-.path-foot {
-  @apply border-stroke-subtle text-ink-muted mt-1 flex items-center gap-2 border-t pt-3 text-[0.8125rem] font-semibold;
-}
-.path-arrow {
-  @apply text-primary ml-auto;
-}
-.path.challenge {
-  @apply bg-secondary-50 border-secondary-200;
-}
-.path.challenge:hover {
-  @apply border-secondary-700;
-  box-shadow: 0 0 0 1px var(--secondary-700);
-}
-.path.challenge .path-icon {
-  @apply bg-secondary-700 text-ink-inverse;
-}
-.path.challenge .path-foot {
-  @apply text-secondary-800 border-secondary-200;
-}
-.path.challenge .path-arrow {
-  @apply text-secondary-700;
 }
 .browse {
   @apply flex min-h-0 flex-col gap-4;

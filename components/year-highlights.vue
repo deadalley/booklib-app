@@ -9,7 +9,7 @@
     <div class="body" aria-live="polite">
       <p class="big" :class="{ long: slide.big.length > 3 }">{{ slide.big }}</p>
       <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <span class="chip">{{ slide.chip }}</span>
+        <bl-chip size="xs" rounded>{{ slide.chip }}</bl-chip>
         <p class="headline">{{ slide.headline }}</p>
         <p class="sub">{{ slide.sub }}</p>
       </div>
@@ -93,9 +93,6 @@ const slide = computed(() => props.insights[index.value] ?? props.insights[0]!)
 }
 .big.long {
   @apply text-[84px];
-}
-.chip {
-  @apply bg-surface-container text-ink-secondary w-fit rounded-full px-2.5 py-0.75 text-xs font-bold tracking-[0.06em] uppercase;
 }
 .headline {
   @apply font-display text-ink-primary text-[38px] leading-[1.15] font-semibold text-balance;
