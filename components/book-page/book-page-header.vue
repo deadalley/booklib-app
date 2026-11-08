@@ -48,12 +48,23 @@
       </div>
 
       <div v-if="(book.genres ?? []).length" class="flex flex-wrap gap-2">
-        <bl-genre-tag
+        <bl-chip
           v-for="genre in book.genres"
           :key="genre"
-          :genre="genre"
-          with-icon
-        />
+          rounded
+          class="max-w-full"
+          data-testid="genre-tag"
+        >
+          <template #prependIcon>
+            <IconTag
+              :size="14"
+              stroke="1.75"
+              class="text-ink-muted shrink-0"
+              aria-hidden="true"
+            />
+          </template>
+          <span class="truncate">{{ genre }}</span>
+        </bl-chip>
       </div>
 
       <bl-book-page-default-collections
@@ -68,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconTag } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import { toFullDateCompact } from '~/utils/date'

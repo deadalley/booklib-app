@@ -78,7 +78,7 @@
         <section v-if="collectionsDisplayed.length" class="book-page-section">
           <div class="flex items-center justify-between gap-3">
             <p class="book-page-section-title">Collections</p>
-            <bl-total-tag>{{ collectionsDisplayed.length }}</bl-total-tag>
+            <bl-chip>{{ collectionsDisplayed.length }}</bl-chip>
           </div>
           <div
             class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4"

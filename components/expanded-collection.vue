@@ -30,7 +30,7 @@
             {{ collection.name }}
           </h6>
         </NuxtLink>
-        <bl-total-tag>{{ bookCountLabel }}</bl-total-tag>
+        <bl-chip>{{ bookCountLabel }}</bl-chip>
         <div class="ml-auto flex shrink-0 items-center gap-4">
           <NuxtLink
             v-if="open"

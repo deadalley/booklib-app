@@ -43,14 +43,18 @@
       </ComboboxAnchor>
 
       <div v-if="multiple" class="mt-2 flex flex-wrap gap-1">
-        <bl-genre-tag
+        <bl-chip
           v-for="(item, index) in selectValue"
           :key="item"
-          :genre="item"
           size="sm"
+          rounded
           removable
+          :remove-label="`Remove ${item}`"
+          data-testid="genre-tag"
           @remove="onRemoveItem(index)"
-        />
+        >
+          {{ item }}
+        </bl-chip>
       </div>
 
       <ComboboxContent

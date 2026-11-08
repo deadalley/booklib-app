@@ -93,9 +93,9 @@
         <section class="book-page-section">
           <div class="flex min-h-7 items-center justify-between gap-3">
             <p class="book-page-section-title">Books</p>
-            <bl-total-tag>
+            <bl-chip>
               {{ selected.length }} of {{ orderedBooks.length }}
-            </bl-total-tag>
+            </bl-chip>
           </div>
           <p v-if="!isCollection" class="hint">
             Books can have one author — ticking a book here moves it to

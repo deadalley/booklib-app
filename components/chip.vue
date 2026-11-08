@@ -12,17 +12,30 @@
         rounded: props.rounded,
         sm: props.size === 'sm',
         xs: props.size === 'xs',
+        removable: props.removable,
       },
       $attrs.class,
     ]"
   >
     <slot name="prependIcon" :size="16" stroke="1.5" />
-    <slot />
+    <span v-if="removable" class="truncate"><slot /></span>
+    <slot v-else />
     <slot name="appendIcon" :size="16" stroke="1.5" />
+    <button
+      v-if="removable"
+      type="button"
+      class="chip-remove"
+      :aria-label="removeLabel"
+      @click.stop.prevent="emit('remove')"
+    >
+      <IconX :size="12" stroke="2" />
+    </button>
   </span>
 </template>
 
 <script setup lang="ts">
+import { IconX } from '@tabler/icons-vue'
+
 const props = withDefaults(
   defineProps<{
     variant?: 'default' | 'primary' | 'secondary'
@@ -31,14 +44,21 @@ const props = withDefaults(
     rounded?: boolean
     // xs: an uppercase status badge; sm: a compact pill
     size?: 'xs' | 'sm' | 'md'
+    // Shows a remove button (e.g. genres in an editor)
+    removable?: boolean
+    removeLabel?: string
   }>(),
   {
     variant: 'default',
     bold: false,
     rounded: false,
     size: 'md',
+    removable: false,
+    removeLabel: 'Remove',
   },
 )
+
+const emit = defineEmits<{ (e: 'remove'): void }>()
 </script>
 
 <style scoped>
@@ -74,5 +94,12 @@ const props = withDefaults(
 }
 .xs {
   @apply gap-1 px-2 py-0.5 text-[0.6875rem] font-bold tracking-widest uppercase;
+}
+.removable {
+  @apply max-w-full gap-1.5 pr-1.5;
+}
+.chip-remove {
+  @apply text-ink-muted hover:bg-stroke hover:text-ink-primary inline-flex shrink-0 cursor-pointer rounded-full p-0.5 transition-colors;
+  @apply focus-visible:ring-primary/25 focus-visible:ring-2 focus-visible:outline-none;
 }
 </style>

@@ -10,7 +10,7 @@
           <!-- Title -->
           <h3>{{ title }}</h3>
           <!-- Total -->
-          <bl-total-tag v-if="total">{{ total }}</bl-total-tag>
+          <bl-chip v-if="total">{{ total }}</bl-chip>
           <!-- Sidebar trigger button -->
           <div class="flex flex-1 justify-end sm:hidden">
             <bl-icon-button

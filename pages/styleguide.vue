@@ -192,8 +192,8 @@
               <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
                 <p class="text-ink-secondary text-sm">Tags</p>
                 <div class="flex flex-wrap items-center gap-2">
-                  <bl-total-tag>128 books</bl-total-tag>
-                  <bl-total-tag variant="primary">12 finished</bl-total-tag>
+                  <bl-chip>128 books</bl-chip>
+                  <bl-chip variant="primary">12 finished</bl-chip>
                 </div>
               </div>
 
@@ -506,9 +506,11 @@
             <template #title>Badges & tags</template>
             <div class="flex flex-col gap-4">
               <div class="flex flex-wrap items-center gap-2">
-                <bl-genre-tag genre="Science fiction" />
-                <bl-genre-tag genre="Fantasy" size="sm" />
-                <bl-genre-tag genre="Removable" removable />
+                <bl-chip rounded>Science fiction</bl-chip>
+                <bl-chip rounded size="sm">Fantasy</bl-chip>
+                <bl-chip rounded removable remove-label="Remove genre">
+                  Removable
+                </bl-chip>
               </div>
               <div class="flex flex-wrap items-center gap-2">
                 <bl-challenge-difficulty-badge
