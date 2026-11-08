@@ -18,12 +18,21 @@
       <span v-if="option.subtitle" class="text-ink-secondary truncate text-xs">
         {{ option.subtitle }}
       </span>
+      <span v-if="option.matchedBy" class="text-ink-muted truncate text-xs">
+        Matches {{ option.matchedBy }}
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { IconArchive, IconBooks, IconUser } from '@tabler/icons-vue'
+import {
+  IconArchive,
+  IconBooks,
+  IconNote,
+  IconTarget,
+  IconUser,
+} from '@tabler/icons-vue'
 import type { SearchAutocompleteOption } from './search-bar-autocomplete.vue'
 
 const props = defineProps<{ option: SearchAutocompleteOption }>()
@@ -34,6 +43,10 @@ const icon = computed(() => {
       return IconArchive
     case 'authors':
       return IconUser
+    case 'goals':
+      return IconTarget
+    case 'notes':
+      return IconNote
     default:
       return IconBooks
   }

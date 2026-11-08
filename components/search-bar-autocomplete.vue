@@ -7,12 +7,20 @@
     :groups="visibleGroups"
     :placeholder="placeholder"
     clearable
+    :filter-options="false"
     :not-found-label="notFoundLabel"
     :side="side"
+    align="end"
     :can-create-new="false"
   >
     <template #prepend>
       <IconSearch :size="ICON_SIZE_SMALL" class="text-ink-muted" />
+    </template>
+
+    <template #append>
+      <kbd v-if="shortcut && !searchTerm" class="shortcut" aria-hidden="true">
+        {{ shortcut }}
+      </kbd>
     </template>
 
     <template #item="{ option }">
@@ -25,11 +33,22 @@
 import { IconSearch } from '@tabler/icons-vue'
 import type { SelectOption } from './raw-select.vue'
 
+export type SearchGroupKind =
+  | 'books'
+  | 'collections'
+  | 'authors'
+  | 'goals'
+  | 'notes'
+
 export type SearchAutocompleteOption = SelectOption & {
   href?: string
   subtitle?: string
   imageSrc?: string | null
-  group?: 'books' | 'collections' | 'authors'
+  group?: SearchGroupKind
+  // Extra fields matched only when the label doesn't match, e.g. ISBN
+  keywords?: { label: string; value: string }[]
+  // Set by the search filter: the keyword that matched, shown on the result
+  matchedBy?: string
 }
 
 export type SearchAutocompleteGroup = {
@@ -42,10 +61,13 @@ const props = withDefaults(
     groups: SearchAutocompleteGroup[]
     placeholder?: string
     side?: 'top' | 'right' | 'bottom' | 'left'
+    // Keyboard shortcut hint, e.g. "⌘K"
+    shortcut?: string
   }>(),
   {
-    placeholder: 'Search books, collections, authors...',
+    placeholder: SEARCH_PLACEHOLDER,
     side: 'bottom',
+    shortcut: undefined,
   },
 )
 
@@ -94,3 +116,16 @@ watch(searchTerm, (term) => {
   }
 })
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+/* Results stay on screen; long notes truncate instead of widening the list */
+:deep(.menu-content) {
+  width: min(32rem, calc(100vw - 2rem));
+}
+/* Overlaid so the hint doesn't widen the search bar */
+.shortcut {
+  @apply border-stroke text-ink-muted bg-surface-elevated pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 rounded border px-1.5 font-sans text-[0.6875rem] font-semibold whitespace-nowrap;
+}
+</style>

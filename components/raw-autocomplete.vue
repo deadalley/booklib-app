@@ -34,6 +34,7 @@
           @focus="onFocus"
           @blur="onBlur"
         />
+        <slot name="append" />
         <IconX
           v-if="clearable && selectValue"
           class="shrink-0 cursor-pointer"
@@ -154,6 +155,9 @@ export type AutocompleteProps = {
   hidden?: boolean
   canCreateNew?: boolean
   notFoundLabel?: string
+  // false when the options are already filtered by the caller (e.g. by
+  // fields other than the label)
+  filterOptions?: boolean
 }
 
 const props = withDefaults(defineProps<AutocompleteProps>(), {
@@ -164,6 +168,7 @@ const props = withDefaults(defineProps<AutocompleteProps>(), {
   clearable: false,
   side: 'bottom',
   multiple: false,
+  filterOptions: true,
 })
 
 const selectValue = defineModel<string | string[]>()
@@ -202,6 +207,7 @@ function onBlur() {
 }
 
 function filterFunction(list: string[], searchTerm: string) {
+  if (!props.filterOptions) return list
   return list.filter((option) => {
     return labelByValue.value[option]
       ?.toLowerCase()
