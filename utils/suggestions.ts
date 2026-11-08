@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import type { Goal } from '~/types/goal'
+import { getBookFinishedAt, isBookFinished } from './book-progress'
 import { toSimpleDate } from './date'
 import { getGoalStatus, getUnloggedGoalBooks, resolveGoal } from './goal'
 
@@ -30,12 +31,16 @@ const KIND_ORDER: SuggestionKind[] = ['almost', 'log', 'author', 'old']
 /** Pages read so far: every page once read, otherwise the logged page. */
 export function getBookPagesRead(book: Book): number {
   const pages = book.pages ?? 0
-  if (book.progress.status === 'read') return pages
+  if (isBookFinished(book)) return pages
   return Math.min(pages, book.progress.currentPage ?? 0)
 }
 
-/** Reading progress as a whole percentage (0 without a page count). */
+/**
+ * Reading progress as a whole percentage. Read books are always 100%; others
+ * need a page count (0 without one).
+ */
 export function getBookPercentage(book: Book): number {
+  if (isBookFinished(book)) return 100
   if (!book.pages) return 0
   return Math.min(100, Math.round((getBookPagesRead(book) / book.pages) * 100))
 }
@@ -118,7 +123,7 @@ function unloggedGoalBooks(
     .flatMap((goal) => {
       const book = getUnloggedGoalBooks(goal, books)[0]
       if (!book) return []
-      const finished = toSimpleDate(book.progress.finishedAt!)
+      const finished = toSimpleDate(getBookFinishedAt(book)!)
       return [
         {
           id: `log-${goal.id}-${book.id}`,

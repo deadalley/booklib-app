@@ -1,6 +1,7 @@
 <template>
   <bl-modal v-model="open" size="sm" icon="IconChartAreaLine">
-    <template #title>{{ TITLES[mode] }}</template>
+    <template #title>{{ flow ? 'Custom goal' : TITLES[mode] }}</template>
+    <template v-if="flow" #subtitle>Step 2 of 2 · Set your own target</template>
 
     <form
       ref="formRef"
@@ -176,7 +177,18 @@
         {{ summary }}
       </p>
 
-      <div class="flex justify-end gap-2">
+      <div class="flex flex-wrap justify-end gap-2">
+        <bl-button
+          v-if="flow"
+          variant="tertiary"
+          class="mr-auto"
+          @click="$emit('back')"
+        >
+          <template #prependIcon="iconProps">
+            <IconArrowLeft v-bind="iconProps" />
+          </template>
+          Back
+        </bl-button>
         <bl-button variant="secondary" @click="open = false">
           {{ mode === 'edit' ? 'Discard changes' : 'Cancel' }}
         </bl-button>
@@ -189,7 +201,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconCalendar, IconTarget, icons } from '@tabler/icons-vue'
+import {
+  IconArrowLeft,
+  IconCalendar,
+  IconTarget,
+  icons,
+} from '@tabler/icons-vue'
 import { uniq } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import type { Author } from '~/types/author'
@@ -215,9 +232,14 @@ const props = defineProps<{
   mode: 'new' | 'edit' | 'repeat'
   authors: Author[]
   books: Book[]
+  // Shown as step 2 of the new-goal flow, with a Back button
+  flow?: boolean
 }>()
 
-const emit = defineEmits<{ (e: 'save', goal: Goal): void }>()
+const emit = defineEmits<{
+  (e: 'save', goal: Goal): void
+  (e: 'back'): void
+}>()
 
 const open = defineModel<boolean>({ default: false })
 

@@ -38,12 +38,10 @@ const props = defineProps<{ books: Book[] }>()
 const year = dayjs().year()
 
 const stats = computed(() => {
-  const finished = props.books.filter(
-    ({ progress }) =>
-      progress.status === 'read' &&
-      !!progress.finishedAt &&
-      toSimpleDate(progress.finishedAt).startsWith(`${year}-`),
-  )
+  const finished = props.books.filter((book) => {
+    const finishedAt = getBookFinishedAt(book)
+    return !!finishedAt && toSimpleDate(finishedAt).startsWith(`${year}-`)
+  })
   const rated = finished.filter(({ rating }) => rating != null)
   const pages = finished.reduce((total, { pages }) => total + (pages ?? 0), 0)
   const average = rated.length

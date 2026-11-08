@@ -207,8 +207,8 @@ function onSearch(event: Event) {
 function pick(id: string) {
   selectedId.value = selectedId.value === id ? null : id
 
-  const finishedAt = props.books.find((book) => book.id === id)?.progress
-    .finishedAt
+  const book = props.books.find((candidate) => candidate.id === id)
+  const finishedAt = book ? getBookFinishedAt(book) : null
   if (selectedId.value && finishedAt) {
     date.value = toSimpleDate(finishedAt)
   }

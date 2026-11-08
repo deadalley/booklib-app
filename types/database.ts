@@ -4,7 +4,7 @@ import type {
   BookProgressStatus,
   BookPropertyStatus,
 } from './book'
-import type { GoalInterval, GoalStatus, GoalType } from './goal'
+import type { ChallengeLevel, GoalInterval, GoalStatus, GoalType } from './goal'
 
 export type AuthorDB = {
   id: string
@@ -58,6 +58,8 @@ export type GoalDB = {
   genres: string[]
   entries: GoalEntryDB[]
   auto?: boolean
+  challenge?: string
+  level?: ChallengeLevel
 }
 
 export type GoalEntryDB = {

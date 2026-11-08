@@ -6,7 +6,7 @@
     </DialogTrigger>
     <DialogPortal>
       <DialogOverlay
-        class="data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
+        class="modal-overlay data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
       <DialogContent
         class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl p-5 focus:outline-none sm:p-7"
@@ -24,16 +24,27 @@
           as="div"
           class="items-top mb-4 flex w-full items-start"
         >
-          <h4 class="flex flex-1 items-center gap-2">
-            <component
-              :is="icons[icon]"
-              v-if="icon"
-              class="text-primary"
-              :size="30"
-              stroke="1.5"
-            />
-            <slot name="title" />
-          </h4>
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <h4
+              class="flex items-center gap-2"
+              :class="{ 'text-[1.44rem] leading-tight': $slots['subtitle'] }"
+            >
+              <component
+                :is="icons[icon]"
+                v-if="icon"
+                class="text-primary flex-none"
+                :size="$slots['subtitle'] ? 22 : 30"
+                stroke="1.5"
+              />
+              <slot name="title" />
+            </h4>
+            <p
+              v-if="$slots['subtitle']"
+              class="text-ink-muted text-sm font-semibold"
+            >
+              <slot name="subtitle" />
+            </p>
+          </div>
           <DialogClose v-if="withCloseButton" as-child>
             <bl-icon-button
               variant="secondary"

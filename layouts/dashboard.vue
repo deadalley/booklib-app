@@ -71,6 +71,21 @@
           <!-- Global search bar -->
           <bl-global-search />
 
+          <button
+            type="button"
+            class="text-ink-secondary hover:text-primary grid flex-none cursor-pointer place-items-center"
+            :aria-label="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
+            :title="`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`"
+            data-testid="theme-toggle"
+            @click="toggleTheme"
+          >
+            <component
+              :is="theme === 'dark' ? IconSun : IconMoon"
+              :size="ICON_SIZE_MEDIUM"
+              stroke="1.5"
+            />
+          </button>
+
           <slot name="action-btn" />
 
           <button
@@ -120,15 +135,20 @@
 </template>
 
 <script setup lang="ts">
-import { IconAlertTriangle, IconMenu2 } from '@tabler/icons-vue'
+import {
+  IconAlertTriangle,
+  IconMenu2,
+  IconMoon,
+  IconSun,
+} from '@tabler/icons-vue'
 import { RELEASES_URL, isWebDemo } from '~/utils/platform'
-import { activeTheme } from '~/utils/theme'
 
 const route = useRoute()
 
 const isWebEnvironment = ref<boolean>(isWebDemo())
 
-const loadingColor = activeTheme.colors.primary.DEFAULT
+const { colors, theme, toggleTheme } = useTheme()
+const loadingColor = computed(() => colors.value.primary.DEFAULT)
 
 const props = defineProps<{
   title: string

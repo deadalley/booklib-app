@@ -1,9 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+import { activeTheme, themeBootScript, themeCss } from './utils/theme'
 
 // `BUILD_TARGET=capacitor` builds the static app that is bundled into the
 // Android app (see capacitor.config.ts).
 const isCapacitorBuild = process.env.BUILD_TARGET === 'capacitor'
+
+// Theme tokens as CSS variables plus a blocking script that applies the saved
+// light/dark preference before first paint (see utils/theme.ts).
+const head = {
+  meta: [{ name: 'theme-color', content: activeTheme.colors.surface.canvas }],
+  style: [{ id: 'booklib-theme', innerHTML: themeCss() }],
+  script: [{ innerHTML: themeBootScript, tagPosition: 'head' as const }],
+}
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -55,9 +64,12 @@ export default defineNuxtConfig({
     ],
   },
 
+  app: { head },
+
   ...(process.env.ELECTRON_ENABLED === 'true'
     ? {
         app: {
+          head,
           baseURL: './',
           buildAssetsDir: '_nuxt/',
           cdnURL: './',

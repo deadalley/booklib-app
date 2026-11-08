@@ -39,6 +39,24 @@ describe('goal transformers', () => {
     }
     expect(goal.entries[0]?.createdAt).toBe('2026-10-30T00:00:00.000Z')
   })
+
+  it('round-trips the challenge a goal was started from', () => {
+    const goal = dbGoalToGoal(
+      goalToDbGoal({
+        ...pagesGoal('2026-10-30'),
+        challenge: '30-day',
+        level: 1,
+      }),
+    )
+    expect(goal.challenge).toBe('30-day')
+    expect(goal.level).toBe(1)
+  })
+
+  it('leaves regular goals without challenge fields', () => {
+    const db = goalToDbGoal(pagesGoal('2026-10-30'))
+    expect(db).not.toHaveProperty('challenge')
+    expect(dbGoalToGoal(db)).not.toHaveProperty('challenge')
+  })
 })
 
 describe('book transformers', () => {
