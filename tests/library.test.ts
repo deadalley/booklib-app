@@ -159,7 +159,7 @@ test.describe('bulk actions', () => {
       .filter({ hasText: 'Choose collection' })
       .click()
     await page.getByRole('option', { name: 'Short fiction' }).click()
-    await page.getByRole('button', { name: 'Move' }).click()
+    await page.getByRole('button', { name: 'Add', exact: true }).click()
 
     await expect
       .poll(async () =>
@@ -188,7 +188,11 @@ test.describe('bulk actions', () => {
   test('changing the author keeps all other data', async ({ page }) => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
-    await page.getByRole('button', { name: 'Author' }).click()
+    // Author is the first field under Edit
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
     await page
       .getByRole('combobox')
       .filter({ hasText: 'Choose author' })
@@ -228,5 +232,112 @@ test.describe('bulk actions', () => {
         (await readLibrary(page)).books.map((b) => b.title).sort(),
       )
       .toEqual([earthsea.title, cien.title, future.title].sort())
+  })
+
+  test('removes books from a collection', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+    await page.getByRole('button', { name: 'Collection' }).click()
+    await page.getByRole('radio', { name: 'remove' }).click()
+    await page
+      .getByRole('combobox')
+      .filter({ hasText: 'Choose collection' })
+      .click()
+    await page.getByRole('option', { name: 'Short fiction' }).click()
+    await page.getByRole('button', { name: 'Remove', exact: true }).click()
+
+    await expect
+      .poll(async () =>
+        (await readLibrary(page))['collection-book'].filter(
+          (cb) => cb.collection_id === shelf.id,
+        ),
+      )
+      .toEqual([])
+  })
+
+  test('sets the status, recording a finish date', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+    await page.getByRole('button', { name: 'Status' }).click()
+    await page
+      .getByRole('combobox')
+      .filter({ hasText: 'Choose status' })
+      .click()
+    await page.getByRole('option', { name: 'Read', exact: true }).click()
+    await page.getByRole('button', { name: 'Apply' }).click()
+
+    await expect
+      .poll(async () =>
+        (await readLibrary(page)).books
+          .filter((b) => b.id === cien.id || b.id === earthsea.id)
+          .map((b) => [b.progress_status, !!b.finished_at]),
+      )
+      .toEqual([
+        ['read', true],
+        ['read', true],
+      ])
+  })
+
+  test('adds a genre and sets the format and rating', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'genre' }).click()
+    const genre = page.getByTestId('bulk-action-form').getByRole('combobox')
+    await genre.fill('Classics')
+    await page.getByText('Add Classics').click()
+    await page.getByRole('button', { name: 'Apply' }).click()
+    await expect
+      .poll(async () =>
+        (await readLibrary(page)).books
+          .filter((b) => b.id === cien.id || b.id === earthsea.id)
+          .map((b) => b.genres?.includes('Classics')),
+      )
+      .toEqual([true, true])
+    // Existing genres are kept
+    expect(
+      (await readLibrary(page)).books.find((b) => b.id === earthsea.id)?.genres,
+    ).toContain('Fantasy')
+
+    // The bar stays open after an action, with the selection cleared
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'format' }).click()
+    await page
+      .getByRole('combobox')
+      .filter({ hasText: 'Choose format' })
+      .click()
+    await page.getByRole('option', { name: 'Audiobook' }).click()
+    await page.getByRole('button', { name: 'Apply' }).click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === cien.id)?.format,
+      )
+      .toBe('audiobook')
+  })
+
+  test('exports only the selected books', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('button', { name: 'Export' }).click()
+
+    const download = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download' }).click()
+    const file = await download
+    expect(file.suggestedFilename()).toMatch(/_booklib_books\.csv$/)
+    const contents = await (await file.createReadStream()).toArray()
+    const text = Buffer.concat(contents as Buffer[]).toString('utf8')
+    expect(text).toContain(cien.title)
+    expect(text).not.toContain(earthsea.title)
   })
 })

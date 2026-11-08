@@ -132,11 +132,12 @@
     :has-selected-books="hasSelectedBooks"
     :collection-options="collectionActionOptions"
     :author-options="authorActionOptions"
+    :genre-options="genreActionOptions"
     @close="onCancel"
     @select-all="selectAll"
     @clear="clearSelectedBooks"
-    @move-to-collection="onMoveBooksToCollection"
-    @edit-author="onEditBooksAuthor"
+    @change="onBulkChange"
+    @export="onExportSelected"
     @delete="onDeleteSelectedBooks"
   />
 </template>
@@ -146,12 +147,15 @@ import type { Book, ViewBook } from '~/types/book'
 import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
-import { indexBy } from 'ramda'
+import { indexBy, uniq } from 'ramda'
+import dayjs from 'dayjs'
+import type { BulkBookChange } from '~/types/ui'
+import { bookToRecord, serializeBooks } from '~/services/transfer'
 import type { Collection } from '~/types/collection'
 
 const { isMobile } = useBreakpoints()
 
-const { getBooks, getAuthors, getCollections, updateBook, deleteBooks } =
+const { getBooks, getAuthors, getCollections, updateBooks, deleteBooks } =
   useBookLibrary()
 
 const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
@@ -272,6 +276,12 @@ const collectionActionOptions = computed(() =>
 const authorActionOptions = computed(() =>
   authors.value.map(({ id, name }) => ({ value: id, label: name })),
 )
+const genreActionOptions = computed(() =>
+  uniq(books.value.flatMap(({ genres }) => genres ?? []))
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .map((genre) => ({ value: genre, label: genre })),
+)
 
 function clearSelectedBooks() {
   viewBooks.value.forEach((book) => {
@@ -292,25 +302,42 @@ async function refresh() {
   authors.value = await getAuthors()
 }
 
-async function onMoveBooksToCollection(collectionId: string) {
-  if (!collectionId || !hasSelectedBooks.value) {
-    return
+/** The patch for one book; `book` is its current stored state */
+function patchFor(change: BulkBookChange, book: Book): Partial<Book> {
+  switch (change.field) {
+    case 'collection':
+      return {
+        collections:
+          change.mode === 'add'
+            ? uniq([...book.collections, change.collectionId])
+            : book.collections.filter((id) => id !== change.collectionId),
+      }
+    case 'status':
+      return { progress: withProgressStatus(book.progress, change.status) }
+    case 'author':
+      return { author: change.authorId }
+    case 'genre': {
+      const genres = book.genres ?? []
+      return {
+        genres:
+          change.mode === 'add'
+            ? uniq([...genres, change.genre])
+            : genres.filter((genre) => genre !== change.genre),
+      }
+    }
+    case 'format':
+      return { format: change.format }
+    case 'rating':
+      return { rating: change.rating }
   }
+}
+
+async function onBulkChange(change: BulkBookChange) {
+  if (!hasSelectedBooks.value) return
 
   loading.value = true
-
   try {
-    // Sequential writes: each update reads and writes the whole database
-    for (const bookId of selectedBookIds.value) {
-      const currentBook = books.value.find((book) => book.id === bookId)
-      if (!currentBook) continue
-
-      const nextCollections = Array.from(
-        new Set([...(currentBook.collections ?? []), collectionId]),
-      )
-      await updateBook(bookId, { collections: nextCollections })
-    }
-
+    await updateBooks(selectedBookIds.value, (book) => patchFor(change, book))
     await refresh()
     clearSelectedBooks()
     onResetFilter()
@@ -319,24 +346,17 @@ async function onMoveBooksToCollection(collectionId: string) {
   }
 }
 
-async function onEditBooksAuthor(authorId: string) {
-  if (!authorId || !hasSelectedBooks.value) {
-    return
-  }
-
-  loading.value = true
-
-  try {
-    for (const bookId of selectedBookIds.value) {
-      await updateBook(bookId, { author: authorId })
-    }
-
-    await refresh()
-    clearSelectedBooks()
-    onResetFilter()
-  } finally {
-    loading.value = false
-  }
+function onExportSelected(format: 'csv' | 'json') {
+  const selected = new Set(selectedBookIds.value)
+  const authorMap = new Map(authors.value.map((author) => [author.id, author]))
+  const records = books.value
+    .filter((book) => selected.has(book.id))
+    .map((book) => bookToRecord(book, authorMap))
+  downloadFile(
+    `${dayjs().format('YYYY-MM-DD')}_booklib_books.${format}`,
+    serializeBooks(records, format),
+    format === 'csv' ? 'text/csv' : 'application/json',
+  )
 }
 
 async function onDeleteSelectedBooks() {

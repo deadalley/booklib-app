@@ -38,35 +38,18 @@
 
         <div class="bulk-actions-divider" />
 
-        <div class="bulk-actions-section">
+        <div class="bulk-actions-section flex-wrap justify-center">
           <button
+            v-for="item in ACTIONS"
+            :key="item.id"
             class="bulk-action-btn"
+            :class="{ 'bulk-action-btn-danger': item.id === 'delete' }"
             type="button"
             :disabled="!hasSelectedBooks"
-            @click="moveCollectionModalOpen = true"
+            @click="openAction(item.id)"
           >
-            <IconFolder :size="16" stroke="1.75" />
-            Collection
-          </button>
-
-          <button
-            class="bulk-action-btn"
-            type="button"
-            :disabled="!hasSelectedBooks"
-            @click="editAuthorModalOpen = true"
-          >
-            <IconUser :size="16" stroke="1.75" />
-            Author
-          </button>
-
-          <button
-            class="bulk-action-btn bulk-action-btn-danger"
-            type="button"
-            :disabled="!hasSelectedBooks"
-            @click="deleteModalOpen = true"
-          >
-            <IconTrash :size="16" stroke="1.75" />
-            Remove
+            <component :is="item.icon" :size="16" stroke="1.75" />
+            {{ item.label }}
           </button>
         </div>
 
@@ -85,67 +68,180 @@
   </Transition>
 
   <bl-modal
-    v-model="moveCollectionModalOpen"
+    :model-value="!!action"
     size="sm"
-    @confirm="onMoveConfirm"
+    @update:model-value="(value) => !value && (action = null)"
+    @confirm="onConfirm"
   >
-    <template #title>
-      Move {{ selectedBooksCount }} selected
-      {{ selectedBooksCount === 1 ? 'book' : 'books' }} to a collection
-    </template>
-    <div class="flex flex-col gap-2">
+    <template #title>{{ title }}</template>
+
+    <div class="flex flex-col gap-4" data-testid="bulk-action-form">
+      <!-- Collection -->
+      <template v-if="action === 'collection'">
+        <bl-switch v-model="collectionMode" aria-label="Add or remove">
+          <bl-switch-option
+            v-for="mode in MODES"
+            :key="mode.value"
+            :value="mode.value"
+            :selected-value="collectionMode"
+          >
+            <template #label>{{ mode.label }}</template>
+          </bl-switch-option>
+        </bl-switch>
+        <bl-raw-select
+          v-model="collectionId"
+          :options="collectionOptions"
+          :with-wrapper="false"
+          placeholder="Choose collection"
+        />
+      </template>
+
+      <!-- Status -->
       <bl-raw-select
-        v-model="selectedCollectionId"
-        :options="collectionOptions"
+        v-else-if="action === 'status'"
+        v-model="statusValue"
+        :options="STATUS_OPTIONS"
         :with-wrapper="false"
-        placeholder="Choose collection"
+        placeholder="Choose status"
       />
-      <p v-if="!selectedCollectionId" class="text-ink-muted text-sm">
-        Select a collection before confirming.
+
+      <!-- Edit: one field at a time -->
+      <template v-else-if="action === 'edit'">
+        <bl-switch v-model="editField" aria-label="Field">
+          <bl-switch-option
+            v-for="field in EDIT_FIELDS"
+            :key="field.value"
+            :value="field.value"
+            :selected-value="editField"
+          >
+            <template #label>{{ field.label }}</template>
+          </bl-switch-option>
+        </bl-switch>
+
+        <bl-raw-select
+          v-if="editField === 'author'"
+          v-model="authorId"
+          :options="authorOptions"
+          :with-wrapper="false"
+          placeholder="Choose author"
+        />
+
+        <template v-else-if="editField === 'genre'">
+          <bl-switch v-model="genreMode" aria-label="Add or remove">
+            <bl-switch-option
+              v-for="mode in MODES"
+              :key="mode.value"
+              :value="mode.value"
+              :selected-value="genreMode"
+            >
+              <template #label>{{ mode.label }}</template>
+            </bl-switch-option>
+          </bl-switch>
+          <bl-raw-autocomplete
+            v-model="genre"
+            v-model:search-term="genreSearch"
+            :options="genreOptions"
+            :can-create-new="genreMode === 'add'"
+            placeholder="Choose a genre"
+          />
+        </template>
+
+        <bl-raw-select
+          v-else-if="editField === 'format'"
+          v-model="format"
+          :options="FORMAT_OPTIONS"
+          :with-wrapper="false"
+          placeholder="Choose format"
+        />
+
+        <div v-else-if="editField === 'rating'" class="flex items-center">
+          <bl-rating-input
+            :rating="rating"
+            @commit="(value) => (rating = value)"
+          />
+        </div>
+      </template>
+
+      <!-- Export -->
+      <bl-switch
+        v-else-if="action === 'export'"
+        v-model="exportFormat"
+        aria-label="Format"
+      >
+        <bl-switch-option
+          v-for="option in EXPORT_FORMATS"
+          :key="option.value"
+          :value="option.value"
+          :selected-value="exportFormat"
+        >
+          <template #label>{{ option.label }}</template>
+        </bl-switch-option>
+      </bl-switch>
+
+      <p v-if="action === 'delete'" class="text-ink-secondary text-sm">
+        This action cannot be undone.
+      </p>
+      <p v-else-if="!ready" class="text-ink-muted text-sm">
+        {{ hint }}
       </p>
     </div>
-    <template #cancel-label>Cancel</template>
-    <template #action-label>Move</template>
-  </bl-modal>
 
-  <bl-modal v-model="editAuthorModalOpen" size="sm" @confirm="onAuthorConfirm">
-    <template #title>
-      Set author for {{ selectedBooksCount }} selected
-      {{ selectedBooksCount === 1 ? 'book' : 'books' }}
-    </template>
-    <div class="flex flex-col gap-2">
-      <bl-raw-select
-        v-model="selectedAuthorId"
-        :options="authorOptions"
-        :with-wrapper="false"
-        placeholder="Choose author"
-      />
-      <p v-if="!selectedAuthorId" class="text-ink-muted text-sm">
-        Select an author before confirming.
-      </p>
-    </div>
     <template #cancel-label>Cancel</template>
-    <template #action-label>Apply</template>
-  </bl-modal>
-
-  <bl-modal v-model="deleteModalOpen" size="sm" @confirm="emit('delete')">
-    <template #title>
-      Delete {{ selectedBooksCount }} selected
-      {{ selectedBooksCount === 1 ? 'book' : 'books' }}?
-    </template>
-    <p class="text-ink-secondary text-sm">This action cannot be undone.</p>
-    <template #cancel-label>Cancel</template>
-    <template #action-label>Delete</template>
+    <template #action-label>{{ actionLabel }}</template>
   </bl-modal>
 </template>
 
 <script setup lang="ts">
-import { IconFolder, IconTrash, IconUser, IconX } from '@tabler/icons-vue'
+import {
+  IconDownload,
+  IconFolder,
+  IconPencil,
+  IconProgress,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-vue'
+import type { BookFormat, BookProgressStatus } from '~/types/book'
+import type { BulkBookChange } from '~/types/ui'
 
-type ActionOption = {
-  value: string
-  label: string
-}
+type ActionOption = { value: string; label: string }
+type Action = 'collection' | 'status' | 'edit' | 'export' | 'delete'
+type EditField = 'author' | 'genre' | 'format' | 'rating'
+type Mode = 'add' | 'remove'
+
+const ACTIONS = [
+  { id: 'collection', label: 'Collection', icon: IconFolder },
+  { id: 'status', label: 'Status', icon: IconProgress },
+  { id: 'edit', label: 'Edit', icon: IconPencil },
+  { id: 'export', label: 'Export', icon: IconDownload },
+  { id: 'delete', label: 'Remove', icon: IconTrash },
+] as const
+
+const MODES: { value: Mode; label: string }[] = [
+  { value: 'add', label: 'Add' },
+  { value: 'remove', label: 'Remove' },
+]
+const EDIT_FIELDS: { value: EditField; label: string }[] = [
+  { value: 'author', label: 'Author' },
+  { value: 'genre', label: 'Genre' },
+  { value: 'format', label: 'Format' },
+  { value: 'rating', label: 'Rating' },
+]
+// The select needs a string value for "not started"
+const NOT_STARTED = 'not-started'
+const STATUS_OPTIONS: ActionOption[] = [
+  { value: NOT_STARTED, label: 'Not started' },
+  ...Object.values(PROGRESS_STATUS_MAP).map(({ id, description }) => ({
+    value: id,
+    label: description,
+  })),
+]
+const FORMAT_OPTIONS: ActionOption[] = Object.values(BOOK_FORMAT_MAP).map(
+  ({ id, description }) => ({ value: id, label: description }),
+)
+const EXPORT_FORMATS = [
+  { value: 'csv', label: 'CSV' },
+  { value: 'json', label: 'JSON' },
+] as const
 
 const props = defineProps<{
   selectedBooksCount: number
@@ -153,43 +249,163 @@ const props = defineProps<{
   hasSelectedBooks: boolean
   collectionOptions: ActionOption[]
   authorOptions: ActionOption[]
+  genreOptions: ActionOption[]
 }>()
 
 const open = defineModel<boolean>({ default: false })
 
 const emit = defineEmits<{
   (e: 'close' | 'delete' | 'select-all' | 'clear'): void
-  (e: 'move-to-collection' | 'edit-author', valueId: string): void
+  (e: 'change', change: BulkBookChange): void
+  (e: 'export', format: 'csv' | 'json'): void
 }>()
 
-const moveCollectionModalOpen = ref(false)
-const editAuthorModalOpen = ref(false)
-const deleteModalOpen = ref(false)
-const selectedCollectionId = ref<string>()
-const selectedAuthorId = ref<string>()
+const action = ref<Action | null>(null)
+const collectionMode = ref<Mode>('add')
+const collectionId = ref<string>()
+const statusValue = ref<string>()
+const editField = ref<EditField>('author')
+const authorId = ref<string>()
+const genreMode = ref<Mode>('add')
+const genre = ref<string>()
+const genreSearch = ref<string>()
+const format = ref<string>()
+const rating = ref<number | null>(null)
+const exportFormat = ref<'csv' | 'json'>('csv')
+
+function reset() {
+  collectionMode.value = 'add'
+  collectionId.value = undefined
+  statusValue.value = undefined
+  editField.value = 'author'
+  authorId.value = undefined
+  genreMode.value = 'add'
+  genre.value = undefined
+  genreSearch.value = undefined
+  format.value = undefined
+  rating.value = null
+  exportFormat.value = 'csv'
+}
+
+function openAction(next: Action) {
+  reset()
+  action.value = next
+}
 
 watch(open, (isOpen) => {
-  if (!isOpen) {
-    moveCollectionModalOpen.value = false
-    editAuthorModalOpen.value = false
-    deleteModalOpen.value = false
-    selectedCollectionId.value = undefined
-    selectedAuthorId.value = undefined
+  if (!isOpen) action.value = null
+})
+
+const books = computed(
+  () =>
+    `${props.selectedBooksCount} ${props.selectedBooksCount === 1 ? 'book' : 'books'}`,
+)
+
+const title = computed(() => {
+  switch (action.value) {
+    case 'collection':
+      return collectionMode.value === 'add'
+        ? `Add ${books.value} to a collection`
+        : `Remove ${books.value} from a collection`
+    case 'status':
+      return `Set the status of ${books.value}`
+    case 'edit':
+      return `Edit ${books.value}`
+    case 'export':
+      return `Export ${books.value}`
+    case 'delete':
+      return `Delete ${books.value}?`
+    default:
+      return ''
   }
 })
 
-const anyModalOpen = computed(
+const actionLabel = computed(() => {
+  switch (action.value) {
+    case 'collection':
+      return collectionMode.value === 'add' ? 'Add' : 'Remove'
+    case 'export':
+      return 'Download'
+    case 'delete':
+      return 'Delete'
+    default:
+      return 'Apply'
+  }
+})
+
+/** The change to apply, or null while the form is incomplete */
+const change = computed<BulkBookChange | null>(() => {
+  switch (action.value) {
+    case 'collection':
+      return collectionId.value
+        ? {
+            field: 'collection',
+            collectionId: collectionId.value,
+            mode: collectionMode.value,
+          }
+        : null
+    case 'status':
+      return statusValue.value
+        ? {
+            field: 'status',
+            status:
+              statusValue.value === NOT_STARTED
+                ? null
+                : (statusValue.value as BookProgressStatus),
+          }
+        : null
+    case 'edit':
+      switch (editField.value) {
+        case 'author':
+          return authorId.value
+            ? { field: 'author', authorId: authorId.value }
+            : null
+        case 'genre': {
+          // When adding, a typed new genre counts without picking "Add …"
+          const value = (
+            genre.value ??
+            (genreMode.value === 'add' ? genreSearch.value : undefined)
+          )?.trim()
+          return value
+            ? { field: 'genre', genre: value, mode: genreMode.value }
+            : null
+        }
+        case 'format':
+          return format.value
+            ? { field: 'format', format: format.value as BookFormat }
+            : null
+        case 'rating':
+          return { field: 'rating', rating: rating.value }
+      }
+      return null
+    default:
+      return null
+  }
+})
+
+const ready = computed(
   () =>
-    moveCollectionModalOpen.value ||
-    editAuthorModalOpen.value ||
-    deleteModalOpen.value,
+    action.value === 'export' || action.value === 'delete' || !!change.value,
 )
+
+const hint = computed(() => {
+  if (action.value === 'collection') return 'Choose a collection first.'
+  if (action.value === 'status') return 'Choose a status first.'
+  return `Choose a ${editField.value} first.`
+})
+
+function onConfirm() {
+  if (!props.hasSelectedBooks) return
+  if (action.value === 'delete') emit('delete')
+  else if (action.value === 'export') emit('export', exportFormat.value)
+  else if (change.value) emit('change', change.value)
+}
 
 function onKeydown(event: KeyboardEvent) {
   if (
     event.key !== 'Escape' ||
     !open.value ||
-    anyModalOpen.value ||
+    action.value ||
     document.querySelector('[role="dialog"]')
   ) {
     return
@@ -204,24 +420,6 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 function onClose() {
   open.value = false
   emit('close')
-}
-
-function onMoveConfirm() {
-  if (!selectedCollectionId.value || !props.hasSelectedBooks) {
-    return
-  }
-
-  emit('move-to-collection', selectedCollectionId.value)
-  selectedCollectionId.value = undefined
-}
-
-function onAuthorConfirm() {
-  if (!selectedAuthorId.value || !props.hasSelectedBooks) {
-    return
-  }
-
-  emit('edit-author', selectedAuthorId.value)
-  selectedAuthorId.value = undefined
 }
 </script>
 

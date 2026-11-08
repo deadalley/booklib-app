@@ -354,9 +354,49 @@ export class BookLibDataManagementService {
     if (!this.client) throw new Error('Database not initialized')
 
     await this.client.read()
+    if (!this.patchBook(id, book)) return null
+    await this.client.write()
+
+    return this.getBook(id)
+  }
+
+  /**
+   * Updates several books with one read and one write. `patchFor` gets each
+   * stored book and returns the changes for it (same patch semantics as
+   * updateBook), so changes can depend on the book, e.g. adding a genre.
+   * Returns how many books were updated.
+   */
+  async updateBooks(
+    ids: BookDB['id'][],
+    patchFor: (book: Book) => Partial<Book>,
+  ): Promise<number> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    await this.client.read()
+
+    let updated = 0
+    for (const id of ids) {
+      const stored = this.client.data.books.find((book) => book.id === id)
+      if (!stored) continue
+      const collections = this.client.data['collection-book']
+        .filter(({ book_id }) => book_id === id)
+        .map(({ collection_id }) => collection_id)
+      if (this.patchBook(id, patchFor(dbBookToBook(stored, collections)))) {
+        updated++
+      }
+    }
+
+    if (updated) await this.client.write()
+    return updated
+  }
+
+  /** Applies a patch to a loaded book in memory; the caller writes. */
+  private patchBook(id: BookDB['id'], book: Partial<Book>): boolean {
+    if (!this.client) throw new Error('Database not initialized')
 
     const bookIndex = this.client.data.books.findIndex((b) => b.id === id)
-    if (bookIndex === -1) return null
+    if (bookIndex === -1) return false
 
     const existingBook = this.client.data.books[bookIndex]
 
@@ -408,9 +448,7 @@ export class BookLibDataManagementService {
       })
     }
 
-    await this.client.write()
-
-    return this.getBook(id)
+    return true
   }
 
   async deleteBook(id: BookDB['id']): Promise<BookDB['id'] | null> {

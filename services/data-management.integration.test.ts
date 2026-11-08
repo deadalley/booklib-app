@@ -169,6 +169,40 @@ describe('BookLibDataManagementService (real transformers)', () => {
     })
   })
 
+  describe('updateBooks', () => {
+    it('patches each book from its own state with one write', async () => {
+      const write = vi.spyOn(
+        (service as unknown as { client: { write: () => Promise<void> } })
+          .client,
+        'write',
+      )
+      const updated = await service.updateBooks(
+        ['b1', 'b2', 'missing'],
+        (book) => ({
+          genres: [...(book.genres ?? []), 'Fantasy'],
+        }),
+      )
+
+      expect(updated).toBe(2)
+      expect(write).toHaveBeenCalledTimes(1)
+      const [b1, b2] = await Promise.all([
+        service.getBook('b1'),
+        service.getBook('b2'),
+      ])
+      expect(b1?.genres).toContain('Fantasy')
+      expect(b2?.genres).toContain('Fantasy')
+      // Untouched fields are kept
+      expect(b1).toMatchObject({ title: 'Piranesi', rating: 4 })
+    })
+
+    it('updates collections per book', async () => {
+      await service.updateBooks(['b1', 'b2'], (book) => ({
+        collections: book.collections.filter((id) => id !== 'c1'),
+      }))
+      expect((await service.getBook('b1'))?.collections).toEqual([])
+    })
+  })
+
   describe('deletes clean up goal references', () => {
     it('deleteBook removes the goal entries of that book', async () => {
       await service.deleteBook('b1')
