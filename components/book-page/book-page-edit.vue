@@ -43,8 +43,8 @@
         data-testid="pending-lookup"
       >
         <IconWifiOff :size="16" stroke="1.8" />
-        The details for ISBN {{ pendingLookupIsbn }} are filled in when you’re
-        back online.
+        The details for ISBN {{ pendingLookupIsbn }} are looked up again once
+        BookLib can reach the book services.
       </p>
     </header>
 
@@ -304,18 +304,18 @@ const emit = defineEmits<{
 
 const submitAttempted = ref(false)
 
-const route = useRoute()
 const { downloadBookCover } = useBookLibrary()
-// Opened straight away from the books page's "Scan ISBN"
-const scannerOpen = ref(props.isNew && route.query.scan !== undefined)
+const { takePendingScan } = useAddBook()
+// Existing books only; new books are scanned from the "Add book" modal
+const scannerOpen = ref(false)
 const pendingLookupIsbn = ref<string | null>(null)
 
-async function onScan({ isbn, result, offline }: IsbnScan) {
+async function onScan({ isbn, result, lookUpLater }: IsbnScan) {
   pendingLookupIsbn.value = null
 
   if (!result) {
     book.value.isbn = isbn
-    if (offline) {
+    if (lookUpLater) {
       pendingLookupIsbn.value = isbn
       if (!book.value.title?.trim()) book.value.title = placeholderTitle(isbn)
     }
@@ -426,6 +426,13 @@ const formState = computed(() =>
 )
 
 const initialSnapshot = ref(formState.value)
+
+// A scan chosen in the "Add book" modal fills the new book (after the
+// snapshot, so the filled-in book counts as a change to save)
+if (props.isNew) {
+  const scan = takePendingScan()
+  if (scan) onScan(scan)
+}
 
 const dirty = computed(() => formState.value !== initialSnapshot.value)
 

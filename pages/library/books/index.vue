@@ -79,7 +79,7 @@
           ? '1 scanned book is waiting for its details.'
           : `${pendingLookups} scanned books are waiting for their details.`
       }}
-      They’re filled in when you’re back online.
+      BookLib looks them up again when you’re online.
     </p>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>

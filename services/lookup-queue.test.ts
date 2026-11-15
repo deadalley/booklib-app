@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Book } from '~/types/book'
-import { LookupOfflineError, type BookLookupResult } from './book-lookup'
+import {
+  LookupOfflineError,
+  LookupUnavailableError,
+  type BookLookupResult,
+} from './book-lookup'
 import {
   placeholderTitle,
   processLookupQueue,
@@ -87,6 +91,16 @@ describe('processLookupQueue', () => {
     expect(remaining).toEqual(items)
     expect(d.lookup).toHaveBeenCalledTimes(1)
     expect(d.updateBook).not.toHaveBeenCalled()
+  })
+
+  it('keeps everything queued while the services are down', async () => {
+    const d = deps({
+      lookup: vi.fn(async () => {
+        throw new LookupUnavailableError('busy')
+      }),
+    })
+    const items = [item('b1'), item('b2')]
+    expect((await processLookupQueue(items, d)).remaining).toEqual(items)
   })
 
   it('drops deleted books and unknown ISBNs', async () => {

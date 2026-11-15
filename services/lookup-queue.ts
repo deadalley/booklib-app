@@ -3,6 +3,7 @@ import type { Book } from '~/types/book'
 import {
   bookPatchFromLookup,
   LookupOfflineError,
+  LookupUnavailableError,
   type BookLookupResult,
 } from './book-lookup'
 
@@ -77,7 +78,11 @@ export async function processLookupQueue(
     try {
       result = await deps.lookup(item.isbn)
     } catch (error) {
-      if (error instanceof LookupOfflineError) {
+      // Still offline, or the services are down: try them all again later
+      if (
+        error instanceof LookupOfflineError ||
+        error instanceof LookupUnavailableError
+      ) {
         remaining.push(...items.slice(index))
         break
       }

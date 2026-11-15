@@ -130,7 +130,7 @@
         <!-- Content -->
         <slot />
 
-        <bl-add-book-modal v-model="addBookOpen" />
+        <bl-add-book-modal />
 
         <!-- Loading indicator -->
         <NuxtLoadingIndicator :color="loadingColor" />
@@ -149,7 +149,6 @@ import {
 import { RELEASES_URL, isWebDemo } from '~/utils/platform'
 
 const route = useRoute()
-const { addBookOpen } = useAddBook()
 
 const isWebEnvironment = ref<boolean>(isWebDemo())
 

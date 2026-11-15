@@ -14,14 +14,13 @@ test.describe('ISBN lookup', () => {
     await startScan(page)
 
     await typeIsbn(page, '12345')
-    await expect(
-      page.getByTestId('isbn-scanner').getByRole('alert'),
-    ).toContainText('isn’t a valid ISBN')
+    await expect(page.getByText('That isn’t a valid ISBN')).toBeVisible()
 
     await typeIsbn(page, '978-0-06-051275-0')
     const scanner = page.getByTestId('isbn-scanner')
     await expect(scanner).toContainText('The Dispossessed')
     await expect(scanner).toContainText('2003 · 387 pages · Harper Perennial')
+    await expect(page).toHaveURL(/\/library\/books$/)
     await page.getByRole('button', { name: 'Use these details' }).click()
 
     await expect(
@@ -65,8 +64,12 @@ test.describe('ISBN lookup', () => {
     page,
     context,
   }) => {
-    // Starts on the books page: the dev server can't serve its code offline
-    await startScan(page)
+    // Open the new book page once first: the dev server can't serve its
+    // code offline (the packaged apps load everything locally)
+    await seedLibrary(page, makeDb({ authors: [leGuin], books: [otherBook] }))
+    await page.goto('/library/books/new')
+    await page.getByRole('button', { name: 'Back' }).click()
+    await startScan(page, { seed: false })
     await context.setOffline(true)
     await typeIsbn(page, ISBN)
     await expect(page.getByTestId('isbn-scanner')).toContainText(

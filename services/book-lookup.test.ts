@@ -76,13 +76,34 @@ describe('lookupIsbn', () => {
     expect(await lookupIsbn(ISBN, fakeFetch({}))).toBeNull()
   })
 
-  it('reports offline when neither service can be reached', async () => {
+  it('reports unreachable services, not "not found", when online', async () => {
     const failing = vi.fn(async () => {
       throw new TypeError('Failed to fetch')
     }) as unknown as typeof fetch
-    await expect(lookupIsbn(ISBN, failing)).rejects.toBeInstanceOf(
+    await expect(lookupIsbn(ISBN, failing)).rejects.toMatchObject({
+      name: 'LookupUnavailableError',
+      reason: 'unreachable',
+    })
+  })
+
+  it('reports offline when the device is offline', async () => {
+    const onLine = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
+    await expect(lookupIsbn(ISBN, fakeFetch({}))).rejects.toBeInstanceOf(
       LookupOfflineError,
     )
+    onLine.mockRestore()
+  })
+
+  it('does not call an ISBN unknown while a service is busy', async () => {
+    const fetchFn = vi.fn(async (url: string | URL | Request) =>
+      String(url).includes('googleapis')
+        ? json({ error: 'rate limited' }, 429)
+        : json({}),
+    ) as unknown as typeof fetch
+    await expect(lookupIsbn(ISBN, fetchFn)).rejects.toMatchObject({
+      name: 'LookupUnavailableError',
+      reason: 'busy',
+    })
   })
 
   it('still answers when one service fails', async () => {

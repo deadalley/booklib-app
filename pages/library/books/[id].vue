@@ -326,7 +326,7 @@ async function onSaveChanges({
     const updatedBook = await onSubmit(book.value)
 
     if (updatedBook) {
-      // Scanned offline: the details are filled in once back online
+      // The lookup could not run: BookLib tries again later
       if (pendingLookupIsbn && updatedBook.id) {
         enqueueLookup(updatedBook.id, pendingLookupIsbn)
       }

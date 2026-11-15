@@ -31,6 +31,32 @@ export class LookupOfflineError extends Error {
   }
 }
 
+/**
+ * The device is online but the lookup could not be completed: a service
+ * could not be reached (blocked, down) or turned the request away (rate
+ * limited). Unlike a book that isn't found, this is worth retrying.
+ */
+export class LookupUnavailableError extends Error {
+  constructor(
+    // busy: a service answered with an error, e.g. too many requests
+    readonly reason: 'unreachable' | 'busy',
+  ) {
+    super(
+      reason === 'busy'
+        ? 'The book services are busy'
+        : 'The book services could not be reached',
+    )
+    this.name = 'LookupUnavailableError'
+  }
+}
+
+/** A service answered with an error status (not "not found") */
+class ServiceError extends Error {
+  constructor(readonly status: number) {
+    super(`Lookup service answered ${status}`)
+  }
+}
+
 type Fetch = typeof fetch
 
 type OpenLibraryBook = {
@@ -61,8 +87,9 @@ async function getJson<T>(fetchFn: Fetch, url: string): Promise<T | null> {
   const response = await fetchFn(url, {
     headers: { Accept: 'application/json' },
   })
-  // Not found or rate limited: no data from this source
-  if (!response.ok) return null
+  if (response.status === 404) return null
+  // Rate limited or failing: worth trying again later
+  if (!response.ok) throw new ServiceError(response.status)
   return (await response.json()) as T
 }
 
@@ -168,14 +195,25 @@ export async function lookupIsbn(
     fromOpenLibrary(fetchFn, isbn),
     fromGoogleBooks(fetchFn, isbn),
   ])
-  if (openLibrary.status === 'rejected' && google.status === 'rejected') {
-    throw new LookupOfflineError()
-  }
-
-  return mergeLookup(
+  const result = mergeLookup(
     isbn,
     openLibrary.status === 'fulfilled' ? openLibrary.value : null,
     google.status === 'fulfilled' ? google.value : null,
+  )
+  if (result) return result
+
+  // Nothing found, but only "not found" if every service could answer
+  const failures = [openLibrary, google].flatMap((outcome) =>
+    outcome.status === 'rejected' ? [outcome.reason] : [],
+  )
+  if (!failures.length) return null
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    throw new LookupOfflineError()
+  }
+  throw new LookupUnavailableError(
+    failures.some((failure) => failure instanceof ServiceError)
+      ? 'busy'
+      : 'unreachable',
   )
 }
 

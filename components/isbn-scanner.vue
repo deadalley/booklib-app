@@ -22,30 +22,85 @@
           playsinline
           aria-label="Camera preview"
         />
-        <div v-if="cameraShown" class="scanner-guide" aria-hidden="true">
-          <span class="scanner-line" />
-        </div>
-        <div v-else class="scanner-message" role="status">
+        <template v-if="cameraShown">
+          <div class="scanner-guide" aria-hidden="true">
+            <span v-if="state === 'scanning'" class="scanner-line" />
+          </div>
+          <div class="scanner-controls">
+            <bl-icon-button
+              v-if="torchSupported"
+              variant="secondary"
+              size="sm"
+              :aria-label="torchOn ? 'Turn off the light' : 'Turn on the light'"
+              :aria-pressed="torchOn"
+              @click="toggleTorch"
+            >
+              <template #default="iconProps">
+                <IconBulbOff v-if="torchOn" v-bind="iconProps" />
+                <IconBulb v-else v-bind="iconProps" />
+              </template>
+            </bl-icon-button>
+            <bl-icon-button
+              v-if="cameraCount > 1"
+              variant="secondary"
+              size="sm"
+              aria-label="Switch camera"
+              @click="switchCamera"
+            >
+              <template #default="iconProps">
+                <IconCameraRotate v-bind="iconProps" />
+              </template>
+            </bl-icon-button>
+          </div>
+        </template>
+        <div v-else class="scanner-message" role="alert">
           <component :is="cameraMessage.icon" :size="28" stroke="1.5" />
           <p class="font-semibold">{{ cameraMessage.title }}</p>
           <p class="text-ink-muted text-sm">{{ cameraMessage.text }}</p>
           <bl-button
-            v-if="state === 'denied' || state === 'idle'"
+            v-if="cameraMessage.retry"
             variant="secondary"
             size="sm"
             @click="start"
           >
-            {{ state === 'denied' ? 'Try again' : 'Turn on camera' }}
+            {{ cameraMessage.retry }}
           </bl-button>
         </div>
       </div>
-      <p
-        v-if="step === 'scan' && sawOtherBarcode"
-        class="text-ink-muted text-center text-sm"
-        role="status"
+
+      <!-- What the camera is doing, and why it may not be working -->
+      <div
+        v-if="step === 'scan' && cameraShown"
+        class="flex flex-col gap-2"
+        aria-live="polite"
+        data-testid="scanner-status"
       >
-        That barcode isn’t an ISBN. Look for the one starting with 978 or 979.
-      </p>
+        <p v-if="otherCode" class="scanner-hint warn">
+          <IconAlertTriangle :size="16" stroke="1.8" class="mt-0.5 flex-none" />
+          <span>{{ otherCodeMessage }}</span>
+        </p>
+        <p v-else class="scanner-hint">
+          <bl-loading v-if="state === 'starting'" class="size-4!" />
+          <IconScan v-else :size="16" stroke="1.8" class="flex-none" />
+          {{
+            state === 'starting'
+              ? 'Starting the camera…'
+              : 'Looking for a barcode…'
+          }}
+        </p>
+        <div v-if="struggling && !otherCode" class="scanner-tips">
+          <p class="font-semibold">Not reading it?</p>
+          <ul>
+            <li>Fill the frame with the barcode, keeping it level.</li>
+            <li>
+              If it looks blurry, move it a little further away. Laptop webcams
+              can’t focus up close.
+            </li>
+            <li>Tilt the book to get rid of glare, or add light.</li>
+            <li>Or type the 13 digits printed above the barcode.</li>
+          </ul>
+        </div>
+      </div>
 
       <!-- Typed ISBN -->
       <form
@@ -104,27 +159,24 @@
         </div>
       </div>
 
-      <!-- Not found / offline -->
-      <div v-else class="scanner-state" role="status">
+      <!-- Not found / offline / services unavailable -->
+      <div v-else-if="outcome" class="scanner-state" role="status">
         <component
-          :is="step === 'offline' ? IconWifiOff : IconBookOff"
+          :is="outcome.icon"
           class="text-ink-muted"
           :size="28"
           stroke="1.5"
         />
-        <p class="font-semibold">
-          {{ step === 'offline' ? 'You’re offline' : 'No details found' }}
-        </p>
-        <p class="text-ink-muted text-sm">
-          <template v-if="step === 'offline'">
-            Keep the ISBN {{ isbn }} for now. The book’s details are filled in
-            when you’re back online.
-          </template>
-          <template v-else>
-            Neither Open Library nor Google Books knows ISBN {{ isbn }}. You can
-            keep the ISBN and fill in the rest yourself.
-          </template>
-        </p>
+        <p class="font-semibold">{{ outcome.title }}</p>
+        <p class="text-ink-muted text-sm">{{ outcome.text }}</p>
+        <bl-button
+          v-if="step === 'unavailable'"
+          variant="secondary"
+          size="sm"
+          @click="lookup(isbn)"
+        >
+          Try again
+        </bl-button>
       </div>
 
       <bl-button
@@ -148,16 +200,24 @@
 
 <script setup lang="ts">
 import {
+  IconAlertTriangle,
   IconBook,
   IconBookOff,
+  IconBulb,
+  IconBulbOff,
   IconCamera,
   IconCameraOff,
+  IconCameraRotate,
+  IconCloudOff,
+  IconLock,
   IconRefresh,
+  IconScan,
   IconWifiOff,
 } from '@tabler/icons-vue'
 import {
   lookupIsbn,
   LookupOfflineError,
+  LookupUnavailableError,
   type BookLookupResult,
 } from '~/services/book-lookup'
 
@@ -165,11 +225,17 @@ import {
 export type IsbnScan = {
   isbn: string
   result: BookLookupResult | null
-  // Looked up later, when back online
-  offline: boolean
+  // The lookup couldn't run (offline, services down): try again later
+  lookUpLater: boolean
 }
 
-type Step = 'scan' | 'looking' | 'found' | 'not-found' | 'offline'
+type Step =
+  | 'scan'
+  | 'looking'
+  | 'found'
+  | 'not-found'
+  | 'offline'
+  | 'unavailable'
 
 const open = defineModel<boolean>({ default: false })
 
@@ -179,13 +245,22 @@ const video = ref<HTMLVideoElement>()
 const step = ref<Step>('scan')
 const isbn = ref('')
 const result = ref<BookLookupResult | null>(null)
+const unavailableReason = ref<LookupUnavailableError['reason']>('unreachable')
 const typedIsbn = ref('')
 const typedError = ref('')
 
-const { state, sawOtherBarcode, start, stop } = useBarcodeScanner(
-  video,
-  (code) => lookup(code),
-)
+const {
+  state,
+  otherCode,
+  struggling,
+  torchSupported,
+  torchOn,
+  cameraCount,
+  start,
+  stop,
+  toggleTorch,
+  switchCamera,
+} = useBarcodeScanner(video, (code) => lookup(code))
 
 const cameraShown = computed(
   () => state.value === 'scanning' || state.value === 'starting',
@@ -197,21 +272,59 @@ const cameraMessage = computed(() => {
       return {
         icon: IconCameraOff,
         title: 'Camera access is blocked',
-        text: 'Allow camera access for BookLib, or type the ISBN below.',
+        text: 'Allow camera access for BookLib in your browser or system settings, or type the ISBN below.',
+        retry: 'Try again',
+      }
+    case 'busy':
+      return {
+        icon: IconCameraOff,
+        title: 'The camera is in use',
+        text: 'Another app or browser tab is using it. Close that, then try again.',
+        retry: 'Try again',
       }
     case 'unavailable':
       return {
         icon: IconCameraOff,
         title: 'No camera found',
-        text: 'Type the ISBN below instead.',
+        text: 'Connect a camera, or type the ISBN below.',
+        retry: 'Try again',
+      }
+    case 'insecure':
+      return {
+        icon: IconLock,
+        title: 'The camera needs a secure connection',
+        text: 'Browsers only allow the camera on https pages. Type the ISBN below instead.',
+        retry: null,
+      }
+    case 'error':
+      return {
+        icon: IconCameraOff,
+        title: 'The scanner couldn’t start',
+        text: 'Something went wrong starting the camera or the barcode reader. Try again, or type the ISBN below.',
+        retry: 'Try again',
       }
     default:
       return {
         icon: IconCamera,
         title: 'Camera is off',
         text: 'Turn it on to scan the barcode.',
+        retry: 'Turn on camera',
       }
   }
+})
+
+// 12 digits, or 13 starting with 0: a UPC code (US prices, mass-market)
+const otherCodeKind = computed(() =>
+  otherCode.value && /^0?\d{12}$/.test(otherCode.value)
+    ? 'a price code (UPC)'
+    : 'a product code',
+)
+const otherCodeMessage = computed(() => {
+  const advice =
+    otherCodeKind.value === 'a price code (UPC)'
+      ? 'Some paperbacks have the ISBN barcode inside the front cover. Or type the ISBN printed on the back or the copyright page.'
+      : 'Look for the barcode starting with 978 or 979, or type the ISBN.'
+  return `Read ${otherCode.value}, but that’s ${otherCodeKind.value}, not the ISBN. ${advice}`
 })
 
 const resultDetails = computed(() =>
@@ -224,12 +337,41 @@ const resultDetails = computed(() =>
     .join(' · '),
 )
 
+const outcome = computed(() => {
+  switch (step.value) {
+    case 'offline':
+      return {
+        icon: IconWifiOff,
+        title: 'You’re offline',
+        text: `Keep the ISBN ${isbn.value} for now. The book’s details are filled in when you’re back online.`,
+      }
+    case 'unavailable':
+      return {
+        icon: IconCloudOff,
+        title:
+          unavailableReason.value === 'busy'
+            ? 'The book services are busy'
+            : 'Couldn’t reach the book services',
+        text: `Open Library or Google Books didn’t answer, so ISBN ${isbn.value} couldn’t be checked. Try again, or keep the ISBN and BookLib looks it up again later.`,
+      }
+    case 'not-found':
+      return {
+        icon: IconBookOff,
+        title: 'No details found',
+        text: `Neither Open Library nor Google Books knows ISBN ${isbn.value}. You can keep the ISBN and fill in the rest yourself.`,
+      }
+    default:
+      return null
+  }
+})
+
 const confirmLabel = computed(() => {
   switch (step.value) {
     case 'found':
       return 'Use these details'
     case 'not-found':
     case 'offline':
+    case 'unavailable':
       return 'Keep the ISBN'
     default:
       return null
@@ -246,7 +388,16 @@ async function lookup(code: string) {
     result.value = await lookupIsbn(code)
     step.value = result.value ? 'found' : 'not-found'
   } catch (error) {
-    step.value = error instanceof LookupOfflineError ? 'offline' : 'not-found'
+    if (error instanceof LookupUnavailableError) {
+      unavailableReason.value = error.reason
+      step.value = 'unavailable'
+    } else if (error instanceof LookupOfflineError) {
+      step.value = 'offline'
+    } else {
+      console.error('ISBN lookup failed:', error)
+      unavailableReason.value = 'unreachable'
+      step.value = 'unavailable'
+    }
   }
 }
 
@@ -272,7 +423,7 @@ function onConfirm() {
   emit('use', {
     isbn: isbn.value,
     result: step.value === 'found' ? result.value : null,
-    offline: step.value === 'offline',
+    lookUpLater: step.value === 'offline' || step.value === 'unavailable',
   })
 }
 
@@ -303,8 +454,11 @@ watch(open, (isOpen) => {
   @apply absolute inset-0 size-full object-cover;
 }
 .scanner-guide {
-  @apply absolute inset-x-[12%] top-1/2 grid h-[38%] -translate-y-1/2 place-items-center rounded-lg border-2 border-white/85;
+  @apply absolute inset-x-[8%] top-1/2 grid h-[42%] -translate-y-1/2 place-items-center rounded-lg border-2 border-white/85;
   box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+}
+.scanner-controls {
+  @apply absolute top-2.5 right-2.5 flex gap-2;
 }
 .scanner-line {
   @apply bg-primary-400 h-0.5 w-[90%] rounded-full opacity-90;
@@ -325,6 +479,18 @@ watch(open, (isOpen) => {
 }
 .scanner-message {
   @apply bg-surface-subtle text-ink-primary absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center;
+}
+.scanner-hint {
+  @apply text-ink-secondary flex items-center gap-2 text-sm;
+}
+.scanner-hint.warn {
+  @apply bg-secondary-50 border-secondary-200 text-secondary-800 items-start rounded-lg border px-3 py-2;
+}
+.scanner-tips {
+  @apply bg-surface-subtle border-stroke text-ink-secondary flex flex-col gap-1 rounded-lg border px-3 py-2.5 text-sm;
+}
+.scanner-tips ul {
+  @apply list-disc pl-5;
 }
 .scanner-state {
   @apply flex flex-col items-center gap-2 py-6 text-center;
