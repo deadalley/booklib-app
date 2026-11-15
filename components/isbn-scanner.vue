@@ -127,14 +127,18 @@
         </p>
       </div>
 
-      <button
+      <bl-button
         v-if="step !== 'scan' && step !== 'looking'"
         type="button"
-        class="link-muted self-center text-sm"
+        expand
+        variant="secondary"
         @click="scanAgain"
       >
-        Scan another
-      </button>
+        <template #prependIcon="iconProps">
+          <IconRefresh v-bind="iconProps" />
+        </template>
+        Scan again
+      </bl-button>
     </div>
 
     <template #cancel-label>Cancel</template>
@@ -148,6 +152,7 @@ import {
   IconBookOff,
   IconCamera,
   IconCameraOff,
+  IconRefresh,
   IconWifiOff,
 } from '@tabler/icons-vue'
 import {
