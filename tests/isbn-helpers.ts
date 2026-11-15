@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, makeAuthor, makeDb, seedLibrary } from './fixtures'
+import { expect, makeAuthor, makeBook, makeDb, seedLibrary } from './fixtures'
 
 /* Shared by the ISBN lookup and camera scan tests */
 
@@ -38,12 +38,19 @@ export async function mockLookups(page: Page) {
   )
 }
 
-export async function openNewBook(page: Page) {
-  await seedLibrary(page, makeDb({ authors: [leGuin] }))
-  await page.goto('/library/books/new')
-  await expect(
-    page.getByRole('heading', { name: 'Untitled book' }),
-  ).toBeVisible()
+// The books page needs a book, or it sends an empty library home
+export const otherBook = makeBook('Kindred')
+
+/** Add book → Scan ISBN, from the books page */
+export async function startScan(page: Page) {
+  await seedLibrary(page, makeDb({ authors: [leGuin], books: [otherBook] }))
+  await page.goto('/library/books')
+  await page.getByRole('button', { name: 'Add book' }).click()
+  await page
+    .getByTestId('add-book-options')
+    .getByRole('button', { name: 'Scan ISBN' })
+    .click()
+  await expect(page.getByTestId('isbn-scanner')).toBeVisible()
 }
 
 export async function typeIsbn(page: Page, isbn: string) {

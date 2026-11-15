@@ -8,7 +8,9 @@
       <DialogOverlay
         class="modal-overlay data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
+      <!-- Without a subtitle there is no description to point at -->
       <DialogContent
+        v-bind="$slots['subtitle'] ? {} : { 'aria-describedby': undefined }"
         class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl p-5 focus:outline-none sm:p-7"
         :class="{
           'overflow-y-auto': !allowOverflow || sheet,
@@ -43,12 +45,13 @@
               />
               <slot name="title" />
             </h4>
-            <p
+            <DialogDescription
               v-if="$slots['subtitle']"
+              as="p"
               class="text-ink-muted text-sm font-semibold"
             >
               <slot name="subtitle" />
-            </p>
+            </DialogDescription>
           </div>
           <DialogClose v-if="withCloseButton" as-child>
             <bl-icon-button
@@ -96,6 +99,7 @@
 import {
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogOverlay,
   DialogPortal,
   DialogRoot,

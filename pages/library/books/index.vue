@@ -10,17 +10,7 @@
     :loading="loading"
   >
     <template #headerActions>
-      <bl-button
-        :to="{ path: '/library/books/new', query: { scan: null } }"
-        variant="secondary"
-        :expand="isMobile"
-      >
-        <template #prependIcon="iconProps">
-          <IconBarcode v-bind="iconProps" />
-        </template>
-        Scan ISBN
-      </bl-button>
-      <bl-button to="/library/books/new" variant="primary" :expand="isMobile">
+      <bl-button variant="primary" :expand="isMobile" @click="openAddBook">
         <template #prependIcon="iconProps">
           <IconPlus v-bind="iconProps" />
         </template>
@@ -94,7 +84,7 @@
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
-        <bl-button to="/library/books/new">Create a book</bl-button>
+        <bl-button @click="openAddBook">Create a book</bl-button>
       </template>
     </bl-empty>
     <bl-books-views
@@ -182,7 +172,6 @@
 import type { Book, ViewBook } from '~/types/book'
 import {
   IconArrowBackUp,
-  IconBarcode,
   IconWifiOff,
   IconPlus,
   IconFilter,
@@ -198,6 +187,7 @@ import { bookToRecord, serializeBooks } from '~/services/transfer'
 import type { Collection } from '~/types/collection'
 
 const { isMobile } = useBreakpoints()
+const { openAddBook } = useAddBook()
 
 const { getBooks, getAuthors, getCollections, updateBooks, deleteBooks } =
   useBookLibrary()

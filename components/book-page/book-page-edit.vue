@@ -6,7 +6,12 @@
         Back
       </button>
       <div class="flex flex-wrap gap-2">
-        <bl-button variant="secondary" @click="scannerOpen = true">
+        <!-- New books choose scanning in the "Add book" modal -->
+        <bl-button
+          v-if="!isNew"
+          variant="secondary"
+          @click="scannerOpen = true"
+        >
           <template #prependIcon="iconProps">
             <IconBarcode v-bind="iconProps" />
           </template>

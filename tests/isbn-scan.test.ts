@@ -1,27 +1,17 @@
-import {
-  expect,
-  makeBook,
-  makeDb,
-  readLibrary,
-  seedLibrary,
-  test,
-} from './fixtures'
+import { expect, makeDb, readLibrary, seedLibrary, test } from './fixtures'
 import {
   ISBN,
   leGuin,
   mockLookups,
-  openNewBook,
+  otherBook,
+  startScan,
   typeIsbn,
 } from './isbn-helpers'
-
-// The books page needs a book, or it sends an empty library home
-const other = makeBook('Kindred')
 
 test.describe('ISBN lookup', () => {
   test('fills a new book from a typed ISBN', async ({ page }) => {
     await mockLookups(page)
-    await openNewBook(page)
-    await page.getByRole('button', { name: 'Scan ISBN' }).click()
+    await startScan(page)
 
     await typeIsbn(page, '12345')
     await expect(
@@ -41,8 +31,8 @@ test.describe('ISBN lookup', () => {
     await expect(page).toHaveURL(/\/library\/books$/)
 
     const db = await readLibrary(page)
-    expect(db.books).toHaveLength(1)
-    expect(db.books[0]).toMatchObject({
+    expect(db.books).toHaveLength(2)
+    expect(db.books.find((book) => book.isbn === ISBN)).toMatchObject({
       title: 'The Dispossessed',
       isbn: ISBN,
       // The existing author, matched by name
@@ -62,8 +52,7 @@ test.describe('ISBN lookup', () => {
     await page.route('https://www.googleapis.com/books/**', (route) =>
       route.fulfill({ json: { totalItems: 0 } }),
     )
-    await openNewBook(page)
-    await page.getByRole('button', { name: 'Scan ISBN' }).click()
+    await startScan(page)
     await typeIsbn(page, ISBN)
     await expect(page.getByTestId('isbn-scanner')).toContainText(
       'No details found',
@@ -76,15 +65,9 @@ test.describe('ISBN lookup', () => {
     page,
     context,
   }) => {
-    // Load the books page first: the dev server can't serve its code offline
-    await seedLibrary(page, makeDb({ authors: [leGuin], books: [other] }))
-    await page.goto('/library/books')
-    await page.getByRole('link', { name: 'Add book' }).click()
-    await expect(
-      page.getByRole('heading', { name: 'Untitled book' }),
-    ).toBeVisible()
+    // Starts on the books page: the dev server can't serve its code offline
+    await startScan(page)
     await context.setOffline(true)
-    await page.getByRole('button', { name: 'Scan ISBN' }).click()
     await typeIsbn(page, ISBN)
     await expect(page.getByTestId('isbn-scanner')).toContainText(
       'You’re offline',
@@ -116,10 +99,20 @@ test.describe('ISBN lookup', () => {
     })
   })
 
-  test('opens the scanner from the books page', async ({ page }) => {
-    await seedLibrary(page, makeDb({ books: [other] }))
+  test('Add book offers manual entry or a scan', async ({ page }) => {
+    await seedLibrary(page, makeDb({ books: [otherBook] }))
     await page.goto('/library/books')
-    await page.getByRole('link', { name: 'Scan ISBN' }).click()
-    await expect(page.getByTestId('isbn-scanner')).toBeVisible()
+    await page.getByRole('button', { name: 'Add book' }).click()
+    const options = page.getByTestId('add-book-options')
+    await expect(options.getByRole('button')).toHaveText([
+      /Enter manually/,
+      /Scan ISBN/,
+    ])
+    await options.getByRole('button', { name: 'Enter manually' }).click()
+    await expect(page).toHaveURL(/\/library\/books\/new$/)
+    await expect(
+      page.getByRole('heading', { name: 'Untitled book' }),
+    ).toBeVisible()
+    await expect(page.getByTestId('isbn-scanner')).toBeHidden()
   })
 })
