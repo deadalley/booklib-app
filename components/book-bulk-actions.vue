@@ -121,11 +121,13 @@
           placeholder="Choose status"
         />
 
-        <bl-raw-select
+        <bl-raw-autocomplete
           v-else-if="editField === 'author'"
-          v-model="authorId"
+          v-model="author"
+          v-model:search-term="authorSearch"
           :options="authorOptions"
-          placeholder="Choose author"
+          can-create-new
+          placeholder="Choose or add an author"
         />
 
         <template v-else-if="editField === 'genre'">
@@ -262,7 +264,9 @@ const collectionMode = ref<Mode>('add')
 const collectionId = ref<string>()
 const statusValue = ref<string>()
 const editField = ref<EditField>('status')
-const authorId = ref<string>()
+// An author id, or a new author's name (created when applied)
+const author = ref<string>()
+const authorSearch = ref<string>()
 const genreMode = ref<Mode>('add')
 const genre = ref<string>()
 const genreSearch = ref<string>()
@@ -275,7 +279,8 @@ function reset() {
   collectionId.value = undefined
   statusValue.value = undefined
   editField.value = 'status'
-  authorId.value = undefined
+  author.value = undefined
+  authorSearch.value = undefined
   genreMode.value = 'add'
   genre.value = undefined
   genreSearch.value = undefined
@@ -351,10 +356,11 @@ const change = computed<BulkBookChange | null>(() => {
                     : (statusValue.value as BookProgressStatus),
               }
             : null
-        case 'author':
-          return authorId.value
-            ? { field: 'author', authorId: authorId.value }
-            : null
+        case 'author': {
+          // A typed new name counts without picking "Add …"
+          const value = (author.value ?? authorSearch.value)?.trim()
+          return value ? { field: 'author', author: value } : null
+        }
         case 'genre': {
           // When adding, a typed new genre counts without picking "Add …"
           const value = (

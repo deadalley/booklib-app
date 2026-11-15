@@ -194,9 +194,9 @@ test.describe('bulk actions', () => {
       .click()
     await page.getByRole('radio', { name: 'author' }).click()
     await page
+      .getByTestId('bulk-action-form')
       .getByRole('combobox')
-      .filter({ hasText: 'Choose author' })
-      .click()
+      .fill('Le Guin')
     await page.getByRole('option', { name: leGuin.name }).click()
     await page.getByRole('button', { name: 'Apply' }).click()
 
@@ -343,5 +343,29 @@ test.describe('bulk actions', () => {
     const text = Buffer.concat(contents as Buffer[]).toString('utf8')
     expect(text).toContain(cien.title)
     expect(text).not.toContain(earthsea.title)
+  })
+
+  test('sets a new author by typing their name', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'author' }).click()
+    await page
+      .getByTestId('bulk-action-form')
+      .getByRole('combobox')
+      .fill('Jorge Luis Borges')
+    await page.getByText('Add Jorge Luis Borges').click()
+    await page.getByRole('button', { name: 'Apply' }).click()
+
+    await expect
+      .poll(async () => {
+        const db = await readLibrary(page)
+        const authorId = db.books.find((b) => b.id === cien.id)?.author_id
+        return db.authors.find((a) => a.id === authorId)?.name
+      })
+      .toBe('Jorge Luis Borges')
   })
 })

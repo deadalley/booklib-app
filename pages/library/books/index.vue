@@ -315,7 +315,7 @@ function patchFor(change: BulkBookChange, book: Book): Partial<Book> {
     case 'status':
       return { progress: withProgressStatus(book.progress, change.status) }
     case 'author':
-      return { author: change.authorId }
+      return { author: change.author }
     case 'genre': {
       const genres = book.genres ?? []
       return {
