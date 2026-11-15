@@ -21,7 +21,7 @@
           <br />
           Let's add your first book.
         </p>
-        <bl-button to="/library/books/new" class="mt-4 w-full sm:w-72">
+        <bl-button class="mt-4 w-full sm:w-72" @click="openAddBook">
           <template #prependIcon="prependIcon">
             <IconPlus v-bind="prependIcon" />
           </template>
@@ -55,7 +55,7 @@
           </p>
           <h3 class="text-ink-primary">{{ greeting }}</h3>
         </div>
-        <bl-button to="/library/books/new">
+        <bl-button @click="openAddBook">
           <template #prependIcon="prependIcon">
             <IconPlus v-bind="prependIcon" />
           </template>
@@ -114,6 +114,8 @@ import {
   snoozeUntil,
   type Suggestion,
 } from '~/utils/suggestions'
+
+const { openAddBook } = useAddBook()
 
 const TOAST_MS = 2600
 

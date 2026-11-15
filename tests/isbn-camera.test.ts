@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { expect, test } from './fixtures'
-import { ISBN, mockLookups, openNewBook } from './isbn-helpers'
+import { ISBN, mockLookups, startScan } from './isbn-helpers'
 
 // Chromium plays a video of an ISBN barcode as its fake camera
 /** The bars of an EAN-13 code, as 95 modules (true = black) */
@@ -71,8 +71,7 @@ test.describe('ISBN camera scan', () => {
   }) => {
     test.skip(browserName !== 'chromium', 'Fake camera is Chromium only')
     await mockLookups(page)
-    await openNewBook(page)
-    await page.getByRole('button', { name: 'Scan ISBN' }).click()
+    await startScan(page)
 
     await expect(page.getByTestId('isbn-scanner')).toContainText(
       'The Dispossessed',

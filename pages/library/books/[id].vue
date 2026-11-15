@@ -236,6 +236,7 @@ async function fetchBook() {
     book.value = {
       collections: [],
       genres: [],
+      rating: null,
       progress: { status: null, startedAt: null, finishedAt: null, notes: [] },
     } as unknown as Book
   } else {

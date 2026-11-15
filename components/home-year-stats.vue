@@ -27,7 +27,7 @@
         </bl-button>
       </div>
       <div class="flex flex-wrap gap-2">
-        <bl-button to="/library/books/new">Add a book</bl-button>
+        <bl-button @click="openAddBook">Add a book</bl-button>
         <bl-button to="/library/books" variant="secondary">Log pages</bl-button>
       </div>
     </div>
@@ -109,6 +109,8 @@ import { IconSparkles, IconTrendingUp } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Goal } from '~/types/goal'
+
+const { openAddBook } = useAddBook()
 
 const props = defineProps<{
   books: Book[]
