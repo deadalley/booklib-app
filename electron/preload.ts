@@ -33,6 +33,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ensureDir: (dirPath: string) => ipcRenderer.invoke('dir:ensure', dirPath),
   saveCover: (id: string, bytes: Uint8Array, mimeType: string) =>
     ipcRenderer.invoke('cover:save', id, bytes, mimeType),
+  downloadCover: (id: string, url: string) =>
+    ipcRenderer.invoke('cover:download', id, url),
   deleteCover: (id: string) => ipcRenderer.invoke('cover:delete', id),
   renameCover: (fromId: string, toId: string) =>
     ipcRenderer.invoke('cover:rename', fromId, toId),

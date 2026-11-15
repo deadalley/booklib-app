@@ -130,6 +130,8 @@
         <!-- Content -->
         <slot />
 
+        <bl-add-book-modal />
+
         <!-- Loading indicator -->
         <NuxtLoadingIndicator :color="loadingColor" />
       </div>

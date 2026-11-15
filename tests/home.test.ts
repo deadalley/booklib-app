@@ -73,9 +73,9 @@ test.describe('home', () => {
   })
 
   test('shows every section', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: 'Add book', exact: true }),
-    ).toHaveAttribute('href', '/library/books/new')
+    await page.getByRole('button', { name: 'Add book', exact: true }).click()
+    await expect(page.getByTestId('add-book-options')).toBeVisible()
+    await page.keyboard.press('Escape')
 
     const libraryNav = page.getByRole('navigation', { name: 'Library' })
     await expect(

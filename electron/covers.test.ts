@@ -2,8 +2,8 @@
 import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { CoverStore } from './covers'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { CoverStore, downloadCoverImage } from './covers'
 
 const BOOK_ID = '0b5c2f7e-1d1a-4c1e-9a43-6a2d7a0f1b23'
 const OTHER_ID = '7f3e2b1a-5c4d-4e6f-8a9b-0c1d2e3f4a5b'
@@ -92,5 +92,44 @@ describe('CoverStore', () => {
 
     await store.removeStaleTempCovers(Date.now() + 25 * 60 * 60 * 1000)
     expect(await files()).toEqual([`${BOOK_ID}.png`])
+  })
+})
+
+describe('downloadCoverImage', () => {
+  const image = (type = 'image/jpeg', status = 200) =>
+    vi.fn(
+      async () =>
+        new Response(PNG, { status, headers: { 'content-type': type } }),
+    )
+
+  it('downloads an image from a lookup host', async () => {
+    const fetchFn = image('image/jpeg; charset=binary')
+    await expect(
+      downloadCoverImage(
+        'https://covers.openlibrary.org/b/id/1-L.jpg',
+        fetchFn,
+      ),
+    ).resolves.toEqual({ bytes: PNG, mimeType: 'image/jpeg' })
+  })
+
+  it('refuses other hosts, plain http and non-images', async () => {
+    await expect(
+      downloadCoverImage('https://example.com/a.jpg', image()),
+    ).rejects.toThrow('not allowed')
+    await expect(
+      downloadCoverImage('http://covers.openlibrary.org/a.jpg', image()),
+    ).rejects.toThrow('not allowed')
+    await expect(
+      downloadCoverImage(
+        'https://covers.openlibrary.org/a.jpg',
+        image('text/html'),
+      ),
+    ).rejects.toThrow('Unsupported')
+    await expect(
+      downloadCoverImage(
+        'https://covers.openlibrary.org/a.jpg',
+        image('image/jpeg', 404),
+      ),
+    ).rejects.toThrow('404')
   })
 })

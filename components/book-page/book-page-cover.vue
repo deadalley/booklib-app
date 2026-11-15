@@ -80,6 +80,13 @@ const loading = ref(false)
 // Local covers come back with a ?v=<timestamp> query, so a replaced image
 // gets a new URL and is not served from the cache.
 const coverSrc = ref<string | null>(props.book.coverSrc ?? null)
+// e.g. a cover saved from an ISBN lookup
+watch(
+  () => props.book.coverSrc,
+  (value) => {
+    if (value) coverSrc.value = value
+  },
+)
 
 const { updateBookCover, deleteBookCover } = useBookLibrary()
 

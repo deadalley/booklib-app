@@ -86,7 +86,7 @@
             </div>
             <div class="flex flex-wrap gap-2">
               <bl-button to="/library/books">Log pages</bl-button>
-              <bl-button to="/library/books/new" variant="secondary">
+              <bl-button variant="secondary" @click="openAddBook">
                 Add a book
               </bl-button>
             </div>
@@ -467,6 +467,8 @@ import type { Book, ViewBook } from '~/types/book'
 import type { Goal, GoalDisplayStatus } from '~/types/goal'
 import type { StatsDonutItem } from '~/components/stats-donut.vue'
 import type { CountItem, YearGoalRow } from '~/utils/year-review'
+
+const { openAddBook } = useAddBook()
 
 const DELTA_ICONS = {
   up: IconTrendingUp,

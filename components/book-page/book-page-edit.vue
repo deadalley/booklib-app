@@ -5,7 +5,18 @@
         <IconArrowLeft :size="ICON_SIZE_SMALL" stroke="1.5" />
         Back
       </button>
-      <div class="flex gap-2">
+      <div class="flex flex-wrap gap-2">
+        <!-- New books choose scanning in the "Add book" modal -->
+        <bl-button
+          v-if="!isNew"
+          variant="secondary"
+          @click="scannerOpen = true"
+        >
+          <template #prependIcon="iconProps">
+            <IconBarcode v-bind="iconProps" />
+          </template>
+          Scan ISBN
+        </bl-button>
         <bl-button variant="secondary" @click="$emit('cancel')">
           {{ isNew ? 'Cancel' : 'Discard changes' }}
         </bl-button>
@@ -25,7 +36,19 @@
       <h2 class="book-page-title">
         {{ book.title?.trim() || 'Untitled book' }}
       </h2>
+      <p
+        v-if="pendingLookupIsbn"
+        class="notice"
+        role="status"
+        data-testid="pending-lookup"
+      >
+        <IconWifiOff :size="16" stroke="1.8" />
+        The details for ISBN {{ pendingLookupIsbn }} are looked up again once
+        BookLib can reach the book services.
+      </p>
     </header>
+
+    <bl-isbn-scanner v-model="scannerOpen" @use="onScan" />
 
     <div class="book-page-edit-grid">
       <aside class="flex min-w-0 flex-col gap-6">
@@ -236,7 +259,17 @@
     }
   "
 >
-import { IconArrowLeft, IconCheck, IconDeviceFloppy } from '@tabler/icons-vue'
+import {
+  IconArrowLeft,
+  IconBarcode,
+  IconCheck,
+  IconDeviceFloppy,
+  IconWifiOff,
+} from '@tabler/icons-vue'
+import type { IsbnScan } from '~/components/isbn-scanner.vue'
+import { bookPatchFromLookup } from '~/services/book-lookup'
+import { placeholderTitle } from '~/services/lookup-queue'
+import { supportsCoverUploads } from '~/utils/platform'
 import { BOOK_FORMAT_MAP, DEFAULT_COLLECTIONS } from '~/utils/constants'
 import { fromSimpleDate, toSimpleDate } from '~/utils/date'
 import type { Book } from '~/types/book'
@@ -259,7 +292,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'cancel' | 'save'): void
+  (e: 'cancel'): void
+  // pendingLookupIsbn: saved offline from a scan, to look up when online
+  (e: 'save', options: { pendingLookupIsbn: string | null }): void
   (e: 'default-collection-change', collectionId: string): void
   (
     e: 'collection-select',
@@ -268,6 +303,49 @@ const emit = defineEmits<{
 }>()
 
 const submitAttempted = ref(false)
+
+const { downloadBookCover } = useBookLibrary()
+const { takePendingScan } = useAddBook()
+// Existing books only; new books are scanned from the "Add book" modal
+const scannerOpen = ref(false)
+const pendingLookupIsbn = ref<string | null>(null)
+
+async function onScan({ isbn, result, lookUpLater }: IsbnScan) {
+  pendingLookupIsbn.value = null
+
+  if (!result) {
+    book.value.isbn = isbn
+    if (lookUpLater) {
+      pendingLookupIsbn.value = isbn
+      if (!book.value.title?.trim()) book.value.title = placeholderTitle(isbn)
+    }
+    return
+  }
+
+  const authors = props.authorSelectOptions.map(({ value, label }) => ({
+    id: value,
+    name: label,
+  }))
+  // A new book takes everything found; an existing one only fills its gaps
+  Object.assign(
+    book.value,
+    bookPatchFromLookup(result, book.value, authors, {
+      onlyEmpty: !props.isNew,
+    }),
+  )
+
+  if (result.coverUrl && !book.value.coverSrc && supportsCoverUploads()) {
+    try {
+      const coverSrc = await downloadBookCover(
+        String(book.value.id ?? props.tempCoverSrc),
+        result.coverUrl,
+      )
+      if (coverSrc) book.value.coverSrc = coverSrc
+    } catch {
+      // The details are in; the cover can still be uploaded by hand
+    }
+  }
+}
 
 const formatOptions = Object.values(BOOK_FORMAT_MAP).map(
   ({ id, description, icon }) => ({ label: description, value: id, icon }),
@@ -349,6 +427,13 @@ const formState = computed(() =>
 
 const initialSnapshot = ref(formState.value)
 
+// A scan chosen in the "Add book" modal fills the new book (after the
+// snapshot, so the filled-in book counts as a change to save)
+if (props.isNew) {
+  const scan = takePendingScan()
+  if (scan) onScan(scan)
+}
+
 const dirty = computed(() => formState.value !== initialSnapshot.value)
 
 function onSave() {
@@ -356,7 +441,14 @@ function onSave() {
 
   if (!dirty.value || titleError.value || dateError.value) return
 
-  emit('save')
+  emit('save', {
+    // Only if the ISBN was not changed by hand since
+    pendingLookupIsbn:
+      pendingLookupIsbn.value &&
+      parseIsbn(book.value.isbn) === pendingLookupIsbn.value
+        ? pendingLookupIsbn.value
+        : null,
+  })
 }
 
 function onKeydown(event: KeyboardEvent) {

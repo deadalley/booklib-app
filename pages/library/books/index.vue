@@ -10,7 +10,7 @@
     :loading="loading"
   >
     <template #headerActions>
-      <bl-button to="/library/books/new" variant="primary" :expand="isMobile">
+      <bl-button variant="primary" :expand="isMobile" @click="openAddBook">
         <template #prependIcon="iconProps">
           <IconPlus v-bind="iconProps" />
         </template>
@@ -67,10 +67,24 @@
         </bl-button>
       </bl-tooltip>
     </template>
+    <p
+      v-if="pendingLookups"
+      class="notice"
+      role="status"
+      data-testid="lookup-notice"
+    >
+      <IconWifiOff :size="16" stroke="1.8" />
+      {{
+        pendingLookups === 1
+          ? '1 scanned book is waiting for its details.'
+          : `${pendingLookups} scanned books are waiting for their details.`
+      }}
+      BookLib looks them up again when you’re online.
+    </p>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
-        <bl-button to="/library/books/new">Create a book</bl-button>
+        <bl-button @click="openAddBook">Create a book</bl-button>
       </template>
     </bl-empty>
     <bl-books-views
@@ -158,6 +172,7 @@
 import type { Book, ViewBook } from '~/types/book'
 import {
   IconArrowBackUp,
+  IconWifiOff,
   IconPlus,
   IconFilter,
   IconTable,
@@ -172,6 +187,7 @@ import { bookToRecord, serializeBooks } from '~/services/transfer'
 import type { Collection } from '~/types/collection'
 
 const { isMobile } = useBreakpoints()
+const { openAddBook } = useAddBook()
 
 const { getBooks, getAuthors, getCollections, updateBooks, deleteBooks } =
   useBookLibrary()
@@ -329,6 +345,19 @@ async function refresh() {
   books.value = await getBooks({ withBookCovers: true })
   authors.value = await getAuthors()
 }
+
+// Books scanned offline get their details when the device is back online
+const { pending: pendingLookups, lastFilled } = useLookupQueue()
+watch(lastFilled, async (titles) => {
+  if (!titles.length) return
+  await refresh()
+  showToast(
+    titles.length === 1
+      ? `Filled in the details for ${titles[0]}`
+      : `Filled in the details for ${titles.length} scanned books`,
+  )
+  lastFilled.value = []
+})
 
 /** The patch for one book; `book` is its current stored state */
 function patchFor(change: BulkBookChange, book: Book): Partial<Book> {
