@@ -99,6 +99,13 @@ export function useBookLibrary() {
     return await service.updateBookCover(id, file)
   }
 
+  const downloadBookCover = async (
+    id: string,
+    url: string,
+  ): Promise<string | null> => {
+    return await service.downloadBookCover(id, url)
+  }
+
   const deleteBookCover = async (id: string): Promise<void> => {
     return await service.deleteBookCover(id)
   }
@@ -195,6 +202,7 @@ export function useBookLibrary() {
     // Book Covers
     getBookCover,
     updateBookCover,
+    downloadBookCover,
     deleteBookCover,
     // Collections
     getCollection,

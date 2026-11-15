@@ -12,6 +12,8 @@ export interface ElectronAPI {
     bytes: Uint8Array,
     mimeType: string,
   ) => Promise<string>
+  // Downloads a cover found by an ISBN lookup and saves it for `id`
+  downloadCover: (id: string, url: string) => Promise<string>
   deleteCover: (id: string) => Promise<void>
   renameCover: (fromId: string, toId: string) => Promise<string | null>
 }

@@ -29,7 +29,9 @@
             </bl-icon-button>
           </div>
         </div>
-        <slot v-if="!isMobile" name="headerActions" />
+        <div v-if="!isMobile" class="flex items-center gap-2">
+          <slot name="headerActions" />
+        </div>
       </div>
       <!-- Actions -->
       <div
@@ -51,7 +53,9 @@
             <slot name="navbar" />
           </div>
         </div>
-        <slot v-if="isMobile" name="headerActions" />
+        <div v-if="isMobile" class="flex flex-col gap-2">
+          <slot name="headerActions" />
+        </div>
       </div>
     </div>
     <!-- Content -->

@@ -307,20 +307,28 @@ async function onSubmit(bookValues: Book) {
     rating: book.value?.rating,
   } as Book
 
-  if (isNew.value) {
-    await createBook(updatedBook)
-  } else {
-    await updateBook(route.params.id as string, updatedBook)
-  }
+  const savedBook = isNew.value
+    ? await createBook(updatedBook)
+    : await updateBook(route.params.id as string, updatedBook)
 
-  return updatedBook
+  return savedBook ?? updatedBook
 }
 
-async function onSaveChanges() {
+const { enqueue: enqueueLookup } = useLookupQueue()
+
+async function onSaveChanges({
+  pendingLookupIsbn,
+}: {
+  pendingLookupIsbn: string | null
+}) {
   if (book.value) {
     const updatedBook = await onSubmit(book.value)
 
     if (updatedBook) {
+      // Scanned offline: the details are filled in once back online
+      if (pendingLookupIsbn && updatedBook.id) {
+        enqueueLookup(updatedBook.id, pendingLookupIsbn)
+      }
       navigateTo('/library/books')
     }
   }

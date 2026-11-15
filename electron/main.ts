@@ -5,7 +5,7 @@ import fs from 'node:fs/promises'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { handleFileError } from '../utils/error-handling'
 import { logger } from '../utils/logger'
-import { COVER_PROTOCOL, CoverStore } from './covers'
+import { COVER_PROTOCOL, CoverStore, downloadCoverImage } from './covers'
 import { atomicWriteFile } from './fs-utils'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -201,6 +201,21 @@ function initIpc() {
       }
     },
   )
+
+  // A cover found by an ISBN lookup. Fetched here rather than in the
+  // renderer, where the image hosts' missing CORS headers would block it.
+  ipcMain.handle('cover:download', async (_, id: string, url: string) => {
+    try {
+      const { bytes, mimeType } = await downloadCoverImage(url, (target) =>
+        net.fetch(target),
+      )
+      return await coverStore.save(id, bytes, mimeType)
+    } catch (error) {
+      logger.error({ error, id, url }, 'Cover download error')
+      Sentry.captureException(error)
+      throw error
+    }
+  })
 
   ipcMain.handle('cover:delete', async (_, id: string) => {
     try {

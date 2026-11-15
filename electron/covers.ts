@@ -23,6 +23,53 @@ export function assertCoverId(id: unknown): asserts id is string {
   }
 }
 
+// Hosts book lookups return cover images from (see services/book-lookup.ts)
+const COVER_DOWNLOAD_HOSTS = new Set([
+  'covers.openlibrary.org',
+  'books.google.com',
+  'books.googleusercontent.com',
+])
+
+/**
+ * Downloads a cover image found by a book lookup. Only https URLs from the
+ * lookup services are fetched, and only images up to MAX_COVER_BYTES.
+ */
+export async function downloadCoverImage(
+  url: string,
+  fetchFn: (url: string) => Promise<Response>,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new Error(`Invalid cover URL: ${url}`)
+  }
+  if (
+    parsed.protocol !== 'https:' ||
+    !COVER_DOWNLOAD_HOSTS.has(parsed.hostname)
+  ) {
+    throw new Error(`Cover downloads are not allowed from ${parsed.hostname}`)
+  }
+
+  const response = await fetchFn(parsed.toString())
+  if (!response.ok) {
+    throw new Error(`Cover download failed with status ${response.status}`)
+  }
+  const mimeType = (response.headers.get('content-type') ?? '')
+    .split(';')[0]!
+    .trim()
+    .toLowerCase()
+  if (!COVER_EXTENSIONS[mimeType]) {
+    throw new Error(`Unsupported cover image type: ${mimeType}`)
+  }
+  const length = Number(response.headers.get('content-length') ?? 0)
+  if (length > MAX_COVER_BYTES) {
+    throw new Error('Cover image is larger than 10 MB')
+  }
+
+  return { bytes: new Uint8Array(await response.arrayBuffer()), mimeType }
+}
+
 function coverUrl(fileName: string) {
   return `${COVER_PROTOCOL}://${fileName}?v=${Date.now()}`
 }

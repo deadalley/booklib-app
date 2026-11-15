@@ -10,6 +10,16 @@
     :loading="loading"
   >
     <template #headerActions>
+      <bl-button
+        :to="{ path: '/library/books/new', query: { scan: null } }"
+        variant="secondary"
+        :expand="isMobile"
+      >
+        <template #prependIcon="iconProps">
+          <IconBarcode v-bind="iconProps" />
+        </template>
+        Scan ISBN
+      </bl-button>
       <bl-button to="/library/books/new" variant="primary" :expand="isMobile">
         <template #prependIcon="iconProps">
           <IconPlus v-bind="iconProps" />
@@ -67,6 +77,20 @@
         </bl-button>
       </bl-tooltip>
     </template>
+    <p
+      v-if="pendingLookups"
+      class="notice"
+      role="status"
+      data-testid="lookup-notice"
+    >
+      <IconWifiOff :size="16" stroke="1.8" />
+      {{
+        pendingLookups === 1
+          ? '1 scanned book is waiting for its details.'
+          : `${pendingLookups} scanned books are waiting for their details.`
+      }}
+      They’re filled in when you’re back online.
+    </p>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
@@ -158,6 +182,8 @@
 import type { Book, ViewBook } from '~/types/book'
 import {
   IconArrowBackUp,
+  IconBarcode,
+  IconWifiOff,
   IconPlus,
   IconFilter,
   IconTable,
@@ -329,6 +355,19 @@ async function refresh() {
   books.value = await getBooks({ withBookCovers: true })
   authors.value = await getAuthors()
 }
+
+// Books scanned offline get their details when the device is back online
+const { pending: pendingLookups, lastFilled } = useLookupQueue()
+watch(lastFilled, async (titles) => {
+  if (!titles.length) return
+  await refresh()
+  showToast(
+    titles.length === 1
+      ? `Filled in the details for ${titles[0]}`
+      : `Filled in the details for ${titles.length} scanned books`,
+  )
+  lastFilled.value = []
+})
 
 /** The patch for one book; `book` is its current stored state */
 function patchFor(change: BulkBookChange, book: Book): Partial<Book> {

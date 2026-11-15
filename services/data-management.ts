@@ -614,6 +614,32 @@ export class BookLibDataManagementService {
     return coverSrc
   }
 
+  /**
+   * Saves a cover found by an ISBN lookup (desktop app only). Returns the
+   * cover's URL, or null when covers are not supported here.
+   */
+  async downloadBookCover(
+    id: BookDB['id'],
+    url: string,
+  ): Promise<string | null> {
+    const electronAPI = this.electronAPI
+    if (!electronAPI) return null
+
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+
+    const coverSrc = await electronAPI.downloadCover(id, url)
+
+    await this.client.read()
+    const book = this.client.data.books.find((book) => book.id === id)
+    if (book) {
+      book.cover_src = coverSrc
+      await this.client.write()
+    }
+
+    return coverSrc
+  }
+
   // Removes the image file only; callers that keep the book update `cover_src`.
   private async deleteBookCoverFile(id: BookDB['id']): Promise<void> {
     try {
