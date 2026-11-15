@@ -89,17 +89,12 @@
       </div>
     </div>
 
-    <Transition name="fade">
-      <div v-if="toast" class="toast" role="status">
-        <IconCheck :size="16" stroke="2.2" />
-        {{ toast }}
-      </div>
-    </Transition>
+    <bl-toast :message="toast" />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { IconCheck, IconPlus, IconUpload } from '@tabler/icons-vue'
+import { IconPlus, IconUpload } from '@tabler/icons-vue'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { v4 as uuidv4 } from 'uuid'
@@ -303,16 +298,5 @@ useHead({
   .main > .span-5 {
     grid-column: span 5;
   }
-}
-.toast {
-  @apply bg-ink-primary text-ink-inverse fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.2)];
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

@@ -67,8 +67,17 @@
     </div>
   </Transition>
 
+  <bl-book-bulk-edit
+    :model-value="action === 'edit'"
+    :books="selectedBooks"
+    :authors="authors"
+    :genres="genres"
+    @update:model-value="(value) => !value && (action = null)"
+    @change="(change) => emit('change', change)"
+  />
+
   <bl-modal
-    :model-value="!!action"
+    :model-value="!!action && action !== 'edit'"
     size="sm"
     allow-overflow
     :confirm-disabled="!ready"
@@ -95,74 +104,6 @@
           :options="collectionOptions"
           placeholder="Choose collection"
         />
-      </template>
-
-      <!-- Edit: one field at a time -->
-      <template v-else-if="action === 'edit'">
-        <bl-switch
-          v-model="editField"
-          aria-label="Field"
-          class="max-w-full overflow-x-auto"
-        >
-          <bl-switch-option
-            v-for="field in EDIT_FIELDS"
-            :key="field.value"
-            :value="field.value"
-            :selected-value="editField"
-          >
-            <template #label>{{ field.label }}</template>
-          </bl-switch-option>
-        </bl-switch>
-
-        <bl-raw-select
-          v-if="editField === 'status'"
-          v-model="statusValue"
-          :options="STATUS_OPTIONS"
-          placeholder="Choose status"
-        />
-
-        <bl-raw-autocomplete
-          v-else-if="editField === 'author'"
-          v-model="author"
-          v-model:search-term="authorSearch"
-          :options="authorOptions"
-          can-create-new
-          placeholder="Choose or add an author"
-        />
-
-        <template v-else-if="editField === 'genre'">
-          <bl-switch v-model="genreMode" aria-label="Add or remove">
-            <bl-switch-option
-              v-for="mode in MODES"
-              :key="mode.value"
-              :value="mode.value"
-              :selected-value="genreMode"
-            >
-              <template #label>{{ mode.label }}</template>
-            </bl-switch-option>
-          </bl-switch>
-          <bl-raw-autocomplete
-            v-model="genre"
-            v-model:search-term="genreSearch"
-            :options="genreOptions"
-            :can-create-new="genreMode === 'add'"
-            placeholder="Choose a genre"
-          />
-        </template>
-
-        <bl-raw-select
-          v-else-if="editField === 'format'"
-          v-model="format"
-          :options="FORMAT_OPTIONS"
-          placeholder="Choose format"
-        />
-
-        <div v-else-if="editField === 'rating'" class="flex items-center">
-          <bl-rating-input
-            :rating="rating"
-            @commit="(value) => (rating = value)"
-          />
-        </div>
       </template>
 
       <!-- Export -->
@@ -199,12 +140,11 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-vue'
-import type { BookFormat, BookProgressStatus } from '~/types/book'
+import type { Book } from '~/types/book'
 import type { BulkBookChange } from '~/types/ui'
 
 type ActionOption = { value: string; label: string }
 type Action = 'collection' | 'edit' | 'export' | 'delete'
-type EditField = 'status' | 'author' | 'genre' | 'format' | 'rating'
 type Mode = 'add' | 'remove'
 
 const ACTIONS = [
@@ -218,25 +158,6 @@ const MODES: { value: Mode; label: string }[] = [
   { value: 'add', label: 'Add' },
   { value: 'remove', label: 'Remove' },
 ]
-const EDIT_FIELDS: { value: EditField; label: string }[] = [
-  { value: 'status', label: 'Status' },
-  { value: 'author', label: 'Author' },
-  { value: 'genre', label: 'Genre' },
-  { value: 'format', label: 'Format' },
-  { value: 'rating', label: 'Rating' },
-]
-// The select needs a string value for "not started"
-const NOT_STARTED = 'not-started'
-const STATUS_OPTIONS: ActionOption[] = [
-  { value: NOT_STARTED, label: 'Not started' },
-  ...Object.values(PROGRESS_STATUS_MAP).map(({ id, description }) => ({
-    value: id,
-    label: description,
-  })),
-]
-const FORMAT_OPTIONS: ActionOption[] = Object.values(BOOK_FORMAT_MAP).map(
-  ({ id, description }) => ({ value: id, label: description }),
-)
 const EXPORT_FORMATS = [
   { value: 'csv', label: 'CSV' },
   { value: 'json', label: 'JSON' },
@@ -247,8 +168,10 @@ const props = defineProps<{
   totalBooksCount: number
   hasSelectedBooks: boolean
   collectionOptions: ActionOption[]
-  authorOptions: ActionOption[]
-  genreOptions: ActionOption[]
+  selectedBooks: Book[]
+  // For the edit modal
+  authors: { id: string; name: string; count: number }[]
+  genres: { name: string; count: number }[]
 }>()
 
 const open = defineModel<boolean>({ default: false })
@@ -262,30 +185,11 @@ const emit = defineEmits<{
 const action = ref<Action | null>(null)
 const collectionMode = ref<Mode>('add')
 const collectionId = ref<string>()
-const statusValue = ref<string>()
-const editField = ref<EditField>('status')
-// An author id, or a new author's name (created when applied)
-const author = ref<string>()
-const authorSearch = ref<string>()
-const genreMode = ref<Mode>('add')
-const genre = ref<string>()
-const genreSearch = ref<string>()
-const format = ref<string>()
-const rating = ref<number | null>(null)
 const exportFormat = ref<'csv' | 'json'>('csv')
 
 function reset() {
   collectionMode.value = 'add'
   collectionId.value = undefined
-  statusValue.value = undefined
-  editField.value = 'status'
-  author.value = undefined
-  authorSearch.value = undefined
-  genreMode.value = 'add'
-  genre.value = undefined
-  genreSearch.value = undefined
-  format.value = undefined
-  rating.value = null
   exportFormat.value = 'csv'
 }
 
@@ -309,8 +213,6 @@ const title = computed(() => {
       return collectionMode.value === 'add'
         ? `Add ${books.value} to a collection`
         : `Remove ${books.value} from a collection`
-    case 'edit':
-      return `Edit ${books.value}`
     case 'export':
       return `Export ${books.value}`
     case 'delete':
@@ -344,41 +246,6 @@ const change = computed<BulkBookChange | null>(() => {
             mode: collectionMode.value,
           }
         : null
-    case 'edit':
-      switch (editField.value) {
-        case 'status':
-          return statusValue.value
-            ? {
-                field: 'status',
-                status:
-                  statusValue.value === NOT_STARTED
-                    ? null
-                    : (statusValue.value as BookProgressStatus),
-              }
-            : null
-        case 'author': {
-          // A typed new name counts without picking "Add …"
-          const value = (author.value ?? authorSearch.value)?.trim()
-          return value ? { field: 'author', author: value } : null
-        }
-        case 'genre': {
-          // When adding, a typed new genre counts without picking "Add …"
-          const value = (
-            genre.value ??
-            (genreMode.value === 'add' ? genreSearch.value : undefined)
-          )?.trim()
-          return value
-            ? { field: 'genre', genre: value, mode: genreMode.value }
-            : null
-        }
-        case 'format':
-          return format.value
-            ? { field: 'format', format: format.value as BookFormat }
-            : null
-        case 'rating':
-          return { field: 'rating', rating: rating.value }
-      }
-      return null
     default:
       return null
   }

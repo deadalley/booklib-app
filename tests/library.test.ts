@@ -192,13 +192,16 @@ test.describe('bulk actions', () => {
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
-    await page.getByRole('radio', { name: 'author' }).click()
+    await page.getByRole('radio', { name: 'Author' }).click()
     await page
       .getByTestId('bulk-action-form')
       .getByRole('combobox')
       .fill('Le Guin')
     await page.getByRole('option', { name: leGuin.name }).click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    await expect(page.getByRole('status')).toContainText(
+      'Replaces the author on 1 book.',
+    )
+    await page.getByRole('button', { name: 'Set author for 1 book' }).click()
 
     await expect
       .poll(
@@ -259,17 +262,23 @@ test.describe('bulk actions', () => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
     await page.getByRole('checkbox', { name: earthsea.title }).click()
-    // Status is the first field under Edit
     await page
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
-    await page
-      .getByRole('combobox')
-      .filter({ hasText: 'Choose status' })
-      .click()
-    await page.getByRole('option', { name: 'Read', exact: true }).click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    // Nothing is chosen yet
+    await expect(
+      page.getByRole('button', { name: 'Apply change' }),
+    ).toBeDisabled()
+    await page.getByRole('radio', { name: 'Status' }).click()
+    await page.getByRole('radio', { name: 'Read', exact: true }).click()
+    await expect(page.getByTestId('bulk-action-form')).toContainText(
+      'A finish date of today is recorded on each book.',
+    )
+    await page.getByRole('button', { name: 'Mark 2 books as Read' }).click()
+    await expect(page.getByTestId('toast')).toContainText(
+      'Updated 2 books · Marked as Read',
+    )
 
     await expect
       .poll(async () =>
@@ -283,6 +292,38 @@ test.describe('bulk actions', () => {
       ])
   })
 
+  test('undoes a change from the toast', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: dispossessed.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'Rating' }).click()
+    await page.getByRole('button', { name: '2 stars', exact: true }).click()
+    await page.getByRole('button', { name: 'Rate 1 book 2 stars' }).click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === dispossessed.id)
+            ?.rating,
+      )
+      .toBe(2)
+
+    await page
+      .getByTestId('toast')
+      .getByRole('button', { name: 'Undo' })
+      .click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === dispossessed.id)
+            ?.rating,
+      )
+      .toBe(5)
+    await expect(page.getByTestId('toast')).toContainText('Change undone')
+  })
+
   test('adds a genre and sets the format and rating', async ({ page }) => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
@@ -292,11 +333,11 @@ test.describe('bulk actions', () => {
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
-    await page.getByRole('radio', { name: 'genre' }).click()
+    await page.getByRole('radio', { name: 'Genre' }).click()
     const genre = page.getByTestId('bulk-action-form').getByRole('combobox')
     await genre.fill('Classics')
-    await page.getByText('Add Classics').click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    await page.getByText('Add Classics', { exact: true }).click()
+    await page.getByRole('button', { name: 'Add Classics to 2 books' }).click()
     await expect
       .poll(async () =>
         (await readLibrary(page)).books
@@ -315,13 +356,9 @@ test.describe('bulk actions', () => {
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
-    await page.getByRole('radio', { name: 'format' }).click()
-    await page
-      .getByRole('combobox')
-      .filter({ hasText: 'Choose format' })
-      .click()
-    await page.getByRole('option', { name: 'Audiobook' }).click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    await page.getByRole('radio', { name: 'Format' }).click()
+    await page.getByRole('radio', { name: 'Audiobook' }).click()
+    await page.getByRole('button', { name: 'Set 1 book to Audiobook' }).click()
     await expect
       .poll(
         async () =>
@@ -352,13 +389,16 @@ test.describe('bulk actions', () => {
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
-    await page.getByRole('radio', { name: 'author' }).click()
+    await page.getByRole('radio', { name: 'Author' }).click()
     await page
       .getByTestId('bulk-action-form')
       .getByRole('combobox')
       .fill('Jorge Luis Borges')
-    await page.getByText('Add Jorge Luis Borges').click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    await page.getByText('Add Jorge Luis Borges', { exact: true }).click()
+    await expect(page.getByTestId('bulk-action-form')).toContainText(
+      'Jorge Luis Borges (new)',
+    )
+    await page.getByRole('button', { name: 'Set author for 1 book' }).click()
 
     await expect
       .poll(async () => {

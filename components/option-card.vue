@@ -2,8 +2,17 @@
   <button
     type="button"
     class="option-card"
-    :class="[layout, size, tone, { selected }]"
+    :class="[
+      layout,
+      size,
+      tone,
+      iconWell && `well-${iconWell}`,
+      { selected, centered },
+    ]"
   >
+    <span v-if="indicator === 'check'" class="option-card-check">
+      <IconCheck :size="12" stroke="2.6" aria-hidden="true" />
+    </span>
     <span v-if="icon" class="option-card-icon" aria-hidden="true">
       <component
         :is="icons[icon]"
@@ -26,6 +35,9 @@
     <span v-if="$slots.trailing" class="option-card-trailing">
       <slot name="trailing" />
     </span>
+    <span v-if="indicator === 'radio'" class="option-card-radio">
+      <IconCheck v-if="selected" :size="11" stroke="2.6" aria-hidden="true" />
+    </span>
     <span v-if="$slots.footer" class="option-card-footer">
       <slot name="footer" />
     </span>
@@ -33,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { icons } from '@tabler/icons-vue'
+import { icons, IconCheck } from '@tabler/icons-vue'
 
 /**
  * A selectable card: picks an option, a template or a path. Use `selected`
@@ -51,6 +63,12 @@ withDefaults(
     size?: 'sm' | 'md' | 'lg'
     // secondary: the amber treatment (e.g. challenges)
     tone?: 'primary' | 'secondary'
+    // Puts the icon in a tinted well that fills when selected
+    iconWell?: 'square' | 'round'
+    // check: a corner badge when selected; radio: a trailing radio dot
+    indicator?: 'check' | 'radio'
+    // stack layout only: centers the icon and text
+    centered?: boolean
   }>(),
   { layout: 'row', size: 'md', tone: 'primary' },
 )
@@ -62,7 +80,7 @@ const ICON_SIZES = { sm: 16, md: 18, lg: 24 }
 @reference '../assets/css/main.css';
 
 .option-card {
-  @apply border-stroke bg-surface-elevated text-ink-primary rounded-scholarly flex min-w-0 cursor-pointer border text-left;
+  @apply border-stroke bg-surface-elevated text-ink-primary rounded-scholarly relative flex min-w-0 cursor-pointer border text-left;
   transition:
     border-color 0.15s,
     background-color 0.15s,
@@ -127,6 +145,48 @@ const ICON_SIZES = { sm: 16, md: 18, lg: 24 }
 }
 .option-card-footer {
   @apply border-stroke-subtle text-ink-muted mt-1 flex w-full items-center gap-2 border-t pt-3 text-[0.8125rem] font-semibold;
+}
+
+/* Icon wells */
+.well-square .option-card-icon,
+.well-round .option-card-icon {
+  @apply bg-surface-subtle text-ink-secondary grid size-9 place-items-center transition-colors;
+}
+.well-square .option-card-icon {
+  @apply rounded-lg;
+}
+.well-round .option-card-icon {
+  @apply rounded-full;
+}
+.selected.well-square .option-card-icon,
+.selected.well-round .option-card-icon {
+  @apply bg-primary text-ink-inverse;
+}
+.centered {
+  @apply items-center text-center;
+}
+.centered .option-card-body {
+  @apply items-center;
+}
+.centered.well-round .option-card-icon {
+  @apply size-11;
+}
+
+/* Indicators */
+.option-card-check {
+  @apply bg-primary text-ink-inverse absolute top-2.5 right-2.5 hidden size-[18px] place-items-center rounded-full;
+}
+.selected .option-card-check {
+  @apply grid;
+}
+.option-card-radio {
+  @apply border-stroke-strong text-ink-inverse ml-auto grid size-[18px] flex-none place-items-center rounded-full border-[1.5px];
+}
+.selected .option-card-radio {
+  @apply border-primary bg-primary;
+}
+.option-card.selected {
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 /* Amber tone */

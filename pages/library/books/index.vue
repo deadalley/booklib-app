@@ -131,8 +131,9 @@
     :total-books-count="sortedBooks.length"
     :has-selected-books="hasSelectedBooks"
     :collection-options="collectionActionOptions"
-    :author-options="authorActionOptions"
-    :genre-options="genreActionOptions"
+    :selected-books="selectedBooks"
+    :authors="authorsWithCounts"
+    :genres="genresWithCounts"
     @close="onCancel"
     @select-all="selectAll"
     @clear="clearSelectedBooks"
@@ -140,14 +141,31 @@
     @export="onExportSelected"
     @delete="onDeleteSelectedBooks"
   />
+
+  <bl-toast
+    :message="toast?.message ?? null"
+    :action-label="toast?.undo ? 'Undo' : undefined"
+    :raised="editing"
+    @action="onUndo"
+  >
+    <template #actionIcon>
+      <IconArrowBackUp :size="16" stroke="1.8" />
+    </template>
+  </bl-toast>
 </template>
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
+import {
+  IconArrowBackUp,
+  IconPlus,
+  IconFilter,
+  IconTable,
+  IconStack2,
+} from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
-import { indexBy, uniq } from 'ramda'
+import { countBy, indexBy, pick, uniq } from 'ramda'
 import dayjs from 'dayjs'
 import type { BulkBookChange } from '~/types/ui'
 import { bookToRecord, serializeBooks } from '~/services/transfer'
@@ -273,15 +291,25 @@ const collectionActionOptions = computed(() =>
     label: name,
   })),
 )
-const authorActionOptions = computed(() =>
-  authors.value.map(({ id, name }) => ({ value: id, label: name })),
-)
-const genreActionOptions = computed(() =>
-  uniq(books.value.flatMap(({ genres }) => genres ?? []))
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b))
-    .map((genre) => ({ value: genre, label: genre })),
-)
+const selectedBooks = computed(() => {
+  const ids = new Set(selectedBookIds.value)
+  return books.value.filter(({ id }) => ids.has(id))
+})
+const authorsWithCounts = computed(() => {
+  const counts = countBy((book: Book) => book.author ?? '', books.value)
+  return [...authors.value]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ id, name }) => ({ id, name, count: counts[id] ?? 0 }))
+})
+const genresWithCounts = computed(() => {
+  const counts = countBy(
+    (genre: string) => genre,
+    books.value.flatMap(({ genres }) => uniq(genres ?? []).filter(Boolean)),
+  )
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+})
 
 function clearSelectedBooks() {
   viewBooks.value.forEach((book) => {
@@ -332,15 +360,66 @@ function patchFor(change: BulkBookChange, book: Book): Partial<Book> {
   }
 }
 
+// The fields a bulk change can touch, restored by Undo
+const UNDO_FIELDS = [
+  'progress',
+  'author',
+  'genres',
+  'format',
+  'rating',
+  'collections',
+] as const
+const TOAST_MS = 6000
+
+const toast = ref<{
+  message: string
+  undo?: Map<Book['id'], Partial<Book>>
+} | null>(null)
+let toastTimer: ReturnType<typeof setTimeout> | undefined
+
+function showToast(message: string, undo?: Map<Book['id'], Partial<Book>>) {
+  toast.value = { message, undo }
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(toastTimer))
+
 async function onBulkChange(change: BulkBookChange) {
   if (!hasSelectedBooks.value) return
 
+  const ids = selectedBookIds.value
+  const preview = previewBulkChange(change, selectedBooks.value, {
+    authors: authors.value,
+    genres: genresWithCounts.value.map(({ name }) => name),
+    collections: collections.value,
+  })
+  const before = new Map(
+    selectedBooks.value.map((book) => [book.id, pick(UNDO_FIELDS, book)]),
+  )
+
   loading.value = true
   try {
-    await updateBooks(selectedBookIds.value, (book) => patchFor(change, book))
+    await updateBooks(ids, (book) => patchFor(change, book))
     await refresh()
     clearSelectedBooks()
     onResetFilter()
+    showToast(`Updated ${pluralBooks(ids.length)} · ${preview.done}`, before)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function onUndo() {
+  const before = toast.value?.undo
+  if (!before) return
+
+  toast.value = null
+  loading.value = true
+  try {
+    await updateBooks([...before.keys()], (book) => before.get(book.id) ?? {})
+    await refresh()
+    showToast('Change undone')
   } finally {
     loading.value = false
   }

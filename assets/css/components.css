@@ -195,6 +195,12 @@
   .pill-selected {
     @apply border-stroke-strong bg-surface-container hover:bg-surface/80;
   }
+  .pill-primary {
+    @apply bg-surface-elevated border-stroke-strong hover:border-primary rounded-full;
+  }
+  .pill-primary.pill-selected {
+    @apply bg-primary border-primary text-ink-inverse hover:bg-primary;
+  }
 
   /* Dropdown */
   .menu-trigger {
