@@ -553,7 +553,7 @@ async function onExport() {
     const date = dayjs().format('YYYY-MM-DD')
     if (exportType.value === 'backup') {
       const data = await exportLibrary()
-      download(
+      downloadFile(
         `${date}_booklib_backup.json`,
         JSON.stringify(data, null, 2),
         'application/json',
@@ -565,7 +565,7 @@ async function onExport() {
     const authorsById = new Map(authors.map((author) => [author.id, author]))
     const records = books.map((book) => bookToRecord(book, authorsById))
     const format = exportType.value
-    download(
+    downloadFile(
       `${date}_booklib_books.${format}`,
       serializeBooks(records, format),
       format === 'csv' ? 'text/csv' : 'application/json',
@@ -573,15 +573,6 @@ async function onExport() {
   } finally {
     exportLoading.value = false
   }
-}
-
-function download(name: string, contents: string, type: string) {
-  const url = URL.createObjectURL(new Blob([contents], { type }))
-  const link = document.createElement('a')
-  link.href = url
-  link.download = name
-  link.click()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 useHead({

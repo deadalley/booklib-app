@@ -57,6 +57,14 @@ export function useBookLibrary() {
     return await service.updateBook(id, book)
   }
 
+  /** Updates several books at once; see DataManagementService.updateBooks */
+  const updateBooks = async (
+    ids: string[],
+    patchFor: (book: Book) => Partial<Book>,
+  ): Promise<number> => {
+    return await service.updateBooks(ids, patchFor)
+  }
+
   const deleteBook = async (id: string): Promise<string | null> => {
     return await service.deleteBook(id)
   }
@@ -178,6 +186,7 @@ export function useBookLibrary() {
     getBooks,
     createBook,
     updateBook,
+    updateBooks,
     deleteBook,
     deleteBooks,
     getBookCount,

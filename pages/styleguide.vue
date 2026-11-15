@@ -188,6 +188,15 @@
                   as="button" toggles (aria-pressed)
                 </span>
               </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <bl-pill as="button" variant="primary">Primary</bl-pill>
+                <bl-pill as="button" variant="primary" selected>
+                  Primary selected
+                </bl-pill>
+                <span class="text-ink-muted text-xs">
+                  variant="primary": a single choice, e.g. bulk edit genres
+                </span>
+              </div>
 
               <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
                 <p class="text-ink-secondary text-sm">Chips</p>
@@ -601,6 +610,32 @@
                   icon="IconBooks"
                   title="Stack, size sm"
                 />
+                <bl-option-card
+                  layout="stack"
+                  size="sm"
+                  icon-well="square"
+                  indicator="check"
+                  icon="IconTags"
+                  title="Square well, check"
+                  description="icon-well + indicator"
+                  selected
+                />
+                <bl-option-card
+                  icon-well="round"
+                  indicator="radio"
+                  icon="IconBook"
+                  title="Round well, radio"
+                  description="For one-of-many choices"
+                  selected
+                />
+                <bl-option-card
+                  layout="stack"
+                  size="sm"
+                  icon-well="round"
+                  centered
+                  icon="IconHeadphones"
+                  title="Centered"
+                />
               </div>
               <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <bl-option-card
@@ -641,10 +676,28 @@
                 <template #cancel-label>Cancel</template>
                 <template #action-label>Confirm</template>
               </bl-modal>
+              <bl-modal size="sm" sheet>
+                <template #trigger>
+                  <bl-button variant="secondary">Open sheet modal</bl-button>
+                </template>
+                <template #title>Sheet on phones</template>
+                <p class="text-ink-secondary">
+                  With `sheet`, the modal slides up from the bottom on phones.
+                </p>
+                <template #cancel-label>Close</template>
+              </bl-modal>
               <bl-tooltip>
                 <bl-button variant="tertiary">Hover for tooltip</bl-button>
                 <template #tooltip-content>Tooltip content</template>
               </bl-tooltip>
+              <bl-button variant="secondary" @click="showStyleguideToast">
+                Show toast
+              </bl-button>
+              <bl-toast
+                :message="styleguideToast"
+                action-label="Undo"
+                @action="styleguideToast = null"
+              />
             </div>
           </bl-tile>
         </div>
@@ -890,6 +943,12 @@ const rating = ref(4)
 const stepperStatus = ref<BookProgressStatus>('reading')
 const dotIndex = ref(1)
 const pickedOption = ref('Paperback')
+
+const styleguideToast = ref<string | null>(null)
+function showStyleguideToast() {
+  styleguideToast.value = 'Updated 4 books · Marked as Read'
+  setTimeout(() => (styleguideToast.value = null), 4000)
+}
 const OPTION_CARDS = [
   { title: 'Hardcover', icon: 'IconBook' },
   { title: 'Paperback', icon: 'IconBook2' },

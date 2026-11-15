@@ -159,7 +159,7 @@ test.describe('bulk actions', () => {
       .filter({ hasText: 'Choose collection' })
       .click()
     await page.getByRole('option', { name: 'Short fiction' }).click()
-    await page.getByRole('button', { name: 'Move' }).click()
+    await page.getByRole('button', { name: 'Add', exact: true }).click()
 
     await expect
       .poll(async () =>
@@ -188,13 +188,20 @@ test.describe('bulk actions', () => {
   test('changing the author keeps all other data', async ({ page }) => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
-    await page.getByRole('button', { name: 'Author' }).click()
     await page
-      .getByRole('combobox')
-      .filter({ hasText: 'Choose author' })
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
       .click()
+    await page.getByRole('radio', { name: 'Author' }).click()
+    await page
+      .getByTestId('bulk-action-form')
+      .getByRole('combobox')
+      .fill('Le Guin')
     await page.getByRole('option', { name: leGuin.name }).click()
-    await page.getByRole('button', { name: 'Apply' }).click()
+    await expect(page.getByRole('status')).toContainText(
+      'Replaces the author on 1 book.',
+    )
+    await page.getByRole('button', { name: 'Set author for 1 book' }).click()
 
     await expect
       .poll(
@@ -228,5 +235,177 @@ test.describe('bulk actions', () => {
         (await readLibrary(page)).books.map((b) => b.title).sort(),
       )
       .toEqual([earthsea.title, cien.title, future.title].sort())
+  })
+
+  test('removes books from a collection', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+    await page.getByRole('button', { name: 'Collection' }).click()
+    await page.getByRole('radio', { name: 'remove' }).click()
+    await page
+      .getByRole('combobox')
+      .filter({ hasText: 'Choose collection' })
+      .click()
+    await page.getByRole('option', { name: 'Short fiction' }).click()
+    await page.getByRole('button', { name: 'Remove', exact: true }).click()
+
+    await expect
+      .poll(async () =>
+        (await readLibrary(page))['collection-book'].filter(
+          (cb) => cb.collection_id === shelf.id,
+        ),
+      )
+      .toEqual([])
+  })
+
+  test('sets the status, recording a finish date', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    // Nothing is chosen yet
+    await expect(
+      page.getByRole('button', { name: 'Apply change' }),
+    ).toBeDisabled()
+    await page.getByRole('radio', { name: 'Status' }).click()
+    await page.getByRole('radio', { name: 'Read', exact: true }).click()
+    await expect(page.getByTestId('bulk-action-form')).toContainText(
+      'A finish date of today is recorded on each book.',
+    )
+    await page.getByRole('button', { name: 'Mark 2 books as Read' }).click()
+    await expect(page.getByTestId('toast')).toContainText(
+      'Updated 2 books · Marked as Read',
+    )
+
+    await expect
+      .poll(async () =>
+        (await readLibrary(page)).books
+          .filter((b) => b.id === cien.id || b.id === earthsea.id)
+          .map((b) => [b.progress_status, !!b.finished_at]),
+      )
+      .toEqual([
+        ['read', true],
+        ['read', true],
+      ])
+  })
+
+  test('undoes a change from the toast', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: dispossessed.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'Rating' }).click()
+    await page.getByRole('button', { name: '2 stars', exact: true }).click()
+    await page.getByRole('button', { name: 'Rate 1 book 2 stars' }).click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === dispossessed.id)
+            ?.rating,
+      )
+      .toBe(2)
+
+    await page
+      .getByTestId('toast')
+      .getByRole('button', { name: 'Undo' })
+      .click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === dispossessed.id)
+            ?.rating,
+      )
+      .toBe(5)
+    await expect(page.getByTestId('toast')).toContainText('Change undone')
+  })
+
+  test('adds a genre and sets the format and rating', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('checkbox', { name: earthsea.title }).click()
+
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'Genre' }).click()
+    const genre = page.getByTestId('bulk-action-form').getByRole('combobox')
+    await genre.fill('Classics')
+    await page.getByText('Add Classics', { exact: true }).click()
+    await page.getByRole('button', { name: 'Add Classics to 2 books' }).click()
+    await expect
+      .poll(async () =>
+        (await readLibrary(page)).books
+          .filter((b) => b.id === cien.id || b.id === earthsea.id)
+          .map((b) => b.genres?.includes('Classics')),
+      )
+      .toEqual([true, true])
+    // Existing genres are kept
+    expect(
+      (await readLibrary(page)).books.find((b) => b.id === earthsea.id)?.genres,
+    ).toContain('Fantasy')
+
+    // The bar stays open after an action, with the selection cleared
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'Format' }).click()
+    await page.getByRole('radio', { name: 'Audiobook' }).click()
+    await page.getByRole('button', { name: 'Set 1 book to Audiobook' }).click()
+    await expect
+      .poll(
+        async () =>
+          (await readLibrary(page)).books.find((b) => b.id === cien.id)?.format,
+      )
+      .toBe('audiobook')
+  })
+
+  test('exports only the selected books', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page.getByRole('button', { name: 'Export' }).click()
+
+    const download = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download' }).click()
+    const file = await download
+    expect(file.suggestedFilename()).toMatch(/_booklib_books\.csv$/)
+    const contents = await (await file.createReadStream()).toArray()
+    const text = Buffer.concat(contents as Buffer[]).toString('utf8')
+    expect(text).toContain(cien.title)
+    expect(text).not.toContain(earthsea.title)
+  })
+
+  test('sets a new author by typing their name', async ({ page }) => {
+    await startManaging(page)
+    await page.getByRole('checkbox', { name: cien.title }).click()
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
+    await page.getByRole('radio', { name: 'Author' }).click()
+    await page
+      .getByTestId('bulk-action-form')
+      .getByRole('combobox')
+      .fill('Jorge Luis Borges')
+    await page.getByText('Add Jorge Luis Borges', { exact: true }).click()
+    await expect(page.getByTestId('bulk-action-form')).toContainText(
+      'Jorge Luis Borges (new)',
+    )
+    await page.getByRole('button', { name: 'Set author for 1 book' }).click()
+
+    await expect
+      .poll(async () => {
+        const db = await readLibrary(page)
+        const authorId = db.books.find((b) => b.id === cien.id)?.author_id
+        return db.authors.find((a) => a.id === authorId)?.name
+      })
+      .toBe('Jorge Luis Borges')
   })
 })

@@ -25,11 +25,11 @@
         @click="$emit('commit', value)"
       />
     </span>
-    <span class="text-ink-primary ml-2 text-sm font-semibold">
+    <span v-if="showValue" class="text-ink-primary ml-2 text-sm font-semibold">
       {{ displayed ? displayed.toFixed(1) : 'Not rated' }}
     </span>
     <button
-      v-if="rating"
+      v-if="showValue && rating"
       type="button"
       class="link-muted ml-1"
       @click="$emit('commit', null)"
@@ -46,8 +46,10 @@ const props = withDefaults(
   defineProps<{
     rating: number | null
     iconSize?: number
+    // false when the caller shows the value and a clear action itself
+    showValue?: boolean
   }>(),
-  { iconSize: 26 },
+  { iconSize: 26, showValue: true },
 )
 
 defineEmits<{

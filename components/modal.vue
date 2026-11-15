@@ -9,8 +9,12 @@
         class="modal-overlay data-[state=open]:animate-overlayShow bg-surface-inverse/80 fixed inset-0 z-30"
       />
       <DialogContent
-        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl p-5 focus:outline-none sm:p-7"
+        class="data-[state=open]:animate-contentShow bg-surface-elevated fixed top-1/2 left-1/2 z-100 max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl p-5 focus:outline-none sm:p-7"
         :class="{
+          'overflow-y-auto': !allowOverflow || sheet,
+          'overflow-visible': allowOverflow && !sheet,
+          'sm:overflow-visible': allowOverflow && sheet,
+          'modal-sheet': sheet,
           'w-[calc(100vw-2rem)]': size !== undefined,
           'max-w-screen-sm': size === 'sm',
           'max-w-screen-md': size === 'md',
@@ -19,6 +23,7 @@
           'max-w-screen-2xl': size === '2xl',
         }"
       >
+        <div v-if="sheet" class="modal-sheet-handle" aria-hidden="true" />
         <DialogTitle
           v-if="$slots['title'] || withCloseButton || icon"
           as="div"
@@ -76,6 +81,7 @@
           <bl-button
             v-if="$slots['action-label']"
             class="justify-center"
+            :disabled="confirmDisabled"
             @click="_onConfirm"
           >
             <slot name="action-label" />
@@ -103,8 +109,19 @@ withDefaults(
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
     icon?: keyof typeof icons
     withCloseButton?: boolean
+    // For short content with dropdowns: don't clip them to the modal
+    allowOverflow?: boolean
+    // Disables the action button, e.g. while a form is incomplete
+    confirmDisabled?: boolean
+    // On phones, slides up from the bottom as a sheet
+    sheet?: boolean
   }>(),
-  { withCloseButton: true },
+  {
+    withCloseButton: true,
+    allowOverflow: false,
+    confirmDisabled: false,
+    sheet: false,
+  },
 )
 
 const open = defineModel<boolean>({ default: false })
@@ -121,3 +138,14 @@ function _onConfirm() {
   open.value = false
 }
 </script>
+
+<style scoped>
+@reference '../assets/css/main.css';
+
+.modal-sheet {
+  @apply max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-h-[92dvh] max-sm:w-full max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:px-5 max-sm:pt-2.5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))];
+}
+.modal-sheet-handle {
+  @apply bg-stroke-strong mx-auto mb-3 h-1 w-10 rounded-full sm:hidden;
+}
+</style>

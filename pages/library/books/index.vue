@@ -131,27 +131,49 @@
     :total-books-count="sortedBooks.length"
     :has-selected-books="hasSelectedBooks"
     :collection-options="collectionActionOptions"
-    :author-options="authorActionOptions"
+    :selected-books="selectedBooks"
+    :authors="authorsWithCounts"
+    :genres="genresWithCounts"
     @close="onCancel"
     @select-all="selectAll"
     @clear="clearSelectedBooks"
-    @move-to-collection="onMoveBooksToCollection"
-    @edit-author="onEditBooksAuthor"
+    @change="onBulkChange"
+    @export="onExportSelected"
     @delete="onDeleteSelectedBooks"
   />
+
+  <bl-toast
+    :message="toast?.message ?? null"
+    :action-label="toast?.undo ? 'Undo' : undefined"
+    :raised="editing"
+    @action="onUndo"
+  >
+    <template #actionIcon>
+      <IconArrowBackUp :size="16" stroke="1.8" />
+    </template>
+  </bl-toast>
 </template>
 
 <script setup lang="ts">
 import type { Book, ViewBook } from '~/types/book'
-import { IconPlus, IconFilter, IconTable, IconStack2 } from '@tabler/icons-vue'
+import {
+  IconArrowBackUp,
+  IconPlus,
+  IconFilter,
+  IconTable,
+  IconStack2,
+} from '@tabler/icons-vue'
 import type { DropdownItem } from '~/components/dropdown.vue'
 import type { Author } from '~/types/author'
-import { indexBy } from 'ramda'
+import { countBy, indexBy, pick, uniq } from 'ramda'
+import dayjs from 'dayjs'
+import type { BulkBookChange } from '~/types/ui'
+import { bookToRecord, serializeBooks } from '~/services/transfer'
 import type { Collection } from '~/types/collection'
 
 const { isMobile } = useBreakpoints()
 
-const { getBooks, getAuthors, getCollections, updateBook, deleteBooks } =
+const { getBooks, getAuthors, getCollections, updateBooks, deleteBooks } =
   useBookLibrary()
 
 const books = ref<Book[]>(await getBooks({ withBookCovers: true }))
@@ -269,9 +291,25 @@ const collectionActionOptions = computed(() =>
     label: name,
   })),
 )
-const authorActionOptions = computed(() =>
-  authors.value.map(({ id, name }) => ({ value: id, label: name })),
-)
+const selectedBooks = computed(() => {
+  const ids = new Set(selectedBookIds.value)
+  return books.value.filter(({ id }) => ids.has(id))
+})
+const authorsWithCounts = computed(() => {
+  const counts = countBy((book: Book) => book.author ?? '', books.value)
+  return [...authors.value]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ id, name }) => ({ id, name, count: counts[id] ?? 0 }))
+})
+const genresWithCounts = computed(() => {
+  const counts = countBy(
+    (genre: string) => genre,
+    books.value.flatMap(({ genres }) => uniq(genres ?? []).filter(Boolean)),
+  )
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+})
 
 function clearSelectedBooks() {
   viewBooks.value.forEach((book) => {
@@ -292,51 +330,112 @@ async function refresh() {
   authors.value = await getAuthors()
 }
 
-async function onMoveBooksToCollection(collectionId: string) {
-  if (!collectionId || !hasSelectedBooks.value) {
-    return
+/** The patch for one book; `book` is its current stored state */
+function patchFor(change: BulkBookChange, book: Book): Partial<Book> {
+  switch (change.field) {
+    case 'collection':
+      return {
+        collections:
+          change.mode === 'add'
+            ? uniq([...book.collections, change.collectionId])
+            : book.collections.filter((id) => id !== change.collectionId),
+      }
+    case 'status':
+      return { progress: withProgressStatus(book.progress, change.status) }
+    case 'author':
+      return { author: change.author }
+    case 'genre': {
+      const genres = book.genres ?? []
+      return {
+        genres:
+          change.mode === 'add'
+            ? uniq([...genres, change.genre])
+            : genres.filter((genre) => genre !== change.genre),
+      }
+    }
+    case 'format':
+      return { format: change.format }
+    case 'rating':
+      return { rating: change.rating }
   }
+}
+
+// The fields a bulk change can touch, restored by Undo
+const UNDO_FIELDS = [
+  'progress',
+  'author',
+  'genres',
+  'format',
+  'rating',
+  'collections',
+] as const
+const TOAST_MS = 6000
+
+const toast = ref<{
+  message: string
+  undo?: Map<Book['id'], Partial<Book>>
+} | null>(null)
+let toastTimer: ReturnType<typeof setTimeout> | undefined
+
+function showToast(message: string, undo?: Map<Book['id'], Partial<Book>>) {
+  toast.value = { message, undo }
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(toastTimer))
+
+async function onBulkChange(change: BulkBookChange) {
+  if (!hasSelectedBooks.value) return
+
+  const ids = selectedBookIds.value
+  const preview = previewBulkChange(change, selectedBooks.value, {
+    authors: authors.value,
+    genres: genresWithCounts.value.map(({ name }) => name),
+    collections: collections.value,
+  })
+  const before = new Map(
+    selectedBooks.value.map((book) => [book.id, pick(UNDO_FIELDS, book)]),
+  )
 
   loading.value = true
-
   try {
-    // Sequential writes: each update reads and writes the whole database
-    for (const bookId of selectedBookIds.value) {
-      const currentBook = books.value.find((book) => book.id === bookId)
-      if (!currentBook) continue
-
-      const nextCollections = Array.from(
-        new Set([...(currentBook.collections ?? []), collectionId]),
-      )
-      await updateBook(bookId, { collections: nextCollections })
-    }
-
+    await updateBooks(ids, (book) => patchFor(change, book))
     await refresh()
     clearSelectedBooks()
     onResetFilter()
+    showToast(`Updated ${pluralBooks(ids.length)} · ${preview.done}`, before)
   } finally {
     loading.value = false
   }
 }
 
-async function onEditBooksAuthor(authorId: string) {
-  if (!authorId || !hasSelectedBooks.value) {
-    return
-  }
+async function onUndo() {
+  const before = toast.value?.undo
+  if (!before) return
 
+  toast.value = null
   loading.value = true
-
   try {
-    for (const bookId of selectedBookIds.value) {
-      await updateBook(bookId, { author: authorId })
-    }
-
+    await updateBooks([...before.keys()], (book) => before.get(book.id) ?? {})
     await refresh()
-    clearSelectedBooks()
-    onResetFilter()
+    showToast('Change undone')
   } finally {
     loading.value = false
   }
+}
+
+function onExportSelected(format: 'csv' | 'json') {
+  const selected = new Set(selectedBookIds.value)
+  const authorMap = new Map(authors.value.map((author) => [author.id, author]))
+  const records = books.value
+    .filter((book) => selected.has(book.id))
+    .map((book) => bookToRecord(book, authorMap))
+  downloadFile(
+    `${dayjs().format('YYYY-MM-DD')}_booklib_books.${format}`,
+    serializeBooks(records, format),
+    format === 'csv' ? 'text/csv' : 'application/json',
+  )
 }
 
 async function onDeleteSelectedBooks() {
