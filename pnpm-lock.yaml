@@ -171,6 +171,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@vercel/nft': ^0.27.4
+  '@electron/node-gyp': 10.2.0-electron.1
+
 importers:
 
   .:
@@ -2948,9 +2952,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vercel/nft@0.30.4':
-    resolution: {integrity: sha512-wE6eAGSXScra60N2l6jWvNtVK0m+sh873CpfZW4KI2v8EHuUQp+mSEi4T+IcdPCSEDgCdAS/7bizbhQlkjzrSA==}
-    engines: {node: '>=18'}
+  '@vercel/nft@0.27.10':
+    resolution: {integrity: sha512-zbaF9Wp/NsZtKLE4uVmL3FyfFwlpDyuymQM1kPbeT0mVOHKDQQNjnnfslB3REg3oZprmNFJuh3pkHBk2qAaizg==}
+    engines: {node: '>=16'}
     hasBin: true
 
   '@vitejs/plugin-vue-jsx@5.1.2':
@@ -10351,7 +10355,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vercel/nft@0.30.4(encoding@0.1.13)(rollup@4.53.4)(supports-color@10.0.0)':
+  '@vercel/nft@0.27.10(encoding@0.1.13)(rollup@4.53.4)(supports-color@10.0.0)':
     dependencies:
       '@mapbox/node-pre-gyp': 2.0.0(encoding@0.1.13)(supports-color@10.0.0)
       '@rollup/pluginutils': 5.2.0(rollup@4.53.4)
@@ -10360,7 +10364,7 @@ snapshots:
       async-sema: 3.1.1
       bindings: 1.5.0
       estree-walker: 2.0.2
-      glob: 10.5.0
+      glob: 7.2.3
       graceful-fs: 4.2.11
       node-gyp-build: 4.8.4
       picomatch: 4.0.3
@@ -13188,7 +13192,7 @@ snapshots:
       '@rollup/plugin-node-resolve': 16.0.3(rollup@4.53.4)
       '@rollup/plugin-replace': 6.0.3(rollup@4.53.4)
       '@rollup/plugin-terser': 0.4.4(rollup@4.53.4)
-      '@vercel/nft': 0.30.4(encoding@0.1.13)(rollup@4.53.4)(supports-color@10.0.0)
+      '@vercel/nft': 0.27.10(encoding@0.1.13)(rollup@4.53.4)(supports-color@10.0.0)
       archiver: 7.0.1
       c12: 3.3.2(magicast@0.5.1)
       chokidar: 4.0.3
