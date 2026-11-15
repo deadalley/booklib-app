@@ -46,9 +46,9 @@ test.beforeEach(async ({ page }) => {
 test('reorders the To Be Read queue with the keyboard', async ({ page }) => {
   await page.goto('/library/collections/tbr')
   await page.getByRole('button', { name: 'Reorder' }).click()
-  await expect(page.getByRole('status')).toContainText(
-    'the order you want to read them',
-  )
+  await expect(
+    page.getByRole('status').filter({ hasText: 'the order you want' }),
+  ).toBeVisible()
 
   const handle = page.getByRole('button', { name: /^Move Kindred/ })
   await handle.focus()
@@ -65,6 +65,36 @@ test('reorders the To Be Read queue with the keyboard', async ({ page }) => {
 
   await page.reload()
   await expect(page.locator('.book-tile').first()).toContainText('Kindred')
+})
+
+test('reorders a collection by dragging with the mouse', async ({ page }) => {
+  // Tall enough that the whole grid is on screen
+  await page.setViewportSize({ width: 1280, height: 1600 })
+  await page.goto('/library/collections/tbr')
+  await page.getByRole('button', { name: 'Reorder' }).click()
+  const tiles = page.getByTestId('reorder-grid').locator('.book-tile')
+  const from = (await tiles
+    .nth(2)
+    .getByRole('button', { name: /^Move Kindred/ })
+    .boundingBox())!
+  const to = (await tiles.nth(0).boundingBox())!
+
+  await page.mouse.move(from.x + 10, from.y + 5)
+  await page.mouse.down()
+  // Sortable needs a few moves to start dragging and find the drop spot
+  for (let step = 1; step <= 20; step++) {
+    await page.mouse.move(
+      from.x + 10 + ((to.x + 20 - from.x - 10) * step) / 20,
+      from.y + 5 + ((to.y + 40 - from.y - 5) * step) / 20,
+    )
+    await page.waitForTimeout(30)
+  }
+  await page.mouse.up()
+
+  await expect(tiles.first()).toContainText('Kindred')
+  await expect
+    .poll(() => tbrOrder(page))
+    .toEqual([kindred.id, earthsea.id, dispossessed.id])
 })
 
 test('suggests the top of the queue on the home page', async ({ page }) => {

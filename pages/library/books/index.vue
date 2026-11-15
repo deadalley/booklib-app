@@ -67,20 +67,21 @@
         </bl-button>
       </bl-tooltip>
     </template>
-    <p
+    <bl-alert
       v-if="pendingLookups"
-      class="notice"
+      tone="secondary"
+      size="sm"
+      icon="IconWifiOff"
       role="status"
       data-testid="lookup-notice"
     >
-      <IconWifiOff :size="16" stroke="1.8" />
       {{
         pendingLookups === 1
           ? '1 scanned book is waiting for its details.'
           : `${pendingLookups} scanned books are waiting for their details.`
       }}
       BookLib looks them up again when you’re online.
-    </p>
+    </bl-alert>
     <bl-empty v-if="books?.length === 0" icon="IconBooks">
       <template #label>There are no books in your library</template>
       <template #action>
@@ -172,7 +173,6 @@
 import type { Book, ViewBook } from '~/types/book'
 import {
   IconArrowBackUp,
-  IconWifiOff,
   IconPlus,
   IconFilter,
   IconTable,

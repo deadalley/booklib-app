@@ -3,7 +3,6 @@
     <div
       class="book-tile"
       :class="{ selectable, selected: selectable && book.selected }"
-      v-bind="$attrs"
       :role="selectable ? 'checkbox' : undefined"
       :aria-checked="selectable ? !!book.selected : undefined"
       :aria-label="selectable ? book.title : undefined"
@@ -12,10 +11,14 @@
       @keydown.space.prevent="onSelect"
       @keydown.enter.prevent="onSelect"
     >
-      <!-- Drag it, or focus it and use the arrow keys -->
-      <button
+      <!--
+        Drag it, or focus it and use the arrow keys. A div, not a <button>:
+        browsers won't start dragging from a button.
+      -->
+      <div
         v-if="draggable"
-        type="button"
+        role="button"
+        tabindex="0"
         class="book-tile-drag-handle"
         :data-drag-handle="book.id"
         :aria-label="
@@ -34,7 +37,7 @@
           {{ book.order + 1 }}
         </span>
         <IconDirectionArrows :size="ICON_SIZE_SMALL" stroke="1.5" />
-      </button>
+      </div>
 
       <NuxtLink
         :to="selectable ? undefined : href"

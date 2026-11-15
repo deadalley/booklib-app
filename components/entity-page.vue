@@ -136,10 +136,9 @@
               <bl-view-switch v-if="!reordering" v-model:view="view" />
             </div>
           </div>
-          <p v-if="reordering" class="notice" role="status">
-            <IconInfoCircle :size="16" stroke="1.8" class="flex-none" />
+          <bl-alert v-if="reordering" tone="secondary" size="sm" role="status">
             {{ reorderHint }}
-          </p>
+          </bl-alert>
 
           <template v-if="books.length">
             <bl-books-grid
@@ -189,7 +188,6 @@ import {
   IconCheck,
   IconDice5,
   IconEdit,
-  IconInfoCircle,
   IconPlus,
   IconTrash,
   icons,

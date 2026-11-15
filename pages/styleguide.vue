@@ -1,15 +1,10 @@
 <template>
   <NuxtLayout name="dashboard" title="Styleguide">
     <div class="flex flex-col gap-6">
-      <bl-warning-badge>
-        <template #icon="iconProps">
-          <IconPalette v-bind="iconProps" />
-        </template>
-        <template #content>
-          Local design system preview for BookLib components, tokens, and common
-          states.
-        </template>
-      </bl-warning-badge>
+      <bl-alert tone="neutral" icon="IconPalette">
+        Local design system preview for BookLib components, tokens, and common
+        states.
+      </bl-alert>
 
       <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 xl:col-span-7">
@@ -488,16 +483,25 @@
                   editing
                 />
               </div>
-              <bl-warning-badge>
-                <template #title>Storage note</template>
-                <template #icon="iconProps">
-                  <IconAlertTriangle v-bind="iconProps" />
-                </template>
-                <template #content>
-                  Sample warning badge with inline icon, title, and descriptive
-                  content.
-                </template>
-              </bl-warning-badge>
+              <div class="flex flex-col gap-3">
+                <p class="text-ink-secondary text-sm">Alerts</p>
+                <bl-alert icon="IconAlertTriangle" title="Storage note">
+                  tone="primary" (default): errors and important notices, with
+                  an optional title and actions.
+                  <template #actions>
+                    <bl-button size="sm">Action</bl-button>
+                  </template>
+                </bl-alert>
+                <bl-alert tone="secondary" icon="IconClock">
+                  tone="secondary": amber hints and waiting states.
+                </bl-alert>
+                <bl-alert tone="neutral">
+                  tone="neutral": plain information.
+                </bl-alert>
+                <bl-alert tone="secondary" size="sm" icon="IconWifiOff">
+                  size="sm": a compact inline line
+                </bl-alert>
+              </div>
             </div>
           </bl-tile>
         </div>
@@ -904,7 +908,6 @@
 
 <script setup lang="ts">
 import {
-  IconAlertTriangle,
   IconArrowLeft,
   IconArrowRight,
   IconBooks,

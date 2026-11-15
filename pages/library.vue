@@ -3,18 +3,16 @@
     <!-- Error boundary -->
     <NuxtErrorBoundary>
       <template #error="{ error, clearError }">
-        <bl-warning-badge>
-          <template #icon="iconProps">
-            <IconAlertTriangle v-bind="iconProps" class="text-primary" />
+        <bl-alert
+          icon="IconAlertTriangle"
+          title="Something went wrong."
+          role="alert"
+        >
+          {{ error.message || 'An unexpected error occurred.' }}
+          <template #actions>
+            <bl-button @click="clearError">Reload page</bl-button>
           </template>
-          <template #title>Something went wrong.</template>
-          <template #content>
-            <div class="flex flex-col gap-4">
-              {{ error.message || 'An unexpected error occurred.' }}
-              <bl-button @click="clearError">Reload page</bl-button>
-            </div>
-          </template>
-        </bl-warning-badge>
+        </bl-alert>
       </template>
       <NuxtPage />
     </NuxtErrorBoundary>
@@ -22,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { IconAlertTriangle } from '@tabler/icons-vue'
 import { useBookLibrary } from '~/composables/use-book-library'
 
 const route = useRoute()
