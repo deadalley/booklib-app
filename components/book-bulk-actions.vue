@@ -70,6 +70,8 @@
   <bl-modal
     :model-value="!!action"
     size="sm"
+    allow-overflow
+    :confirm-disabled="!ready"
     @update:model-value="(value) => !value && (action = null)"
     @confirm="onConfirm"
   >
@@ -91,23 +93,17 @@
         <bl-raw-select
           v-model="collectionId"
           :options="collectionOptions"
-          :with-wrapper="false"
           placeholder="Choose collection"
         />
       </template>
 
-      <!-- Status -->
-      <bl-raw-select
-        v-else-if="action === 'status'"
-        v-model="statusValue"
-        :options="STATUS_OPTIONS"
-        :with-wrapper="false"
-        placeholder="Choose status"
-      />
-
       <!-- Edit: one field at a time -->
       <template v-else-if="action === 'edit'">
-        <bl-switch v-model="editField" aria-label="Field">
+        <bl-switch
+          v-model="editField"
+          aria-label="Field"
+          class="max-w-full overflow-x-auto"
+        >
           <bl-switch-option
             v-for="field in EDIT_FIELDS"
             :key="field.value"
@@ -119,10 +115,16 @@
         </bl-switch>
 
         <bl-raw-select
-          v-if="editField === 'author'"
+          v-if="editField === 'status'"
+          v-model="statusValue"
+          :options="STATUS_OPTIONS"
+          placeholder="Choose status"
+        />
+
+        <bl-raw-select
+          v-else-if="editField === 'author'"
           v-model="authorId"
           :options="authorOptions"
-          :with-wrapper="false"
           placeholder="Choose author"
         />
 
@@ -150,7 +152,6 @@
           v-else-if="editField === 'format'"
           v-model="format"
           :options="FORMAT_OPTIONS"
-          :with-wrapper="false"
           placeholder="Choose format"
         />
 
@@ -181,9 +182,6 @@
       <p v-if="action === 'delete'" class="text-ink-secondary text-sm">
         This action cannot be undone.
       </p>
-      <p v-else-if="!ready" class="text-ink-muted text-sm">
-        {{ hint }}
-      </p>
     </div>
 
     <template #cancel-label>Cancel</template>
@@ -196,7 +194,6 @@ import {
   IconDownload,
   IconFolder,
   IconPencil,
-  IconProgress,
   IconTrash,
   IconX,
 } from '@tabler/icons-vue'
@@ -204,13 +201,12 @@ import type { BookFormat, BookProgressStatus } from '~/types/book'
 import type { BulkBookChange } from '~/types/ui'
 
 type ActionOption = { value: string; label: string }
-type Action = 'collection' | 'status' | 'edit' | 'export' | 'delete'
-type EditField = 'author' | 'genre' | 'format' | 'rating'
+type Action = 'collection' | 'edit' | 'export' | 'delete'
+type EditField = 'status' | 'author' | 'genre' | 'format' | 'rating'
 type Mode = 'add' | 'remove'
 
 const ACTIONS = [
   { id: 'collection', label: 'Collection', icon: IconFolder },
-  { id: 'status', label: 'Status', icon: IconProgress },
   { id: 'edit', label: 'Edit', icon: IconPencil },
   { id: 'export', label: 'Export', icon: IconDownload },
   { id: 'delete', label: 'Remove', icon: IconTrash },
@@ -221,6 +217,7 @@ const MODES: { value: Mode; label: string }[] = [
   { value: 'remove', label: 'Remove' },
 ]
 const EDIT_FIELDS: { value: EditField; label: string }[] = [
+  { value: 'status', label: 'Status' },
   { value: 'author', label: 'Author' },
   { value: 'genre', label: 'Genre' },
   { value: 'format', label: 'Format' },
@@ -264,7 +261,7 @@ const action = ref<Action | null>(null)
 const collectionMode = ref<Mode>('add')
 const collectionId = ref<string>()
 const statusValue = ref<string>()
-const editField = ref<EditField>('author')
+const editField = ref<EditField>('status')
 const authorId = ref<string>()
 const genreMode = ref<Mode>('add')
 const genre = ref<string>()
@@ -277,7 +274,7 @@ function reset() {
   collectionMode.value = 'add'
   collectionId.value = undefined
   statusValue.value = undefined
-  editField.value = 'author'
+  editField.value = 'status'
   authorId.value = undefined
   genreMode.value = 'add'
   genre.value = undefined
@@ -307,8 +304,6 @@ const title = computed(() => {
       return collectionMode.value === 'add'
         ? `Add ${books.value} to a collection`
         : `Remove ${books.value} from a collection`
-    case 'status':
-      return `Set the status of ${books.value}`
     case 'edit':
       return `Edit ${books.value}`
     case 'export':
@@ -344,18 +339,18 @@ const change = computed<BulkBookChange | null>(() => {
             mode: collectionMode.value,
           }
         : null
-    case 'status':
-      return statusValue.value
-        ? {
-            field: 'status',
-            status:
-              statusValue.value === NOT_STARTED
-                ? null
-                : (statusValue.value as BookProgressStatus),
-          }
-        : null
     case 'edit':
       switch (editField.value) {
+        case 'status':
+          return statusValue.value
+            ? {
+                field: 'status',
+                status:
+                  statusValue.value === NOT_STARTED
+                    ? null
+                    : (statusValue.value as BookProgressStatus),
+              }
+            : null
         case 'author':
           return authorId.value
             ? { field: 'author', authorId: authorId.value }
@@ -387,12 +382,6 @@ const ready = computed(
   () =>
     action.value === 'export' || action.value === 'delete' || !!change.value,
 )
-
-const hint = computed(() => {
-  if (action.value === 'collection') return 'Choose a collection first.'
-  if (action.value === 'status') return 'Choose a status first.'
-  return `Choose a ${editField.value} first.`
-})
 
 function onConfirm() {
   if (!props.hasSelectedBooks) return

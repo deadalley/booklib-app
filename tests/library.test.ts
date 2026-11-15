@@ -188,11 +188,11 @@ test.describe('bulk actions', () => {
   test('changing the author keeps all other data', async ({ page }) => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
-    // Author is the first field under Edit
     await page
       .getByRole('toolbar', { name: 'Bulk actions' })
       .getByRole('button', { name: 'Edit' })
       .click()
+    await page.getByRole('radio', { name: 'author' }).click()
     await page
       .getByRole('combobox')
       .filter({ hasText: 'Choose author' })
@@ -259,7 +259,11 @@ test.describe('bulk actions', () => {
     await startManaging(page)
     await page.getByRole('checkbox', { name: cien.title }).click()
     await page.getByRole('checkbox', { name: earthsea.title }).click()
-    await page.getByRole('button', { name: 'Status' }).click()
+    // Status is the first field under Edit
+    await page
+      .getByRole('toolbar', { name: 'Bulk actions' })
+      .getByRole('button', { name: 'Edit' })
+      .click()
     await page
       .getByRole('combobox')
       .filter({ hasText: 'Choose status' })
