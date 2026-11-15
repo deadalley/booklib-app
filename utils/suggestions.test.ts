@@ -159,6 +159,28 @@ describe('getBookPercentage', () => {
 })
 
 describe('buildSuggestions', () => {
+  it('suggests the first unstarted book in the To Be Read queue, once', () => {
+    const books = [book('b1'), book('b2'), read('b3')]
+    const result = buildSuggestions({
+      books,
+      authors,
+      goals: [],
+      today: TODAY,
+      // b3 is read already, so b2 is next
+      tbrIds: ['b3', 'b2', 'b1'],
+    })
+    const next = result.filter(({ kind }) => kind === 'next')
+    expect(next).toHaveLength(1)
+    expect(next[0]).toMatchObject({
+      id: 'next-b2',
+      eyebrow: 'Up next',
+      title: 'Book b2 is next on your To Be Read',
+      action: { type: 'start', bookId: 'b2' },
+    })
+    // Not also suggested as "on your shelf"
+    expect(result.filter(({ book: { id } }) => id === 'b2')).toHaveLength(1)
+  })
+
   it('returns nothing for an empty library', () => {
     expect(build([])).toEqual([])
   })
@@ -278,18 +300,23 @@ describe('buildSuggestions', () => {
     expect(result[1]!.body).toBe('')
   })
 
-  it('orders the kinds: almost, log, author, old', () => {
+  it('orders the kinds: almost, log, next, author, old', () => {
     const books = [
       book('b1', { author: 'a1', createdAt: '2025-01-01T00:00:00.000Z' }),
       read('b2', { author: 'a1', rating: 4 }),
       reading('b3', 180, { author: 'a2' }),
+      book('b4', { createdAt: '2025-02-01T00:00:00.000Z' }),
+      book('b5', { createdAt: '2026-10-01T00:00:00.000Z' }),
     ]
-    expect(build(books, [goal()]).map(({ kind }) => kind)).toEqual([
-      'almost',
-      'log',
-      'author',
-      'old',
-    ])
+    const kinds = buildSuggestions({
+      books,
+      authors,
+      goals: [goal()],
+      today: TODAY,
+      tbrIds: ['b5'],
+    }).map(({ kind }) => kind)
+    // b1 is the author pick, so only b4 is "on your shelf"
+    expect(kinds).toEqual(['almost', 'log', 'next', 'author', 'old'])
   })
 
   it('gives every suggestion a unique id', () => {

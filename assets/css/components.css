@@ -84,7 +84,8 @@
     @apply hover:shadow-primary/50 hover:border-primary hover:shadow-sm;
   }
   .book-tile-drag-handle {
-    @apply bg-primary text-ink-inverse flex items-center justify-between px-3 py-1 text-sm;
+    @apply bg-primary text-ink-inverse flex w-full cursor-grab items-center justify-between px-3 py-1 text-sm active:cursor-grabbing;
+    @apply focus-visible:ring-primary/40 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset;
   }
   .book-tile-drag-order {
     @apply text-sm font-semibold;

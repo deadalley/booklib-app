@@ -29,19 +29,31 @@
         </NuxtLink>
       </li>
     </ul>
-    <p v-else class="sub py-2">
-      Nothing in progress. Pick something from the suggestions above.
-    </p>
+    <p v-else class="sub py-2">Nothing in progress right now.</p>
+    <bl-button
+      variant="secondary"
+      size="sm"
+      class="mt-auto self-start"
+      @click="$emit('pick')"
+    >
+      <template #prependIcon="iconProps">
+        <IconDice5 v-bind="iconProps" />
+      </template>
+      What should I read next?
+    </bl-button>
   </bl-home-card>
 </template>
 
 <script setup lang="ts">
+import { IconDice5 } from '@tabler/icons-vue'
 import type { Author } from '~/types/author'
 import type { Book } from '~/types/book'
 import { getBookPagesRead, getBookPercentage } from '~/utils/suggestions'
 
 /** Books being read, sorted by progress. */
 const props = defineProps<{ books: Book[]; authors: Author[] }>()
+
+defineEmits<{ (e: 'pick'): void }>()
 
 const rows = computed(() =>
   props.books.slice(0, 3).map((book) => ({

@@ -12,12 +12,29 @@
       @keydown.space.prevent="onSelect"
       @keydown.enter.prevent="onSelect"
     >
-      <div v-if="draggable" class="book-tile-drag-handle">
+      <!-- Drag it, or focus it and use the arrow keys -->
+      <button
+        v-if="draggable"
+        type="button"
+        class="book-tile-drag-handle"
+        :data-drag-handle="book.id"
+        :aria-label="
+          book.order !== undefined
+            ? `Move ${book.title}, position ${book.order + 1}`
+            : `Move ${book.title}`
+        "
+        aria-description="Use the arrow keys to move it earlier or later"
+        @click.stop.prevent
+        @keydown.left.prevent="emit('move', -1)"
+        @keydown.up.prevent="emit('move', -1)"
+        @keydown.right.prevent="emit('move', 1)"
+        @keydown.down.prevent="emit('move', 1)"
+      >
         <span v-if="book.order !== undefined" class="book-tile-drag-order">
           {{ book.order + 1 }}
         </span>
         <IconDirectionArrows :size="ICON_SIZE_SMALL" stroke="1.5" />
-      </div>
+      </button>
 
       <NuxtLink
         :to="selectable ? undefined : href"
@@ -124,7 +141,11 @@ const props = defineProps<{
   caption?: string
 }>()
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits<{
+  (e: 'selected', selected: boolean): void
+  // Keyboard reordering: -1 earlier, 1 later
+  (e: 'move', delta: -1 | 1): void
+}>()
 
 const href = computed(() => `/library/books/${props.book.id}`)
 

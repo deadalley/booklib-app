@@ -27,6 +27,7 @@
         @selected="
           (selected: boolean) => $emit('select', { bookId: book.id, selected })
         "
+        @move="(delta: -1 | 1) => move(book.id, delta)"
       />
     </template>
   </draggable>
@@ -59,6 +60,20 @@ const emit = defineEmits<{
     val: { bookId: ViewBook['id']; newOrder: number; oldOrder: number },
   ): void
 }>()
+
+/** Keyboard reordering from a tile's drag handle */
+async function move(bookId: ViewBook['id'], delta: -1 | 1) {
+  const oldOrder = books.value.findIndex(({ id }) => id === bookId)
+  const newOrder = oldOrder + delta
+  if (oldOrder === -1 || newOrder < 0 || newOrder >= books.value.length) return
+  const next = [...books.value]
+  next.splice(newOrder, 0, ...next.splice(oldOrder, 1))
+  books.value = next
+  emit('drag', { bookId, newOrder, oldOrder })
+  // Keep focus on the handle so the arrow keys keep moving the same book
+  await nextTick()
+  document.querySelector<HTMLElement>(`[data-drag-handle="${bookId}"]`)?.focus()
+}
 
 function getIcon(book: ViewBook): keyof typeof icons | undefined {
   if (book.isFavorite) {

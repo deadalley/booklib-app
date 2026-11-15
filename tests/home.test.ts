@@ -113,49 +113,49 @@ test.describe('home', () => {
 
   test('orders the suggestions by kind', async ({ page }) => {
     const slides = carousel(page).locator('article')
-    await expect(slides).toHaveCount(5)
+    // A Wizard of Earthsea is the author pick, so it isn't also "on your shelf"
+    await expect(slides).toHaveCount(4)
     await expect(slides.nth(0)).toContainText('Almost there')
     await expect(slides.nth(1)).toContainText('Goal')
     await expect(slides.nth(2)).toContainText('From an author you like')
     await expect(slides.nth(3)).toContainText('On your shelf')
-    await expect(carousel(page).getByText('1 / 5')).toBeVisible()
+    await expect(slides.nth(3)).toContainText('Exhalation')
+    await expect(carousel(page).getByText('1 / 4')).toBeVisible()
   })
 
   test('changes slides with the arrow keys', async ({ page }) => {
     await currentSlide(page).getByRole('button', { name: 'Not now' }).focus()
     await page.keyboard.press('ArrowRight')
-    await expect(carousel(page).getByText('2 / 5')).toBeVisible()
+    await expect(carousel(page).getByText('2 / 4')).toBeVisible()
     await page.keyboard.press('ArrowLeft')
     await page.keyboard.press('ArrowLeft')
-    await expect(carousel(page).getByText('5 / 5')).toBeVisible()
+    await expect(carousel(page).getByText('4 / 4')).toBeVisible()
   })
 
   test('"Not now" hides a suggestion across reloads', async ({ page }) => {
     await currentSlide(page).getByRole('button', { name: 'Not now' }).click()
-    await expect(carousel(page).locator('article')).toHaveCount(4)
+    await expect(carousel(page).locator('article')).toHaveCount(3)
     await page.reload()
-    await expect(carousel(page).locator('article')).toHaveCount(4)
+    await expect(carousel(page).locator('article')).toHaveCount(3)
     await expect(carousel(page)).not.toContainText('Almost there')
   })
 
   test('starts reading a book from the shelf', async ({ page }) => {
-    await showSlide(page, /A Wizard of Earthsea has been in your library/)
+    await showSlide(page, /Exhalation (has been in your library|was added)/)
     await currentSlide(page)
       .getByRole('button', { name: 'Start reading' })
       .click()
-    await expect(page.getByRole('status')).toContainText(
-      'Started A Wizard of Earthsea',
-    )
+    await expect(page.getByRole('status')).toContainText('Started Exhalation')
 
     const stored = (await readLibrary(page)).books.find(
-      ({ title }) => title === 'A Wizard of Earthsea',
+      ({ title }) => title === 'Exhalation',
     )!
     expect(stored.progress_status).toBe('reading')
     expect(stored.started_at).toBeTruthy()
     await expect(
       page
         .getByRole('region', { name: 'Continue reading' })
-        .getByText('A Wizard of Earthsea'),
+        .getByText('Exhalation'),
     ).toBeVisible()
   })
 
@@ -190,11 +190,7 @@ test('shows the empty states', async ({ page }) => {
   await expect(
     page.getByText('You’re all caught up. No suggestions right now.'),
   ).toBeVisible()
-  await expect(
-    page.getByText(
-      'Nothing in progress. Pick something from the suggestions above.',
-    ),
-  ).toBeVisible()
+  await expect(page.getByText('Nothing in progress right now.')).toBeVisible()
   await expect(page.getByText('No active goals.')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Set a goal' })).toHaveAttribute(
     'href',

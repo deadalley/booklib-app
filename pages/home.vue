@@ -79,6 +79,7 @@
           class="span-7"
           :books="reading"
           :authors="authors"
+          @pick="pickerOpen = true"
         />
         <bl-home-goals class="span-5" :goals="activeGoals" />
         <bl-home-recent-books
@@ -88,6 +89,15 @@
         />
       </div>
     </div>
+
+    <bl-next-read-picker
+      v-model="pickerOpen"
+      :sources="pickerSources"
+      :authors="authors"
+      :library="books"
+      :tbr-ids="tbrIds"
+      @started="onPickerStarted"
+    />
 
     <bl-toast :message="toast" />
   </NuxtLayout>
@@ -134,6 +144,15 @@ const isEmpty = ref(false)
 const authors = ref<Author[]>([])
 const books = ref<Book[]>([])
 const collections = ref<Collection[]>([])
+// The To Be Read queue, in priority order
+const tbrIds = computed(() =>
+  [
+    ...(collections.value.find(({ id }) => id === TBR_COLLECTION_ID)?.books ??
+      []),
+  ]
+    .sort((a, b) => a.order - b.order)
+    .map(({ id }) => id),
+)
 const goals = ref<Goal[]>([])
 
 const busy = ref<string | null>(null)
@@ -171,12 +190,31 @@ onMounted(() => {
   load()
 })
 
+// "What should I read next?": the To Be Read queue first, if it has books
+const pickerOpen = ref(false)
+const pickerSources = computed(() => {
+  const byId = new Map(books.value.map((book) => [book.id, book]))
+  const tbr = tbrIds.value.flatMap((id) => byId.get(id) ?? [])
+  return [
+    ...(tbr.some(isUnstarted)
+      ? [{ id: TBR_COLLECTION_ID, label: 'To Be Read', books: tbr }]
+      : []),
+    { id: 'all', label: 'All books', books: books.value },
+  ]
+})
+
+async function onPickerStarted(book: Book) {
+  showToast(`Started ${book.title}`)
+  await load()
+}
+
 const suggestions = computed(() =>
   buildSuggestions({
     books: books.value,
     authors: authors.value,
     goals: goals.value,
     today,
+    tbrIds: tbrIds.value,
   }).filter(({ id }) => !(id in dismissed.value)),
 )
 

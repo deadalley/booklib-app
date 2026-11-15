@@ -109,6 +109,7 @@ import {
   IconFeather,
   IconFlag,
   IconHourglass,
+  IconStack2,
   IconSparkles,
   IconTarget,
 } from '@tabler/icons-vue'
@@ -120,6 +121,7 @@ const AUTOPLAY_MS = 7000
 const KIND_ICONS: Record<SuggestionKind, Component> = {
   almost: IconFlag,
   log: IconTarget,
+  next: IconStack2,
   author: IconFeather,
   old: IconHourglass,
 }
