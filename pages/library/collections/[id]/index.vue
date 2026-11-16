@@ -20,7 +20,11 @@
     :tbr-ids="tbrIds"
     @started="onStarted"
   />
-  <bl-toast :message="toast" />
+  <bl-toast
+    :message="toast?.message ?? null"
+    action-label="View book"
+    @action="navigateTo(`/library/books/${toast?.bookId}`)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -47,7 +51,7 @@ const library = ref<Book[]>([])
 const authors = ref<Author[]>([])
 const tbrIds = ref<string[]>([])
 const pickerOpen = ref(false)
-const toast = ref<string | null>(null)
+const toast = ref<{ message: string; bookId: string } | null>(null)
 
 const orderedIds = (data: Collection | null | undefined) =>
   [...(data?.books ?? [])].sort((a, b) => a.order - b.order).map(({ id }) => id)
@@ -89,7 +93,13 @@ async function fetchCollection() {
 
 // This collection first; any unstarted book as the alternative
 const pickerSources = computed(() => [
-  { id: 'collection', label: collection.value?.name ?? '', books: books.value },
+  {
+    id: 'collection',
+    label: collection.value?.name ?? '',
+    books: books.value,
+    // To Be Read is a queue: Smart pick favours its top
+    queue: collection.value?.id === TBR_COLLECTION_ID,
+  },
   { id: 'all', label: 'All books', books: library.value },
 ])
 
@@ -107,7 +117,10 @@ async function onReorder(bookIds: Book['id'][]) {
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 async function onStarted(book: Book) {
-  toast.value = `Started ${book.title}`
+  toast.value = {
+    message: `Started ${book.title} · Added to Reading`,
+    bookId: book.id,
+  }
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
   await fetchCollection()

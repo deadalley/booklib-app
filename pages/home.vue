@@ -99,7 +99,11 @@
       @started="onPickerStarted"
     />
 
-    <bl-toast :message="toast" />
+    <bl-toast
+      :message="toast"
+      :action-label="toastBookId ? 'View book' : undefined"
+      @action="navigateTo(`/library/books/${toastBookId}`)"
+    />
   </NuxtLayout>
 </template>
 
@@ -157,6 +161,8 @@ const goals = ref<Goal[]>([])
 
 const busy = ref<string | null>(null)
 const toast = ref<string | null>(null)
+// A toast about a book can open it
+const toastBookId = ref<string | null>(null)
 
 // Dismissed suggestion ids and when they may come back
 const dismissed = useLocalStorage<Record<string, number>>(
@@ -197,14 +203,21 @@ const pickerSources = computed(() => {
   const tbr = tbrIds.value.flatMap((id) => byId.get(id) ?? [])
   return [
     ...(tbr.some(isUnstarted)
-      ? [{ id: TBR_COLLECTION_ID, label: 'To Be Read', books: tbr }]
+      ? [
+          {
+            id: TBR_COLLECTION_ID,
+            label: 'To Be Read',
+            books: tbr,
+            queue: true,
+          },
+        ]
       : []),
     { id: 'all', label: 'All books', books: books.value },
   ]
 })
 
 async function onPickerStarted(book: Book) {
-  showToast(`Started ${book.title}`)
+  showToast(`Started ${book.title} · Added to Reading`, book.id)
   await load()
 }
 
@@ -245,8 +258,9 @@ function dismiss(id: string) {
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
-function showToast(message: string) {
+function showToast(message: string, bookId: string | null = null) {
   toast.value = message
+  toastBookId.value = bookId
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
 }

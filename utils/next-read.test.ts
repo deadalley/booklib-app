@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Book } from '~/types/book'
 import {
   filterNextReads,
+  ordinal,
   pickNextRead,
   weighNextRead,
   type NextReadContext,
@@ -84,8 +85,12 @@ describe('weighNextRead', () => {
     const first = weighNextRead(book('a'), ctx)
     const last = weighNextRead(book('c'), ctx)
     expect(first.weight).toBeGreaterThan(last.weight)
-    expect(first.reasons).toEqual(['Top of your To Be Read'])
-    expect(last.reasons).toEqual(['#3 on your To Be Read'])
+    expect(first.reasons).toEqual([
+      { kind: 'tbr', text: 'Top of your To Be Read' },
+    ])
+    expect(last.reasons).toEqual([
+      { kind: 'tbr', text: '3rd in your To Be Read' },
+    ])
   })
 
   it('favours highly rated authors and books waiting a long time', () => {
@@ -95,10 +100,24 @@ describe('weighNextRead', () => {
       context({ library }),
     )
     expect(pick.weight).toBeGreaterThan(1)
-    expect(pick.reasons).toEqual([
+    expect(pick.reasons.map(({ text }) => text)).toEqual([
       'By an author you rate 5.0 ★',
       'On your shelf for 2 years',
     ])
+  })
+})
+
+describe('ordinal', () => {
+  it.each([
+    [1, '1st'],
+    [2, '2nd'],
+    [3, '3rd'],
+    [4, '4th'],
+    [11, '11th'],
+    [12, '12th'],
+    [21, '21st'],
+  ])('%i → %s', (n, expected) => {
+    expect(ordinal(n)).toBe(expected)
   })
 })
 

@@ -35,7 +35,18 @@ export type NextReadContext = {
   today: string
 }
 
-export type NextReadPick = { book: Book; reasons: string[] }
+// Why a book came up: its To Be Read rank, a well-rated author, or time on
+// the shelf
+export type NextReadReason = { kind: 'tbr' | 'author' | 'shelf'; text: string }
+
+export type NextReadPick = { book: Book; reasons: NextReadReason[] }
+
+/** 1st, 2nd, 3rd, 4th … 11th, 12th, 13th, 21st */
+export function ordinal(n: number) {
+  const tens = n % 100
+  if (tens >= 11 && tens <= 13) return `${n}th`
+  return `${n}${['th', 'st', 'nd', 'rd'][n % 10] ?? 'th'}`
+}
 
 /** Books not started yet */
 export const isUnstarted = (book: Book) => !book.progress.status
@@ -78,22 +89,29 @@ export function weighNextRead(
   averages = authorAverages(context.library),
 ): NextReadPick & { weight: number } {
   let weight = 1
-  const reasons: string[] = []
+  const reasons: NextReadReason[] = []
 
   const rank = context.tbrIds.indexOf(book.id)
   if (rank !== -1) {
     // The top of the queue counts most: 4× for #1, fading to 1.5× at the end
     const size = context.tbrIds.length
     weight *= 1.5 + 2.5 * (1 - rank / Math.max(1, size - 1 || 1))
-    reasons.push(
-      rank === 0 ? 'Top of your To Be Read' : `#${rank + 1} on your To Be Read`,
-    )
+    reasons.push({
+      kind: 'tbr',
+      text:
+        rank === 0
+          ? 'Top of your To Be Read'
+          : `${ordinal(rank + 1)} in your To Be Read`,
+    })
   }
 
   const average = book.author ? averages.get(book.author) : undefined
   if (average !== undefined && average >= 3.5) {
     weight *= 1 + (average - 3) / 2
-    reasons.push(`By an author you rate ${average.toFixed(1)} ★`)
+    reasons.push({
+      kind: 'author',
+      text: `By an author you rate ${average.toFixed(1)} ★`,
+    })
   }
 
   if (book.createdAt) {
@@ -101,9 +119,10 @@ export function weighNextRead(
     const days = daysSince(added, context.today)
     if (days >= 180) {
       weight *= 1 + Math.min(1, days / 730)
-      reasons.push(
-        `On your shelf for ${formatRelativeDay(added, context.today, { suffix: false })}`,
-      )
+      reasons.push({
+        kind: 'shelf',
+        text: `On your shelf for ${formatRelativeDay(added, context.today, { suffix: false })}`,
+      })
     }
   }
 

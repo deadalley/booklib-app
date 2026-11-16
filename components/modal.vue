@@ -68,9 +68,13 @@
         <div class="relative">
           <slot />
         </div>
+        <!-- A custom footer, e.g. with more than one action -->
+        <div v-if="$slots['footer']" class="mt-4">
+          <slot name="footer" />
+        </div>
         <!-- Footer: stacked full-width buttons on phones, a row otherwise -->
         <div
-          v-if="$slots['cancel-label'] || $slots['action-label']"
+          v-else-if="$slots['cancel-label'] || $slots['action-label']"
           class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-baseline sm:justify-end"
         >
           <bl-button

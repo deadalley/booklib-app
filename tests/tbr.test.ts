@@ -106,39 +106,120 @@ test('suggests the top of the queue on the home page', async ({ page }) => {
   ).toBeVisible()
 })
 
-test('picks a next read from the collection, with filters', async ({
-  page,
-}) => {
+async function openPicker(page: Page) {
   await page.goto('/library/collections/tbr')
   await page.getByRole('button', { name: 'Pick next read' }).click()
-  const picker = page.getByTestId('next-read-picker')
-  await expect(page.getByRole('dialog')).toContainText(
-    '3 books to choose from in To Be Read',
-  )
-  await expect(page.getByTestId('next-read-pick')).toBeVisible()
+  await expect(page.getByTestId('next-read-picker')).toBeVisible()
+}
 
-  await picker.getByRole('combobox', { name: 'Genre' }).click()
-  await page.getByRole('option', { name: 'Science Fiction' }).click()
-  const pick = page.getByTestId('next-read-pick')
-  await expect(pick).toContainText('The Dispossessed')
-  await expect(pick).toContainText('#2 on your To Be Read')
+const count = (page: Page) => page.getByTestId('next-read-count')
+const pickCard = (page: Page) => page.getByTestId('next-read-pick')
+const showMe = (page: Page) =>
+  page.getByRole('button', { name: 'Show me my next read' })
 
-  await pick.getByRole('button', { name: 'Start reading' }).click()
-  await expect(page.getByTestId('toast')).toContainText(
-    'Started The Dispossessed',
-  )
-  expect(
-    (await readLibrary(page)).books.find(({ id }) => id === dispossessed.id)
-      ?.progress_status,
-  ).toBe('reading')
-})
+test.describe('next read picker', () => {
+  test('changing a setting does not pick; the button does', async ({
+    page,
+  }) => {
+    await openPicker(page)
+    await expect(page.getByRole('dialog')).toContainText(
+      '3 unstarted books in To Be Read',
+    )
+    await expect(count(page)).toContainText('3 books match')
+    await expect(page.getByText('Your queue order counts.')).toBeVisible()
 
-test('picks a next read from the home page', async ({ page }) => {
-  await page.goto('/home')
-  await page.getByRole('button', { name: 'What should I read next?' }).click()
-  const picker = page.getByTestId('next-read-picker')
-  await expect(
-    picker.getByRole('radiogroup', { name: 'Pick from' }),
-  ).toBeVisible()
-  await expect(page.getByTestId('next-read-pick')).toBeVisible()
+    await page.getByRole('radio', { name: 'Surprise me' }).click()
+    await expect(page.getByText('Your queue order counts.')).toBeHidden()
+    await expect(pickCard(page)).toBeHidden()
+
+    await showMe(page).click()
+    await expect(pickCard(page)).toBeVisible()
+    await expect(page.getByTestId('next-read-progress')).toContainText(
+      '1 of 3 shown',
+    )
+  })
+
+  test('filters with a live count, then starts the book', async ({ page }) => {
+    await openPicker(page)
+    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByRole('combobox', { name: 'Genre' }).click()
+    await page.getByRole('option', { name: 'Science Fiction' }).click()
+    await expect(count(page)).toContainText('1 book matches')
+
+    await showMe(page).click()
+    await expect(pickCard(page)).toContainText('The Dispossessed')
+    await expect(pickCard(page)).toContainText('2nd in your To Be Read')
+
+    await page.getByRole('button', { name: 'Start reading' }).click()
+    await expect(page.getByTestId('toast')).toContainText(
+      'Started The Dispossessed · Added to Reading',
+    )
+    expect(
+      (await readLibrary(page)).books.find(({ id }) => id === dispossessed.id)
+        ?.progress_status,
+    ).toBe('reading')
+  })
+
+  test('shows every match once, then starts over', async ({ page }) => {
+    await openPicker(page)
+    await showMe(page).click()
+    const progress = page.getByTestId('next-read-progress')
+    await expect(progress).toContainText('1 of 3 shown')
+    const seen = [await page.locator('.pk-title').textContent()]
+
+    for (const shownCount of [2, 3]) {
+      await page.getByRole('button', { name: 'Show me another' }).click()
+      await expect(progress).toContainText(`${shownCount} of 3 shown`)
+      seen.push(await page.locator('.pk-title').textContent())
+    }
+    expect(new Set(seen).size).toBe(3)
+    await expect(page.getByText('That was every match.')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Start over' }).click()
+    await expect(progress).toContainText('1 of 3 shown')
+  })
+
+  test('says when settings changed after a pick', async ({ page }) => {
+    await openPicker(page)
+    await showMe(page).click()
+    const title = await page.locator('.pk-title').textContent()
+
+    await page.getByRole('button', { name: 'Change settings' }).click()
+    await page.getByRole('radio', { name: 'Surprise me' }).click()
+    await page.getByRole('button', { name: `Back to ${title}` }).click()
+    await expect(page.getByText('Settings changed.')).toBeVisible()
+    await page.getByRole('button', { name: 'Show me a new pick' }).click()
+    await expect(page.getByText('Settings changed.')).toBeHidden()
+    await expect(page.getByText('Surprise me', { exact: true })).toBeVisible()
+  })
+
+  test('says when no books match', async ({ page }) => {
+    await openPicker(page)
+    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByRole('combobox', { name: 'Genre' }).click()
+    await page.getByRole('option', { name: 'Fantasy' }).click()
+    await page.getByRole('combobox', { name: 'Length' }).click()
+    await page.getByRole('option', { name: 'Over 450 pages' }).click()
+
+    await expect(page.getByText('No books match these filters')).toBeVisible()
+    await expect(
+      page.getByText(
+        'Nothing unstarted in To Be Read is Fantasy and over 450 pages.',
+      ),
+    ).toBeVisible()
+    await expect(showMe(page)).toBeDisabled()
+    await page.getByRole('button', { name: 'Reset filters' }).last().click()
+    await expect(count(page)).toContainText('3 books match')
+  })
+
+  test('opens from the home page', async ({ page }) => {
+    await page.goto('/home')
+    await page.getByRole('button', { name: 'What should I read next?' }).click()
+    await expect(
+      page.getByRole('radiogroup', { name: 'Pick from' }),
+    ).toBeVisible()
+    await expect(pickCard(page)).toBeHidden()
+    await showMe(page).click()
+    await expect(pickCard(page)).toBeVisible()
+  })
 })
