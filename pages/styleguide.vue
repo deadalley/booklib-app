@@ -159,7 +159,7 @@
 
         <div class="col-span-12 xl:col-span-5">
           <bl-tile>
-            <template #title>Pills & Chips</template>
+            <template #title>Pills, chips, badges & tags</template>
             <div class="flex flex-col gap-2">
               <p class="text-ink-secondary text-sm">Pills</p>
               <div class="flex flex-wrap items-center gap-3">
@@ -270,6 +270,25 @@
                   <bl-chip variant="secondary" color="secondary" rounded>
                     Rounded
                   </bl-chip>
+                </div>
+              </div>
+
+              <div class="border-t-stroke flex flex-col gap-2 border-t pt-4">
+                <p class="text-ink-secondary text-sm">Badges & tags</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-chip rounded>Science fiction</bl-chip>
+                  <bl-chip rounded size="sm">Fantasy</bl-chip>
+                  <bl-chip rounded removable remove-label="Remove genre">
+                    Removable
+                  </bl-chip>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <bl-challenge-difficulty-badge
+                    v-for="level in CHALLENGE_LEVELS"
+                    :key="level"
+                    :level="level"
+                  />
+                  <bl-challenge-badge :level="2" />
                 </div>
               </div>
             </div>
@@ -471,7 +490,7 @@
           </bl-tile>
         </div>
 
-        <div class="col-span-12 xl:col-span-6">
+        <div class="col-span-12 xl:col-span-4">
           <bl-tile>
             <template #title>Feedback</template>
             <div class="flex flex-col gap-5">
@@ -506,30 +525,7 @@
           </bl-tile>
         </div>
 
-        <div class="col-span-12 xl:col-span-6">
-          <bl-tile>
-            <template #title>Badges & tags</template>
-            <div class="flex flex-col gap-4">
-              <div class="flex flex-wrap items-center gap-2">
-                <bl-chip rounded>Science fiction</bl-chip>
-                <bl-chip rounded size="sm">Fantasy</bl-chip>
-                <bl-chip rounded removable remove-label="Remove genre">
-                  Removable
-                </bl-chip>
-              </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <bl-challenge-difficulty-badge
-                  v-for="level in CHALLENGE_LEVELS"
-                  :key="level"
-                  :level="level"
-                />
-                <bl-challenge-badge :level="2" />
-              </div>
-            </div>
-          </bl-tile>
-        </div>
-
-        <div class="col-span-12 xl:col-span-6">
+        <div class="col-span-12 xl:col-span-4">
           <bl-tile>
             <template #title>Progress & carousels</template>
             <div class="flex flex-col gap-4">
