@@ -106,26 +106,21 @@
         class="relative flex w-full min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-8 pb-10 sm:px-8 sm:py-10 xl:px-12 xl:py-14 2xl:px-16 2xl:py-16"
       >
         <!-- Demo alert -->
-        <bl-warning-badge v-if="isWebEnvironment" class="mb-4">
-          <template #icon="iconProps">
-            <IconAlertTriangle v-bind="iconProps" />
-          </template>
-          <template #content>
-            You are running a
-            <b class="contents">demo</b>
-            version of BookLib. Your data is stored in this browser only and
-            will not be available elsewhere. To keep your library safely on your
-            device,
-            <NuxtLink
-              :to="RELEASES_URL"
-              class="hover:text-primary contents font-semibold underline"
-              target="_blank"
-            >
-              download BookLib for Windows, Linux or Android
-            </NuxtLink>
-            .
-          </template>
-        </bl-warning-badge>
+        <bl-alert v-if="isWebEnvironment" icon="IconAlertTriangle" class="mb-4">
+          You are running a
+          <b class="contents">demo</b>
+          version of BookLib. Your data is stored in this browser only and will
+          not be available elsewhere. To keep your library safely on your
+          device,
+          <NuxtLink
+            :to="RELEASES_URL"
+            class="hover:text-primary contents font-semibold underline"
+            target="_blank"
+          >
+            download BookLib for Windows, Linux or Android
+          </NuxtLink>
+          .
+        </bl-alert>
 
         <!-- Content -->
         <slot />
@@ -140,12 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IconAlertTriangle,
-  IconMenu2,
-  IconMoon,
-  IconSun,
-} from '@tabler/icons-vue'
+import { IconMenu2, IconMoon, IconSun } from '@tabler/icons-vue'
 import { RELEASES_URL, isWebDemo } from '~/utils/platform'
 
 const route = useRoute()

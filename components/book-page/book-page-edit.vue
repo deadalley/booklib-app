@@ -36,16 +36,17 @@
       <h2 class="book-page-title">
         {{ book.title?.trim() || 'Untitled book' }}
       </h2>
-      <p
+      <bl-alert
         v-if="pendingLookupIsbn"
-        class="notice"
+        tone="secondary"
+        size="sm"
+        icon="IconWifiOff"
         role="status"
         data-testid="pending-lookup"
       >
-        <IconWifiOff :size="16" stroke="1.8" />
         The details for ISBN {{ pendingLookupIsbn }} are looked up again once
         BookLib can reach the book services.
-      </p>
+      </bl-alert>
     </header>
 
     <bl-isbn-scanner v-model="scannerOpen" @use="onScan" />
@@ -264,7 +265,6 @@ import {
   IconBarcode,
   IconCheck,
   IconDeviceFloppy,
-  IconWifiOff,
 } from '@tabler/icons-vue'
 import type { IsbnScan } from '~/components/isbn-scanner.vue'
 import { bookPatchFromLookup } from '~/services/book-lookup'

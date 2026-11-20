@@ -3,7 +3,6 @@
     <div
       class="book-tile"
       :class="{ selectable, selected: selectable && book.selected }"
-      v-bind="$attrs"
       :role="selectable ? 'checkbox' : undefined"
       :aria-checked="selectable ? !!book.selected : undefined"
       :aria-label="selectable ? book.title : undefined"
@@ -12,7 +11,28 @@
       @keydown.space.prevent="onSelect"
       @keydown.enter.prevent="onSelect"
     >
-      <div v-if="draggable" class="book-tile-drag-handle">
+      <!--
+        Drag it, or focus it and use the arrow keys. A div, not a <button>:
+        browsers won't start dragging from a button.
+      -->
+      <div
+        v-if="draggable"
+        role="button"
+        tabindex="0"
+        class="book-tile-drag-handle"
+        :data-drag-handle="book.id"
+        :aria-label="
+          book.order !== undefined
+            ? `Move ${book.title}, position ${book.order + 1}`
+            : `Move ${book.title}`
+        "
+        aria-description="Use the arrow keys to move it earlier or later"
+        @click.stop.prevent
+        @keydown.left.prevent="emit('move', -1)"
+        @keydown.up.prevent="emit('move', -1)"
+        @keydown.right.prevent="emit('move', 1)"
+        @keydown.down.prevent="emit('move', 1)"
+      >
         <span v-if="book.order !== undefined" class="book-tile-drag-order">
           {{ book.order + 1 }}
         </span>
@@ -124,7 +144,11 @@ const props = defineProps<{
   caption?: string
 }>()
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits<{
+  (e: 'selected', selected: boolean): void
+  // Keyboard reordering: -1 earlier, 1 later
+  (e: 'move', delta: -1 | 1): void
+}>()
 
 const href = computed(() => `/library/books/${props.book.id}`)
 

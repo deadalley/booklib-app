@@ -105,15 +105,50 @@
 
       <div class="book-page-body-main">
         <section class="book-page-section">
-          <div class="flex min-h-7 items-center justify-between gap-3">
+          <div
+            class="flex min-h-7 flex-wrap items-center justify-between gap-3"
+          >
             <p class="book-page-section-title">
               {{ books.length }} {{ books.length === 1 ? 'Book' : 'Books' }}
             </p>
-            <bl-view-switch v-if="books.length" v-model:view="view" />
+            <div v-if="books.length" class="flex flex-wrap items-center gap-2">
+              <bl-button
+                v-if="pickable && !reordering"
+                variant="secondary"
+                @click="$emit('pick')"
+              >
+                <template #prependIcon="iconProps">
+                  <IconDice5 v-bind="iconProps" />
+                </template>
+                Pick next read
+              </bl-button>
+              <bl-button
+                v-if="reorderable && books.length > 1"
+                :variant="reordering ? 'primary' : 'secondary'"
+                @click="toggleReordering"
+              >
+                <template #prependIcon="iconProps">
+                  <IconCheck v-if="reordering" v-bind="iconProps" />
+                  <IconArrowsSort v-else v-bind="iconProps" />
+                </template>
+                {{ reordering ? 'Done' : 'Reorder' }}
+              </bl-button>
+              <bl-view-switch v-if="!reordering" v-model:view="view" />
+            </div>
           </div>
+          <bl-alert v-if="reordering" tone="secondary" size="sm" role="status">
+            {{ reorderHint }}
+          </bl-alert>
 
           <template v-if="books.length">
-            <bl-books-grid v-if="view === 'cards'" :model-value="books" />
+            <bl-books-grid
+              v-if="reordering"
+              v-model="ordered"
+              draggable
+              data-testid="reorder-grid"
+              @drag="onReorder"
+            />
+            <bl-books-grid v-else-if="view === 'cards'" :model-value="books" />
             <div v-else class="overflow-x-auto">
               <bl-books-table
                 :books="books"
@@ -148,7 +183,15 @@
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconPlus, IconTrash, icons } from '@tabler/icons-vue'
+import {
+  IconArrowsSort,
+  IconCheck,
+  IconDice5,
+  IconEdit,
+  IconPlus,
+  IconTrash,
+  icons,
+} from '@tabler/icons-vue'
 import type { Book, ViewBook } from '~/types/book'
 import type { View } from '~/types/ui'
 import { toFullDateCompact } from '~/utils/date'
@@ -158,9 +201,18 @@ const props = defineProps<{
   entity: { id: string; name: string; createdAt?: string }
   books: ViewBook[]
   canDelete?: boolean
+  // Collections: books can be dragged into order (e.g. reading priority)
+  reorderable?: boolean
+  // Shows "Pick next read"
+  pickable?: boolean
 }>()
 
-defineEmits<{ (e: 'delete', deleteBooks: boolean): void }>()
+const emit = defineEmits<{
+  (e: 'delete', deleteBooks: boolean): void
+  (e: 'pick'): void
+  // The books' ids in their new order
+  (e: 'reorder', bookIds: Book['id'][]): void
+}>()
 
 const TABLE_COLUMNS: {
   [key in keyof Book]?: { label: string; checked: boolean }
@@ -178,6 +230,31 @@ const TABLE_COLUMNS: {
 }
 
 const view = ref<View>('cards')
+
+// Reordering works on a copy, numbered from 1, saved after every move
+const reordering = ref(false)
+const ordered = ref<ViewBook[]>([])
+
+const reorderHint = computed(() =>
+  props.entity.id === TBR_COLLECTION_ID
+    ? 'Drag books into the order you want to read them, or focus a handle and use the arrow keys. The first unstarted book is up next.'
+    : 'Drag books into order, or focus a handle and use the arrow keys.',
+)
+
+function toggleReordering() {
+  reordering.value = !reordering.value
+  if (reordering.value) {
+    ordered.value = props.books.map((book, order) => ({ ...book, order }))
+  }
+}
+
+function onReorder() {
+  ordered.value = ordered.value.map((book, order) => ({ ...book, order }))
+  emit(
+    'reorder',
+    ordered.value.map(({ id }) => id),
+  )
+}
 
 const isCollection = computed(() => props.kind === 'collection')
 const listHref = computed(() =>

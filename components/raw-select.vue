@@ -10,6 +10,7 @@
   >
     <SelectRoot v-model="selectValue" class="relative">
       <SelectTrigger
+        :aria-label="ariaLabel"
         class="menu-trigger relative"
         :class="{
           'flex size-full items-center gap-3': !withWrapper,
@@ -125,6 +126,8 @@ export type SelectProps = {
   withWrapper?: boolean
   align?: 'start' | 'center' | 'end'
   side?: 'top' | 'right' | 'bottom' | 'left'
+  // Names the select when it has no visible label
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<SelectProps>(), {

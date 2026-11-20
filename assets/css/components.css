@@ -84,7 +84,8 @@
     @apply hover:shadow-primary/50 hover:border-primary hover:shadow-sm;
   }
   .book-tile-drag-handle {
-    @apply bg-primary text-ink-inverse flex items-center justify-between px-3 py-1 text-sm;
+    @apply bg-primary text-ink-inverse flex w-full cursor-grab items-center justify-between px-3 py-1 text-sm active:cursor-grabbing;
+    @apply focus-visible:ring-primary/40 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset;
   }
   .book-tile-drag-order {
     @apply text-sm font-semibold;
@@ -537,11 +538,6 @@
 }
 .progress-stat-label {
   @apply text-ink-secondary text-xs font-semibold tracking-widest uppercase;
-}
-
-/* Notice: a short amber status line, e.g. waiting to be back online */
-.notice {
-  @apply bg-secondary-50 border-secondary-200 text-secondary-800 flex w-fit items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold;
 }
 
 /* Card: the standard padded content card, built on paper-flat */

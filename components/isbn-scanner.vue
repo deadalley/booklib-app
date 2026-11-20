@@ -75,10 +75,14 @@
         aria-live="polite"
         data-testid="scanner-status"
       >
-        <p v-if="otherCode" class="scanner-hint warn">
-          <IconAlertTriangle :size="16" stroke="1.8" class="mt-0.5 flex-none" />
-          <span>{{ otherCodeMessage }}</span>
-        </p>
+        <bl-alert
+          v-if="otherCode"
+          tone="secondary"
+          size="sm"
+          icon="IconAlertTriangle"
+        >
+          {{ otherCodeMessage }}
+        </bl-alert>
         <p v-else class="scanner-hint">
           <bl-loading v-if="state === 'starting'" class="size-4!" />
           <IconScan v-else :size="16" stroke="1.8" class="flex-none" />
@@ -200,7 +204,6 @@
 
 <script setup lang="ts">
 import {
-  IconAlertTriangle,
   IconBook,
   IconBookOff,
   IconBulb,
@@ -482,9 +485,6 @@ watch(open, (isOpen) => {
 }
 .scanner-hint {
   @apply text-ink-secondary flex items-center gap-2 text-sm;
-}
-.scanner-hint.warn {
-  @apply bg-secondary-50 border-secondary-200 text-secondary-800 items-start rounded-lg border px-3 py-2;
 }
 .scanner-tips {
   @apply bg-surface-subtle border-stroke text-ink-secondary flex flex-col gap-1 rounded-lg border px-3 py-2.5 text-sm;

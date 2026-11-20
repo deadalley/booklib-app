@@ -203,6 +203,46 @@ describe('BookLibDataManagementService (real transformers)', () => {
     })
   })
 
+  describe('collection order', () => {
+    const order = (collectionId: string) =>
+      db['collection-book']
+        .filter(({ collection_id }) => collection_id === collectionId)
+        .sort((a, b) => a.order - b.order)
+        .map(({ book_id }) => book_id)
+
+    it('keeps a book’s place when it is saved', async () => {
+      db['collection-book'].push({
+        book_id: 'b2',
+        collection_id: 'c1',
+        order: 1,
+      })
+      await service.updateCollection('c1', {
+        books: [
+          { id: 'b2', order: 0 },
+          { id: 'b1', order: 1 },
+        ],
+      })
+      // Saving b1 (also adding it to c2) must not move it in c1
+      await service.updateBook('b1', {
+        title: 'Piranesi',
+        collections: ['c1', 'c2'],
+      })
+      expect(order('c1')).toEqual(['b2', 'b1'])
+    })
+
+    it('adds a book at the end of a collection it joins', async () => {
+      await service.updateBook('b2', { collections: ['c1'] })
+      expect(order('c1')).toEqual(['b1', 'b2'])
+      const created = await service.createBook({
+        ...(await service.getBook('b1'))!,
+        id: undefined as never,
+        title: 'New',
+        collections: ['c1'],
+      })
+      expect(order('c1')).toEqual(['b1', 'b2', created!.id])
+    })
+  })
+
   describe('deletes clean up goal references', () => {
     it('deleteBook removes the goal entries of that book', async () => {
       await service.deleteBook('b1')

@@ -6,7 +6,7 @@ import { getBookFinishedAt, isBookFinished } from './book-progress'
 import { toSimpleDate } from './date'
 import { getGoalStatus, getUnloggedGoalBooks, resolveGoal } from './goal'
 
-export type SuggestionKind = 'almost' | 'log' | 'author' | 'old'
+export type SuggestionKind = 'almost' | 'log' | 'next' | 'author' | 'old'
 
 export type SuggestionAction =
   | { type: 'open'; bookId: string }
@@ -26,7 +26,10 @@ export type Suggestion = {
   action: SuggestionAction
 }
 
-const KIND_ORDER: SuggestionKind[] = ['almost', 'log', 'author', 'old']
+// At most this many "on your shelf" suggestions
+const OLD_LIMIT = 2
+
+const KIND_ORDER: SuggestionKind[] = ['almost', 'log', 'next', 'author', 'old']
 
 /** Pages read so far: every page once read, otherwise the logged page. */
 export function getBookPagesRead(book: Book): number {
@@ -139,6 +142,34 @@ function unloggedGoalBooks(
     })
 }
 
+/** The first unstarted book in the To Be Read queue */
+function upNext(
+  books: Book[],
+  authors: Author[],
+  tbrIds: string[],
+): Suggestion[] {
+  const byId = new Map(books.map((book) => [book.id, book]))
+  const book = tbrIds
+    .map((id) => byId.get(id))
+    .find((book) => book && !book.progress.status)
+  if (!book) return []
+  const author = authors.find(({ id }) => id === book.author)?.name
+  return [
+    {
+      id: `next-${book.id}`,
+      kind: 'next',
+      eyebrow: 'Up next',
+      title: `${book.title} is next on your To Be Read`,
+      body: [author, book.pages && `${book.pages} pages`, book.genres?.[0]]
+        .filter(Boolean)
+        .join(' · '),
+      cta: 'Start reading',
+      book,
+      action: { type: 'start', bookId: book.id },
+    },
+  ]
+}
+
 function favouriteAuthor(books: Book[], authors: Author[]): Suggestion[] {
   const byAuthor = new Map<string, Book[]>()
   books.forEach((book) => {
@@ -190,55 +221,80 @@ function longOnShelf(
   authors: Author[],
   today: string,
 ): Suggestion[] {
-  return books
-    .filter((book) => !book.progress.status && !!book.createdAt)
-    .sort(byCreatedAt)
-    .slice(0, 2)
-    .map((book): Suggestion => {
-      const since = formatRelativeDay(toLocalDay(book.createdAt), today, {
-        suffix: false,
+  return (
+    books
+      .filter((book) => !book.progress.status && !!book.createdAt)
+      .sort(byCreatedAt)
+      // Extra candidates: books already suggested otherwise are skipped
+      .slice(0, OLD_LIMIT + 2)
+      .map((book): Suggestion => {
+        const since = formatRelativeDay(toLocalDay(book.createdAt), today, {
+          suffix: false,
+        })
+        const author = authors.find(({ id }) => id === book.author)?.name
+        return {
+          id: `old-${book.id}`,
+          kind: 'old',
+          eyebrow: 'On your shelf',
+          title:
+            since === 'today' || since === 'yesterday'
+              ? `${book.title} was added ${since}. How about giving it a try?`
+              : `${book.title} has been in your library for ${since}. How about giving it a try?`,
+          body: [author, book.pages && `${book.pages} pages`, book.genres?.[0]]
+            .filter(Boolean)
+            .join(' · '),
+          cta: 'Start reading',
+          book,
+          action: { type: 'start', bookId: book.id },
+        }
       })
-      const author = authors.find(({ id }) => id === book.author)?.name
-      return {
-        id: `old-${book.id}`,
-        kind: 'old',
-        eyebrow: 'On your shelf',
-        title:
-          since === 'today' || since === 'yesterday'
-            ? `${book.title} was added ${since}. How about giving it a try?`
-            : `${book.title} has been in your library for ${since}. How about giving it a try?`,
-        body: [author, book.pages && `${book.pages} pages`, book.genres?.[0]]
-          .filter(Boolean)
-          .join(' · '),
-        cta: 'Start reading',
-        book,
-        action: { type: 'start', bookId: book.id },
-      }
-    })
+  )
 }
 
 /**
  * Contextual nudges for the home carousel, in display order: books close to
- * the end, finished books a manual goal hasn't logged, an unread book from
- * the best-rated author, and the books waiting longest on the shelf.
+ * the end, finished books a manual goal hasn't logged, the next book in the
+ * To Be Read queue, an unread book from the best-rated author, and the books
+ * waiting longest on the shelf.
  */
 export function buildSuggestions({
   books,
   authors,
   goals,
   today,
+  tbrIds = [],
 }: {
   books: Book[]
   authors: Author[]
   goals: Goal[]
   today: string
+  // To Be Read book ids, in priority order
+  tbrIds?: string[]
 }): Suggestion[] {
-  return [
-    ...almostFinished(books),
-    ...unloggedGoalBooks(books, goals, today),
-    ...favouriteAuthor(books, authors),
-    ...longOnShelf(books, authors, today),
-  ].sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind))
+  const seen = new Set<string>()
+  return (
+    [
+      ...almostFinished(books),
+      ...unloggedGoalBooks(books, goals, today),
+      ...upNext(books, authors, tbrIds),
+      ...favouriteAuthor(books, authors),
+      ...longOnShelf(books, authors, today),
+    ]
+      .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind))
+      // One suggestion per book: the up-next book isn't also "on your shelf"
+      .filter(({ kind, book }) => {
+        if (kind === 'log') return true
+        if (seen.has(book.id)) return false
+        seen.add(book.id)
+        return true
+      })
+      .filter(
+        (item, index, items) =>
+          item.kind !== 'old' ||
+          items.slice(0, index).filter(({ kind }) => kind === 'old').length <
+            OLD_LIMIT,
+      )
+  )
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000

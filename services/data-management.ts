@@ -332,14 +332,8 @@ export class BookLibDataManagementService {
     // Add book
     this.client.data.books.push(bookDb)
 
-    // Add collection relationships
-    collections.forEach((collectionId, index) => {
-      this.client!.data['collection-book'].push({
-        book_id: bookDb.id,
-        collection_id: collectionId,
-        order: index,
-      })
-    })
+    // Add collection relationships, each at the end of its collection
+    this.setBookCollections(bookDb.id, collections)
 
     await this.client.write()
 
@@ -392,6 +386,43 @@ export class BookLibDataManagementService {
   }
 
   /** Applies a patch to a loaded book in memory; the caller writes. */
+  /**
+   * Sets which collections a book is in. Collections it was already in keep
+   * its place (a collection's order is its reading priority, e.g. the To Be
+   * Read queue); a collection it joins gets it at the end.
+   */
+  private setBookCollections(
+    bookId: BookDB['id'],
+    collectionIds: CollectionDB['id'][],
+  ) {
+    if (!this.client) throw new Error('Database not initialized')
+    const links = this.client.data['collection-book']
+    const current = new Map(
+      links
+        .filter(({ book_id }) => book_id === bookId)
+        .map((link) => [link.collection_id, link.order]),
+    )
+    const wanted = [...new Set(collectionIds)]
+
+    const others = links.filter(({ book_id }) => book_id !== bookId)
+    const nextOrder = (collectionId: string) =>
+      Math.max(
+        -1,
+        ...others
+          .filter(({ collection_id }) => collection_id === collectionId)
+          .map(({ order }) => order ?? 0),
+      ) + 1
+
+    this.client.data['collection-book'] = [
+      ...others,
+      ...wanted.map((collectionId) => ({
+        book_id: bookId,
+        collection_id: collectionId,
+        order: current.get(collectionId) ?? nextOrder(collectionId),
+      })),
+    ]
+  }
+
   private patchBook(id: BookDB['id'], book: Partial<Book>): boolean {
     if (!this.client) throw new Error('Database not initialized')
 
@@ -435,17 +466,7 @@ export class BookLibDataManagementService {
     this.client.data.books[bookIndex] = updatedBookDb
 
     if (book.collections !== undefined) {
-      this.client.data['collection-book'] = this.client.data[
-        'collection-book'
-      ].filter(({ book_id }) => book_id !== id)
-
-      book.collections.forEach((collectionId, index) => {
-        this.client!.data['collection-book'].push({
-          book_id: id,
-          collection_id: collectionId,
-          order: index,
-        })
-      })
+      this.setBookCollections(id, book.collections)
     }
 
     return true

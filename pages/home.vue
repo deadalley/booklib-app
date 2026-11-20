@@ -79,6 +79,7 @@
           class="span-7"
           :books="reading"
           :authors="authors"
+          @pick="pickerOpen = true"
         />
         <bl-home-goals class="span-5" :goals="activeGoals" />
         <bl-home-recent-books
@@ -89,7 +90,20 @@
       </div>
     </div>
 
-    <bl-toast :message="toast" />
+    <bl-next-read-picker
+      v-model="pickerOpen"
+      :sources="pickerSources"
+      :authors="authors"
+      :library="books"
+      :tbr-ids="tbrIds"
+      @started="onPickerStarted"
+    />
+
+    <bl-toast
+      :message="toast"
+      :action-label="toastBookId ? 'View book' : undefined"
+      @action="navigateTo(`/library/books/${toastBookId}`)"
+    />
   </NuxtLayout>
 </template>
 
@@ -134,10 +148,21 @@ const isEmpty = ref(false)
 const authors = ref<Author[]>([])
 const books = ref<Book[]>([])
 const collections = ref<Collection[]>([])
+// The To Be Read queue, in priority order
+const tbrIds = computed(() =>
+  [
+    ...(collections.value.find(({ id }) => id === TBR_COLLECTION_ID)?.books ??
+      []),
+  ]
+    .sort((a, b) => a.order - b.order)
+    .map(({ id }) => id),
+)
 const goals = ref<Goal[]>([])
 
 const busy = ref<string | null>(null)
 const toast = ref<string | null>(null)
+// A toast about a book can open it
+const toastBookId = ref<string | null>(null)
 
 // Dismissed suggestion ids and when they may come back
 const dismissed = useLocalStorage<Record<string, number>>(
@@ -171,12 +196,38 @@ onMounted(() => {
   load()
 })
 
+// "What should I read next?": the To Be Read queue first, if it has books
+const pickerOpen = ref(false)
+const pickerSources = computed(() => {
+  const byId = new Map(books.value.map((book) => [book.id, book]))
+  const tbr = tbrIds.value.flatMap((id) => byId.get(id) ?? [])
+  return [
+    ...(tbr.some(isUnstarted)
+      ? [
+          {
+            id: TBR_COLLECTION_ID,
+            label: 'To Be Read',
+            books: tbr,
+            queue: true,
+          },
+        ]
+      : []),
+    { id: 'all', label: 'All books', books: books.value },
+  ]
+})
+
+async function onPickerStarted(book: Book) {
+  showToast(`Started ${book.title} · Added to Reading`, book.id)
+  await load()
+}
+
 const suggestions = computed(() =>
   buildSuggestions({
     books: books.value,
     authors: authors.value,
     goals: goals.value,
     today,
+    tbrIds: tbrIds.value,
   }).filter(({ id }) => !(id in dismissed.value)),
 )
 
@@ -207,8 +258,9 @@ function dismiss(id: string) {
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
-function showToast(message: string) {
+function showToast(message: string, bookId: string | null = null) {
   toast.value = message
+  toastBookId.value = bookId
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
 }

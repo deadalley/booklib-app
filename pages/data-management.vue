@@ -56,18 +56,13 @@
         </div>
       </div>
 
-      <bl-warning-badge v-if="preview.backup">
-        <template #icon="iconProps">
-          <IconInfoCircle v-bind="iconProps" />
-        </template>
-        <template #content>
-          This file is a full BookLib backup.
-          <b>Import selected books</b>
-          adds only the books (without collections).
-          <b>Restore full backup</b>
-          also brings in collections, authors and goals.
-        </template>
-      </bl-warning-badge>
+      <bl-alert v-if="preview.backup">
+        This file is a full BookLib backup.
+        <b>Import selected books</b>
+        adds only the books (without collections).
+        <b>Restore full backup</b>
+        also brings in collections, authors and goals.
+      </bl-alert>
 
       <div
         v-if="preview.issues.length"
@@ -205,15 +200,15 @@
             @change="onFileChange"
           />
 
-          <bl-warning-badge v-if="importError" data-testid="import-error">
-            <template #icon="iconProps">
-              <IconAlertTriangle v-bind="iconProps" />
-            </template>
-            <template #content>
-              <b>Could not import {{ fileName }}:</b>
-              {{ importError }}
-            </template>
-          </bl-warning-badge>
+          <bl-alert
+            v-if="importError"
+            icon="IconAlertTriangle"
+            role="alert"
+            data-testid="import-error"
+          >
+            <b>Could not import {{ fileName }}:</b>
+            {{ importError }}
+          </bl-alert>
 
           <p
             v-if="importSuccess"
@@ -297,7 +292,6 @@ import {
   IconDatabaseImport,
   IconDownload,
   IconFileTypeCsv,
-  IconInfoCircle,
   IconUpload,
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
