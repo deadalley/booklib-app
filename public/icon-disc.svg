@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 885" width="512" height="515" role="img" aria-label="Discs">
+  <rect width="880" height="885" rx="220" fill="#0A43A5"/>
+  <g transform="translate(-900 0)">
+    <!-- vinyl -->
+    <path d="M1535 355A254 254 0 1 0 1368 652" fill="none" stroke="#fff" stroke-width="32" stroke-linecap="round"/>
+    <circle cx="1285" cy="410" r="93" fill="#fff"/>
+    <circle cx="1285" cy="410" r="25" fill="#0A43A5"/>
+    <path d="M1080 408A205 205 0 0 1 1250 215M1130 402A152 152 0 0 1 1255 266" fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round"/>
+    <!-- cd -->
+    <circle cx="1530" cy="545" r="179" fill="#fff"/>
+    <circle cx="1530" cy="545" r="152" fill="#0A43A5"/>
+    <circle cx="1530" cy="545" r="56" fill="#fff"/>
+    <circle cx="1530" cy="545" r="40" fill="#0A43A5"/>
+    <circle cx="1530" cy="545" r="26" fill="#fff"/>
+    <circle cx="1530" cy="545" r="12" fill="#0A43A5"/>
+    <path d="M1605 430L1650 470L1595 500L1572 482Z" fill="#fff"/>
+    <path d="M1475 595L1500 612L1475 668L1422 628Z" fill="#fff"/>
+  </g>
+</svg>
