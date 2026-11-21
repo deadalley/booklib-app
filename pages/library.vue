@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout name="dashboard" title="Library" :nav-items="navItems">
+  <NuxtLayout name="dashboard" title="Library">
     <!-- Error boundary -->
     <NuxtErrorBoundary>
       <template #error="{ error, clearError }">
@@ -33,21 +33,6 @@ onMounted(async () => {
     await navigateTo('/home')
   }
 })
-
-const navItems = [
-  {
-    to: '/library/books',
-    label: 'Books',
-  },
-  {
-    to: '/library/collections',
-    label: 'Collections',
-  },
-  {
-    to: '/library/authors',
-    label: 'Authors',
-  },
-]
 
 useHead({
   title: 'BookLib | Library',
