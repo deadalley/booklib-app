@@ -116,173 +116,192 @@
     </div>
 
     <!-- Main data management view -->
-    <div v-else class="mx-auto flex w-full max-w-[90rem] flex-col gap-8">
-      <div class="flex flex-col gap-1">
-        <span class="section-label text-primary">Library</span>
-        <h3>Data Management</h3>
-        <p class="text-ink-secondary">
-          Import books from a spreadsheet or another app, export your library,
-          or keep a full backup.
-        </p>
-      </div>
+    <div v-else class="mx-auto flex w-full max-w-[90rem] flex-col gap-12">
+      <section
+        class="flex flex-col gap-8"
+        aria-labelledby="data-management-title"
+      >
+        <div class="flex flex-col gap-1">
+          <span class="section-label text-primary">Library</span>
+          <h3 id="data-management-title">Data Management</h3>
+          <p class="text-ink-secondary">
+            Import books from a spreadsheet or another app, or export your
+            library.
+          </p>
+        </div>
 
-      <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <!-- Import card -->
-        <section class="paper-flat data-management-card">
-          <div class="data-management-card-header">
-            <div class="flex items-center gap-2">
-              <IconBookUpload
-                class="text-primary"
-                :size="ICON_SIZE_MEDIUM"
-                stroke="1.5"
-              />
-              <h5>Import books</h5>
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <!-- Import card -->
+          <section class="paper-flat data-management-card">
+            <div class="data-management-card-header">
+              <div class="flex items-center gap-2">
+                <IconBookUpload
+                  class="text-primary"
+                  :size="ICON_SIZE_MEDIUM"
+                  stroke="1.5"
+                />
+                <h5>Import books</h5>
+              </div>
+              <p class="text-ink-secondary text-sm">
+                CSV or JSON files: BookLib exports and backups, Goodreads and
+                StoryGraph exports, the templates below, or spreadsheets with
+                matching column names.
+              </p>
             </div>
-            <p class="text-ink-secondary text-sm">
-              CSV or JSON files: BookLib exports and backups, Goodreads and
-              StoryGraph exports, the templates below, or spreadsheets with
-              matching column names.
-            </p>
-          </div>
 
-          <div class="flex flex-col gap-2">
-            <span class="section-label">Templates</span>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-col gap-2">
+              <span class="section-label">Templates</span>
+              <div class="grid grid-cols-2 gap-2">
+                <bl-option-card
+                  v-for="template in templates"
+                  :key="template.value"
+                  @click="downloadTemplate(template.value)"
+                >
+                  <template #title>
+                    <span class="flex items-center gap-2">
+                      <component
+                        :is="template.icon"
+                        :size="16"
+                        stroke="1.5"
+                        class="text-primary shrink-0"
+                      />
+                      {{ template.label }}
+                    </span>
+                  </template>
+                  <template #trailing>
+                    <IconDownload :size="14" />
+                  </template>
+                </bl-option-card>
+              </div>
+            </div>
+
+            <div
+              class="file-drop-zone"
+              :class="{ 'file-drop-zone-over': isDragging }"
+              role="button"
+              tabindex="0"
+              data-testid="import-drop-zone"
+              @dragover.prevent="isDragging = true"
+              @dragleave.prevent="isDragging = false"
+              @drop.prevent="onDrop"
+              @click="onUploadClick"
+              @keydown.enter.prevent="onUploadClick"
+              @keydown.space.prevent="onUploadClick"
+            >
+              <IconCloudUpload
+                :size="44"
+                stroke="1"
+                class="text-ink-muted mx-auto"
+              />
+              <p class="text-ink-primary font-medium">
+                Drag and drop your file here
+              </p>
+              <p class="text-ink-muted text-sm">Supports .csv and .json</p>
+              <span class="text-primary text-sm underline">Browse files</span>
+            </div>
+            <input
+              ref="fileInput"
+              type="file"
+              accept=".csv,.json,text/csv,application/json"
+              class="hidden"
+              data-testid="import-file-input"
+              @change="onFileChange"
+            />
+
+            <bl-alert
+              v-if="importError"
+              icon="IconAlertTriangle"
+              role="alert"
+              data-testid="import-error"
+            >
+              <b>Could not import {{ fileName }}:</b>
+              {{ importError }}
+            </bl-alert>
+
+            <p
+              v-if="importSuccess"
+              class="text-ink-secondary text-sm"
+              data-testid="import-success"
+            >
+              {{ importSuccess }}
+            </p>
+          </section>
+
+          <!-- Export card -->
+          <section class="paper-flat data-management-card">
+            <div class="data-management-card-header">
+              <div class="flex items-center gap-2">
+                <IconBookDownload
+                  class="text-primary"
+                  :size="ICON_SIZE_MEDIUM"
+                  stroke="1.5"
+                />
+                <h5>Export</h5>
+              </div>
+              <p class="text-ink-secondary text-sm">
+                Download your books, or a full backup that can be restored
+                later.
+              </p>
+            </div>
+
+            <div class="flex flex-col gap-2" role="radiogroup">
+              <span class="section-label">Format</span>
               <bl-option-card
-                v-for="template in templates"
-                :key="template.value"
-                @click="downloadTemplate(template.value)"
+                v-for="format in exportFormats"
+                :key="format.value"
+                role="radio"
+                :aria-checked="exportType === format.value"
+                :selected="exportType === format.value"
+                :title="format.label"
+                :description="format.description"
+                @click="exportType = format.value"
               >
-                <template #title>
-                  <span class="flex items-center gap-2">
-                    <component
-                      :is="template.icon"
-                      :size="16"
-                      stroke="1.5"
-                      class="text-primary shrink-0"
-                    />
-                    {{ template.label }}
-                  </span>
-                </template>
                 <template #trailing>
-                  <IconDownload :size="14" />
+                  <component :is="format.icon" :size="18" stroke="1.5" />
                 </template>
               </bl-option-card>
             </div>
-          </div>
 
-          <div
-            class="file-drop-zone"
-            :class="{ 'file-drop-zone-over': isDragging }"
-            role="button"
-            tabindex="0"
-            data-testid="import-drop-zone"
-            @dragover.prevent="isDragging = true"
-            @dragleave.prevent="isDragging = false"
-            @drop.prevent="onDrop"
-            @click="onUploadClick"
-            @keydown.enter.prevent="onUploadClick"
-            @keydown.space.prevent="onUploadClick"
-          >
-            <IconCloudUpload
-              :size="44"
-              stroke="1"
-              class="text-ink-muted mx-auto"
-            />
-            <p class="text-ink-primary font-medium">
-              Drag and drop your file here
-            </p>
-            <p class="text-ink-muted text-sm">Supports .csv and .json</p>
-            <span class="text-primary text-sm underline">Browse files</span>
-          </div>
-          <input
-            ref="fileInput"
-            type="file"
-            accept=".csv,.json,text/csv,application/json"
-            class="hidden"
-            data-testid="import-file-input"
-            @change="onFileChange"
-          />
-
-          <bl-alert
-            v-if="importError"
-            icon="IconAlertTriangle"
-            role="alert"
-            data-testid="import-error"
-          >
-            <b>Could not import {{ fileName }}:</b>
-            {{ importError }}
-          </bl-alert>
-
-          <p
-            v-if="importSuccess"
-            class="text-ink-secondary text-sm"
-            data-testid="import-success"
-          >
-            {{ importSuccess }}
-          </p>
-        </section>
-
-        <!-- Export card -->
-        <section class="paper-flat data-management-card">
-          <div class="data-management-card-header">
-            <div class="flex items-center gap-2">
-              <IconBookDownload
-                class="text-primary"
-                :size="ICON_SIZE_MEDIUM"
-                stroke="1.5"
-              />
-              <h5>Export</h5>
+            <div
+              class="border-stroke mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4"
+            >
+              <p class="text-ink-secondary text-sm">
+                Total books:
+                <span class="text-ink-primary font-semibold">
+                  {{ totalBooks }}
+                </span>
+              </p>
+              <bl-button
+                :disabled="!exportType"
+                :loading="exportLoading"
+                data-testid="export-submit"
+                @click="onExport"
+              >
+                <template #prependIcon="prependIcon">
+                  <IconDownload v-bind="prependIcon" />
+                </template>
+                Download
+              </bl-button>
             </div>
-            <p class="text-ink-secondary text-sm">
-              Download your books, or a full backup that can be restored later.
-            </p>
-          </div>
+          </section>
+        </div>
+      </section>
 
-          <div class="flex flex-col gap-2" role="radiogroup">
-            <span class="section-label">Format</span>
-            <bl-option-card
-              v-for="format in exportFormats"
-              :key="format.value"
-              role="radio"
-              :aria-checked="exportType === format.value"
-              :selected="exportType === format.value"
-              :title="format.label"
-              :description="format.description"
-              @click="exportType = format.value"
-            >
-              <template #trailing>
-                <component :is="format.icon" :size="18" stroke="1.5" />
-              </template>
-            </bl-option-card>
-          </div>
+      <section class="flex flex-col gap-8" aria-labelledby="backup-sync-title">
+        <div class="flex flex-col gap-1">
+          <span class="section-label text-primary">Safekeeping</span>
+          <h3 id="backup-sync-title">Backup & Sync</h3>
+          <p class="text-ink-secondary">
+            Copies of your library on this device, and the same library on all
+            your computers.
+          </p>
+        </div>
 
-          <div
-            class="border-stroke mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4"
-          >
-            <p class="text-ink-secondary text-sm">
-              Total books:
-              <span class="text-ink-primary font-semibold">
-                {{ totalBooks }}
-              </span>
-            </p>
-            <bl-button
-              :disabled="!exportType"
-              :loading="exportLoading"
-              data-testid="export-submit"
-              @click="onExport"
-            >
-              <template #prependIcon="prependIcon">
-                <IconDownload v-bind="prependIcon" />
-              </template>
-              Download
-            </bl-button>
-          </div>
-        </section>
-
-        <bl-backups-card @restored="refreshTotals" />
-        <bl-sync-card />
-      </div>
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <bl-backups-card @restored="refreshTotals" />
+          <bl-sync-card />
+        </div>
+      </section>
     </div>
   </NuxtLayout>
 </template>
