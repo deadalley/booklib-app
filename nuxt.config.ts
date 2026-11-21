@@ -10,6 +10,12 @@ const isCapacitorBuild = process.env.BUILD_TARGET === 'capacitor'
 // light/dark preference before first paint (see utils/theme.ts).
 const head = {
   meta: [{ name: 'theme-color', content: activeTheme.colors.surface.canvas }],
+  link: [
+    // Explicit, versioned links so browsers drop a cached old favicon.
+    { rel: 'icon', href: '/favicon.ico?v=2', sizes: 'any' },
+    { rel: 'icon', type: 'image/svg+xml', href: '/icon.svg?v=2' },
+    { rel: 'apple-touch-icon', href: '/icon.png?v=2' },
+  ],
   style: [{ id: 'booklib-theme', innerHTML: themeCss() }],
   script: [{ innerHTML: themeBootScript, tagPosition: 'head' as const }],
 }
