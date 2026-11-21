@@ -18,6 +18,9 @@
           <h4 v-else>No books selected</h4>
           <p class="text-ink-secondary text-sm">
             {{ fileName }}
+            <template v-if="preview.source !== 'booklib'">
+              · {{ IMPORT_SOURCE_LABELS[preview.source] }} export
+            </template>
             <template v-if="preview.plan.newAuthors.length">
               · {{ preview.plan.newAuthors.length }} new
               {{ preview.plan.newAuthors.length === 1 ? 'author' : 'authors' }}
@@ -136,8 +139,9 @@
               <h5>Import books</h5>
             </div>
             <p class="text-ink-secondary text-sm">
-              CSV or JSON files: BookLib exports and backups, the templates
-              below, or spreadsheets with matching column names.
+              CSV or JSON files: BookLib exports and backups, Goodreads and
+              StoryGraph exports, the templates below, or spreadsheets with
+              matching column names.
             </p>
           </div>
 
@@ -275,6 +279,9 @@
             </bl-button>
           </div>
         </section>
+
+        <bl-backups-card @restored="refreshTotals" />
+        <bl-sync-card />
       </div>
     </div>
   </NuxtLayout>
@@ -302,15 +309,18 @@ import type { Book, ViewBook } from '~/types/book'
 import {
   bookToRecord,
   formatFromFileName,
+  IMPORT_SOURCE_LABELS,
   parseBookFile,
   planImport,
   recordToBook,
   serializeBooks,
   type ImportPlan,
+  type ImportSource,
   type TransferFormat,
   type TransferIssue,
 } from '~/services/transfer'
 
+const { backUp } = useBackups()
 const { getBooks, getAuthors, importBooks, importLibrary, exportLibrary } =
   useBookLibrary()
 
@@ -333,6 +343,8 @@ type Preview = {
   plan: ImportPlan
   rows: ViewBook[]
   issues: TransferIssue[]
+  /** The app the file was exported from */
+  source: ImportSource
   /** Raw backup contents when the file is a full BookLib backup. */
   backup: Database | null
 }
@@ -410,7 +422,10 @@ async function processImportFile(file: File) {
   importLoading.value = true
   try {
     const text = await file.text()
-    const { records, issues, rows } = parseBookFile(text, format)
+    const { records, issues, rows, source, collections } = parseBookFile(
+      text,
+      format,
+    )
 
     if (!records.length) {
       importError.value =
@@ -423,7 +438,7 @@ async function processImportFile(file: File) {
     const plan = planImport(records, { books, authors })
 
     const previewRows: ViewBook[] = plan.items.map((item, index) => ({
-      ...recordToBook(item.record, `row-${rows[index]}`),
+      ...recordToBook(item.record, `row-${rows[index]}`, collections[index]),
       authorName: item.record.author ?? undefined,
       selected: !item.duplicateOf,
     }))
@@ -436,6 +451,7 @@ async function processImportFile(file: File) {
       plan,
       rows: previewRows,
       issues,
+      source,
       backup: format === 'json' ? asBackup(text) : null,
     }
   } catch (error) {
@@ -469,6 +485,8 @@ async function onSubmit() {
     const books: Book[] = selectedRows.value.map(
       ({ authorName: _authorName, selected: _selected, ...book }) => book,
     )
+    // A copy of the library first, in case the import isn't what was wanted
+    await backUp('before-import')
     await importBooks(books)
     preview.value = null
     await navigateTo('/library/books')
@@ -484,6 +502,7 @@ async function onRestoreBackup() {
   if (!preview.value?.backup) return
   importLoading.value = true
   try {
+    await backUp('before-import')
     await importLibrary(preview.value.backup)
     preview.value = null
     await navigateTo('/library/books')
@@ -536,8 +555,12 @@ const exportType = ref<ExportType>()
 const exportLoading = ref(false)
 const totalBooks = ref(0)
 
-onMounted(async () => {
+async function refreshTotals() {
   totalBooks.value = (await getBooks()).length
+}
+
+onMounted(async () => {
+  await refreshTotals()
 })
 
 async function onExport() {

@@ -965,23 +965,34 @@ export class BookLibDataManagementService {
 
   /**
    * Adds books in a single write. `book.author` may be an author id or a name;
-   * authors are matched by name and created when missing. Collections are not
-   * imported.
+   * authors are matched by name and created when missing. Collections the
+   * library has (e.g. To Be Read from a Goodreads "to-read" shelf) are kept,
+   * each book joining the end of the collection.
    */
   async importBooks(books: Book[]): Promise<number> {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
 
     await this.client.read()
+    const collectionIds = new Set(
+      this.client.data.collections.map(({ id }) => id),
+    )
 
     for (const book of books) {
+      const id = uuidv4()
       this.client.data.books.push({
         ...bookToDbBook({ ...book, collections: [] }),
-        id: uuidv4(),
+        id,
         author_id: this.resolveAuthorId(book.author ?? null),
         created_at: book.createdAt || now(),
         collections: [],
       })
+      this.setBookCollections(
+        id,
+        (book.collections ?? []).filter((collectionId) =>
+          collectionIds.has(collectionId),
+        ),
+      )
     }
 
     await this.client.write()
@@ -1092,6 +1103,39 @@ export class BookLibDataManagementService {
     await this.client.write()
   }
 
+  /** Where the library file is (desktop and Android); the web uses storage */
+  async getLibraryPath(): Promise<string> {
+    if (!this.dbPath) this.dbPath = await this.getDefaultDbPath()
+    return this.dbPath
+  }
+
+  /**
+   * Replaces the whole library, e.g. restoring a backup. Everything that
+   * differs counts as changed now, so a sync carries the restore to other
+   * devices instead of undoing it.
+   */
+  async replaceLibrary(data: Database): Promise<void> {
+    await this.ensureInitialized()
+    if (!this.client) throw new Error('Database not initialized')
+    if (!isLibraryData(data)) throw new Error('This isn’t a BookLib library')
+
+    await this.client.read()
+    const deletions = this.client.data.deletions ?? []
+    const next: Database = structuredClone(data)
+    next.deletions = deletions
+    runMigrations(next)
+    this.client.data = next
+    await this.client.write()
+  }
+
+  /** Applies a library merged by sync, keeping its change times */
+  async applySyncedLibrary(data: Database): Promise<void> {
+    await this.ensureInitialized()
+    if (!this.client?.writeSynced) throw new Error('Database not initialized')
+    runMigrations(data)
+    await this.client.writeSynced(data)
+  }
+
   async exportLibrary(): Promise<Database> {
     await this.ensureInitialized()
     if (!this.client) throw new Error('Database not initialized')
@@ -1114,6 +1158,20 @@ export class BookLibDataManagementService {
       throw error
     }
   }
+}
+
+/** Whether `value` looks like a saved library (a backup or sync file) */
+export function isLibraryData(value: unknown): value is Database {
+  const data = value as Partial<Database> | null
+  return (
+    !!data &&
+    typeof data === 'object' &&
+    Array.isArray(data.books) &&
+    Array.isArray(data.authors) &&
+    Array.isArray(data.collections) &&
+    Array.isArray(data['collection-book']) &&
+    Array.isArray(data.goals)
+  )
 }
 
 // Create a singleton instance

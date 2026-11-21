@@ -3,6 +3,7 @@ import type { Book } from '~/types/book'
 import { parseCsv, serializeCsv } from './formats/csv'
 import { parseJson, serializeJson } from './formats/json'
 import { normalizeRows } from './normalize'
+import { adaptRows, detectSource, type ImportSource } from './sources'
 import {
   emptyBookRecord,
   type BookRecord,
@@ -14,12 +15,21 @@ export * from './schema'
 export { normalizeRows } from './normalize'
 export { parseCsv, serializeCsv } from './formats/csv'
 export { parseJson, serializeJson } from './formats/json'
+export {
+  IMPORT_SOURCE_LABELS,
+  detectSource,
+  type ImportSource,
+} from './sources'
 
 export type ParseResult = {
   records: BookRecord[]
   issues: TransferIssue[]
   /** Source row (1-based) of each record. */
   rows: number[]
+  /** The app the file came from (Goodreads and StoryGraph CSV exports) */
+  source: ImportSource
+  /** Default collections for each record, e.g. To Be Read for "to-read" */
+  collections: string[][]
 }
 
 /** Infers the transfer format from a file name. */
@@ -48,8 +58,16 @@ export function parseBookFile(
       severity: 'error',
     })
   }
-  const result = normalizeRows(rows)
-  return { ...result, issues: [...fileIssues, ...result.issues] }
+  const source =
+    format === 'csv' && rows[0] ? detectSource(Object.keys(rows[0])) : 'booklib'
+  const adapted = adaptRows(source, rows)
+  const result = normalizeRows(adapted.rows)
+  return {
+    ...result,
+    issues: [...fileIssues, ...result.issues],
+    source,
+    collections: result.rows.map((row) => adapted.collections[row - 1] ?? []),
+  }
 }
 
 export function serializeBooks(records: BookRecord[], format: TransferFormat) {
@@ -99,7 +117,11 @@ export function bookToRecord(
  * Converts a record to a new (unsaved) library book. `author` holds the author
  * **name**; the data service resolves it to an existing or new author.
  */
-export function recordToBook(record: BookRecord, id: string): Book {
+export function recordToBook(
+  record: BookRecord,
+  id: string,
+  collections: string[] = [],
+): Book {
   return {
     id,
     title: record.title,
@@ -116,7 +138,7 @@ export function recordToBook(record: BookRecord, id: string): Book {
     summary: record.summary,
     year: record.year,
     genres: record.genres,
-    collections: [],
+    collections,
     format: record.format,
     propertyStatus: record.propertyStatus,
     progress: {

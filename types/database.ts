@@ -8,11 +8,15 @@ import type { ChallengeLevel, GoalInterval, GoalStatus, GoalType } from './goal'
 
 export type AuthorDB = {
   id: string
+  // Last change, set on every write; sync keeps the newest (see services/sync)
+  updated_at?: string
   created_at: string
   name: string
 }
 export type BookDB = {
   id: string
+  // Last change, set on every write; sync keeps the newest (see services/sync)
+  updated_at?: string
   author_id: string | null
   cover_src: string | null
   created_at: string
@@ -39,12 +43,16 @@ export type BookDB = {
 
 export type CollectionDB = {
   id: string
+  // Last change, set on every write; sync keeps the newest (see services/sync)
+  updated_at?: string
   created_at: string
   name: string
 }
 
 export type GoalDB = {
   id: string
+  // Last change, set on every write; sync keeps the newest (see services/sync)
+  updated_at?: string
   title: string
   type: GoalType
   interval: GoalInterval

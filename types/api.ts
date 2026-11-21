@@ -44,6 +44,23 @@ export type Database = {
     book_id: BookDB['id']
     collection_id: CollectionDB['id']
     order: number
+    updated_at?: string
   }[]
   goals: GoalDB[]
+  // Records deleted on this device, so a sync doesn't bring them back
+  deletions?: Deletion[]
+}
+
+export type SyncTable =
+  | 'authors'
+  | 'books'
+  | 'collections'
+  | 'goals'
+  | 'collection-book'
+
+export type Deletion = {
+  table: SyncTable
+  // The record id; for collection-book, "<collection_id>|<book_id>"
+  id: string
+  deleted_at: string
 }

@@ -126,6 +126,16 @@
         <slot />
 
         <bl-add-book-modal />
+        <!-- Changes synced in from other computers -->
+        <bl-toast
+          :message="
+            syncPulled
+              ? `Updated ${syncPulled} ${syncPulled === 1 ? 'item' : 'items'} from your other computers`
+              : null
+          "
+          action-label="Refresh"
+          @action="showSyncChanges"
+        />
 
         <!-- Loading indicator -->
         <NuxtLoadingIndicator :color="loadingColor" />
@@ -139,6 +149,7 @@ import { IconMenu2, IconMoon, IconSun } from '@tabler/icons-vue'
 import { RELEASES_URL, isWebDemo } from '~/utils/platform'
 
 const route = useRoute()
+const { pulled: syncPulled, showChanges: showSyncChanges } = useFolderSync()
 
 const isWebEnvironment = ref<boolean>(isWebDemo())
 

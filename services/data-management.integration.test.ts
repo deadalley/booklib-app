@@ -306,7 +306,36 @@ describe('BookLibDataManagementService (real transformers)', () => {
         'Ted Chiang',
       ])
       expect(imported[0]?.finished_at).toBe('2024-05-01T00:00:00.000Z')
-      expect(db['collection-book']).toHaveLength(1)
+      // Collections the library has are kept, each book joining the end
+      expect(
+        db['collection-book']
+          .filter(({ collection_id }) => collection_id === 'c1')
+          .sort((a, b) => a.order - b.order)
+          .map(({ book_id }) => book_id),
+      ).toEqual(['b1', ...imported.map(({ id }) => id)])
+    })
+
+    it('skips collections the library does not have', async () => {
+      await service.importBooks([
+        {
+          title: 'Orphan',
+          author: null,
+          createdAt: '',
+          collections: ['no-such-collection'],
+          progress: {
+            status: null,
+            startedAt: null,
+            finishedAt: null,
+            currentPage: null,
+            notes: [],
+          },
+        } as unknown as Book,
+      ])
+      expect(
+        db['collection-book'].some(
+          ({ collection_id }) => collection_id === 'no-such-collection',
+        ),
+      ).toBe(false)
     })
   })
 
@@ -383,8 +412,16 @@ describe('BookLibDataManagementService (real transformers)', () => {
       // memberships remapped; collection matched by name; orphans dropped
       expect(db['collection-book']).toEqual(
         expect.arrayContaining([
-          { book_id: stories.id, collection_id: shortFiction.id, order: 0 },
-          { book_id: jonathan.id, collection_id: 'c1', order: 0 },
+          expect.objectContaining({
+            book_id: stories.id,
+            collection_id: shortFiction.id,
+            order: 0,
+          }),
+          expect.objectContaining({
+            book_id: jonathan.id,
+            collection_id: 'c1',
+            order: 0,
+          }),
         ]),
       )
       expect(db['collection-book'].some((cb) => cb.book_id === 'missing')).toBe(
