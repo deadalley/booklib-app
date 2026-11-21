@@ -17,6 +17,23 @@ export type BookNote = {
   createdAt: string
   page?: number
   content: string
+  // A highlight from the ebook reader: `content` is the quoted text and this
+  // is where it is (an EPUB CFI, or "page:<n>" in a PDF)
+  highlight?: { location: string }
+}
+
+export type EbookFormat = 'epub' | 'pdf'
+
+/** The ebook file attached to a book, read in the built-in reader */
+export type BookEbook = {
+  format: EbookFormat
+  fileName: string
+  size: number
+  addedAt: string
+  // Where reading stopped: an EPUB CFI, or "page:<n>" in a PDF
+  location: string | null
+  // How far through, 0–1
+  progress: number
 }
 
 export type BookProgress = {
@@ -47,6 +64,7 @@ export type Book = {
   author: Author['id'] | null
   progress: BookProgress
   propertyStatus: BookPropertyStatus | null
+  ebook?: BookEbook | null
 }
 
 export type ViewBook = Book & {

@@ -63,6 +63,8 @@
       </div>
 
       <div class="book-page-body-main">
+        <bl-book-page-ebook :book="book" @changed="fetchBook" />
+
         <section class="book-page-section">
           <p class="book-page-section-title">Summary</p>
           <p class="summary" :class="{ empty: !book.summary }">

@@ -106,6 +106,14 @@ export function useBookLibrary() {
     return await service.downloadBookCover(id, url)
   }
 
+  const attachEbook = (id: string, file: File) => service.attachEbook(id, file)
+  const readEbook = (id: string) => service.readEbook(id)
+  const removeEbook = (id: string) => service.removeEbook(id)
+  const saveReadingPosition = (
+    id: string,
+    position: { location: string; progress: number; page?: number },
+  ) => service.saveReadingPosition(id, position)
+
   const deleteBookCover = async (id: string): Promise<void> => {
     return await service.deleteBookCover(id)
   }
@@ -203,6 +211,10 @@ export function useBookLibrary() {
     getBookCover,
     updateBookCover,
     downloadBookCover,
+    attachEbook,
+    readEbook,
+    removeEbook,
+    saveReadingPosition,
     deleteBookCover,
     // Collections
     getCollection,

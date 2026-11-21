@@ -243,6 +243,51 @@ describe('BookLibDataManagementService (real transformers)', () => {
     })
   })
 
+  describe('saveReadingPosition', () => {
+    const ebook = {
+      format: 'pdf' as const,
+      fileName: 'piranesi.pdf',
+      size: 1,
+      addedAt: '2024-01-01T00:00:00.000Z',
+      location: null,
+      progress: 0,
+    }
+
+    it('starts an unstarted book at the page reached', async () => {
+      db.books[1] = dbBook({
+        id: 'b2',
+        progress_status: null,
+        started_at: null,
+        current_page: null,
+        ebook,
+      })
+      await service.saveReadingPosition('b2', {
+        location: 'page:12',
+        progress: 0.1,
+        page: 12,
+      })
+      const book = await service.getBook('b2')
+      expect(book?.ebook).toMatchObject({ location: 'page:12', progress: 0.1 })
+      expect(book?.progress).toMatchObject({
+        status: 'reading',
+        currentPage: 12,
+      })
+      expect(book?.progress.startedAt).toBeTruthy()
+    })
+
+    it('never moves the current page back', async () => {
+      db.books[0] = dbBook({ ebook })
+      await service.saveReadingPosition('b1', {
+        location: 'page:5',
+        progress: 0.05,
+        page: 5,
+      })
+      const book = await service.getBook('b1')
+      expect(book?.progress.currentPage).toBe(120)
+      expect(book?.ebook?.location).toBe('page:5')
+    })
+  })
+
   describe('deletes clean up goal references', () => {
     it('deleteBook removes the goal entries of that book', async () => {
       await service.deleteBook('b1')

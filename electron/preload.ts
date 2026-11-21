@@ -39,6 +39,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   downloadCover: (id: string, url: string) =>
     ipcRenderer.invoke('cover:download', id, url),
   deleteCover: (id: string) => ipcRenderer.invoke('cover:delete', id),
+  saveEbook: (id: string, format: string, bytes: Uint8Array) =>
+    ipcRenderer.invoke('ebook:save', id, format, bytes),
+  readEbook: (id: string, format: string) =>
+    ipcRenderer.invoke('ebook:read', id, format),
+  deleteEbook: (id: string) => ipcRenderer.invoke('ebook:delete', id),
   renameCover: (fromId: string, toId: string) =>
     ipcRenderer.invoke('cover:rename', fromId, toId),
 })

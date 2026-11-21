@@ -30,6 +30,8 @@ import {
 } from '../utils'
 import type { DatabaseClient } from './database-client'
 import { createDatabaseClient } from './database-client'
+import { ebookFormatOf, getEbookFiles } from './ebooks'
+import { withProgressStatus } from '~/utils/book-progress'
 
 export class BookLibDataManagementService {
   private client: DatabaseClient | null = null
@@ -495,6 +497,7 @@ export class BookLibDataManagementService {
 
     await this.client.write()
     await this.deleteBookCoverFile(id)
+    await this.deleteEbookFile(id)
     return id
   }
 
@@ -524,7 +527,12 @@ export class BookLibDataManagementService {
     this.removeGoalBookReferences(deletedIds)
 
     await this.client.write()
-    await Promise.all(deletedIds.map((id) => this.deleteBookCoverFile(id)))
+    await Promise.all(
+      deletedIds.flatMap((id) => [
+        this.deleteBookCoverFile(id),
+        this.deleteEbookFile(id),
+      ]),
+    )
     return deletedIds
   }
 
@@ -659,6 +667,77 @@ export class BookLibDataManagementService {
     }
 
     return coverSrc
+  }
+
+  // A leftover ebook file must not block deleting the book itself
+  private async deleteEbookFile(id: BookDB['id']): Promise<void> {
+    try {
+      await getEbookFiles().remove(id)
+    } catch (error) {
+      logger.error({ error, id }, 'Failed to delete ebook file')
+    }
+  }
+
+  /** Stores an EPUB or PDF for a book and notes it on the book */
+  async attachEbook(id: BookDB['id'], file: File): Promise<Book | null> {
+    const format = ebookFormatOf(file)
+    if (!format) throw new Error('Only EPUB and PDF files can be read here')
+    await getEbookFiles().save(
+      id,
+      format,
+      new Uint8Array(await file.arrayBuffer()),
+    )
+    return this.updateBook(id, {
+      ebook: {
+        format,
+        fileName: file.name,
+        size: file.size,
+        addedAt: now(),
+        location: null,
+        progress: 0,
+      },
+    })
+  }
+
+  async readEbook(id: BookDB['id']): Promise<Uint8Array> {
+    const book = await this.getBook(id)
+    if (!book?.ebook) throw new Error('This book has no ebook file')
+    return getEbookFiles().read(id, book.ebook.format)
+  }
+
+  async removeEbook(id: BookDB['id']): Promise<void> {
+    await getEbookFiles().remove(id)
+    await this.updateBook(id, { ebook: null })
+  }
+
+  /**
+   * Where reading stopped. Moving forward also updates the current page and
+   * marks an unstarted book as being read.
+   */
+  async saveReadingPosition(
+    id: BookDB['id'],
+    {
+      location,
+      progress,
+      page,
+    }: { location: string; progress: number; page?: number },
+  ): Promise<void> {
+    const book = await this.getBook(id)
+    if (!book?.ebook) return
+    const patch: Partial<Book> = {
+      ebook: { ...book.ebook, location, progress },
+    }
+    const currentPage = book.progress.currentPage ?? 0
+    const started = !!book.progress.status
+    const forward = !!page && page > currentPage
+    if (forward || !started) {
+      // Status first: it returns the whole progress, page and all
+      const base = started
+        ? book.progress
+        : withProgressStatus(book.progress, 'reading')
+      patch.progress = { ...base, ...(forward ? { currentPage: page } : {}) }
+    }
+    await this.updateBook(id, patch)
   }
 
   // Removes the image file only; callers that keep the book update `cover_src`.

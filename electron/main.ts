@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'url'
 import { handleFileError } from '../utils/error-handling'
 import { logger } from '../utils/logger'
 import { COVER_PROTOCOL, CoverStore, downloadCoverImage } from './covers'
+import { EbookStore, type EbookFormat } from './ebooks'
 import { atomicWriteFile } from './fs-utils'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -66,6 +67,7 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 let coverStore: CoverStore
+let ebookStore: EbookStore
 
 function createWindow() {
   win = new BrowserWindow({
@@ -250,6 +252,31 @@ function initIpc() {
     }
   })
 
+  // Ebook files for the built-in reader
+  ipcMain.handle(
+    'ebook:save',
+    async (_, id: string, format: EbookFormat, bytes: Uint8Array) => {
+      try {
+        await ebookStore.save(id, format, bytes)
+      } catch (error) {
+        logger.error({ error, id, format }, 'Ebook save error')
+        Sentry.captureException(error)
+        throw error
+      }
+    },
+  )
+  ipcMain.handle('ebook:read', (_, id: string, format: EbookFormat) =>
+    ebookStore.read(id, format),
+  )
+  ipcMain.handle('ebook:delete', async (_, id: string) => {
+    try {
+      await ebookStore.delete(id)
+    } catch (error) {
+      logger.error({ error, id }, 'Ebook delete error')
+      throw error
+    }
+  })
+
   ipcMain.handle('cover:delete', async (_, id: string) => {
     try {
       await coverStore.delete(id)
@@ -273,6 +300,7 @@ function initIpc() {
 
 function initCovers() {
   coverStore = new CoverStore(path.join(app.getPath('userData'), 'covers'))
+  ebookStore = new EbookStore(path.join(app.getPath('userData'), 'ebooks'))
 
   protocol.handle(COVER_PROTOCOL, async (request) => {
     const filePath = coverStore.resolveUrl(request.url)
