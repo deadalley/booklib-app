@@ -5,12 +5,21 @@ import { Low as LowClass } from 'lowdb'
 import { ElectronAdapter } from './electron-adapter'
 import { CapacitorAdapter } from './capacitor-adapter'
 import { getAppPlatform } from '~/utils/platform'
+import { snapshotOf, stampChanges, type Snapshot } from './sync/changes'
 
 export interface DatabaseClient {
   data: Database
   read(): Promise<void>
   write(): Promise<void>
+  /**
+   * Writes `data` as it is, without stamping changes: for a library merged
+   * by sync, whose records keep the times they were changed on.
+   */
+  writeSynced?(data: Database): Promise<void>
 }
+
+// Fired after a write that changed the library (not after a sync's own)
+export const LIBRARY_CHANGED_EVENT = 'booklib:library-changed'
 
 // File-backed client used by the desktop (Electron) and Android (Capacitor)
 // apps; only the adapter that does the file I/O differs.
@@ -72,6 +81,50 @@ class LocalStorageDatabaseClient implements DatabaseClient {
   }
 }
 
+/**
+ * Stamps every write with what changed since the last read or write
+ * (updated_at, deletion markers), which folder sync merges by.
+ */
+class TrackingDatabaseClient implements DatabaseClient {
+  private snapshot: Snapshot
+
+  constructor(private readonly inner: DatabaseClient) {
+    this.snapshot = snapshotOf(inner.data)
+  }
+
+  get data(): Database {
+    return this.inner.data
+  }
+
+  set data(value: Database) {
+    this.inner.data = value
+  }
+
+  async read(): Promise<void> {
+    await this.inner.read()
+    this.snapshot = snapshotOf(this.inner.data)
+  }
+
+  async write(): Promise<void> {
+    const changed = stampChanges(
+      this.snapshot,
+      this.inner.data,
+      new Date().toISOString(),
+    )
+    await this.inner.write()
+    this.snapshot = snapshotOf(this.inner.data)
+    if (changed && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(LIBRARY_CHANGED_EVENT))
+    }
+  }
+
+  async writeSynced(data: Database): Promise<void> {
+    this.inner.data = data
+    await this.inner.write()
+    this.snapshot = snapshotOf(this.inner.data)
+  }
+}
+
 export async function createDatabaseClient(
   dbPath: string,
   defaultData: Database,
@@ -85,13 +138,13 @@ export async function createDatabaseClient(
         : new CapacitorAdapter<Database>(dbPath)
     const client = new FileDatabaseClient(adapter, defaultData)
     await client.read()
-    return client
+    return new TrackingDatabaseClient(client)
   }
   // Fallback to LocalStorage for browser environment
   else {
     console.log('Creating LocalStorageDatabaseClient with key:', dbPath)
     const client = new LocalStorageDatabaseClient('booklib-data', defaultData)
     await client.read()
-    return client
+    return new TrackingDatabaseClient(client)
   }
 }

@@ -31,6 +31,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   fileExists: (filePath: string) => ipcRenderer.invoke('file:exists', filePath),
   getDbPath: () => ipcRenderer.invoke('db:getPath'),
   ensureDir: (dirPath: string) => ipcRenderer.invoke('dir:ensure', dirPath),
+  listDir: (dirPath: string) => ipcRenderer.invoke('dir:list', dirPath),
+  deleteFile: (filePath: string) => ipcRenderer.invoke('file:delete', filePath),
+  pickFolder: () => ipcRenderer.invoke('dialog:pickFolder'),
   saveCover: (id: string, bytes: Uint8Array, mimeType: string) =>
     ipcRenderer.invoke('cover:save', id, bytes, mimeType),
   downloadCover: (id: string, url: string) =>

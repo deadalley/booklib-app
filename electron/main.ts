@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/electron/main'
-import { app, BrowserWindow, ipcMain, net, protocol } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, net, protocol } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import { fileURLToPath, pathToFileURL } from 'url'
@@ -186,6 +186,39 @@ function initIpc() {
       Sentry.captureException(error)
       throw handleFileError('ensure', dirPath, error)
     }
+  })
+
+  // File names in a folder (backups, the sync folder). Missing folder: none.
+  ipcMain.handle('dir:list', async (_, dirPath: string) => {
+    try {
+      return await fs.readdir(dirPath)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+      logger.error({ error, dirPath }, 'Directory list error')
+      throw handleFileError('read', dirPath, error)
+    }
+  })
+
+  ipcMain.handle('file:delete', async (_, filePath: string) => {
+    try {
+      await fs.rm(filePath, { force: true })
+    } catch (error) {
+      logger.error({ error, filePath }, 'File delete error')
+      throw handleFileError('write', filePath, error)
+    }
+  })
+
+  // The folder BookLib syncs through (e.g. inside Dropbox or Syncthing)
+  ipcMain.handle('dialog:pickFolder', async () => {
+    const options: Electron.OpenDialogOptions = {
+      title: 'Choose a sync folder',
+      buttonLabel: 'Use this folder',
+      properties: ['openDirectory', 'createDirectory'],
+    }
+    const result = win
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options)
+    return result.canceled ? null : (result.filePaths[0] ?? null)
   })
 
   // Book covers

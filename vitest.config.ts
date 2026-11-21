@@ -4,6 +4,9 @@ export default defineVitestConfig({
   test: {
     environment: 'nuxt',
     globals: true,
+    // Node 25+ has its own global localStorage, empty unless a storage file
+    // is given; it would hide the browser one the test environment provides
+    execArgv: ['--no-experimental-webstorage'],
     exclude: [
       '**/node_modules/**',
       '**/.output/**',
