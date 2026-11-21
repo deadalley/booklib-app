@@ -418,6 +418,19 @@
   .nav-sidebar-button-icon-only {
     @apply h-11 w-11 justify-center gap-0 p-0;
   }
+  .nav-sidebar-group {
+    @apply flex flex-col gap-1;
+  }
+  .nav-sidebar-button-parent {
+    @apply text-primary;
+  }
+  /* Nested links are hidden on phones, where the sidebar is a bottom bar */
+  .nav-sidebar-sub {
+    @apply border-stroke mt-0.5 mb-2 ml-6 hidden flex-col gap-0.5 border-l pl-3 sm:flex;
+  }
+  .nav-sidebar-sub-button {
+    @apply h-9 px-3 py-1.5 text-[0.9375rem] font-medium;
+  }
 
   /* Sidebar */
   /* A sheet fixed to the viewport, so it is visible however far the page is

@@ -10,6 +10,8 @@
       :class="{
         'nav-sidebar-button-disabled': disabled,
         'nav-sidebar-button-active': active,
+        'nav-sidebar-button-parent': parent,
+        'nav-sidebar-sub-button': sub,
         'nav-sidebar-button-icon-only': !!iconOnly,
       }"
       :disabled="disabled"
@@ -26,5 +28,7 @@ defineProps<{
   to?: string
   disabled?: boolean
   iconOnly?: boolean
+  parent?: boolean
+  sub?: boolean
 }>()
 </script>
