@@ -10,7 +10,7 @@
     "dev": "cross-env ELECTRON_ENABLED=false nuxt dev --open --dotenv .env.local",
     "dev:electron": "cross-env ELECTRON_ENABLED=true nuxt dev --dotenv .env.local",
     "build:electron": "cross-env ELECTRON_ENABLED=true nuxt generate",
-    "build:web": "cross-env ELECTRON_ENABLED=false nuxt generate",
+    "build:web": "cross-env ELECTRON_ENABLED=false NODE_OPTIONS=--max-old-space-size=6144 nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint:js": "eslint .",
