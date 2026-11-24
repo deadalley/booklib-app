@@ -39,6 +39,8 @@ export type BookDB = {
   title: string
   year: number | null
   collections: CollectionDB['id'][]
+  // The attached ebook file (stored separately, see services/ebooks.ts)
+  ebook?: import('./book').BookEbook | null
 }
 
 export type CollectionDB = {

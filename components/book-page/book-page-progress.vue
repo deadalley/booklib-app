@@ -303,6 +303,7 @@
               :key="note.id ?? `${note.createdAt}-${index}`"
               :note="note"
               :latest="index === 0"
+              :reader-book-id="book.ebook ? book.id : undefined"
               @edit="openLogModalForEdit(note)"
               @delete="deleteNote(note)"
             />

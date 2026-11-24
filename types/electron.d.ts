@@ -20,6 +20,14 @@ export interface ElectronAPI {
   // Downloads a cover found by an ISBN lookup and saves it for `id`
   downloadCover: (id: string, url: string) => Promise<string>
   deleteCover: (id: string) => Promise<void>
+  // Ebook files for the reader (see electron/ebooks.ts)
+  saveEbook: (
+    id: string,
+    format: 'epub' | 'pdf',
+    bytes: Uint8Array,
+  ) => Promise<void>
+  readEbook: (id: string, format: 'epub' | 'pdf') => Promise<Uint8Array>
+  deleteEbook: (id: string) => Promise<void>
   renameCover: (fromId: string, toId: string) => Promise<string | null>
 }
 

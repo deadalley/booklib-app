@@ -57,6 +57,7 @@ export function dbBookToBook(
     propertyStatus: dbBook.property_status,
     collections,
     author: dbBook.author_id,
+    ...(dbBook.ebook ? { ebook: dbBook.ebook } : {}),
   }
 }
 
@@ -86,6 +87,8 @@ export function bookToDbBook(
     finished_at: nullify(book.progress?.finishedAt),
     current_page: nullify(book.progress?.currentPage),
     collections: book.collections ?? [],
+    // Only when given: null removes the ebook, a missing key keeps it
+    ...(book.ebook !== undefined ? { ebook: book.ebook } : {}),
   }
 }
 

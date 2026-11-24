@@ -12,7 +12,21 @@
           p. {{ note.page }}
         </bl-chip>
       </div>
-      <p v-if="note.content" class="log-text">{{ note.content }}</p>
+      <template v-if="note.highlight">
+        <p class="log-highlight-label">
+          <IconHighlight :size="13" stroke="1.8" aria-hidden="true" />
+          Highlight
+        </p>
+        <blockquote class="log-quote">{{ note.content }}</blockquote>
+        <NuxtLink
+          v-if="readerHref"
+          :to="readerHref"
+          class="link-muted self-start text-xs"
+        >
+          Show in book
+        </NuxtLink>
+      </template>
+      <p v-else-if="note.content" class="log-text">{{ note.content }}</p>
     </div>
 
     <div class="log-tools">
@@ -41,10 +55,21 @@
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconTrash } from '@tabler/icons-vue'
+import { IconEdit, IconHighlight, IconTrash } from '@tabler/icons-vue'
 import type { BookNote } from '~/types/book'
 
-const props = defineProps<{ note: BookNote; latest?: boolean }>()
+const props = defineProps<{
+  note: BookNote
+  latest?: boolean
+  // Set when the book has an ebook, so highlights can open the reader
+  readerBookId?: string
+}>()
+
+const readerHref = computed(() =>
+  props.readerBookId && props.note.highlight
+    ? `/read/${props.readerBookId}?at=${encodeURIComponent(props.note.highlight.location)}`
+    : null,
+)
 const emit = defineEmits<{ (e: 'edit' | 'delete'): void }>()
 
 // Log dates are calendar days stored at UTC midnight; format them in UTC so
@@ -54,6 +79,13 @@ const formattedDate = computed(() => toFullDateCompact(props.note.createdAt))
 
 <style scoped>
 @reference '../../assets/css/main.css';
+
+.log-highlight-label {
+  @apply text-secondary-700 flex items-center gap-1 text-[0.6875rem] font-bold tracking-widest uppercase;
+}
+.log-quote {
+  @apply font-display text-ink-primary text-[0.9375rem] leading-snug italic;
+}
 
 .log-item {
   @apply relative flex items-start gap-2 py-2.5;
