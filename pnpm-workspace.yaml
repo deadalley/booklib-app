@@ -12,6 +12,9 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   vue-demi: true
+  # Their install scripts only print a message (via epubjs): not needed
+  core-js: false
+  es5-ext: false
 
 # Was `public-hoist-pattern[]=*` in .npmrc, which pnpm no longer reads:
 # some packages are imported without being direct dependencies
