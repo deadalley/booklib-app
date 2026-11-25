@@ -10,6 +10,17 @@
       />
 
       <div class="flex items-center gap-2">
+        <bl-button
+          v-if="shareable && books.length"
+          variant="secondary"
+          data-testid="share-list"
+          @click="$emit('share')"
+        >
+          <template #prependIcon>
+            <IconShare :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Share list
+        </bl-button>
         <bl-button :to="editHref" variant="secondary">
           <template #prependIcon>
             <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
@@ -189,6 +200,7 @@ import {
   IconDice5,
   IconEdit,
   IconPlus,
+  IconShare,
   IconTrash,
   icons,
 } from '@tabler/icons-vue'
@@ -205,11 +217,13 @@ const props = defineProps<{
   reorderable?: boolean
   // Shows "Pick next read"
   pickable?: boolean
+  // Shows "Share list": the books as a file to import elsewhere
+  shareable?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'delete', deleteBooks: boolean): void
-  (e: 'pick'): void
+  (e: 'pick' | 'share'): void
   // The books' ids in their new order
   (e: 'reorder', bookIds: Book['id'][]): void
 }>()

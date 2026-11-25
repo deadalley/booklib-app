@@ -306,15 +306,25 @@
               :reader-book-id="book.ebook ? book.id : undefined"
               @edit="openLogModalForEdit(note)"
               @delete="deleteNote(note)"
+              @share="sharingNote = note"
             />
           </ol>
         </template>
       </div>
     </template>
+
+    <bl-share-card-modal
+      :model-value="!!sharingNote"
+      title="Share this highlight"
+      :file-name="`${slugify(book.title)}-highlight`"
+      :render="renderQuote"
+      @update:model-value="(value) => !value && (sharingNote = null)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { renderQuoteCard, type CardTheme } from '~/services/share-cards'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -346,7 +356,22 @@ import {
 
 const props = defineProps<{
   book: Book
+  // For sharing highlights as quote cards
+  authorName?: string | null
 }>()
+
+// A highlight shared as a quote card
+const sharingNote = ref<BookNote | null>(null)
+function renderQuote(theme: CardTheme) {
+  return renderQuoteCard(
+    {
+      note: sharingNote.value!,
+      title: props.book.title,
+      author: props.authorName ?? null,
+    },
+    theme,
+  )
+}
 
 const emit = defineEmits<{
   (

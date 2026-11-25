@@ -10,7 +10,12 @@
         class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
       >
         <div class="flex flex-col gap-1">
-          <span class="section-label text-primary">Import preview</span>
+          <span class="section-label text-primary">
+            {{ preview.list ? 'Shared list' : 'Import preview' }}
+          </span>
+          <h3 v-if="preview.list" data-testid="shared-list-name">
+            {{ preview.list.name }}
+          </h3>
           <h4 v-if="selectedRows.length">
             <span class="text-primary">{{ selectedRows.length }}</span>
             of {{ preview.rows.length }} books selected
@@ -18,6 +23,10 @@
           <h4 v-else>No books selected</h4>
           <p class="text-ink-secondary text-sm">
             {{ fileName }}
+            <template v-if="preview.list">
+              · {{ preview.rows.length }}
+              {{ preview.rows.length === 1 ? 'book' : 'books' }}
+            </template>
             <template v-if="preview.source !== 'booklib'">
               · {{ IMPORT_SOURCE_LABELS[preview.source] }} export
             </template>
@@ -46,7 +55,7 @@
             Restore full backup
           </bl-button>
           <bl-button
-            :disabled="!selectedRows.length"
+            :disabled="!selectedRows.length && !linkedIds.length"
             :loading="importLoading"
             data-testid="import-submit"
             @click="onSubmit"
@@ -54,10 +63,24 @@
             <template #prependIcon="prependIcon">
               <IconUpload v-bind="prependIcon" />
             </template>
-            Import selected books
+            {{ preview.list ? 'Import list' : 'Import selected books' }}
           </bl-button>
         </div>
       </div>
+
+      <bl-alert
+        v-if="preview.list"
+        tone="secondary"
+        data-testid="shared-list-info"
+      >
+        Importing adds the collection
+        <b>{{ preview.list.name }}</b>
+        with the selected books.
+        <template v-if="duplicateCount">
+          Books you already have are added to it as they are, without a copy.
+        </template>
+        Ratings, progress and notes are not part of a shared list.
+      </bl-alert>
 
       <bl-alert v-if="preview.backup">
         This file is a full BookLib backup.
@@ -143,9 +166,9 @@
                 <h5>Import books</h5>
               </div>
               <p class="text-ink-secondary text-sm">
-                CSV or JSON files: BookLib exports and backups, Goodreads and
-                StoryGraph exports, the templates below, or spreadsheets with
-                matching column names.
+                CSV or JSON files: BookLib exports, backups and shared lists,
+                Goodreads and StoryGraph exports, the templates below, or
+                spreadsheets with matching column names.
               </p>
             </div>
 
@@ -322,6 +345,7 @@ import {
 } from '@tabler/icons-vue'
 import dayjs from 'dayjs'
 import type { RowSelectionState } from '@tanstack/vue-table'
+import { v4 as uuidv4 } from 'uuid'
 import { useBookLibrary } from '~/composables/use-book-library'
 import type { Database } from '~/types/api'
 import type { Book, ViewBook } from '~/types/book'
@@ -331,8 +355,10 @@ import {
   IMPORT_SOURCE_LABELS,
   parseBookFile,
   planImport,
+  readSharedList,
   recordToBook,
   serializeBooks,
+  uniqueCollectionName,
   type ImportPlan,
   type ImportSource,
   type TransferFormat,
@@ -340,8 +366,15 @@ import {
 } from '~/services/transfer'
 
 const { backUp } = useBackups()
-const { getBooks, getAuthors, importBooks, importLibrary, exportLibrary } =
-  useBookLibrary()
+const {
+  getBooks,
+  getAuthors,
+  getCollections,
+  createCollection,
+  importBooks,
+  importLibrary,
+  exportLibrary,
+} = useBookLibrary()
 
 // ─── Import ──────────────────────────────────────────────────────────────────
 
@@ -366,6 +399,8 @@ type Preview = {
   source: ImportSource
   /** Raw backup contents when the file is a full BookLib backup. */
   backup: Database | null
+  /** A collection someone shared: imported as a collection of that name */
+  list: { name: string } | null
 }
 
 const fileInput = ref<HTMLInputElement>()
@@ -381,6 +416,17 @@ const showIssues = ref(false)
 const selectedRows = computed(() =>
   (preview.value?.rows ?? []).filter(({ id }) => selection.value[id]),
 )
+
+// Shared list: books already in the library (and not imported again) join
+// the new collection as they are
+const linkedIds = computed(() => {
+  if (!preview.value?.list) return []
+  return preview.value.plan.items.flatMap((item, index) =>
+    item.duplicateId && !selection.value[preview.value!.rows[index]!.id]
+      ? [item.duplicateId]
+      : [],
+  )
+})
 
 const duplicateCount = computed(
   () => preview.value?.plan.items.filter((i) => i.duplicateOf).length ?? 0,
@@ -441,6 +487,11 @@ async function processImportFile(file: File) {
   importLoading.value = true
   try {
     const text = await file.text()
+    const list = format === 'json' ? readSharedList(text) : null
+    if (list && !list.ok) {
+      importError.value = list.error
+      return
+    }
     const { records, issues, rows, source, collections } = parseBookFile(
       text,
       format,
@@ -472,6 +523,7 @@ async function processImportFile(file: File) {
       issues,
       source,
       backup: format === 'json' ? asBackup(text) : null,
+      list: list ? { name: list.name } : null,
     }
   } catch (error) {
     importError.value =
@@ -498,14 +550,31 @@ function onSelectRows(value: RowSelectionState) {
 }
 
 async function onSubmit() {
-  if (!preview.value || !selectedRows.value.length) return
+  if (!preview.value) return
+  const list = preview.value.list
+  if (!selectedRows.value.length && !(list && linkedIds.value.length)) return
   importLoading.value = true
   try {
-    const books: Book[] = selectedRows.value.map(
+    let books: Book[] = selectedRows.value.map(
       ({ authorName: _authorName, selected: _selected, ...book }) => book,
     )
     // A copy of the library first, in case the import isn't what was wanted
     await backUp('before-import')
+    if (list) {
+      const taken = (await getCollections()).map(({ name }) => name)
+      const collection = await createCollection({
+        id: uuidv4(),
+        name: uniqueCollectionName(list.name, taken),
+        createdAt: '',
+        books: linkedIds.value.map((id, order) => ({ id, order })),
+      })
+      if (!collection) throw new Error('The collection could not be made.')
+      books = books.map((book) => ({ ...book, collections: [collection.id] }))
+      if (books.length) await importBooks(books)
+      preview.value = null
+      await navigateTo(`/library/collections/${collection.id}`)
+      return
+    }
     await importBooks(books)
     preview.value = null
     await navigateTo('/library/books')

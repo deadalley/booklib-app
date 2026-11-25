@@ -7,7 +7,9 @@
     :can-delete="!DEFAULT_COLLECTIONS.includes(collection.id)"
     reorderable
     pickable
+    shareable
     @delete="onDelete"
+    @share="onShare"
     @reorder="onReorder"
     @pick="pickerOpen = true"
   />
@@ -22,7 +24,7 @@
   />
   <bl-toast
     :message="toast?.message ?? null"
-    action-label="View book"
+    :action-label="toast?.bookId ? 'View book' : undefined"
     @action="navigateTo(`/library/books/${toast?.bookId}`)"
   />
 </template>
@@ -32,6 +34,7 @@ import { useBookLibrary } from '~/composables/use-book-library'
 import type { Author } from '~/types/author'
 import type { Book, ViewBook } from '~/types/book'
 import type { Collection } from '~/types/collection'
+import { bookToRecord, listFileName, serializeList } from '~/services/transfer'
 
 const TOAST_MS = 2600
 
@@ -51,7 +54,7 @@ const library = ref<Book[]>([])
 const authors = ref<Author[]>([])
 const tbrIds = ref<string[]>([])
 const pickerOpen = ref(false)
-const toast = ref<{ message: string; bookId: string } | null>(null)
+const toast = ref<{ message: string; bookId?: string } | null>(null)
 
 const orderedIds = (data: Collection | null | undefined) =>
   [...(data?.books ?? [])].sort((a, b) => a.order - b.order).map(({ id }) => id)
@@ -116,14 +119,38 @@ async function onReorder(bookIds: Book['id'][]) {
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
-async function onStarted(book: Book) {
-  toast.value = {
-    message: `Started ${book.title} · Added to Reading`,
-    bookId: book.id,
-  }
+function showToast(message: string, bookId?: string) {
+  toast.value = { message, bookId }
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => (toast.value = null), TOAST_MS)
+}
+
+async function onStarted(book: Book) {
+  showToast(`Started ${book.title} · Added to Reading`, book.id)
   await fetchCollection()
+}
+
+// The books (without ratings, progress or notes) as a file to import into
+// another BookLib: the share sheet where there is one, otherwise a download
+async function onShare() {
+  if (!collection.value) return
+  const authorsById = new Map(authors.value.map((a) => [a.id, a]))
+  const name = listFileName(collection.value.name)
+  const text = serializeList(
+    collection.value.name,
+    books.value.map((book) => bookToRecord(book, authorsById)),
+  )
+  const file = new File([text], name, { type: 'application/json' })
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: collection.value.name })
+    } catch {
+      // Cancelled from the share sheet
+    }
+    return
+  }
+  downloadFile(name, text, 'application/json')
+  showToast(`Saved ${name}. Import it from Data Management.`)
 }
 onBeforeUnmount(() => clearTimeout(toastTimer))
 

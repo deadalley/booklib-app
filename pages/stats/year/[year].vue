@@ -44,7 +44,25 @@
             <IconChevronRight :size="18" stroke="2" />
           </bl-icon-button>
         </div>
+        <bl-button
+          v-if="loaded && review?.hasActivity"
+          variant="secondary"
+          @click="shareOpen = true"
+        >
+          <template #prependIcon="iconProps">
+            <IconShare v-bind="iconProps" />
+          </template>
+          Share
+        </bl-button>
       </div>
+
+      <bl-share-card-modal
+        v-if="review"
+        v-model="shareOpen"
+        :title="`Share your ${year} in books`"
+        :file-name="`booklib-${year}-in-books`"
+        :render="renderShareCard"
+      />
 
       <template v-if="loaded && review">
         <!-- Empty past year -->
@@ -449,12 +467,14 @@
 </template>
 
 <script setup lang="ts">
+import { renderYearCard, type CardTheme } from '~/services/share-cards'
 import {
   IconBooks,
   IconCalendar,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
+  IconShare,
   IconMinus,
   IconSparkles,
   IconTrendingDown,
@@ -629,6 +649,38 @@ const carryOver = computed(() => {
 })
 
 const topBooks = computed(() => review.value!.top as ViewBook[])
+
+// The year as a shareable image
+const shareOpen = ref(false)
+function renderShareCard(theme: CardTheme) {
+  const value = review.value!
+  return renderYearCard(
+    {
+      year: year.value,
+      isCurrent: value.isCurrent,
+      stats: [
+        {
+          label: value.totals.books === 1 ? 'book' : 'books',
+          value: formatCount(value.totals.books),
+        },
+        { label: 'pages', value: formatCount(value.totals.pages) },
+        {
+          label: value.totals.days === 1 ? 'reading day' : 'reading days',
+          value: formatCount(value.totals.days),
+        },
+        {
+          label: 'longest streak (days)',
+          value: formatCount(value.totals.streak),
+        },
+      ],
+      topGenres: value.topGenres.map(({ label }) => label),
+      topBooks: value.top
+        .slice(0, 3)
+        .map(({ title, coverSrc }) => ({ title, coverSrc })),
+    },
+    theme,
+  )
+}
 
 const firstAndLast = computed(() => {
   const value = review.value!

@@ -500,6 +500,13 @@ describe('planImport', () => {
       null,
       'New Book',
     ])
+    // Only books already in the library have an id to link to
+    expect(plan.items.map((i) => i.duplicateId)).toEqual([
+      'b1',
+      'b1',
+      null,
+      null,
+    ])
   })
 
   it('lists only authors that do not exist yet, once', () => {
