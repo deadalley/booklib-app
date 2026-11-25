@@ -13,6 +13,12 @@
       />
 
       <div class="flex items-center gap-2">
+        <bl-button variant="secondary" @click="shareOpen = true">
+          <template #prependIcon>
+            <IconShare :size="ICON_SIZE_SMALL" stroke="1.5" />
+          </template>
+          Share
+        </bl-button>
         <bl-button variant="secondary" @click="onEdit(true)">
           <template #prependIcon>
             <IconEdit :size="ICON_SIZE_SMALL" stroke="1.5" />
@@ -54,6 +60,7 @@
       <div class="book-page-body-progress">
         <bl-book-page-progress
           :book="book"
+          :author-name="authorName"
           @status-select="onSelectProgress"
           @property-status-select="onPropertyStatusSelect"
           @log-entry="onLogEntry"
@@ -111,6 +118,13 @@
         </section>
       </div>
     </div>
+
+    <bl-share-card-modal
+      v-model="shareOpen"
+      :title="`Share ${book.title}`"
+      :file-name="slugify(book.title)"
+      :render="renderShareCard"
+    />
   </section>
 
   <bl-book-page-edit
@@ -133,7 +147,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconTrash } from '@tabler/icons-vue'
+import { IconEdit, IconShare, IconTrash } from '@tabler/icons-vue'
+import {
+  bookCardStatus,
+  renderBookCard,
+  type CardTheme,
+} from '~/services/share-cards'
 import { v4 as uuidv4 } from 'uuid'
 import { useBookLibrary } from '~/composables/use-book-library'
 import languageOptions from '~/public/languages-2.json'
@@ -167,6 +186,22 @@ const allCollections = ref<(Collection & { selected: boolean })[]>([])
 
 const collections = ref<Collection[]>([])
 const authors = ref<Author[]>([])
+
+// Sharing the book as an image
+const shareOpen = ref(false)
+const authorName = computed(
+  () => authors.value.find(({ id }) => id === book.value?.author)?.name ?? null,
+)
+function renderShareCard(theme: CardTheme) {
+  return renderBookCard(
+    {
+      book: book.value!,
+      author: authorName.value,
+      status: bookCardStatus(book.value!),
+    },
+    theme,
+  )
+}
 const goals = ref<Goal[]>([])
 const libraryBooks = ref<Book[]>([])
 

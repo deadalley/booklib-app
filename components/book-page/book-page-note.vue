@@ -31,6 +31,17 @@
 
     <div class="log-tools">
       <bl-icon-button
+        v-if="note.highlight"
+        variant="tertiary"
+        size="sm"
+        aria-label="Share highlight"
+        @click="emit('share')"
+      >
+        <template #default="iconProps">
+          <IconShare v-bind="iconProps" />
+        </template>
+      </bl-icon-button>
+      <bl-icon-button
         variant="tertiary"
         size="sm"
         aria-label="Edit entry"
@@ -55,7 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconHighlight, IconTrash } from '@tabler/icons-vue'
+import {
+  IconEdit,
+  IconHighlight,
+  IconShare,
+  IconTrash,
+} from '@tabler/icons-vue'
 import type { BookNote } from '~/types/book'
 
 const props = defineProps<{
@@ -70,7 +86,7 @@ const readerHref = computed(() =>
     ? `/read/${props.readerBookId}?at=${encodeURIComponent(props.note.highlight.location)}`
     : null,
 )
-const emit = defineEmits<{ (e: 'edit' | 'delete'): void }>()
+const emit = defineEmits<{ (e: 'edit' | 'delete' | 'share'): void }>()
 
 // Log dates are calendar days stored at UTC midnight; format them in UTC so
 // they don't shift to the previous day west of UTC.

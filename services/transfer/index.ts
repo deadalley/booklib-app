@@ -12,6 +12,7 @@ import {
 } from './schema'
 
 export * from './schema'
+export * from './list'
 export { normalizeRows } from './normalize'
 export { parseCsv, serializeCsv } from './formats/csv'
 export { parseJson, serializeJson } from './formats/json'
@@ -170,6 +171,8 @@ export type PlannedImport = {
   record: BookRecord
   /** Title of the existing (or earlier imported) book this one duplicates. */
   duplicateOf: string | null
+  /** Id of the library book it duplicates (null within the file) */
+  duplicateId: string | null
 }
 
 export type ImportPlan = {
@@ -192,34 +195,38 @@ export function planImport(
   )
   const authorById = new Map(library.authors.map((a) => [a.id, a]))
 
-  const byIsbn = new Map<string, string>()
-  const byTitleAuthor = new Map<string, string>()
+  type Match = { title: string; id: string | null }
+  const byIsbn = new Map<string, Match>()
+  const byTitleAuthor = new Map<string, Match>()
   const remember = (
-    title: string,
+    match: Match,
     author: string | null,
     isbn: string | null,
   ) => {
     const isbnKey = normalizeIsbn(isbn)
-    if (isbnKey) byIsbn.set(isbnKey, title)
-    byTitleAuthor.set(`${normalizeText(title)}|${normalizeText(author)}`, title)
+    if (isbnKey) byIsbn.set(isbnKey, match)
+    byTitleAuthor.set(
+      `${normalizeText(match.title)}|${normalizeText(author)}`,
+      match,
+    )
   }
   for (const book of library.books) {
     const author = book.author
       ? (authorById.get(book.author)?.name ?? null)
       : null
-    remember(book.title, author, book.isbn)
+    remember({ title: book.title, id: book.id }, author, book.isbn)
   }
 
   const newAuthors = new Map<string, string>()
   const items = records.map((record) => {
     const isbnKey = normalizeIsbn(record.isbn)
-    const duplicateOf =
+    const match =
       (isbnKey && byIsbn.get(isbnKey)) ||
       byTitleAuthor.get(
         `${normalizeText(record.title)}|${normalizeText(record.author)}`,
       ) ||
       null
-    remember(record.title, record.author, record.isbn)
+    remember({ title: record.title, id: null }, record.author, record.isbn)
 
     const authorKey = normalizeText(record.author)
     if (
@@ -229,7 +236,11 @@ export function planImport(
     ) {
       newAuthors.set(authorKey, record.author!.trim())
     }
-    return { record, duplicateOf }
+    return {
+      record,
+      duplicateOf: match?.title ?? null,
+      duplicateId: match?.id ?? null,
+    }
   })
 
   return { items, newAuthors: [...newAuthors.values()] }

@@ -686,6 +686,15 @@
                 </p>
                 <template #cancel-label>Close</template>
               </bl-modal>
+              <bl-button variant="secondary" @click="shareOpen = true">
+                Open share card
+              </bl-button>
+              <bl-share-card-modal
+                v-model="shareOpen"
+                title="Share this highlight"
+                file-name="styleguide-quote"
+                :render="renderSampleCard"
+              />
               <bl-tooltip>
                 <bl-button variant="tertiary">Hover for tooltip</bl-button>
                 <template #tooltip-content>Tooltip content</template>
@@ -918,6 +927,7 @@ import {
   IconPlus,
 } from '@tabler/icons-vue'
 import type { BookProgressStatus } from '~/types/book'
+import { renderQuoteCard, type CardTheme } from '~/services/share-cards'
 import { activeTheme } from '~/utils/theme'
 
 const title = ref('The Left Hand of Darkness')
@@ -942,6 +952,21 @@ const rating = ref(4)
 const stepperStatus = ref<BookProgressStatus>('reading')
 const dotIndex = ref(1)
 const pickedOption = ref('Paperback')
+const shareOpen = ref(false)
+const renderSampleCard = (theme: CardTheme) =>
+  renderQuoteCard(
+    {
+      note: {
+        createdAt: '2024-02-03T00:00:00.000Z',
+        page: 88,
+        content:
+          'The Beauty of the House is immeasurable; its Kindness infinite.',
+      },
+      title: 'Piranesi',
+      author: 'Susanna Clarke',
+    },
+    theme,
+  )
 
 const styleguideToast = ref<string | null>(null)
 function showStyleguideToast() {
